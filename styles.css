@@ -1,0 +1,1533 @@
+:root {
+  --ink: #14110E;
+  --ink-soft: #1c1814;
+  --brass: #B8894A;
+  --brass-dim: #7a5a2d;
+  --paper: #e8dcc3;
+  --paper-dim: #9a8f7a;
+  --rule: rgba(184, 137, 74, 0.22);
+  --rule-strong: rgba(184, 137, 74, 0.5);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  background: var(--ink);
+  color: var(--paper);
+  font-family: 'EB Garamond', Georgia, serif;
+  min-width: 1200px;
+}
+
+body {
+  padding: 56px 80px 80px;
+  max-width: 1600px;
+  margin: 0 auto;
+}
+
+/* ── Page header ─────────────────────────────────────────── */
+
+.page-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.page-header h1 {
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 500;
+  font-size: 48px;
+  letter-spacing: 2px;
+  color: var(--brass);
+}
+
+.page-header .sub {
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 11px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--paper-dim);
+  margin-top: 8px;
+}
+
+/* ── Tabs ─────────────────────────────────────────────────── */
+
+.tabs {
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+  border-bottom: 1px solid var(--rule);
+  margin-bottom: 48px;
+  padding-bottom: 0;
+}
+
+.tab {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 24px;
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 500;
+  font-size: 22px;
+  color: var(--paper-dim);
+  text-decoration: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  letter-spacing: 0.5px;
+  transition: color 0.15s, border-color 0.15s, opacity 0.15s;
+}
+
+.tab img {
+  width: 36px;
+  height: 36px;
+  display: block;
+  object-fit: contain;
+  opacity: 0.55;
+  transition: opacity 0.15s;
+}
+
+.tab-sigil {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 28px;
+  color: var(--brass);
+  opacity: 0.55;
+  transition: opacity 0.15s;
+  line-height: 1;
+}
+
+.tab:hover .tab-sigil { opacity: 0.85; }
+.tab.active .tab-sigil { opacity: 1; }
+
+.tab:hover {
+  color: var(--paper);
+}
+
+.tab:hover img {
+  opacity: 0.85;
+}
+
+.tab.active {
+  color: var(--brass);
+  border-bottom-color: var(--brass);
+}
+
+.tab.active img {
+  opacity: 1;
+}
+
+/* ── Character panel ─────────────────────────────────────── */
+
+.character {
+  display: none;
+}
+
+.character.active {
+  display: block;
+}
+
+.character-header {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 40px;
+  align-items: end;
+  padding-bottom: 28px;
+  border-bottom: 1px solid var(--rule-strong);
+  margin-bottom: 36px;
+}
+
+.company-intro {
+  text-align: center;
+  padding: 8px 0 40px;
+  border-bottom: 1px solid var(--rule-strong);
+  margin-bottom: 48px;
+}
+
+.company-intro-epithet {
+  font-family: 'EB Garamond', serif;
+  font-style: italic;
+  font-size: 20px;
+  color: var(--paper-dim);
+}
+
+.company-intro-meta {
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 11px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--paper-dim);
+  margin-top: 10px;
+}
+
+/* ── The Company sections ───────────────────────────────── */
+
+.company-section {
+  margin-bottom: 64px;
+}
+
+.company-section-header {
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 11px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--brass);
+  margin-bottom: 28px;
+  text-align: center;
+}
+
+.company-section-header::before,
+.company-section-header::after {
+  content: '—';
+  color: var(--brass-dim);
+  margin: 0 14px;
+}
+
+/* ── The Bestiary ───────────────────────────────────────── */
+
+.bestiary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  gap: 1px;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+  max-width: 1180px;
+  margin: 0 auto;
+}
+
+.bestiary-group {
+  background: var(--ink-soft);
+  padding: 24px 28px;
+}
+
+.bestiary-group-label {
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 10px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--brass);
+  margin-bottom: 14px;
+  border-bottom: 1px solid var(--rule);
+  padding-bottom: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.bestiary-group-label .count {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 22px;
+  color: var(--paper);
+  letter-spacing: 0;
+  text-transform: none;
+  font-variant-numeric: tabular-nums;
+}
+
+.bestiary-list {
+  list-style: none;
+}
+
+.bestiary-list li {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 16px;
+  align-items: baseline;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--rule);
+}
+
+.bestiary-list li:last-child {
+  border-bottom: none;
+}
+
+.bestiary-creature {
+  font-family: 'EB Garamond', serif;
+  font-size: 18px;
+  color: var(--paper);
+}
+
+.bestiary-marks {
+  font-family: 'Cormorant Garamond', serif;
+  color: var(--brass);
+  font-size: 18px;
+  letter-spacing: 4px;
+  line-height: 1;
+}
+
+/* ── The Chronicle (vertical, regnal-spine timeline) ────── */
+
+.chronicle {
+  display: grid;
+  grid-template-columns: 160px 1fr;
+  gap: 48px;
+  max-width: 1180px;
+  margin: 0 auto;
+  position: relative;
+}
+
+.chronicle-rail {
+  position: sticky;
+  top: 24px;
+  align-self: start;
+  padding-right: 20px;
+  border-right: 1px solid var(--rule);
+  min-height: 200px;
+  text-align: right;
+}
+
+.chronicle-rail-label {
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 10px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--paper-dim);
+  margin-bottom: 12px;
+}
+
+.chronicle-month {
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 500;
+  font-size: 28px;
+  color: var(--brass);
+  line-height: 1.1;
+  margin-bottom: 4px;
+}
+
+.chronicle-month-year {
+  font-family: 'EB Garamond', serif;
+  font-style: italic;
+  font-size: 13px;
+  color: var(--paper-dim);
+  margin-bottom: 20px;
+}
+
+.chronicle-month-count {
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--paper-dim);
+  font-variant-numeric: tabular-nums;
+}
+
+.chronicle-content {
+  min-width: 0;
+}
+
+/* Chapter */
+
+.chronicle-chapter {
+  margin-bottom: 56px;
+}
+
+.chronicle-chapter-head {
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--rule-strong);
+  margin-bottom: 24px;
+}
+
+.chronicle-chapter-label {
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 10px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--brass);
+  margin-bottom: 6px;
+}
+
+.chronicle-chapter-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 600;
+  font-size: 38px;
+  color: var(--paper);
+  letter-spacing: 0.5px;
+  line-height: 1.1;
+}
+
+.chronicle-chapter-epigraph {
+  font-family: 'EB Garamond', serif;
+  font-style: italic;
+  font-size: 16px;
+  color: var(--paper-dim);
+  margin-top: 10px;
+  max-width: 620px;
+}
+
+.chronicle-chapter-meta {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  margin-top: 18px;
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--paper-dim);
+  font-variant-numeric: tabular-nums;
+}
+
+.chronicle-chapter-meta b {
+  color: var(--paper);
+  font-weight: 500;
+}
+
+.chronicle-chapter-tally {
+  display: flex;
+  gap: 3px;
+  align-items: center;
+}
+
+.chronicle-chapter-tally img {
+  width: 20px;
+  height: 20px;
+  display: block;
+}
+
+/* Session entry — <details>/<summary> */
+
+.chronicle-session {
+  border-bottom: 1px solid var(--rule);
+  padding: 4px 0;
+}
+
+.chronicle-session:last-child {
+  border-bottom: none;
+}
+
+.chronicle-session[open] {
+  padding-bottom: 20px;
+}
+
+.chronicle-session > summary {
+  list-style: none;
+  cursor: pointer;
+  padding: 14px 0;
+  display: grid;
+  grid-template-columns: 80px 1fr 50px 110px 110px;
+  gap: 20px;
+  align-items: baseline;
+  color: var(--paper);
+  transition: color 0.12s;
+}
+
+.chronicle-session > summary::-webkit-details-marker {
+  display: none;
+}
+
+.chronicle-session > summary:hover {
+  color: var(--brass);
+}
+
+.chronicle-session-num {
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 10px;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: var(--paper-dim);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.chronicle-session-title {
+  font-family: 'EB Garamond', serif;
+  font-style: italic;
+  font-size: 20px;
+  line-height: 1.25;
+}
+
+.chronicle-session-iu {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 18px;
+  color: var(--brass);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+}
+
+.chronicle-session-real {
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 10px;
+  letter-spacing: 1.8px;
+  text-transform: uppercase;
+  color: var(--paper-dim);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.chronicle-session-kills-inline {
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 12px;
+  color: var(--brass);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.chronicle-session-kills-inline.empty {
+  color: var(--paper-dim);
+  font-style: italic;
+  font-family: 'EB Garamond', serif;
+  font-size: 13px;
+}
+
+.chronicle-session-body {
+  padding: 4px 0 8px 90px;
+}
+
+.chronicle-session-pips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: 10px;
+}
+
+.chronicle-session-pip {
+  width: 24px;
+  height: 24px;
+  display: block;
+}
+
+.chronicle-session-summary {
+  font-family: 'EB Garamond', serif;
+  font-size: 15px;
+  color: var(--paper-dim);
+  line-height: 1.5;
+  max-width: 680px;
+}
+
+/* ── The Constellation ──────────────────────────────────── */
+
+.constellation {
+  position: relative;
+  max-width: 1080px;
+  margin: 0 auto;
+  height: 440px;
+  padding: 24px 60px;
+}
+
+.constellation-plot {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-left: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
+}
+
+.constellation-axis-y,
+.constellation-axis-x {
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 9px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--paper-dim);
+  position: absolute;
+}
+
+.constellation-axis-y {
+  left: -4px;
+  top: 50%;
+  transform-origin: left top;
+  transform: rotate(-90deg) translateX(-50%);
+  white-space: nowrap;
+}
+
+.constellation-axis-x {
+  bottom: -22px;
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+}
+
+.constellation-star {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.constellation-star .portrait {
+  width: 72px;
+  height: 72px;
+}
+
+.constellation-star.absent .portrait {
+  opacity: 0.35;
+  filter: grayscale(100%);
+}
+
+.constellation-star .star-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 18px;
+  color: var(--paper);
+  margin-top: 4px;
+  line-height: 1;
+}
+
+.constellation-star .star-epithet {
+  font-family: 'EB Garamond', serif;
+  font-style: italic;
+  font-size: 11px;
+  color: var(--paper-dim);
+  margin-top: 2px;
+  max-width: 180px;
+  line-height: 1.2;
+}
+
+/* ── Distinctions (crowns) ──────────────────────────────── */
+
+.distinctions {
+  display: grid;
+  grid-template-columns: 80px 1fr auto;
+  gap: 28px;
+  max-width: 980px;
+  margin: 0 auto;
+}
+
+.distinction-row {
+  display: contents;
+}
+
+.distinction-portrait {
+  width: 64px;
+  height: 64px;
+  display: block;
+}
+
+.distinction-portrait-wrap {
+  padding: 16px 0;
+  border-bottom: 1px solid var(--rule);
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.distinction-portrait-wrap:last-of-type { border-bottom: none; }
+
+.distinction-title-wrap {
+  padding: 16px 0;
+  border-bottom: 1px solid var(--rule);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.distinction-title-wrap:last-of-type { border-bottom: none; }
+
+.distinction-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 600;
+  font-size: 22px;
+  color: var(--brass);
+  line-height: 1;
+}
+
+.distinction-title {
+  font-family: 'EB Garamond', serif;
+  font-style: italic;
+  font-size: 17px;
+  color: var(--paper);
+  margin-top: 4px;
+}
+
+.distinction-detail-wrap {
+  padding: 16px 0;
+  border-bottom: 1px solid var(--rule);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.distinction-detail-wrap:last-of-type { border-bottom: none; }
+
+.distinction-detail {
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 11px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--paper-dim);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.distinction-detail b {
+  color: var(--paper);
+  font-weight: 500;
+}
+
+/* ── The Patron Die (party-wide d20 histogram) ──────────── */
+
+.patron-die {
+  max-width: 1080px;
+  margin: 0 auto;
+}
+
+.patron-die-chart {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(20, 1fr);
+  gap: 3px;
+  height: 200px;
+  align-items: end;
+  padding: 0 2px;
+  overflow: hidden;
+}
+
+.patron-die .dice-col {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  height: 100%;
+  position: relative;
+}
+
+.patron-die .dice-count {
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--paper);
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+  margin-bottom: 4px;
+  min-height: 12px;
+}
+
+.patron-die .dice-count.zero {
+  color: var(--paper-dim);
+  opacity: 0.22;
+}
+
+.patron-die .dice-bar {
+  background: var(--brass);
+  width: 100%;
+}
+
+.patron-die .dice-bar.zero {
+  background: var(--rule);
+  height: 1px;
+}
+
+.patron-die .dice-col[data-val="20"] .dice-bar:not(.zero) {
+  background: var(--paper);
+}
+
+.patron-die .dice-col[data-val="1"] .dice-bar:not(.zero) {
+  background: #8a3a2a;
+}
+
+.patron-die-gm-overlay {
+  grid-column: 1 / -1;
+  grid-row: 1;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  pointer-events: none;
+}
+
+.patron-die-gm-line {
+  fill: none;
+  stroke: var(--paper-dim);
+  stroke-width: 1.5;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  opacity: 0.65;
+}
+
+.patron-die-legend {
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--paper-dim);
+  text-align: center;
+  margin-top: 16px;
+}
+
+.patron-die-legend .swatch {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  background: var(--brass);
+  margin-right: 6px;
+  vertical-align: middle;
+}
+
+.patron-die-legend .swatch.gm {
+  background: transparent;
+  border-top: 2px solid var(--paper-dim);
+  height: 0;
+  margin-right: 6px;
+  vertical-align: middle;
+  opacity: 0.65;
+}
+
+/* ── The Silent Roll ────────────────────────────────────── */
+
+.silent-roll {
+  max-width: 860px;
+  margin: 0 auto;
+  padding-top: 32px;
+  border-top: 1px solid var(--rule);
+}
+
+.silent-roll-list {
+  list-style: none;
+}
+
+.silent-roll-list li {
+  font-family: 'EB Garamond', serif;
+  font-style: italic;
+  font-size: 16px;
+  color: var(--paper-dim);
+  line-height: 1.6;
+  padding: 8px 0;
+  text-align: center;
+}
+
+.silent-roll-list li b {
+  font-style: normal;
+  color: var(--brass);
+  font-weight: 500;
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-right: 10px;
+  font-variant-numeric: tabular-nums;
+}
+
+.portrait {
+  width: 160px;
+  height: 160px;
+  display: block;
+  object-fit: contain;
+}
+
+.identity .name {
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 600;
+  font-size: 64px;
+  color: var(--brass);
+  line-height: 1;
+  letter-spacing: 0.5px;
+}
+
+.identity .epithet {
+  font-family: 'EB Garamond', serif;
+  font-style: italic;
+  font-size: 20px;
+  color: var(--paper-dim);
+  margin-top: 10px;
+}
+
+.identity .meta {
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 11px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--paper-dim);
+  margin-top: 20px;
+}
+
+.vitals-block {
+  display: flex;
+  gap: 40px;
+}
+
+.vital {
+  text-align: center;
+}
+
+.vital .label {
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 10px;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: var(--paper-dim);
+  display: block;
+}
+
+.vital .val {
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 40px;
+  font-weight: 500;
+  color: var(--paper);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  margin-top: 4px;
+  display: block;
+}
+
+/* ── Ability band ────────────────────────────────────────── */
+
+.abilities {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 1px;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+  margin-bottom: 36px;
+}
+
+.stat-card {
+  background: var(--ink-soft);
+  padding: 22px 18px 18px;
+  text-align: center;
+}
+
+.stat-card .stat-label {
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 10px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--paper-dim);
+}
+
+.stat-card .stat-val {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 56px;
+  font-weight: 600;
+  color: var(--paper);
+  line-height: 1;
+  margin-top: 10px;
+  font-variant-numeric: tabular-nums;
+}
+
+.stat-card .stat-mod {
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 16px;
+  color: var(--brass);
+  margin-top: 6px;
+  font-variant-numeric: tabular-nums;
+}
+
+.stat-card .stat-save {
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--paper-dim);
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--rule);
+  font-variant-numeric: tabular-nums;
+}
+
+.stat-card .stat-save.proficient {
+  color: var(--brass);
+}
+
+.stat-card .stat-save .save-mark {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--brass);
+  margin-right: 6px;
+  vertical-align: middle;
+  opacity: 0;
+}
+
+.stat-card .stat-save.proficient .save-mark {
+  opacity: 1;
+}
+
+/* ── Proficiencies (skills) ─────────────────────────────── */
+
+.proficiencies {
+  padding: 20px 0 28px;
+  border-bottom: 1px solid var(--rule);
+  margin-bottom: 48px;
+}
+
+.prof-label {
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 10px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--brass);
+  margin-bottom: 12px;
+}
+
+.prof-list {
+  font-family: 'EB Garamond', serif;
+  font-size: 18px;
+  color: var(--paper);
+  line-height: 1.6;
+}
+
+.prof-list .dim {
+  color: var(--paper-dim);
+  font-style: italic;
+  font-size: 15px;
+}
+
+/* ── Trials (stats section above reliquary) ─────────────── */
+
+.trials {
+  margin-bottom: 48px;
+}
+
+.trials-header,
+.sessions-header {
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 11px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--brass);
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.trials-header::before,
+.trials-header::after,
+.sessions-header::before,
+.sessions-header::after {
+  content: '—';
+  color: var(--brass-dim);
+  margin: 0 14px;
+}
+
+.trials-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+  margin-bottom: 44px;
+}
+
+.trial {
+  background: var(--ink-soft);
+  padding: 24px 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  text-align: center;
+  min-height: 168px;
+}
+
+.trial-label {
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 10px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--paper-dim);
+}
+
+.trial-val {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 54px;
+  font-weight: 600;
+  color: var(--paper);
+  line-height: 1;
+  margin-top: 16px;
+  font-variant-numeric: tabular-nums;
+}
+
+.trial-val.text {
+  font-size: 24px;
+  line-height: 1.2;
+  letter-spacing: 0.3px;
+}
+
+.trial-val.kinds {
+  font-family: 'EB Garamond', serif;
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 1.5;
+  font-style: italic;
+}
+
+.trial-sub {
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--paper-dim);
+  margin-top: 14px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Sessions chart (kills over time) ───────────────────── */
+
+.sessions {
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.sessions-chart {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 48px;
+  padding: 8px 0 34px;
+  border-bottom: 1px solid var(--rule);
+}
+
+.session-bar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 64px;
+  position: relative;
+}
+
+.session-bar .bar-stack {
+  height: 180px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.session-bar .bar-count {
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--paper);
+  font-variant-numeric: tabular-nums;
+  margin-bottom: 6px;
+}
+
+.session-bar .bar-count.zero {
+  color: var(--paper-dim);
+}
+
+.session-bar .bar {
+  width: 100%;
+  background: var(--brass);
+  min-height: 2px;
+}
+
+.session-bar .bar.zero {
+  background: var(--rule);
+  height: 2px;
+}
+
+.session-bar .bar-label {
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--paper-dim);
+  margin-top: 14px;
+  white-space: nowrap;
+  text-align: center;
+}
+
+/* ── Fortune (dice stats) ───────────────────────────────── */
+
+.fortune {
+  margin-bottom: 48px;
+}
+
+.fortune-header,
+.dice-hist-title {
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 11px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--brass);
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.fortune-header::before,
+.fortune-header::after,
+.dice-hist-title::before,
+.dice-hist-title::after {
+  content: '—';
+  color: var(--brass-dim);
+  margin: 0 14px;
+}
+
+.fortune-empty {
+  text-align: center;
+  font-family: 'EB Garamond', serif;
+  font-style: italic;
+  color: var(--paper-dim);
+  font-size: 17px;
+  padding: 4px 0 16px;
+}
+
+.dice-hist-wrap {
+  max-width: 1080px;
+  margin: 44px auto 0;
+}
+
+.dice-hist {
+  display: grid;
+  grid-template-columns: repeat(20, 1fr);
+  gap: 3px;
+  height: 180px;
+  align-items: end;
+  padding: 0 2px;
+}
+
+.dice-col {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  height: 100%;
+}
+
+.dice-col .dice-count {
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--paper);
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+  margin-bottom: 4px;
+  min-height: 12px;
+}
+
+.dice-col .dice-count.zero {
+  color: var(--paper-dim);
+  opacity: 0.22;
+}
+
+.dice-bar {
+  background: var(--brass);
+  width: 100%;
+}
+
+.dice-bar.zero {
+  background: var(--rule);
+  height: 1px;
+}
+
+.dice-col[data-val="20"] .dice-bar:not(.zero) {
+  background: var(--paper);
+}
+
+.dice-col[data-val="1"] .dice-bar:not(.zero) {
+  background: #8a3a2a;
+}
+
+.dice-labels {
+  display: grid;
+  grid-template-columns: repeat(20, 1fr);
+  gap: 3px;
+  margin-top: 10px;
+  padding: 6px 2px 0;
+  border-top: 1px solid var(--rule);
+}
+
+.dice-labels .lbl {
+  text-align: center;
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 10px;
+  color: var(--paper-dim);
+  font-variant-numeric: tabular-nums;
+}
+
+.dice-labels .lbl.nat {
+  color: var(--brass);
+  font-weight: 500;
+}
+
+/* ── Other Dice (non-d20 per-die breakdown) ─────────────── */
+
+.other-dice {
+  max-width: 820px;
+  margin: 44px auto 0;
+}
+
+.other-dice-title {
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 11px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--brass);
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.other-dice-title::before,
+.other-dice-title::after {
+  content: '—';
+  color: var(--brass-dim);
+  margin: 0 14px;
+}
+
+.dt-list {
+  list-style: none;
+}
+
+.dt-row {
+  display: grid;
+  grid-template-columns: 110px 1fr auto;
+  gap: 28px;
+  align-items: center;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--rule);
+}
+
+.dt-row:last-child {
+  border-bottom: none;
+}
+
+.dt-label {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 26px;
+  font-weight: 600;
+  color: var(--brass);
+  letter-spacing: 0.5px;
+}
+
+.dt-count {
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 11px;
+  letter-spacing: 1.5px;
+  color: var(--paper-dim);
+  text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
+  font-weight: 400;
+}
+
+.dt-chart {
+  width: 100%;
+  max-width: 400px;
+  height: 60px;
+  display: block;
+  justify-self: stretch;
+}
+
+.dt-chart .avg-line {
+  stroke: var(--paper-dim);
+  stroke-width: 1;
+  stroke-dasharray: 3 3;
+  opacity: 0.45;
+}
+
+.dt-chart .roll-line {
+  fill: none;
+  stroke: var(--brass);
+  stroke-width: 1.5;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.dt-chart .roll-dot {
+  fill: var(--brass);
+  transition: r 0.12s, fill 0.12s;
+}
+
+.dt-chart .roll-dot.active {
+  fill: var(--paper);
+  r: 4;
+}
+
+.dt-chart .hit {
+  fill: transparent;
+  cursor: help;
+  pointer-events: all;
+}
+
+.dt-chart .hit:focus {
+  outline: none;
+}
+
+.dice-tooltip {
+  position: fixed;
+  pointer-events: none;
+  background: var(--ink-soft);
+  color: var(--paper);
+  border: 1px solid var(--brass-dim);
+  padding: 8px 14px;
+  font-family: 'IBM Plex Sans', sans-serif;
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.12s;
+  z-index: 1000;
+  transform: translate(-50%, calc(-100% - 10px));
+  text-align: center;
+  box-shadow: 0 2px 14px rgba(0, 0, 0, 0.55);
+}
+
+.dice-tooltip.visible {
+  opacity: 1;
+}
+
+.dice-tooltip .tip-val {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--brass);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.dice-tooltip .tip-ctx {
+  font-size: 10px;
+  letter-spacing: 1.8px;
+  text-transform: uppercase;
+  color: var(--paper-dim);
+  margin-top: 6px;
+  font-variant-numeric: tabular-nums;
+}
+
+.dice-tooltip .tip-list {
+  list-style: none;
+  margin: 10px 0 0;
+  padding: 10px 0 0;
+  border-top: 1px solid var(--rule);
+  text-align: left;
+}
+
+.dice-tooltip .tip-list li {
+  font-family: 'EB Garamond', serif;
+  font-size: 14px;
+  color: var(--paper);
+  line-height: 1.5;
+  padding: 2px 0;
+  white-space: nowrap;
+}
+
+.dice-tooltip .tip-list li .method {
+  color: var(--paper-dim);
+  font-style: italic;
+}
+
+.session-bar {
+  cursor: help;
+}
+
+.dt-chart .axis-tick {
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 9px;
+  fill: var(--paper-dim);
+  opacity: 0.55;
+}
+
+.dt-stat {
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 11px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--paper-dim);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.dt-stat b {
+  color: var(--paper);
+  font-weight: 500;
+}
+
+/* ── Reliquary ──────────────────────────────────────────── */
+
+.reliquary {
+  margin-bottom: 24px;
+}
+
+.reliquary-header {
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 11px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--brass);
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+.reliquary-header::before,
+.reliquary-header::after {
+  content: '—';
+  color: var(--brass-dim);
+  margin: 0 14px;
+}
+
+.reliquary-empty {
+  font-family: 'EB Garamond', serif;
+  font-style: italic;
+  color: var(--paper-dim);
+  font-size: 17px;
+  text-align: center;
+  padding: 8px 0;
+}
+
+.fallen {
+  list-style: none;
+  max-width: 980px;
+  margin: 0 auto;
+}
+
+.fallen li {
+  display: grid;
+  grid-template-columns: 36px 1fr auto;
+  gap: 20px;
+  align-items: baseline;
+  padding: 22px 0;
+  border-bottom: 1px solid var(--rule);
+}
+
+.fallen li:last-child { border-bottom: none; }
+.fallen li:first-of-type { padding-top: 8px; }
+
+.fallen .mark {
+  font-family: 'Cormorant Garamond', serif;
+  color: var(--brass);
+  font-size: 26px;
+  line-height: 1;
+  text-align: center;
+  opacity: 0.9;
+}
+
+.fallen .verse {
+  font-family: 'EB Garamond', serif;
+  font-size: 22px;
+  line-height: 1.45;
+  color: var(--paper);
+}
+
+.fallen .verse .what {
+  font-style: italic;
+  color: var(--paper-dim);
+  font-size: 16px;
+  display: block;
+  margin-top: 6px;
+  letter-spacing: 0.2px;
+}
+
+.fallen .when {
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--paper-dim);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  padding-top: 6px;
+}
+
+.fallen li:first-of-type .verse::first-letter {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 64px;
+  float: left;
+  line-height: 0.85;
+  padding: 6px 12px 0 0;
+  color: var(--brass);
+  font-weight: 600;
+}
+
+/* ── Footer ─────────────────────────────────────────────── */
+
+.footnote {
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--paper-dim);
+  text-align: center;
+  margin-top: 72px;
+  padding-top: 32px;
+  border-top: 1px solid var(--rule);
+  opacity: 0.7;
+}
