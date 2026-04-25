@@ -45,7 +45,17 @@
         {%- for star in constellation.stars %}
           {%- set member = (party.members | selectattr("id", "equalto", star.id) | first) %}
           {%- set auth = characters_authored[star.id] %}
-        <div class="constellation-star" style="top: {{ star.top_pct }}%; left: {{ star.left_pct }}%;">
+        <div class="constellation-star" style="top: {{ star.top_pct }}%; left: {{ star.left_pct }}%;"
+             data-name="{{ star.name }}"
+             data-epithet="{{ auth.constellation_epithet }}"
+             data-xp="{{ star.xp }}"
+             data-rolls="{{ star.rolls }}"
+             data-kept-d20s="{{ star.kept_d20s }}"
+             data-kills="{{ star.kills }}"
+             data-avg="{{ star.avg }}"
+             data-sd="{{ star.sd }}"
+             data-crits="{{ star.crits }}"
+             data-fumbles="{{ star.fumbles }}">
           <img class="portrait" src="images/{{ member.image }}" alt="">
           <div class="star-name">{{ member.id | title }}</div>
           <div class="star-epithet">{{ auth.constellation_epithet }}</div>

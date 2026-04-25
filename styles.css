@@ -615,6 +615,7 @@ body {
 .constellation-star .portrait {
   width: 72px;
   height: 72px;
+  cursor: help;
 }
 
 .constellation-star .star-name {

@@ -588,7 +588,20 @@ def compute_constellation(party: dict, fortune_by_char: dict, trials: dict) -> d
         rolls = fortune_by_char[cid]["rolls_total"]
         left = round(xp / party_max_xp * 92 + 4) if party_max_xp else 4
         top = round(96 - rolls / party_max_rolls * 92) if party_max_rolls else 96
-        stars.append({"id": cid, "left_pct": left, "top_pct": top})
+        stars.append({
+            "id": cid,
+            "left_pct": left,
+            "top_pct": top,
+            "name": m.get("name") or cid.title(),
+            "xp": xp,
+            "rolls": rolls,
+            "kept_d20s": fortune_by_char[cid]["kept_d20s_count"],
+            "kills": trials["per_char"][cid]["kill_count"],
+            "avg": fortune_by_char[cid]["avg"],
+            "sd": fortune_by_char[cid]["sd"],
+            "crits": fortune_by_char[cid]["crits"],
+            "fumbles": fortune_by_char[cid]["fumbles"],
+        })
 
     return {
         "stars": stars,
