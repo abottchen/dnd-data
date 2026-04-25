@@ -549,6 +549,35 @@ def validate_all(data: dict, authored: dict) -> list[ValidationError]:
     errors.extend(validate_site(authored["site"]))
     return errors
 
+_ROMAN_PAIRS = [(1000,"M"),(900,"CM"),(500,"D"),(400,"CD"),(100,"C"),(90,"XC"),
+                (50,"L"),(40,"XL"),(10,"X"),(9,"IX"),(5,"V"),(4,"IV"),(1,"I")]
+
+def _to_roman(n: int) -> str:
+    out = ""
+    for val, s in _ROMAN_PAIRS:
+        while n >= val:
+            out += s
+            n -= val
+    return out
+
+def _mdy_to_iso(mdy: str) -> str:
+    """'03/15/2026' -> '2026-03-15'. Returns input unchanged if it doesn't match."""
+    parts = mdy.split("/")
+    if len(parts) != 3:
+        return mdy
+    m, d, y = parts
+    try:
+        return f"{int(y):04d}-{int(m):02d}-{int(d):02d}"
+    except ValueError:
+        return mdy
+
+def _has_chapter_marker(text: str) -> bool:
+    """Detect an explicit chapter boundary marker authored in a session log entry."""
+    if not text:
+        return False
+    low = text.lower()
+    return ("--- chapter" in low) or ("chapter " in low and " begins" in low)
+
 def load_data(data_dir: Path) -> dict:
     """Load upstream data files. Returns dict with party, dice_rolls, session_log."""
     data_dir = Path(data_dir)
@@ -603,14 +632,36 @@ def load_data(data_dir: Path) -> dict:
     party = dict(party)
     party["members"] = scrubbed_members
 
-    # Normalize session-log: upstream uses "id" and "realDate"; validators expect "session" and "date".
+    # Normalize session-log entries to the shape downstream expects:
+    #   session: Roman numeral from upstream `day` (1 -> I, 2 -> II, ...).
+    #   date: ISO YYYY-MM-DD from upstream `realDate` MM/DD/YYYY.
+    #   iu_day, iu_month, iu_year: snake-case from camelCase iuDay/iuMonth/iuYear.
+    #   chapter_marker: True when the upstream `text` contains an explicit chapter
+    #     boundary marker authored by the user (e.g. "--- Chapter II ---" or
+    #     "Chapter II begins."). First session implicitly opens Chapter I.
+    # Session I lacks in-universe date fields upstream; they get backfilled here,
+    # per the design rule: never edit upstream data, fill the gap at render time.
     normalized_entries = []
     for e in session_log.get("entries", []):
         ne = dict(e)
-        if "session" not in ne and "id" in ne:
-            ne["session"] = ne["id"]
+        if "session" not in ne and "day" in ne:
+            try:
+                ne["session"] = _to_roman(int(ne["day"]))
+            except (ValueError, TypeError):
+                ne["session"] = str(ne["day"])
         if "date" not in ne and "realDate" in ne:
-            ne["date"] = ne["realDate"]
+            ne["date"] = _mdy_to_iso(ne["realDate"])
+        for camel, snake in (("iuDay", "iu_day"), ("iuMonth", "iu_month"), ("iuYear", "iu_year")):
+            if camel in ne and snake not in ne:
+                ne[snake] = ne[camel]
+        # Backfill Session I's in-universe date (absent upstream).
+        if ne.get("session") == "I":
+            ne.setdefault("iu_day", "1")
+            ne.setdefault("iu_month", "Kythorn")
+            ne.setdefault("iu_year", "1494")
+        text = ne.get("text", "")
+        if _has_chapter_marker(text):
+            ne["chapter_marker"] = True
         normalized_entries.append(ne)
     session_log = dict(session_log)
     session_log["entries"] = normalized_entries
