@@ -2,8 +2,8 @@
 
 The helpers live in a gitignored skill directory so a fresh clone (or CI
 without the skill installed) gracefully skips these tests. When the skill
-IS installed, the helpers module is imported by manipulating sys.path —
-the helpers themselves do the same dance for `import build`.
+IS installed, this test file invokes the helper module via subprocess;
+the helpers themselves manipulate sys.path internally to `import build`.
 """
 import json
 import shutil
@@ -61,3 +61,15 @@ def helper_env(tmp_path):
 def test_skill_directory_present():
     """Sanity check that the skip guard would have triggered if absent."""
     assert HELPERS_PATH.exists()
+
+
+def test_helpers_cli_unknown_subcommand_exits_nonzero(helper_env):
+    result = subprocess.run(
+        [sys.executable, str(HELPERS_PATH), "no-such-subcommand"],
+        env={"HYDRATE_DATA_DIR": str(helper_env["data_dir"]),
+             "HYDRATE_AUTHORED_DIR": str(helper_env["authored_dir"]),
+             "HYDRATE_TEMP_DIR": str(helper_env["temp_dir"]),
+             "PATH": "/usr/bin:/bin"},
+        capture_output=True, text=True,
+    )
+    assert result.returncode != 0
