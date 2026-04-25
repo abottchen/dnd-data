@@ -3,7 +3,7 @@
 # message contains a forbidden name. Catches anything pre-commit / commit-msg
 # missed (e.g. commits authored before the hooks existed).
 #
-# Source list: .claude/skills/hydrate-ledger/dice-players.json -> forbidden_in_commits
+# Pattern source: .githooks/_forbidden-names.sh
 # Bypass (use sparingly): git push --no-verify
 
 hook_dir="$(cd "$(dirname "$0")" && pwd)"

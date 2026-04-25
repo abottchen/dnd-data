@@ -38,7 +38,7 @@ End-to-end verification: run `build.py` and visually check the rendered page via
 
 ## Skills available in this repo
 
-- **`hydrate-ledger`** (`.claude/skills/hydrate-ledger/`) — authors new prose into `authored/*.json` and runs `build.py`. Invoked when upstream data files change, when new sessions / kills / NPCs / chapters need verse / summary / epithet / title authored, or when the user asks to "hydrate", "rebuild", "update the site", "refresh the data". **The skill directory is gitignored** (it holds the real-name mapping) — it stays local-only, clone-specific. **Invoke this skill for any change to the site's contents, panels, or Company landing view.**
+- **`hydrate-ledger`** (`.claude/skills/hydrate-ledger/`) — authors new prose into `authored/*.json` and runs `build.py`. Invoked when upstream data files change, when new sessions / kills / NPCs / chapters need verse / summary / epithet / title authored, or when the user asks to "hydrate", "rebuild", "update the site", "refresh the data". **Invoke this skill for any change to the site's contents, panels, or Company landing view.**
 - **`bestiarylookup`** (`.claude/skills/bestiarylookup/`) — looks up a creature in 5etools data and returns its stats (type, CR, source, URL). Used by `hydrate-ledger` for the "Kinds Slain" trial card.
 
 ## External dependencies
@@ -56,11 +56,11 @@ End-to-end verification: run `build.py` and visually check the rendered page via
 
 ## Privacy
 
-`party.json` carries real player first names in the `player` field, dice-roll files carry real names or handles, and `session-log.json` narrative prose may reference real names. **None must appear on the rendered site.** All three source files are gitignored; the `hydrate-ledger` skill (also gitignored) holds the current name-to-character mapping and enforces scrubbing on every hydration.
+`party.json` carries real player first names in the `player` field, dice-roll files carry real first names + last names or handles, and `session-log.json` narrative prose may reference real names. **None must appear on the rendered site.** All three source files are gitignored. Last names exist nowhere else in the repo: the `hydrate-ledger` skill's `dice-players.json` keys on first-name (or handle) substrings, and `build.py:_resolve_dice_player` does longest-pattern-first substring lookup so an upstream `"FirstName LastName"` resolves through a `"FirstName"` key without the file ever recording the last name.
 
 ### Git hooks (forbidden-name guard)
 
-`.githooks/` contains versioned hooks (`pre-commit`, `commit-msg`, `pre-push`) that refuse to commit or push any change whose staged content, commit message, or pushed-commit content matches a forbidden name. The list is read at hook-time from the gitignored `.claude/skills/hydrate-ledger/dice-players.json` (`forbidden_in_commits` array), so the hook scripts themselves stay free of PII.
+`.githooks/` contains versioned hooks (`pre-commit`, `commit-msg`, `pre-push`) that refuse to commit or push any change whose staged content, commit message, or pushed-commit content matches a known full-name pattern. The pattern lives in `.githooks/_forbidden-names.sh` as a regex over the players' first names: `\b(Simon|Steve|Quinn|Mike|David)\s+[A-Z]\w+`. Bare first names are allowed (they appear unavoidably in test fixtures and party metadata); a first name immediately followed by a capitalized word — i.e. a likely full name — is refused. Update the alternation when a new player joins.
 
 Activate per clone with:
 

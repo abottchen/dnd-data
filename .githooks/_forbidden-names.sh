@@ -1,17 +1,13 @@
 #!/usr/bin/env bash
-# Helper: print a regex alternation of forbidden names from the gitignored
-# dice-players.json. Empty output means "no enforcement" (file or list missing).
-# Sourced by pre-commit, commit-msg, and pre-push hooks.
+# Helper: print the regex that pre-commit, commit-msg, and pre-push hooks
+# use to detect player real names in commits.
+#
+# The signal we want to block is "<player first name> <Capitalized word>" —
+# i.e. a full real name. The first names of the players currently at the
+# table are baked in below; bare first names are allowed (they already
+# appear unavoidably in CLAUDE.md, test fixtures, etc.). When a new player
+# joins the table, add their first name to the alternation.
 
-source_file=".claude/skills/hydrate-ledger/dice-players.json"
-[ -f "$source_file" ] || { echo ""; exit 0; }
-
-python3 - "$source_file" <<'PY'
-import json, re, sys
-try:
-    data = json.load(open(sys.argv[1]))
-    names = data.get("forbidden_in_commits", []) or []
-    print("|".join(re.escape(n) for n in names if isinstance(n, str) and n))
-except Exception:
-    print("")
-PY
+# Word-boundary on each side, alternation of first names, one-or-more
+# whitespace, then a Capitalized token (the suspected last name).
+echo "\\b(Simon|Steve|Quinn|Mike|David)[[:space:]]+[A-Z][a-zA-Z'-]+\\b"
