@@ -6,9 +6,9 @@
 
 # Sensitive source data — contains real player names/handles.
 # Not needed to display index.html; hydration runs locally against these.
-party.json
-dicex-rolls-*.json
-session-log.json
+data/party.json
+data/dicex-rolls-*.json
+data/session-log.json
 
 # Python build artifacts
 __pycache__/

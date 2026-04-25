@@ -16,7 +16,8 @@ from pathlib import Path
 from statistics import pstdev
 from typing import Optional
 
-REPO_ROOT = Path(__file__).resolve().parent
+BUILD_DIR = Path(__file__).resolve().parent
+REPO_ROOT = BUILD_DIR.parent
 
 KIND_MISSING = "MISSING"
 KIND_MALFORMED = "MALFORMED"
@@ -1087,9 +1088,9 @@ def render_page(context: dict, templates_dir: Path, out_path: Path) -> None:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Render index.html.")
-    parser.add_argument("--data-dir", default=str(REPO_ROOT),
+    parser.add_argument("--data-dir", default=str(REPO_ROOT / "data"),
                         help="Directory containing party.json etc.")
-    parser.add_argument("--out", default=str(REPO_ROOT / "index.html"),
+    parser.add_argument("--out", default=str(REPO_ROOT / "site" / "index.html"),
                         help="Output HTML path.")
     parser.add_argument("--strict", action="store_true",
                         help="Abort on any validation error (default: True).")
@@ -1097,7 +1098,7 @@ def main() -> int:
 
     print(f"build.py: starting (data_dir={args.data_dir})")
     data = load_data(Path(args.data_dir))
-    authored = load_authored(REPO_ROOT)
+    authored = load_authored(BUILD_DIR)
     party_count = len(data['party']) if isinstance(data['party'], list) else len(data['party'].get('members', []))
     session_count = len(data['session_log'].get('entries', []))
     dice_count = sum(len(r) for r in data['dice_rolls'])
@@ -1114,7 +1115,7 @@ def main() -> int:
         return 1
     print("build.py: validation passed")
 
-    templates_dir = REPO_ROOT / "templates"
+    templates_dir = BUILD_DIR / "templates"
     base_template = templates_dir / "base.html"
     if not base_template.exists():
         print(f"build.py: no templates/base.html yet; skipping render (compute only). "

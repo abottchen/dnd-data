@@ -1,22 +1,22 @@
 ---
 name: hydrate-ledger
-description: Add new prose entries to the dnd-data site's authored store and run build.py. Invoke whenever upstream data files change (party.json, dicex-rolls-*.json, session-log.json), when new sessions / kills / NPCs / chapters appear and need verse / summary / epithet / title authored, when build.py reports MISSING or MALFORMED errors, or when the user asks to "hydrate", "rebuild", "update the site", "refresh the data". The skill does NOT modify templates or build.py — only authored/*.json files.
+description: Add new prose entries to the dnd-data site's authored store and run build.py. Invoke whenever upstream data files change (party.json, dicex-rolls-*.json, session-log.json), when new sessions / kills / NPCs / chapters appear and need verse / summary / epithet / title authored, when build.py reports MISSING or MALFORMED errors, or when the user asks to "hydrate", "rebuild", "update the site", "refresh the data". The skill does NOT modify templates or build.py — only build/authored/*.json files.
 ---
 
 # Hydrate Ledger
 
-Author new prose into `authored/*.json` and run `build.py`. The build is the deterministic renderer; this skill's only writable surface is the authored store.
+Author new prose into `build/authored/*.json` and run `build.py`. The build is the deterministic renderer; this skill's only writable surface is the authored store.
 
 ## Architecture (read this first)
 
 `build.py` is the authoritative contract:
-- Reads `party.json`, `dicex-rolls-*.json`, `session-log.json` (upstream, gitignored, read-only).
+- Reads `data/party.json`, `data/dicex-rolls-*.json`, `data/session-log.json` (upstream, gitignored, read-only).
 - Computes every number on the page (trials, fortune, constellation, bestiary, chronicle, etc.).
-- Loads `authored/*.json` for prose.
+- Loads `build/authored/*.json` for prose.
 - Validates: every kill, session, chapter, NPC, character, and site singleton must have an authored entry. Missing → `MISSING <type> <key>`.
-- Renders `templates/*.html` (Jinja2) into `index.html`.
+- Renders `build/templates/*.html` (Jinja2) into `site/index.html`.
 
-The page structure (HTML/CSS), every formula, the histogram math, the SVG layout, the scrubbing of upstream real names — all of that lives in `build.py` and `templates/`. You do not modify those. Your job: write prose entries that satisfy `build.py`'s schema and pass its validation.
+The page structure (HTML/CSS), every formula, the histogram math, the SVG layout, the scrubbing of upstream real names — all of that lives in `build/build.py` and `build/templates/`. You do not modify those. Your job: write prose entries that satisfy `build/build.py`'s schema and pass its validation.
 
 ## Workflow
 
@@ -29,7 +29,7 @@ The page structure (HTML/CSS), every formula, the histogram math, the SVG layout
 The skill is an orchestrator. It does not load narrative data. Slice helpers
 introspect upstream + authored state; dispatch subagents author prose.
 
-1. **Read authored state and create the run's temp dir.** Read `authored/*.json`
+1. **Read authored state and create the run's temp dir.** Read `build/authored/*.json`
    and the marker `site.refreshed_through_session`. Create a single temp directory
    for this run (e.g. `mktemp -d -t hydrate-XXXXXX`) and export
    `HYDRATE_TEMP_DIR=<that-path>`. Every helper invocation in steps 2 and 6 must
@@ -57,7 +57,7 @@ introspect upstream + authored state; dispatch subagents author prose.
    `.claude/skills/hydrate-ledger/voice-samples.md`.
 4. **Append pass — apply.** For each returned JSON object, validate against
    the append schema (`fields` present, `reason` present). Append entries to
-   the appropriate `authored/*.json` file. For `append-chapters` (which
+   the appropriate `build/authored/*.json` file. For `append-chapters` (which
    returns candidates), surface candidates to the user and apply their
    selection.
 5. **Refresh pass — trigger check.** Compute `latest_session = len(session_log.entries)`.
@@ -85,7 +85,7 @@ introspect upstream + authored state; dispatch subagents author prose.
 9. **Bump marker on full refresh success.** If every refresh dispatch
    succeeded (after retries), set `site.refreshed_through_session = latest_session`.
    Partial failure → leave marker untouched.
-10. **Build.** Run `.venv/bin/python build.py`. On `MISSING <type> <key>` or
+10. **Build.** Run `.venv/bin/python build/build.py`. On `MISSING <type> <key>` or
     `MALFORMED <type> <key> field=<f>`: targeted single-dispatch for the
     offending entity (max 3 iterations).
 11. **Report.** Print the end-of-run report (see below).
@@ -95,9 +95,9 @@ introspect upstream + authored state; dispatch subagents author prose.
 Several dispatch templates return `fields` as a dict-of-entities rather than a
 single entry — one dispatch yields multiple authored writes:
 
-- **`append-kills`**: `fields` keys are `<character>__<date>__<creature>__<method>` tuples; each value is a `{verse, annotation}` pair. Iterate keys; parse each into a kill row and append to `authored/kills.json`.
-- **`append-characters`**: `fields` keys are character ids; each value is the 6-field bundle. Iterate keys; append each as a row to `authored/characters.json`.
-- **`refresh-characters`**: `fields` keys are character ids; each value is the 5-field rewrite. Iterate keys; for each, find the matching row in `authored/characters.json` and overwrite the 5 evolvable fields (preserving `reliquary_header` which is locked).
+- **`append-kills`**: `fields` keys are `<character>__<date>__<creature>__<method>` tuples; each value is a `{verse, annotation}` pair. Iterate keys; parse each into a kill row and append to `build/authored/kills.json`.
+- **`append-characters`**: `fields` keys are character ids; each value is the 6-field bundle. Iterate keys; append each as a row to `build/authored/characters.json`.
+- **`refresh-characters`**: `fields` keys are character ids; each value is the 5-field rewrite. Iterate keys; for each, find the matching row in `build/authored/characters.json` and overwrite the 5 evolvable fields (preserving `reliquary_header` which is locked).
 
 For non-bundle templates (`append-sessions`, `append-chapters`, `append-npcs`, `refresh-chapters`, `refresh-npcs`, `refresh-road-ahead`, `refresh-intro-epithet`), `fields` is a single object representing one entity.
 
@@ -105,7 +105,7 @@ For non-bundle templates (`append-sessions`, `append-chapters`, `append-npcs`, `
 
 (All schemas mirror `build.py`'s validators. JSON, one file per content type.)
 
-### `authored/kills.json`
+### `build/authored/kills.json`
 Array. Key: `(character, date, creature, method)` tuple, case-insensitive on creature/method.
 ```json
 { "character": "anton", "date": "2026-04-23",
@@ -113,7 +113,7 @@ Array. Key: `(character, date, creature, method)` tuple, case-insensitive on cre
   "verse": "...", "annotation": "..." }
 ```
 
-### `authored/sessions.json`
+### `build/authored/sessions.json`
 ```json
 { "session": 5, "date": "2026-04-19",
   "title": "...", "summary": "...",
@@ -121,20 +121,20 @@ Array. Key: `(character, date, creature, method)` tuple, case-insensitive on cre
 ```
 `silent_roll` may be `[]` for sessions with no off-Chronicle beat. `chapter_id` is optional.
 
-### `authored/chapters.json`
+### `build/authored/chapters.json`
 ```json
 { "id": 2, "starts_at_session": 7,
   "title": "...", "epigraph": "..." }
 ```
 A new chapter opens when an upstream session log entry contains a marker like `--- Chapter II ---` or `Chapter II begins.`. Propose 2-3 candidate titles + epigraphs to the user and let them pick.
 
-### `authored/npcs.json`
+### `build/authored/npcs.json`
 ```json
 { "name": "Azlund", "allegiance": "with", "epithet": "..." }
 ```
 `allegiance` is `"with"` or `"against"`.
 
-### `authored/characters.json`
+### `build/authored/characters.json`
 ```json
 { "id": "anton",
   "epithet": "of the Halflings, whose tongue cuts sharper than his blade",
@@ -146,7 +146,7 @@ A new chapter opens when an upstream session log entry contains a marker like `-
 ```
 `epithet` is the prose oneliner shown beneath the character's name in the page header (e.g. "of the Wulven, sworn to the hunt"). Voice: kenning-style, evocative of race/lineage and signature trait. `distinction_title` must be unique across the party (validator enforces).
 
-### `authored/site.json`
+### `build/authored/site.json`
 Singleton object: `intro_epithet`, `page_title`, `page_subtitle`, `road_ahead.{known, was_known, direction}`, `gm.{name, epithet, meta}`, `known_npcs`, `footnote`, `refreshed_through_session`.
 
 `refreshed_through_session` is the integer marker driving the refresh pass (see below). Validator requires `0 <= value <= latest_session`. The skill bumps it after every successful refresh pass.
@@ -249,7 +249,7 @@ Always load `voice-samples.md` in this skill's directory before authoring. Match
 
 ## Scrubbing
 
-Real names from upstream data files must NOT appear on the rendered page or in `authored/*.json`. The character slug is derived from the first word of `name`, lowercased (handled by `build.py`'s `load_data`). Schematically: `<id> (id) / <first name> (player) / <character name> (name) → slug`. The mapping is data-driven from `party.json`; the skill never hardcodes player or character names.
+Real names from upstream data files must NOT appear on the rendered page or in `build/authored/*.json`. The character slug is derived from the first word of `name`, lowercased (handled by `build.py`'s `load_data`). Schematically: `<id> (id) / <first name> (player) / <character name> (name) → slug`. The mapping is data-driven from `party.json`; the skill never hardcodes player or character names.
 
 Dice-roll player names map to slugs via `dice-players.json` in this directory. Keys are first-name or handle substrings (never full real names) — `build.py:_resolve_dice_player` does longest-pattern-first substring lookup, so an upstream full name like `"Simon ___"` resolves through a key of `"Simon"` without the file ever recording the last name. Add a new entry whenever a new player appears in the dice rolls.
 
@@ -267,13 +267,13 @@ These are computed by `build.py`:
 - Chapter portrait tallies.
 - Patron Die histogram.
 - Company ledger totals.
-- `intro_meta` ("N Sessions · Month Year DR") — derived from the session log in `build.py`. The validator rejects a still-present `intro_meta` field in `authored/site.json` as a dead-field guard.
+- `intro_meta` ("N Sessions · Month Year DR") — derived from the session log in `build.py`. The validator rejects a still-present `intro_meta` field in `build/authored/site.json` as a dead-field guard.
 
-If the user asks for a change to any of these, the change is in `build.py` or upstream data — not in `authored/*.json`.
+If the user asks for a change to any of these, the change is in `build.py` or upstream data — not in `build/authored/*.json`.
 
 ## Page anatomy reference
 
-For HTML structure, see `templates/*.html`. These are frozen; do not modify them as part of normal hydration.
+For HTML structure, see `build/templates/*.html`. These are frozen; do not modify them as part of normal hydration.
 
 ## End-of-run report
 
