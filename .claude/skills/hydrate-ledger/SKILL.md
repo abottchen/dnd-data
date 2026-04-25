@@ -115,7 +115,7 @@ Array. Key: `(character, date, creature, method)` tuple, case-insensitive on cre
 
 ### `authored/sessions.json`
 ```json
-{ "session": "V", "date": "2026-04-19",
+{ "session": 5, "date": "2026-04-19",
   "title": "...", "summary": "...",
   "silent_roll": ["...", "..."], "chapter_id": 1 }
 ```
@@ -123,7 +123,7 @@ Array. Key: `(character, date, creature, method)` tuple, case-insensitive on cre
 
 ### `authored/chapters.json`
 ```json
-{ "id": 2, "starts_at_session": "VII",
+{ "id": 2, "starts_at_session": 7,
   "title": "...", "epigraph": "..." }
 ```
 A new chapter opens when an upstream session log entry contains a marker like `--- Chapter II ---` or `Chapter II begins.`. Propose 2-3 candidate titles + epigraphs to the user and let them pick.

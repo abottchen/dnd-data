@@ -9,8 +9,8 @@ def test_validation_error_format_missing():
     assert str(e) == "MISSING kills (anton, 2026-04-23, yuan-ti broodguard, vicious mockery)"
 
 def test_validation_error_format_malformed():
-    e = ValidationError(KIND_MALFORMED, "sessions", ("V",), field="title")
-    assert str(e) == "MALFORMED sessions (V) field=title"
+    e = ValidationError(KIND_MALFORMED, "sessions", (5,), field="title")
+    assert str(e) == "MALFORMED sessions (5) field=title"
 
 def test_validation_error_format_orphan():
     e = ValidationError(KIND_ORPHAN, "kills", ("anton", "2025-12-15", "gnoll", "scimitar"))
@@ -73,19 +73,19 @@ def test_validate_kills_case_insensitive_creature_match():
 # --- Task 6: new validator tests ---
 
 def test_validate_sessions_missing():
-    log = {"entries": [{"session": "V", "date": "2026-04-23"}]}
+    log = {"entries": [{"session": 5, "date": "2026-04-23"}]}
     errors = validate_sessions(log, [])
     assert len(errors) == 1
     assert errors[0].kind == "MISSING"
 
 def test_validate_sessions_malformed_missing_silent_roll():
-    log = {"entries": [{"session": "V", "date": "2026-04-23"}]}
-    authored = [{"session": "V", "title": "t", "summary": "s"}]  # silent_roll missing
+    log = {"entries": [{"session": 5, "date": "2026-04-23"}]}
+    authored = [{"session": 5, "title": "t", "summary": "s"}]  # silent_roll missing
     errors = validate_sessions(log, authored)
     assert any(e.field == "silent_roll" for e in errors)
 
 def test_validate_chapters_missing():
-    log = {"entries": [{"session": "I", "chapter_marker": True}]}
+    log = {"entries": [{"session": 1, "chapter_marker": True}]}
     errors = validate_chapters(log, [])
     assert any(e.kind == "MISSING" for e in errors)
 

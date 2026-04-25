@@ -772,8 +772,13 @@ def _render_session(entry: dict, auth_by_id: dict, kills_by_date: dict) -> dict:
     kills = kills_by_date.get(entry["date"], [])
     iu_day = entry.get("iu_day", "")
     iu_month = entry.get("iu_month", "Kythorn")
+    try:
+        label = _to_roman(int(sess_id))
+    except (ValueError, TypeError):
+        label = str(sess_id)
     return {
         "id": sess_id,
+        "label": label,
         "title": auth.get("title", ""),
         "summary": auth.get("summary", ""),
         "silent_roll": auth.get("silent_roll", []),
@@ -914,29 +919,30 @@ def load_data(data_dir: Path) -> dict:
     party["members"] = scrubbed_members
 
     # Normalize session-log entries to the shape downstream expects:
-    #   session: Roman numeral from upstream `day` (1 -> I, 2 -> II, ...).
+    #   session: integer ordinal from upstream `day` (the join key into authored
+    #     sessions/chapters). The Roman label is computed at render time only.
     #   date: ISO YYYY-MM-DD from upstream `realDate` MM/DD/YYYY.
     #   iu_day, iu_month, iu_year: snake-case from camelCase iuDay/iuMonth/iuYear.
     #   chapter_marker: True when the upstream `text` contains an explicit chapter
     #     boundary marker authored by the user (e.g. "--- Chapter II ---" or
     #     "Chapter II begins."). First session implicitly opens Chapter I.
-    # Session I lacks in-universe date fields upstream; they get backfilled here,
+    # Session 1 lacks in-universe date fields upstream; they get backfilled here,
     # per the design rule: never edit upstream data, fill the gap at render time.
     normalized_entries = []
     for e in session_log.get("entries", []):
         ne = dict(e)
         if "session" not in ne and "day" in ne:
             try:
-                ne["session"] = _to_roman(int(ne["day"]))
+                ne["session"] = int(ne["day"])
             except (ValueError, TypeError):
-                ne["session"] = str(ne["day"])
+                ne["session"] = ne["day"]
         if "date" not in ne and "realDate" in ne:
             ne["date"] = _mdy_to_iso(ne["realDate"])
         for camel, snake in (("iuDay", "iu_day"), ("iuMonth", "iu_month"), ("iuYear", "iu_year")):
             if camel in ne and snake not in ne:
                 ne[snake] = ne[camel]
-        # Backfill Session I's in-universe date (absent upstream).
-        if ne.get("session") == "I":
+        # Backfill Session 1's in-universe date (absent upstream).
+        if ne.get("session") == 1:
             ne.setdefault("iu_day", "1")
             ne.setdefault("iu_month", "Kythorn")
             ne.setdefault("iu_year", "1494")
