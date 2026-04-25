@@ -698,13 +698,13 @@ def compute_chronicle(session_log: dict, sessions_authored: list, chapters_autho
     chapter_by_starts = {a["starts_at_session"]: a for a in chapters_authored if "starts_at_session" in a}
 
     # Determine chapter spans: every chapter_marker opens a chapter; first session implicitly opens one.
-    chapter_starts: list[str] = []
+    chapter_starts: list[int] = []
     for e in entries:
         if not chapter_starts or e.get("chapter_marker"):
             chapter_starts.append(e["session"])
 
     # Map each session to its chapter's starting session
-    session_to_chapter: dict[str, str] = {}
+    session_to_chapter: dict[int, int] = {}
     current = None
     for e in entries:
         if e["session"] in chapter_starts:
@@ -772,13 +772,9 @@ def _render_session(entry: dict, auth_by_id: dict, kills_by_date: dict) -> dict:
     kills = kills_by_date.get(entry["date"], [])
     iu_day = entry.get("iu_day", "")
     iu_month = entry.get("iu_month", "Kythorn")
-    try:
-        label = _to_roman(int(sess_id))
-    except (ValueError, TypeError):
-        label = str(sess_id)
     return {
         "id": sess_id,
-        "label": label,
+        "label": _to_roman(sess_id),
         "title": auth.get("title", ""),
         "summary": auth.get("summary", ""),
         "silent_roll": auth.get("silent_roll", []),
