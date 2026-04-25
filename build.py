@@ -538,6 +538,96 @@ def compute_company_ledger(party: dict, dice_files: list, session_log: dict, tri
         "sessions_kept": sessions_kept,
     }
 
+FORGOTTEN_REALMS_MONTHS = [
+    "Hammer", "Alturiak", "Ches", "Tarsakh", "Mirtul", "Kythorn",
+    "Flamerule", "Eleasis", "Eleint", "Marpenoth", "Uktar", "Nightal",
+]
+
+def compute_chronicle(session_log: dict, sessions_authored: list, chapters_authored: list, party: dict) -> dict:
+    entries = session_log.get("entries", [])
+    auth_session_by_id = {a["session"]: a for a in sessions_authored}
+    chapter_by_starts = {a["starts_at_session"]: a for a in chapters_authored if "starts_at_session" in a}
+
+    # Determine chapter spans: every chapter_marker opens a chapter; first session implicitly opens one.
+    chapter_starts: list[str] = []
+    for e in entries:
+        if not chapter_starts or e.get("chapter_marker"):
+            chapter_starts.append(e["session"])
+
+    # Map each session to its chapter's starting session
+    session_to_chapter: dict[str, str] = {}
+    current = None
+    for e in entries:
+        if e["session"] in chapter_starts:
+            current = e["session"]
+        session_to_chapter[e["session"]] = current
+
+    # Per-date -> [character ids] for portrait tallies + pip pips
+    party_kills_by_date: dict[str, list[str]] = {}
+    for m in party.get("members", []):
+        for k in m.get("kills", []):
+            party_kills_by_date.setdefault(k["date"], []).append(m["id"])
+
+    chapters = []
+    for idx, start_id in enumerate(chapter_starts, start=1):
+        ch = chapter_by_starts.get(start_id, {})
+        sess_in_chapter = [e for e in entries if session_to_chapter[e["session"]] == start_id]
+        portrait_counts: Counter = Counter()
+        kill_total = 0
+        for e in sess_in_chapter:
+            for cid in party_kills_by_date.get(e["date"], []):
+                portrait_counts[cid] += 1
+                kill_total += 1
+        portraits: list[str] = []
+        for cid, n in sorted(portrait_counts.items(), key=lambda kv: (-kv[1], kv[0])):
+            portraits.extend([cid] * n)
+
+        chapters.append({
+            "label": _to_roman(idx),
+            "title": ch.get("title", ""),
+            "epigraph": ch.get("epigraph", ""),
+            "starts_at": start_id,
+            "session_count": len(sess_in_chapter),
+            "kill_count": kill_total,
+            "portrait_tally": portraits,
+            "sessions": [_render_session(e, auth_session_by_id, party_kills_by_date)
+                         for e in sess_in_chapter],
+        })
+
+    # Regnal rail: (year, month) -> session count, ordered by Forgotten Realms month order.
+    months_by_year: dict[str, dict[str, int]] = {}
+    for e in entries:
+        iu_m = e.get("iu_month") or "Kythorn"
+        iu_y = e.get("iu_year") or "1494"
+        year = f"{iu_y} DR" if not iu_y.endswith("DR") else iu_y
+        months_by_year.setdefault(year, {})
+        months_by_year[year][iu_m] = months_by_year[year].get(iu_m, 0) + 1
+    rail = []
+    for year, ms in months_by_year.items():
+        ordered = [m for m in FORGOTTEN_REALMS_MONTHS if m in ms]
+        for m in ordered:
+            rail.append({"month": m, "year": year, "count": ms[m]})
+
+    return {"chapters": chapters, "rail": rail}
+
+def _render_session(entry: dict, auth_by_id: dict, kills_by_date: dict) -> dict:
+    sess_id = entry["session"]
+    auth = auth_by_id.get(sess_id, {})
+    kills = kills_by_date.get(entry["date"], [])
+    iu_day = entry.get("iu_day", "")
+    iu_month = entry.get("iu_month", "Kythorn")
+    return {
+        "id": sess_id,
+        "title": auth.get("title", ""),
+        "summary": auth.get("summary", ""),
+        "silent_roll": auth.get("silent_roll", []),
+        "real_date": entry["date"],
+        "real_date_label": _short_date(entry["date"]),
+        "iu_date": f"{iu_day} {iu_month}".strip(),
+        "kills_count": len(kills),
+        "kill_pips": kills,
+    }
+
 def validate_all(data: dict, authored: dict) -> list[ValidationError]:
     errors: list[ValidationError] = []
     errors.extend(validate_kills(data["party"], authored["kills"]))
