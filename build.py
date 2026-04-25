@@ -69,6 +69,103 @@ def validate_kills(party: dict, authored: list) -> list[ValidationError]:
 
     return errors
 
+REQUIRED_SESSION_FIELDS = ("title", "summary", "silent_roll")
+REQUIRED_CHAPTER_FIELDS = ("title", "epigraph")
+REQUIRED_NPC_FIELDS = ("epithet",)
+REQUIRED_CHAR_FIELDS = ("reliquary_header", "constellation_epithet")
+REQUIRED_SITE_FIELDS = ("intro_epithet", "intro_meta", "page_title", "page_subtitle")
+
+def _missing_or_blank(entry: dict, field: str) -> bool:
+    v = entry.get(field)
+    if v is None:
+        return True
+    if isinstance(v, str) and not v.strip():
+        return True
+    if isinstance(v, list) and len(v) == 0:
+        return True
+    return False
+
+def validate_sessions(session_log: dict, authored: list) -> list[ValidationError]:
+    errors: list[ValidationError] = []
+    expected = {e["session"]: e for e in session_log.get("entries", [])}
+    by_key = {a["session"]: a for a in authored}
+    for sess_id in expected:
+        a = by_key.get(sess_id)
+        if a is None:
+            errors.append(ValidationError(KIND_MISSING, "sessions", (sess_id,)))
+            continue
+        for f in REQUIRED_SESSION_FIELDS:
+            if _missing_or_blank(a, f):
+                errors.append(ValidationError(KIND_MALFORMED, "sessions", (sess_id,), field=f))
+    for sess_id in by_key:
+        if sess_id not in expected:
+            errors.append(ValidationError(KIND_ORPHAN, "sessions", (sess_id,)))
+    return errors
+
+def validate_chapters(session_log: dict, authored: list) -> list[ValidationError]:
+    """Each chapter_marker session opens a chapter that needs authored content.
+    The first session implicitly opens a chapter even without an explicit marker."""
+    errors: list[ValidationError] = []
+    chapter_sessions = [e["session"] for e in session_log.get("entries", []) if e.get("chapter_marker")]
+    by_starts = {a["starts_at_session"]: a for a in authored if "starts_at_session" in a}
+    if session_log.get("entries"):
+        first = session_log["entries"][0]["session"]
+        if first not in by_starts and first not in chapter_sessions:
+            chapter_sessions = [first] + chapter_sessions
+    for s in chapter_sessions:
+        a = by_starts.get(s)
+        if a is None:
+            errors.append(ValidationError(KIND_MISSING, "chapters", (s,)))
+            continue
+        for f in REQUIRED_CHAPTER_FIELDS:
+            if _missing_or_blank(a, f):
+                errors.append(ValidationError(KIND_MALFORMED, "chapters", (s,), field=f))
+    for s in by_starts:
+        if s not in chapter_sessions:
+            errors.append(ValidationError(KIND_ORPHAN, "chapters", (s,)))
+    return errors
+
+def validate_npcs(npcs_in_log: list, authored: list) -> list[ValidationError]:
+    errors: list[ValidationError] = []
+    expected = set(npcs_in_log)
+    by_name = {a["name"]: a for a in authored}
+    for n in expected:
+        a = by_name.get(n)
+        if a is None:
+            errors.append(ValidationError(KIND_MISSING, "npcs", (n,)))
+            continue
+        for f in REQUIRED_NPC_FIELDS:
+            if _missing_or_blank(a, f):
+                errors.append(ValidationError(KIND_MALFORMED, "npcs", (n,), field=f))
+    for n in by_name:
+        if n not in expected:
+            errors.append(ValidationError(KIND_ORPHAN, "npcs", (n,)))
+    return errors
+
+def validate_characters(party: dict, authored: list) -> list[ValidationError]:
+    errors: list[ValidationError] = []
+    expected = {m["id"] for m in party.get("members", [])}
+    by_id = {a["id"]: a for a in authored}
+    for cid in expected:
+        a = by_id.get(cid)
+        if a is None:
+            errors.append(ValidationError(KIND_MISSING, "characters", (cid,)))
+            continue
+        for f in REQUIRED_CHAR_FIELDS:
+            if _missing_or_blank(a, f):
+                errors.append(ValidationError(KIND_MALFORMED, "characters", (cid,), field=f))
+    for cid in by_id:
+        if cid not in expected:
+            errors.append(ValidationError(KIND_ORPHAN, "characters", (cid,)))
+    return errors
+
+def validate_site(site: dict) -> list[ValidationError]:
+    errors: list[ValidationError] = []
+    for f in REQUIRED_SITE_FIELDS:
+        if _missing_or_blank(site, f):
+            errors.append(ValidationError(KIND_MALFORMED, "site", ("singleton",), field=f))
+    return errors
+
 def load_data(data_dir: Path) -> dict:
     """Load upstream data files. Returns dict with party, dice_rolls, session_log."""
     data_dir = Path(data_dir)

@@ -1,5 +1,8 @@
 import pytest
-from build import ValidationError, KIND_MISSING, KIND_MALFORMED, KIND_ORPHAN, validate_kills
+from build import (
+    ValidationError, KIND_MISSING, KIND_MALFORMED, KIND_ORPHAN, validate_kills,
+    validate_sessions, validate_chapters, validate_npcs, validate_characters, validate_site,
+)
 
 def test_validation_error_format_missing():
     e = ValidationError(KIND_MISSING, "kills", ("anton", "2026-04-23", "yuan-ti broodguard", "vicious mockery"))
@@ -65,3 +68,42 @@ def test_validate_kills_case_insensitive_creature_match():
     }]
     errors = validate_kills(party, authored)
     assert errors == []
+
+
+# --- Task 6: new validator tests ---
+
+def test_validate_sessions_missing():
+    log = {"entries": [{"session": "V", "date": "2026-04-23"}]}
+    errors = validate_sessions(log, [])
+    assert len(errors) == 1
+    assert errors[0].kind == "MISSING"
+
+def test_validate_sessions_malformed_missing_silent_roll():
+    log = {"entries": [{"session": "V", "date": "2026-04-23"}]}
+    authored = [{"session": "V", "title": "t", "summary": "s"}]  # silent_roll missing
+    errors = validate_sessions(log, authored)
+    assert any(e.field == "silent_roll" for e in errors)
+
+def test_validate_chapters_missing():
+    log = {"entries": [{"session": "I", "chapter_marker": True}]}
+    errors = validate_chapters(log, [])
+    assert any(e.kind == "MISSING" for e in errors)
+
+def test_validate_npcs_missing():
+    npcs_in_log = ["Azlund"]
+    errors = validate_npcs(npcs_in_log, [])
+    assert any(e.kind == "MISSING" for e in errors)
+
+def test_validate_characters_missing_constellation_epithet():
+    party = {"members": [{"id": "anton"}]}
+    authored = [{"id": "anton", "reliquary_header": "Fallen by his tongue"}]  # constellation_epithet missing
+    errors = validate_characters(party, authored)
+    assert any(e.field == "constellation_epithet" for e in errors)
+
+def test_validate_site_required_keys():
+    site = {"intro_epithet": "x"}  # missing intro_meta, page_title, page_subtitle
+    errors = validate_site(site)
+    fields = {e.field for e in errors}
+    assert "intro_meta" in fields
+    assert "page_title" in fields
+    assert "page_subtitle" in fields
