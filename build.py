@@ -14,6 +14,23 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent
 
+KIND_MISSING = "MISSING"
+KIND_MALFORMED = "MALFORMED"
+KIND_ORPHAN = "ORPHAN"
+
+class ValidationError:
+    def __init__(self, kind: str, kind_type: str, key: tuple, field: str | None = None):
+        self.kind = kind
+        self.kind_type = kind_type
+        self.key = key
+        self.field = field
+
+    def __str__(self) -> str:
+        key_str = "(" + ", ".join(str(k) for k in self.key) + ")"
+        if self.kind == KIND_MALFORMED:
+            return f"{self.kind} {self.kind_type} {key_str} field={self.field}"
+        return f"{self.kind} {self.kind_type} {key_str}"
+
 def load_data(data_dir: Path) -> dict:
     """Load upstream data files. Returns dict with party, dice_rolls, session_log."""
     data_dir = Path(data_dir)
