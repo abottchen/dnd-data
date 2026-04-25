@@ -1,0 +1,82 @@
+[
+  {
+    "character": "anton",
+    "date": "2026-03-29",
+    "creature": "Sahuagin Warrior",
+    "method": "Vicious Mockery",
+    "verse": "A sahuagin warrior, undone by his own laughter",
+    "annotation": "Vicious Mockery &middot; the joke was cruel, and the tide heard it"
+  },
+  {
+    "character": "grieg",
+    "date": "2026-04-19",
+    "creature": "Bandit",
+    "method": "Shoved off ship",
+    "verse": "A bandit upon the bloodied deck",
+    "annotation": "shoved into the cold, where no rope could find him"
+  },
+  {
+    "character": "grieg",
+    "date": "2026-04-19",
+    "creature": "Pirate",
+    "method": "Shoved off ship",
+    "verse": "A pirate who did not rise with the tide",
+    "annotation": "pushed beneath the waterline &middot; saltwater his last hymn"
+  },
+  {
+    "character": "vex",
+    "date": "2026-03-29",
+    "creature": "Sahuagin Warrior",
+    "method": "Scimitar",
+    "verse": "A sahuagin warrior, opened like a tide-pool",
+    "annotation": "Scimitar &middot; one arc, one answer"
+  },
+  {
+    "character": "vex",
+    "date": "2026-03-29",
+    "creature": "Sahuagin Warrior",
+    "method": "Shortsword",
+    "verse": "A sahuagin warrior, who swam no further",
+    "annotation": "Shortsword &middot; close work, finished clean"
+  },
+  {
+    "character": "vex",
+    "date": "2026-04-19",
+    "creature": "Bandit",
+    "method": "Scimitar",
+    "verse": "A bandit felled in the pirate's wake",
+    "annotation": "Scimitar &middot; steel where steel was owed"
+  },
+  {
+    "character": "urida",
+    "date": "2026-03-29",
+    "creature": "Sahuagin Warrior",
+    "method": "Toll the Dead",
+    "verse": "A sahuagin warrior, bell-tolled into silence",
+    "annotation": "Toll the Dead &middot; the dead already knew her voice"
+  },
+  {
+    "character": "urida",
+    "date": "2026-04-19",
+    "creature": "Bandit",
+    "method": "Magic Missile",
+    "verse": "A bandit unraveled by three darts of light",
+    "annotation": "Magic Missile &middot; no hiding from what cannot miss"
+  },
+  {
+    "character": "urida",
+    "date": "2026-04-19",
+    "creature": "Pirate",
+    "method": "Toll the Dead",
+    "verse": "A pirate called home by a bell he could not hear",
+    "annotation": "Toll the Dead &middot; the second time it struck, he fell"
+  },
+  {
+    "character": "chumble",
+    "date": "2026-04-19",
+    "creature": "Bandit",
+    "method": "Eldritch Blast",
+    "verse": "A bandit briefly lit by arcane fire",
+    "annotation": "Eldritch Blast &middot; the patron's small attention, spent"
+  }
+]
