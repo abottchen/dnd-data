@@ -1,4 +1,4 @@
-from build import xp_for_cr, compute_trials, compute_sessions_chart
+from build import xp_for_cr, compute_trials, compute_sessions_chart, compute_fortune
 
 def test_xp_for_cr_handles_fractions():
     assert xp_for_cr("1/8") == 25
@@ -35,3 +35,22 @@ def test_sessions_chart_uses_party_max_for_scaling():
     b_april23 = next(b for b in b_bars if b["date"] == "2026-04-23")
     assert b_april23["count"] == 0
     assert b_april23["zero"] is True
+
+def test_fortune_average_and_sd_use_kept_d20s_only():
+    events = [
+        {"rolls": [{"type": "d20", "value": 15, "dropped": False}], "total": 15, "notation": "1d20", "date": "2026-04-01"},
+        {"rolls": [{"type": "d20", "value": 5, "dropped": True}], "total": 5, "notation": "1d20", "date": "2026-04-01"},
+        {"rolls": [{"type": "d20", "value": 17, "dropped": False}], "total": 17, "notation": "1d20", "date": "2026-04-01"},
+    ]
+    f = compute_fortune(events)
+    # Kept: 15, 17. Mean=16.0; population sd = 1.0
+    assert f["avg"] == 16.0
+    assert f["sd"] == 1.0
+
+def test_fortune_crit_count_excludes_dropped():
+    events = [
+        {"rolls": [{"type": "d20", "value": 20, "dropped": False}], "total": 20, "notation": "1d20", "date": "x"},
+        {"rolls": [{"type": "d20", "value": 20, "dropped": True}], "total": 20, "notation": "1d20", "date": "x"},
+    ]
+    f = compute_fortune(events)
+    assert f["crits"] == 1

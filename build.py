@@ -13,6 +13,7 @@ import json
 import sys
 from collections import Counter
 from pathlib import Path
+from statistics import pstdev
 from typing import Optional
 
 REPO_ROOT = Path(__file__).resolve().parent
@@ -371,6 +372,45 @@ def compute_sessions_chart(party: dict) -> dict:
         "per_char": per_char_bars,
         "party_max": party_max,
         "scale": scale,
+    }
+
+def compute_fortune(events: list) -> dict:
+    """Compute fortune stats for one character from their flattened roll events.
+
+    events: list of {"rolls": [die...], "total": N, "notation": str, "date": "YYYY-MM-DD"}.
+    Each die is {"type": "d20"/"d6"/..., "value": N, "dropped"?: bool, "isExplosion"?: bool}.
+    """
+    physical_d20s: list[int] = []
+    kept_d20s: list[int] = []
+    heaviest = {"total": 0, "notation": ""}
+
+    for ev in events:
+        for d in ev.get("rolls", []):
+            if d.get("type") == "d20":
+                v = int(d["value"])
+                physical_d20s.append(v)
+                if not d.get("dropped"):
+                    kept_d20s.append(v)
+        # Heaviest blow: rolls involving non-d20 / non-d100 / non-mod dice
+        types_in_event = {d.get("type") for d in ev.get("rolls", [])}
+        is_damage = bool(types_in_event - {"d20", "d100", "mod"})
+        if is_damage and ev.get("total", 0) > heaviest["total"]:
+            heaviest = {"total": ev["total"], "notation": ev.get("notation", "")}
+
+    avg = round(sum(kept_d20s) / len(kept_d20s), 1) if kept_d20s else 0.0
+    sd = round(pstdev(kept_d20s), 1) if len(kept_d20s) >= 2 else 0.0
+
+    return {
+        "rolls_total": len(events),
+        "physical_d20s_count": len(physical_d20s),
+        "kept_d20s_count": len(kept_d20s),
+        "avg": avg,
+        "sd": sd,
+        "crits": sum(1 for v in kept_d20s if v == 20),
+        "fumbles": sum(1 for v in kept_d20s if v == 1),
+        "heaviest": heaviest,
+        "physical_d20s": physical_d20s,  # for histogram
+        "events": events,                # for Other Dice and tooltips
     }
 
 def validate_all(data: dict, authored: dict) -> list[ValidationError]:
