@@ -67,10 +67,44 @@ def _iu_date(entry: dict) -> str:
     return " ".join(parts) + " DR"
 
 
+NAME_STOP_TOKENS = frozenset({"the", "a", "an", "of", "and", "or"})
+NAME_LEADING_ARTICLE = re.compile(r"^(?:The|A|An)\s+", re.IGNORECASE)
+NAME_ALIAS_SPLIT = re.compile(r",?\s+called\s+", re.IGNORECASE)
+
+
+def _name_forms(name: str) -> list[str]:
+    """Return search forms for an NPC name: canonical, leading-article-stripped,
+    sub-names from ', called ' aliases, and individual non-stop-word tokens of
+    each multi-token sub-name. Single-token names yield only themselves.
+
+    Example: "Corwin, called Artus Cimber" yields
+        {"Corwin, called Artus Cimber", "Corwin", "Artus Cimber", "Artus", "Cimber"}.
+    """
+    forms: set[str] = {name}
+    forms.add(NAME_LEADING_ARTICLE.sub("", name))
+    for part in NAME_ALIAS_SPLIT.split(name):
+        part = part.strip()
+        if not part:
+            continue
+        forms.add(part)
+        forms.add(NAME_LEADING_ARTICLE.sub("", part))
+        tokens = part.split()
+        if len(tokens) > 1:
+            for tok in tokens:
+                if tok.lower().rstrip(",.;:") not in NAME_STOP_TOKENS:
+                    forms.add(tok)
+    return [f for f in forms if f.strip()]
+
+
 def _mentions(name: str, text: str) -> bool:
-    """Word-boundary match — guards against an NPC name appearing inside a
-    larger word (e.g. a hypothetical NPC "Al" matching "All")."""
-    return re.search(r"\b" + re.escape(name) + r"\b", text) is not None
+    """Word-boundary, case-insensitive match across all search forms of `name`.
+    Forms include the canonical name, the leading-article-stripped variant,
+    sub-names from ', called ' aliases, and individual proper-noun tokens.
+    The \\b boundary guards against substring false positives."""
+    for form in _name_forms(name):
+        if re.search(r"\b" + re.escape(form) + r"\b", text, re.IGNORECASE):
+            return True
+    return False
 
 
 def _session_index(roman: str, session_log: dict) -> int | None:
