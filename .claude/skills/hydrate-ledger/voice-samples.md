@@ -1,85 +1,75 @@
 # Voice Samples
 
-Hand-curated representative entries from `authored/*.json`. The
-hydrate-ledger skill always loads this file when authoring new prose
-to prevent style drift. Updated by the user when the voice direction
-shifts; not auto-rotated.
+Hand-curated examples illustrating the project's voice. The hydrate-ledger
+skill always loads this file when authoring new prose, to anchor style.
 
-## Kill verses (character + method paired with verse + annotation)
+**These are tone-reference fragments only.** They are not from the campaign's
+authored store and must never be reproduced verbatim. Use them to calibrate
+cadence, density, and register — not as fill-in answers.
 
-- **Anton** killing a Sahuagin Warrior with Vicious Mockery:
-  > A sahuagin warrior, undone by his own laughter
-  > _Vicious Mockery &middot; the joke was cruel, and the tide heard it_
+## Kill verses (verse + annotation pairing)
 
-- **Grieg** killing a Bandit by Shoved off ship:
-  > A bandit upon the bloodied deck
-  > _shoved into the cold, where no rope could find him_
+The verse names what fell and gives one image; the annotation names the
+method and a small further beat. Both are single-line, single-image, no
+sentimentality.
 
-- **Grieg** killing a Pirate by Shoved off ship:
-  > A pirate who did not rise with the tide
-  > _pushed beneath the waterline &middot; saltwater his last hymn_
+- (kobold, with a sling stone):
+  > A kobold gone still in the long grass
+  > _Sling &middot; one stone, one breath, no second_
 
-- **Vex** killing a Sahuagin Warrior with Scimitar:
-  > A sahuagin warrior, opened like a tide-pool
-  > _Scimitar &middot; one arc, one answer_
+- (ogre, with fire-bolt):
+  > An ogre lit and unbothered, until he was not
+  > _Fire Bolt &middot; the third one took the lung_
 
-- **Vex** killing a Sahuagin Warrior with Shortsword:
-  > A sahuagin warrior, who swam no further
-  > _Shortsword &middot; close work, finished clean_
+- (acolyte, with a strangler's wire):
+  > An acolyte who heard nothing of his hour
+  > _Garrote &middot; the prayer half-formed, the throat half-closed_
 
-- **Vex** killing a Bandit with Scimitar:
-  > A bandit felled in the pirate's wake
-  > _Scimitar &middot; steel where steel was owed_
+## Silent Roll lines (one-line off-Chronicle beats)
 
-- **Urida** killing a Sahuagin Warrior with Toll the Dead:
-  > A sahuagin warrior, bell-tolled into silence
-  > _Toll the Dead &middot; the dead already knew her voice_
+A silent roll is not a kill — it's an unscored moment that the session
+turned on. One line, no flourish.
 
-- **Urida** killing a Bandit with Magic Missile:
-  > A bandit unraveled by three darts of light
-  > _Magic Missile &middot; no hiding from what cannot miss_
+- The map was redrawn at midnight, and a road was added that no one had walked.
+- A name was spoken aloud that none of them had used in a year.
+- Three coins were left at the threshold, and the door opened on the fourth.
 
-- **Urida** killing a Pirate with Toll the Dead:
-  > A pirate called home by a bell he could not hear
-  > _Toll the Dead &middot; the second time it struck, he fell_
+## Session summaries (concrete events, no commentary)
 
-- **Chumble** killing a Bandit with Eldritch Blast:
-  > A bandit briefly lit by arcane fire
-  > _Eldritch Blast &middot; the patron's small attention, spent_
+Three to four sentences. Names + actions + their consequences. No "the
+party did X with Y feeling Z" — just what happened, in the order it
+happened.
 
-## Silent Roll lines (one per representative session)
+- (a sample-shape):
+  > The offer was declined. The lantern went out at the second watch.
+  > Six were paid; one was not. By morning the road had taken them past
+  > the second bridge.
 
-- **15 MAR**: No blade was drawn; only a name was pressed into a sending stone.
-- **22 MAR**: A familiar was pulled from a pickle-barrel, and the company called him Wickles.
-- **12 APR**: A ring opened its eye in the galley, and a cheese-thief was revealed a spy.
+## Chapter epigraph (kenning, four-beat is common)
 
-## Session summaries (2 distinct tones)
+A kenning sequence: from-place to to-place, mediated by the work the
+chapter required. Single sentence, em-dash separator.
 
-- **Session I** "An Oath, a Map, and a Sending Stone":
-  > No blade was drawn. The company took Azlund's oath under zone of truth, received the map of Chult and fifty gold apiece, and boarded The Horizon at the Waterdeep docks.
+- (a sample-shape):
+  > From the high tower to the seventh ford &mdash; by silence, by hunger,
+  > by oath, by signal.
 
-- **Session V** "Through Pirate Steel, into Nyanzaru":
-  > Pirates boarded in the night. The deck ran red. When it became clear the company could not win the tally, Artus Cimber teleported them to Port Nyanzaru in a flash of ice and turned alone to the remaining crew.
+## NPC epithets (sentence-fragment placing the NPC)
 
-## Chapter epigraph
+What they do, where they stand, the company's relationship. No
+backstory, no inner life. Single fragment, no terminal punctuation.
 
-- **Chapter I** "Passage to Chult":
-  > From the House of Healing to the docks of Port Nyanzaru &mdash; by word, by storm, by blade, by ice.
+- (with): "of the merchants' guild, who would not be paid in coin"
+- (with): "first watchman of the south gate, whose lantern is held lower than the others"
+- (against): "whose name has been given three times, each different"
 
-## NPC epithets (spanning allegiances)
+## Constellation epithets (one-line for a PC)
 
-- **Azlund** (with): "of the House of Healing, whose oath bound the road"
-- **Corwin, called Artus Cimber** (with): "who hid his name in a glove and a ring, and turned alone to the pirates so the company might live"
-- **Harlen** (against): "Zhentarim spy, the wrong sailor, the cheese-thief, now chained to the galley wall"
-- **The Fleeing Yuan-ti** (against): "whose blade nearly took Urida, and who fled before the reckoning"
+What the PC's dice say about them. No combat narrative. Six words or fewer.
 
-## Constellation epithets (one per character)
-
-- **Anton**: "his rolls yet unwritten"
-- **Grieg**: "the ready hand"
-- **Vex**: "blade in every fight"
-- **Urida**: "the heaviest lift"
-- **Chumble**: "many rolls, one kill"
+- "the long second"
+- "no answer twice"
+- "the silent throw"
 
 ## Tone reference
 
