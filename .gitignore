@@ -2,6 +2,7 @@
 .superpowers/
 .claude/ext/5etools-src
 .worktrees/
+/.mcp.json
 
 # Sensitive source data — contains real player names/handles.
 # Not needed to display index.html; hydration runs locally against these.
