@@ -70,27 +70,77 @@
         <span class="constellation-tick-x" style="left: 4%;">0</span>
         <span class="constellation-tick-x" style="left: 50%;">163</span>
         <span class="constellation-tick-x" style="left: 96%;">325</span>
-        <div class="constellation-star" style="top: 96%; left: 32%;">
+        <div class="constellation-star" style="top: 96%; left: 32%;"
+             data-name="Anton Truebranch"
+             data-epithet="his rolls yet unwritten"
+             data-xp="100"
+             data-rolls="0"
+             data-kept-d20s="0"
+             data-kills="1"
+             data-avg="0.0"
+             data-sd="0.0"
+             data-crits="0"
+             data-fumbles="0">
           <img class="portrait" src="images/anton.png" alt="">
           <div class="star-name">Anton</div>
           <div class="star-epithet">his rolls yet unwritten</div>
         </div>
-        <div class="constellation-star" style="top: 4%; left: 68%;">
+        <div class="constellation-star" style="top: 4%; left: 68%;"
+             data-name="Grieg"
+             data-epithet="the ready hand"
+             data-xp="225"
+             data-rolls="25"
+             data-kept-d20s="14"
+             data-kills="2"
+             data-avg="12.3"
+             data-sd="5.4"
+             data-crits="1"
+             data-fumbles="0">
           <img class="portrait" src="images/grieg.png" alt="">
           <div class="star-name">Grieg</div>
           <div class="star-epithet">the ready hand</div>
         </div>
-        <div class="constellation-star" style="top: 22%; left: 68%;">
+        <div class="constellation-star" style="top: 22%; left: 68%;"
+             data-name="Vex"
+             data-epithet="blade in every fight"
+             data-xp="225"
+             data-rolls="20"
+             data-kept-d20s="11"
+             data-kills="3"
+             data-avg="10.5"
+             data-sd="5.3"
+             data-crits="0"
+             data-fumbles="0">
           <img class="portrait" src="images/vex.png" alt="">
           <div class="star-name">Vex</div>
           <div class="star-epithet">blade in every fight</div>
         </div>
-        <div class="constellation-star" style="top: 52%; left: 96%;">
+        <div class="constellation-star" style="top: 52%; left: 96%;"
+             data-name="Urida"
+             data-epithet="the heaviest lift"
+             data-xp="325"
+             data-rolls="12"
+             data-kept-d20s="8"
+             data-kills="3"
+             data-avg="11.0"
+             data-sd="5.8"
+             data-crits="0"
+             data-fumbles="0">
           <img class="portrait" src="images/urida.png" alt="">
           <div class="star-name">Urida</div>
           <div class="star-epithet">the heaviest lift</div>
         </div>
-        <div class="constellation-star" style="top: 26%; left: 11%;">
+        <div class="constellation-star" style="top: 26%; left: 11%;"
+             data-name="Chumble Crudluck"
+             data-epithet="many rolls, one kill"
+             data-xp="25"
+             data-rolls="19"
+             data-kept-d20s="11"
+             data-kills="1"
+             data-avg="14.7"
+             data-sd="4.9"
+             data-crits="1"
+             data-fumbles="0">
           <img class="portrait" src="images/chumble-crudluck.png" alt="">
           <div class="star-name">Chumble</div>
           <div class="star-epithet">many rolls, one kill</div>
@@ -1642,6 +1692,55 @@
           span.setAttribute('aria-hidden', 'true');
           img.replaceWith(span);
         }, { once: true });
+      });
+    })();
+
+    (function () {
+      // Constellation portrait tooltips: exact axis values + dice/kill stats that
+      // can't be read off the chart at a glance.
+      let tip = document.querySelector('.dice-tooltip');
+      if (!tip) {
+        tip = document.createElement('div');
+        tip.className = 'dice-tooltip';
+        document.body.appendChild(tip);
+      }
+      let hideTimer;
+
+      document.querySelectorAll('.constellation-star').forEach(star => {
+        const portrait = star.querySelector('.portrait');
+        if (!portrait) return;
+        const name = star.getAttribute('data-name') || '';
+        const epithet = star.getAttribute('data-epithet') || '';
+        const xp = parseInt(star.getAttribute('data-xp'), 10) || 0;
+        const rolls = parseInt(star.getAttribute('data-rolls'), 10) || 0;
+        const keptD20s = parseInt(star.getAttribute('data-kept-d20s'), 10) || 0;
+        const kills = parseInt(star.getAttribute('data-kills'), 10) || 0;
+        const avg = parseFloat(star.getAttribute('data-avg')) || 0;
+        const sd = parseFloat(star.getAttribute('data-sd')) || 0;
+        const crits = parseInt(star.getAttribute('data-crits'), 10) || 0;
+        const fumbles = parseInt(star.getAttribute('data-fumbles'), 10) || 0;
+
+        const show = () => {
+          clearTimeout(hideTimer);
+          let html = '<div class="tip-val tip-val-text">' + name + '</div>';
+          if (epithet) html += '<div class="tip-ctx">' + epithet + '</div>';
+          html += '<div class="tip-ctx">' + xp + ' earned &middot; ' + kills + ' fallen</div>';
+          html += '<div class="tip-ctx">' + rolls + ' rolls cast &middot; ' + keptD20s + ' on the twenty</div>';
+          if (keptD20s > 0) {
+            html += '<div class="tip-ctx">avg ' + avg.toFixed(1) + ' &middot; &sigma; ' + sd.toFixed(1) +
+                    ' &middot; ' + crits + '&times; crit &middot; ' + fumbles + '&times; fumble</div>';
+          }
+          tip.innerHTML = html;
+          const r = portrait.getBoundingClientRect();
+          tip.style.left = (r.left + r.width / 2) + 'px';
+          tip.style.top = r.top + 'px';
+          tip.classList.add('visible');
+        };
+        const hide = () => {
+          hideTimer = setTimeout(() => tip.classList.remove('visible'), 80);
+        };
+        portrait.addEventListener('mouseenter', show);
+        portrait.addEventListener('mouseleave', hide);
       });
     })();
 

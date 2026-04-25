@@ -85,6 +85,55 @@
     })();
 
     (function () {
+      // Constellation portrait tooltips: exact axis values + dice/kill stats that
+      // can't be read off the chart at a glance.
+      let tip = document.querySelector('.dice-tooltip');
+      if (!tip) {
+        tip = document.createElement('div');
+        tip.className = 'dice-tooltip';
+        document.body.appendChild(tip);
+      }
+      let hideTimer;
+
+      document.querySelectorAll('.constellation-star').forEach(star => {
+        const portrait = star.querySelector('.portrait');
+        if (!portrait) return;
+        const name = star.getAttribute('data-name') || '';
+        const epithet = star.getAttribute('data-epithet') || '';
+        const xp = parseInt(star.getAttribute('data-xp'), 10) || 0;
+        const rolls = parseInt(star.getAttribute('data-rolls'), 10) || 0;
+        const keptD20s = parseInt(star.getAttribute('data-kept-d20s'), 10) || 0;
+        const kills = parseInt(star.getAttribute('data-kills'), 10) || 0;
+        const avg = parseFloat(star.getAttribute('data-avg')) || 0;
+        const sd = parseFloat(star.getAttribute('data-sd')) || 0;
+        const crits = parseInt(star.getAttribute('data-crits'), 10) || 0;
+        const fumbles = parseInt(star.getAttribute('data-fumbles'), 10) || 0;
+
+        const show = () => {
+          clearTimeout(hideTimer);
+          let html = '<div class="tip-val tip-val-text">' + name + '</div>';
+          if (epithet) html += '<div class="tip-ctx">' + epithet + '</div>';
+          html += '<div class="tip-ctx">' + xp + ' earned &middot; ' + kills + ' fallen</div>';
+          html += '<div class="tip-ctx">' + rolls + ' rolls cast &middot; ' + keptD20s + ' on the twenty</div>';
+          if (keptD20s > 0) {
+            html += '<div class="tip-ctx">avg ' + avg.toFixed(1) + ' &middot; &sigma; ' + sd.toFixed(1) +
+                    ' &middot; ' + crits + '&times; crit &middot; ' + fumbles + '&times; fumble</div>';
+          }
+          tip.innerHTML = html;
+          const r = portrait.getBoundingClientRect();
+          tip.style.left = (r.left + r.width / 2) + 'px';
+          tip.style.top = r.top + 'px';
+          tip.classList.add('visible');
+        };
+        const hide = () => {
+          hideTimer = setTimeout(() => tip.classList.remove('visible'), 80);
+        };
+        portrait.addEventListener('mouseenter', show);
+        portrait.addEventListener('mouseleave', hide);
+      });
+    })();
+
+    (function () {
       // Sessions Chart ("Across the Ages") tooltips: read kills from each bar's data-kills attribute.
       let sessionTip = document.querySelector('.dice-tooltip');
       if (!sessionTip) {
