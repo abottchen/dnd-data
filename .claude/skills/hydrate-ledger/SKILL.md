@@ -44,8 +44,11 @@ introspect upstream + authored state; dispatch subagents author prose.
    .venv/bin/python .claude/skills/hydrate-ledger/helpers.py append-npcs
    .venv/bin/python .claude/skills/hydrate-ledger/helpers.py append-characters
    ```
-   For each, parse the stdout `{"slices": [...]}` and collect entries with
-   `count > 0`. **Do not read the slice files.**
+   For each, parse the stdout `{"slices": [...]}` and collect every entry —
+   an append slice with `count == 0` (e.g. an NPC declared in `site.known_npcs`
+   without textual evidence in the log yet) still represents an authoring task
+   and must be dispatched. The "drop `count == 0`" rule applies only to the
+   refresh pass below. **Do not read the slice files.**
 3. **Append pass — dispatch.** Issue all collected append dispatches in a
    single Agent-tool message (parallel). For each dispatch, the prompt is
    the matching `dispatch/<category>.md` template with `{slice_path}`,
@@ -68,7 +71,8 @@ introspect upstream + authored state; dispatch subagents author prose.
    .venv/bin/python .claude/skills/hydrate-ledger/helpers.py refresh-road-ahead
    .venv/bin/python .claude/skills/hydrate-ledger/helpers.py refresh-intro-epithet
    ```
-   Drop `count == 0` entries.
+   Drop `count == 0` entries. (Refresh-only — append slices always dispatch
+   regardless of count, see step 2.)
 7. **Refresh pass — dispatch.** Issue all remaining refresh dispatches in a
    single parallel Agent-tool message. Templates use the refresh return schema
    (`decision: "no_change" | "rewrite"`).
