@@ -840,6 +840,85 @@ def load_authored(repo_root: Path) -> dict:
         "site": read_or({}, "site.json"),
     }
 
+def compute_all(data: dict, authored: dict) -> dict:
+    party = data["party"]
+    session_log = data["session_log"]
+    rolls_by_slug = data.get("rolls_by_slug", {})
+
+    trials = compute_trials(party)
+    fortune_by_char = {m["id"]: compute_fortune(rolls_by_slug.get(m["id"], []))
+                       for m in party.get("members", [])}
+    sessions_chart = compute_sessions_chart(party)
+
+    # Histograms
+    all_physicals_by_player = {cid: f["physical_d20s"] for cid, f in fortune_by_char.items()}
+    party_max = compute_party_d20_max(all_physicals_by_player)
+    histograms = {cid: compute_d20_histogram(f["physical_d20s"], party_max)
+                  for cid, f in fortune_by_char.items()}
+    other_dice = {cid: compute_other_dice(f["events"]) for cid, f in fortune_by_char.items()}
+
+    constellation = compute_constellation(party, fortune_by_char, trials)
+    bestiary = compute_bestiary(party)
+    chronicle = compute_chronicle(session_log, authored["sessions"], authored["chapters"], party)
+    ledger = compute_company_ledger(party, data.get("dice_rolls", []), session_log, trials, fortune_by_char)
+    distinctions = compute_distinctions(party, authored["characters"])
+    patron = compute_patron_die(fortune_by_char, party)
+
+    char_auth_by_id = {a["id"]: a for a in authored["characters"]}
+
+    return {
+        "site": authored["site"],
+        "party": party,
+        "characters_authored": char_auth_by_id,
+        "kills_authored_by_key": {
+            kill_key(k["character"], k["date"], k["creature"], k["method"]): k
+            for k in authored["kills"]
+        },
+        "trials": trials,
+        "fortune": fortune_by_char,
+        "sessions_chart": sessions_chart,
+        "histograms": histograms,
+        "other_dice": other_dice,
+        "constellation": constellation,
+        "bestiary": bestiary,
+        "chronicle": chronicle,
+        "ledger": ledger,
+        "distinctions": distinctions,
+        "patron_die": patron,
+        "npcs_by_allegiance": _split_npcs(authored["npcs"]),
+    }
+
+def _split_npcs(npcs: list) -> dict:
+    return {
+        "with": [n for n in npcs if n.get("allegiance") == "with"],
+        "against": [n for n in npcs if n.get("allegiance") == "against"],
+    }
+
+def compute_cr_label(creature: str) -> str:
+    info = bestiary_lookup(creature)
+    if not info:
+        return "?"
+    cr = info["cr"]
+    if isinstance(cr, dict):
+        cr = cr.get("cr")
+    cr = str(cr)
+    return {"1/8": "&frac18;", "1/4": "&frac14;", "1/2": "&frac12;"}.get(cr, cr)
+
+def render_page(context: dict, templates_dir: Path, out_path: Path) -> None:
+    from jinja2 import Environment, FileSystemLoader, StrictUndefined
+    env = Environment(
+        loader=FileSystemLoader(str(templates_dir)),
+        undefined=StrictUndefined,
+        autoescape=False,
+        keep_trailing_newline=True,
+    )
+    env.filters["short_date"] = _short_date
+    env.filters["roman"] = _to_roman
+    env.filters["cr_label"] = compute_cr_label
+    template = env.get_template("base.html")
+    html = template.render(**context)
+    out_path.write_text(html)
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Render index.html.")
     parser.add_argument("--data-dir", default=str(REPO_ROOT),
@@ -868,6 +947,21 @@ def main() -> int:
             print(f"  {e}", file=sys.stderr)
         return 1
     print("build.py: validation passed")
+
+    templates_dir = REPO_ROOT / "templates"
+    base_template = templates_dir / "base.html"
+    if not base_template.exists():
+        print(f"build.py: no templates/base.html yet; skipping render (compute only). "
+              f"Create templates first (plan tasks 18-24).")
+        return 0
+
+    try:
+        context = compute_all(data, authored)
+        render_page(context, templates_dir, Path(args.out))
+    except Exception as e:
+        print(f"build.py: render failed: {type(e).__name__}: {e}", file=sys.stderr)
+        return 2
+    print(f"build.py: rendered {args.out}")
     return 0
 
 if __name__ == "__main__":
