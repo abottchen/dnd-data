@@ -110,3 +110,15 @@ def test_append_sessions_emits_slice_per_unauthored_session(helper_env):
     assert body["real_date"] == "2026-04-23"
     assert "crossroads" in body["narrative"]
     assert body["chapter_marker"] is True
+
+
+def test_append_chapters_emits_slice_per_unauthored_marker(helper_env):
+    """Fixture: session II has '--- Chapter II ---' marker; authored has chapter 1.
+    Expect one slice keyed "2" (the next chapter id)."""
+    out = run_helper("append-chapters", **helper_env)
+    slices = out["slices"]
+    assert len(slices) == 1
+    assert slices[0]["key"] == "2"
+    body = json.loads(Path(slices[0]["path"]).read_text())
+    assert body["starts_at_session"] == "II"
+    assert "crossroads" in body["narrative"]
