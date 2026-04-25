@@ -210,3 +210,14 @@ def test_refresh_road_ahead_emits_singleton(helper_env):
     assert "new_sessions" in body
     assert "existing" in body
     assert "Azlund's offer" in {e["name"] for e in body["existing"]["known"]}
+
+
+def test_refresh_intro_epithet_emits_singleton(helper_env):
+    out = run_helper("refresh-intro-epithet", **helper_env)
+    slices = out["slices"]
+    assert len(slices) == 1
+    assert slices[0]["key"] == "all"
+    body = json.loads(Path(slices[0]["path"]).read_text())
+    assert "new_sessions" in body
+    assert "road_ahead_known" in body
+    assert body["existing"] == "A small ledger."
