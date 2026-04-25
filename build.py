@@ -166,6 +166,35 @@ def validate_site(site: dict) -> list[ValidationError]:
             errors.append(ValidationError(KIND_MALFORMED, "site", ("singleton",), field=f))
     return errors
 
+def collect_npcs_from_log(session_log: dict, site: dict) -> list[str]:
+    """Return the canonical list of NPC names whose epithets must be authored.
+    Priority: per-entry `npcs` field; fallback: site.known_npcs allowlist.
+    """
+    seen: list[str] = []
+    seen_set: set[str] = set()
+    for entry in session_log.get("entries", []):
+        for n in entry.get("npcs", []):
+            if n not in seen_set:
+                seen.append(n)
+                seen_set.add(n)
+    if not seen:
+        for n in site.get("known_npcs", []):
+            if n not in seen_set:
+                seen.append(n)
+                seen_set.add(n)
+    return seen
+
+def validate_all(data: dict, authored: dict) -> list[ValidationError]:
+    errors: list[ValidationError] = []
+    errors.extend(validate_kills(data["party"], authored["kills"]))
+    errors.extend(validate_sessions(data["session_log"], authored["sessions"]))
+    errors.extend(validate_chapters(data["session_log"], authored["chapters"]))
+    npcs = collect_npcs_from_log(data["session_log"], authored["site"])
+    errors.extend(validate_npcs(npcs, authored["npcs"]))
+    errors.extend(validate_characters(data["party"], authored["characters"]))
+    errors.extend(validate_site(authored["site"]))
+    return errors
+
 def load_data(data_dir: Path) -> dict:
     """Load upstream data files. Returns dict with party, dice_rolls, session_log."""
     data_dir = Path(data_dir)
@@ -176,6 +205,22 @@ def load_data(data_dir: Path) -> dict:
 
     dice_paths = sorted(data_dir.glob("dicex-rolls-*.json"))
     dice_rolls = [json.loads(p.read_text()) for p in dice_paths]
+
+    # Normalize party: upstream may emit a bare list; wrap it for downstream validators.
+    if isinstance(party, list):
+        party = {"members": party}
+
+    # Normalize session-log: upstream uses "id" and "realDate"; validators expect "session" and "date".
+    normalized_entries = []
+    for e in session_log.get("entries", []):
+        ne = dict(e)
+        if "session" not in ne and "id" in ne:
+            ne["session"] = ne["id"]
+        if "date" not in ne and "realDate" in ne:
+            ne["date"] = ne["realDate"]
+        normalized_entries.append(ne)
+    session_log = dict(session_log)
+    session_log["entries"] = normalized_entries
 
     return {
         "party": party,
@@ -219,6 +264,13 @@ def main() -> int:
           f"{session_count} session entries")
     print(f"build.py: authored kills={len(authored['kills'])} sessions={len(authored['sessions'])} "
           f"npcs={len(authored['npcs'])} chapters={len(authored['chapters'])}")
+    errors = validate_all(data, authored)
+    if errors:
+        print(f"build.py: {len(errors)} validation error(s):", file=sys.stderr)
+        for e in errors:
+            print(f"  {e}", file=sys.stderr)
+        return 1
+    print("build.py: validation passed")
     return 0
 
 if __name__ == "__main__":
