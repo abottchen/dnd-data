@@ -4,11 +4,11 @@
         <div class="identity">
           <div class="name">{{ member.name }}</div>
           <div class="epithet">{{ member.identity | default("") | safe }}</div>
-          {%- set tier_labels = ["Zeroth", "First", "Second", "Third", "Fourth", "Fifth"] %}
+          {%- set tier_labels = ["First", "Second", "Third", "Fourth", "Fifth"] %}
           {%- set lvl = (member.level | int) %}
-          {%- if lvl < 0 %}{% set lvl = 0 %}{% endif %}
+          {%- if lvl < 1 %}{% set lvl = 1 %}{% endif %}
           {%- if lvl > 5 %}{% set lvl = 5 %}{% endif %}
-          <div class="meta">{{ member.class }} &middot; {{ tier_labels[lvl] }} Tier &middot; {{ member.background }}</div>
+          <div class="meta">{{ member.class }} &middot; {{ tier_labels[lvl - 1] }} Tier &middot; {{ member.background }}</div>
         </div>
         <div class="vitals-block">
           <div class="vital"><span class="label">Armor</span><span class="val">{{ member.ac.value if member.ac.value is defined else member.ac }}</span></div>
