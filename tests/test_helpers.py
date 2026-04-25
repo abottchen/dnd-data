@@ -134,3 +134,19 @@ def test_append_npcs_emits_slice_per_unauthored_npc(helper_env):
     body = json.loads(Path(slices[0]["path"]).read_text())
     assert body["name"] == "Azlund"
     assert any("Azlund" in m["line"] for m in body["mentions"])
+
+
+def test_append_characters_emits_one_bundled_slice(helper_env):
+    """Fixture: party has anton + vex; authored characters has only anton.
+    Expect ONE slice with key='all' covering vex; existing anton's
+    distinction_title surfaced for collision avoidance."""
+    out = run_helper("append-characters", **helper_env)
+    slices = out["slices"]
+    assert len(slices) == 1
+    assert slices[0]["key"] == "all"
+    assert slices[0]["count"] == 1  # one new PC
+
+    body = json.loads(Path(slices[0]["path"]).read_text())
+    assert len(body["new_pcs"]) == 1
+    assert body["new_pcs"][0]["id"] == "vex"
+    assert "Sharpest Tongue" in body["existing_distinction_titles"]
