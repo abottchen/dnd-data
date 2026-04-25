@@ -1,0 +1,58 @@
+<div class="chronicle">
+  <aside class="chronicle-rail">
+    <div class="chronicle-rail-label">Regnal</div>
+    {%- for r in chronicle.rail %}
+    <div class="chronicle-month">{{ r.month }}</div>
+    <div class="chronicle-month-year">{{ r.year }}</div>
+    <div class="chronicle-month-count">{{ r.count }} session{% if r.count != 1 %}s{% endif %}</div>
+    {%- endfor %}
+  </aside>
+
+  <div class="chronicle-content">
+    {%- for ch in chronicle.chapters %}
+    <div class="chronicle-chapter">
+      <header class="chronicle-chapter-head">
+        <div class="chronicle-chapter-label">Chapter {{ ch.label }}</div>
+        <h3 class="chronicle-chapter-title">{{ ch.title }}</h3>
+        <p class="chronicle-chapter-epigraph">{{ ch.epigraph | safe }}</p>
+        <div class="chronicle-chapter-meta">
+          <span><b>{{ ch.session_count }}</b> session{% if ch.session_count != 1 %}s{% endif %}</span>
+          <span><b>{{ ch.kill_count }}</b> fallen</span>
+          <span class="chronicle-chapter-tally">
+            {%- for cid in ch.portrait_tally %}
+              {%- set member = (party.members | selectattr("id", "equalto", cid) | first) %}
+            <img src="images/{{ member.image }}" alt="">
+            {%- endfor %}
+          </span>
+        </div>
+      </header>
+      {%- for s in ch.sessions %}
+      <details class="chronicle-session">
+        <summary>
+          <span class="chronicle-session-num">{{ s.id }}</span>
+          <span class="chronicle-session-title">{{ s.title }}</span>
+          {%- if s.kills_count > 0 %}
+          <span class="chronicle-session-kills-inline">&#10013; {{ s.kills_count }}</span>
+          {%- else %}
+          <span class="chronicle-session-kills-inline empty">&mdash;</span>
+          {%- endif %}
+          <span class="chronicle-session-iu">{{ s.iu_date }}</span>
+          <span class="chronicle-session-real">{{ s.real_date_label }}</span>
+        </summary>
+        <div class="chronicle-session-body">
+          {%- if s.kills_count > 0 %}
+          <div class="chronicle-session-pips">
+            {%- for cid in s.kill_pips %}
+              {%- set member = (party.members | selectattr("id", "equalto", cid) | first) %}
+            <img class="chronicle-session-pip" src="images/{{ member.image }}" alt="">
+            {%- endfor %}
+          </div>
+          {%- endif %}
+          <div class="chronicle-session-summary">{{ s.summary | safe }}</div>
+        </div>
+      </details>
+      {%- endfor %}
+    </div>
+    {%- endfor %}
+  </div>
+</div>
