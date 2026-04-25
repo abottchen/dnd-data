@@ -31,6 +31,44 @@ class ValidationError:
             return f"{self.kind} {self.kind_type} {key_str} field={self.field}"
         return f"{self.kind} {self.kind_type} {key_str}"
 
+def kill_key(character: str, date: str, creature: str, method: str) -> tuple:
+    """Normalize a kill key. Case-folded creature/method; date and char as-is."""
+    return (character, date, creature.casefold(), method.casefold())
+
+REQUIRED_KILL_FIELDS = ("verse", "annotation")
+
+def validate_kills(party: dict, authored: list) -> list[ValidationError]:
+    errors: list[ValidationError] = []
+    expected_keys: dict[tuple, dict] = {}
+    for member in party.get("members", []):
+        char_id = member["id"]
+        for k in member.get("kills", []):
+            key = kill_key(char_id, k["date"], k["creature"], k["method"])
+            expected_keys[key] = k
+
+    by_key: dict[tuple, dict] = {}
+    for entry in authored:
+        key = kill_key(entry["character"], entry["date"], entry["creature"], entry["method"])
+        by_key[key] = entry
+
+    # MISSING + MALFORMED
+    for key, _kill in expected_keys.items():
+        entry = by_key.get(key)
+        if entry is None:
+            errors.append(ValidationError(KIND_MISSING, "kills", key))
+            continue
+        for f in REQUIRED_KILL_FIELDS:
+            v = entry.get(f)
+            if v is None or (isinstance(v, str) and not v.strip()):
+                errors.append(ValidationError(KIND_MALFORMED, "kills", key, field=f))
+
+    # ORPHAN
+    for key in by_key:
+        if key not in expected_keys:
+            errors.append(ValidationError(KIND_ORPHAN, "kills", key))
+
+    return errors
+
 def load_data(data_dir: Path) -> dict:
     """Load upstream data files. Returns dict with party, dice_rolls, session_log."""
     data_dir = Path(data_dir)
