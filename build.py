@@ -437,6 +437,17 @@ def compute_party_d20_max(all_physicals_by_player: dict[str, list[int]]) -> int:
             party_max = s
     return party_max
 
+def compute_patron_die(fortune_by_char: dict, party: dict) -> list[dict]:
+    """Party-wide d20 histogram, excluding the GM."""
+    physicals: list[int] = []
+    for m in party.get("members", []):
+        if m["id"] == "gm":
+            continue
+        physicals.extend(fortune_by_char[m["id"]]["physical_d20s"])
+    counts = Counter(physicals)
+    party_max = max((counts.get(v, 0) for v in range(1, 21)), default=0)
+    return compute_d20_histogram(physicals, party_max=party_max)
+
 def compute_other_dice(events: list) -> list[dict]:
     """Per-die-type rows: d4..d12+, with dot positions and avg/best."""
     by_die: dict[str, list[dict]] = {}
