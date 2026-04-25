@@ -78,7 +78,16 @@ REQUIRED_CHAPTER_FIELDS = ("title", "epigraph")
 REQUIRED_NPC_FIELDS = ("epithet",)
 REQUIRED_CHAR_FIELDS = ("epithet", "reliquary_header", "constellation_epithet",
                          "distinction_title", "distinction_subtitle", "distinction_detail")
-REQUIRED_SITE_FIELDS = ("intro_epithet", "intro_meta", "page_title", "page_subtitle")
+REQUIRED_SITE_FIELDS = ("intro_epithet", "page_title", "page_subtitle")
+
+# Reject if still present in authored/site.json after the migration to a build-computed value.
+DEAD_SITE_FIELDS = ("intro_meta",)
+
+NUMBER_WORDS = (
+    "Zero", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight",
+    "Nine", "Ten", "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen",
+    "Sixteen", "Seventeen", "Eighteen", "Nineteen", "Twenty",
+)
 
 # Fields that are list-typed and legitimately may be empty lists (not MALFORMED).
 _LIST_EMPTY_OK = frozenset({"silent_roll"})
@@ -167,10 +176,17 @@ def validate_characters(party: dict, authored: list) -> list[ValidationError]:
             errors.append(ValidationError(KIND_ORPHAN, "characters", (cid,)))
     return errors
 
-def validate_site(site: dict) -> list[ValidationError]:
+def validate_site(site: dict, latest_session: int) -> list[ValidationError]:
     errors: list[ValidationError] = []
     for f in REQUIRED_SITE_FIELDS:
         if _missing_or_blank(site, f):
+            errors.append(ValidationError(KIND_MALFORMED, "site", ("singleton",), field=f))
+    rts = site.get("refreshed_through_session")
+    # Reject bools (which are ints in Python) and any non-int / out-of-range value.
+    if not isinstance(rts, int) or isinstance(rts, bool) or rts < 0 or rts > latest_session:
+        errors.append(ValidationError(KIND_MALFORMED, "site", ("singleton",), field="refreshed_through_session"))
+    for f in DEAD_SITE_FIELDS:
+        if f in site:
             errors.append(ValidationError(KIND_MALFORMED, "site", ("singleton",), field=f))
     return errors
 
@@ -638,6 +654,23 @@ def compute_bestiary(party: dict) -> list[dict]:
     groups.sort(key=lambda g: (-g["total"], g["type"].lower()))
     return groups
 
+def _count_word(n: int) -> str:
+    if 0 <= n <= 20:
+        return NUMBER_WORDS[n]
+    return str(n)
+
+def compute_intro_meta(session_log: dict) -> str:
+    """Header line under the campaign title — count + latest in-universe month/year."""
+    entries = session_log.get("entries", [])
+    n = len(entries)
+    if n == 0:
+        return "No Sessions Yet"
+    noun = "Session" if n == 1 else "Sessions"
+    latest = entries[-1]
+    iu_month = latest.get("iu_month", "Kythorn")
+    iu_year = latest.get("iu_year", "1494")
+    return f"{_count_word(n)} {noun} &middot; {iu_month} {iu_year} DR"
+
 def compute_company_ledger(party: dict, dice_files: list, session_log: dict, trials: dict, fortune_by_char: dict) -> dict:
     members = [m for m in party.get("members", []) if m["id"] != "gm"]
     total_xp = sum(trials["per_char"][m["id"]]["xp"] for m in members)
@@ -794,7 +827,7 @@ def validate_all(data: dict, authored: dict) -> list[ValidationError]:
     errors.extend(validate_npcs(npcs, authored["npcs"]))
     errors.extend(validate_characters(data["party"], authored["characters"]))
     errors.extend(validate_distinction_uniqueness(authored["characters"]))
-    errors.extend(validate_site(authored["site"]))
+    errors.extend(validate_site(authored["site"], len(data["session_log"].get("entries", []))))
     return errors
 
 _ROMAN_PAIRS = [(1000,"M"),(900,"CM"),(500,"D"),(400,"CD"),(100,"C"),(90,"XC"),
@@ -980,8 +1013,11 @@ def compute_all(data: dict, authored: dict) -> dict:
 
     char_auth_by_id = {a["id"]: a for a in authored["characters"]}
 
+    site = dict(authored["site"])
+    site["intro_meta"] = compute_intro_meta(session_log)
+
     return {
-        "site": authored["site"],
+        "site": site,
         "party": party,
         "characters_authored": char_auth_by_id,
         "kills_authored_by_key": {

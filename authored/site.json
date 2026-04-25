@@ -2,8 +2,8 @@
   "page_title": "The Company of the Wandering Star",
   "page_subtitle": "A ledger of those who walk &middot; and those they have laid down",
   "intro_epithet": "Five travellers and a storyteller, bound to a doomed road",
-  "intro_meta": "Five Sessions &middot; Kythorn 1494 DR",
   "footnote": "The names above are the names given &middot; the ones who fell were given no names",
+  "refreshed_through_session": 5,
   "road_ahead": {
     "known": [
       {
