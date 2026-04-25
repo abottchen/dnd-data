@@ -122,3 +122,15 @@ def test_append_chapters_emits_slice_per_unauthored_marker(helper_env):
     body = json.loads(Path(slices[0]["path"]).read_text())
     assert body["starts_at_session"] == "II"
     assert "crossroads" in body["narrative"]
+
+
+def test_append_npcs_emits_slice_per_unauthored_npc(helper_env):
+    """Fixture: site.known_npcs lists 'Azlund'; authored npcs is empty.
+    Expect one slice for Azlund with the session-I narrative line."""
+    out = run_helper("append-npcs", **helper_env)
+    slices = out["slices"]
+    assert len(slices) == 1
+    assert slices[0]["key"] == "Azlund"
+    body = json.loads(Path(slices[0]["path"]).read_text())
+    assert body["name"] == "Azlund"
+    assert any("Azlund" in m["line"] for m in body["mentions"])
