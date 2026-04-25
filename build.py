@@ -413,6 +413,68 @@ def compute_fortune(events: list) -> dict:
         "events": events,                # for Other Dice and tooltips
     }
 
+def compute_d20_histogram(physical_d20s: list[int], party_max: int) -> list[dict]:
+    counts = Counter(physical_d20s)
+    scale = max(party_max, 3)
+    bars = []
+    for v in range(1, 21):
+        n = counts.get(v, 0)
+        bars.append({
+            "value": v,
+            "count": n,
+            "height_pct": round(n / scale * 100) if scale else 0,
+            "zero": n == 0,
+        })
+    return bars
+
+def compute_party_d20_max(all_physicals_by_player: dict[str, list[int]]) -> int:
+    """Per-value max across the party (incl. GM)."""
+    party_max = 0
+    for v in range(1, 21):
+        s = sum(physicals.count(v) for physicals in all_physicals_by_player.values())
+        if s > party_max:
+            party_max = s
+    return party_max
+
+def compute_other_dice(events: list) -> list[dict]:
+    """Per-die-type rows: d4..d12+, with dot positions and avg/best."""
+    by_die: dict[str, list[dict]] = {}
+    for ev in events:
+        date = ev.get("date", "")
+        for d in ev.get("rolls", []):
+            t = d.get("type")
+            if t in (None, "d20", "d100", "mod"):
+                continue
+            if d.get("dropped"):
+                continue
+            v = int(d["value"])
+            face = int(t.lstrip("d"))
+            # d10 quirk: source stores 10 as value: 0
+            if face == 10 and v == 0:
+                v = 10
+            by_die.setdefault(t, []).append({"value": v, "face": face, "date": date})
+
+    rows = []
+    for die_type in sorted(by_die.keys(), key=lambda x: int(x.lstrip("d"))):
+        entries = by_die[die_type]
+        values = [e["value"] for e in entries]
+        face = entries[0]["face"]
+        N = len(values)
+        if N == 1:
+            xs = [189]
+        else:
+            xs = [round(24 + i / (N - 1) * 330) for i in range(N)]
+        ys = [round(56 - (v - 1) / (face - 1) * 52) for v in values]
+        rows.append({
+            "die": die_type,
+            "count": N,
+            "avg": round(sum(values) / N, 1),
+            "best": max(values),
+            "dots": [{"x": x, "y": y, "value": v, "date": e["date"]}
+                     for x, y, v, e in zip(xs, ys, values, entries)],
+        })
+    return rows
+
 def validate_all(data: dict, authored: dict) -> list[ValidationError]:
     errors: list[ValidationError] = []
     errors.extend(validate_kills(data["party"], authored["kills"]))

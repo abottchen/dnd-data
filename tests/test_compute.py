@@ -1,4 +1,4 @@
-from build import xp_for_cr, compute_trials, compute_sessions_chart, compute_fortune
+from build import xp_for_cr, compute_trials, compute_sessions_chart, compute_fortune, compute_d20_histogram
 
 def test_xp_for_cr_handles_fractions():
     assert xp_for_cr("1/8") == 25
@@ -54,3 +54,15 @@ def test_fortune_crit_count_excludes_dropped():
     ]
     f = compute_fortune(events)
     assert f["crits"] == 1
+
+def test_d20_histogram_emits_all_20_bars():
+    physicals = [20, 20, 1, 10]
+    bars = compute_d20_histogram(physicals, party_max=2)
+    assert len(bars) == 20
+    assert bars[0]["value"] == 1
+    assert bars[19]["value"] == 20
+    bar20 = next(b for b in bars if b["value"] == 20)
+    assert bar20["count"] == 2
+    bar5 = next(b for b in bars if b["value"] == 5)
+    assert bar5["count"] == 0
+    assert bar5["zero"] is True
