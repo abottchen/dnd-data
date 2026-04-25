@@ -12,6 +12,7 @@ Test override env vars:
 import argparse
 import json
 import os
+import re
 import sys
 import tempfile
 from collections import defaultdict
@@ -66,6 +67,12 @@ def _iu_date(entry: dict) -> str:
     return " ".join(parts) + " DR"
 
 
+def _mentions(name: str, text: str) -> bool:
+    """Word-boundary match — guards against an NPC name appearing inside a
+    larger word (e.g. a hypothetical NPC "Al" matching "All")."""
+    return re.search(r"\b" + re.escape(name) + r"\b", text) is not None
+
+
 def _session_index(roman: str, session_log: dict) -> int | None:
     """Return the 1-based ordinal of a session id within the log."""
     for i, e in enumerate(session_log["entries"], start=1):
@@ -102,7 +109,11 @@ def cmd_append_kills() -> int:
     auth_keys = {build.kill_key(k["character"], k["date"], k["creature"], k["method"])
                  for k in authored["kills"]}
 
-    sessions_by_date = {e["date"]: e for e in data["session_log"]["entries"]}
+    # First-seen wins on the rare same-date case (a long Saturday spanning two
+    # sessions): the earlier session in log order owns the date's kill narrative.
+    sessions_by_date: dict[str, dict] = {}
+    for e in data["session_log"]["entries"]:
+        sessions_by_date.setdefault(e["date"], e)
     new_by_date: dict[str, list[dict]] = defaultdict(list)
     for member in data["party"]["members"]:
         char = member["id"]
@@ -171,14 +182,20 @@ def cmd_append_chapters() -> int:
     auth_chapter_starts = {c["starts_at_session"] for c in authored["chapters"]}
     next_id = max((c["id"] for c in authored["chapters"]), default=0) + 1
 
+    entries = data["session_log"]["entries"]
+    by_session = {e.get("session"): e for e in entries}
+    chapter_session_ids = [e.get("session") for e in entries if e.get("chapter_marker")]
+    if entries:
+        first = entries[0].get("session")
+        if first not in chapter_session_ids:
+            chapter_session_ids = [first] + chapter_session_ids
+
     temp = _temp_dir()
     slices = []
-    for entry in data["session_log"]["entries"]:
-        if not entry.get("chapter_marker"):
-            continue
-        sid = entry.get("session")
+    for sid in chapter_session_ids:
         if sid in auth_chapter_starts:
             continue
+        entry = by_session.get(sid, {})
         slice_data = {
             "starts_at_session": sid,
             "real_date": entry.get("date"),
@@ -206,7 +223,7 @@ def cmd_append_npcs() -> int:
     for entry in data["session_log"]["entries"]:
         text = entry.get("text", "")
         for name in missing:
-            if name in text:
+            if _mentions(name, text):
                 mentions_by_npc[name].append({"session": entry.get("session"), "line": text})
 
     temp = _temp_dir()
@@ -303,7 +320,7 @@ def cmd_refresh_npcs() -> int:
         all_mentions = []
         new_mentions = 0
         for entry in data["session_log"]["entries"]:
-            if name not in entry.get("text", ""):
+            if not _mentions(name, entry.get("text", "")):
                 continue
             sid_idx = _session_index(entry.get("session"), data["session_log"]) or 0
             mention = {"session": entry.get("session"), "line": entry.get("text", "")}
@@ -420,11 +437,8 @@ SUBCOMMANDS: dict[str, Callable[[], int]] = {
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="hydrate-ledger slice helpers")
-    parser.add_argument("subcommand", choices=sorted(SUBCOMMANDS.keys()) or ["__none__"])
+    parser.add_argument("subcommand", choices=sorted(SUBCOMMANDS.keys()))
     args = parser.parse_args(argv)
-    if args.subcommand not in SUBCOMMANDS:
-        parser.error(f"unknown subcommand: {args.subcommand}")
-        return 2
     return SUBCOMMANDS[args.subcommand]()
 
 

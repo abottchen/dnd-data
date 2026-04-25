@@ -1,4 +1,4 @@
-You are authoring the character bundle (5 fields per PC) for one or more new
+You are authoring the character bundle (6 fields per PC) for one or more new
 party members on the dnd-data site.
 
 Your input:
@@ -13,7 +13,7 @@ The slice contains:
     chosen `distinction_title` for each new PC must not collide with these or
     with each other.
 
-For each new PC, author the 5-field bundle:
+For each new PC, author the 6-field bundle:
   - `epithet`: the prose oneliner under the character's name. Kenning-style,
     evocative of race/lineage and signature trait.
   - `reliquary_header`: title for the kill-list panel. A short character-voice

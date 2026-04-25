@@ -29,9 +29,14 @@ The page structure (HTML/CSS), every formula, the histogram math, the SVG layout
 The skill is an orchestrator. It does not load narrative data. Slice helpers
 introspect upstream + authored state; dispatch subagents author prose.
 
-1. **Read authored state.** Read `authored/*.json` and the marker
-   `site.refreshed_through_session`.
-2. **Append pass — gather slices.** Invoke each `append-*` helper in turn:
+1. **Read authored state and create the run's temp dir.** Read `authored/*.json`
+   and the marker `site.refreshed_through_session`. Create a single temp directory
+   for this run (e.g. `mktemp -d -t hydrate-XXXXXX`) and export
+   `HYDRATE_TEMP_DIR=<that-path>`. Every helper invocation in steps 2 and 6 must
+   inherit this env var so all slice files for the run land in one place — the
+   "preserve on failure / clean on full success" rule operates on this single dir.
+2. **Append pass — gather slices.** Invoke each `append-*` helper in turn (with
+   `HYDRATE_TEMP_DIR` exported from step 1):
    ```bash
    .venv/bin/python .claude/skills/hydrate-ledger/helpers.py append-kills
    .venv/bin/python .claude/skills/hydrate-ledger/helpers.py append-sessions
@@ -54,7 +59,8 @@ introspect upstream + authored state; dispatch subagents author prose.
    selection.
 5. **Refresh pass — trigger check.** Compute `latest_session = len(session_log.entries)`.
    If `latest_session == site.refreshed_through_session`, skip the refresh pass.
-6. **Refresh pass — gather slices.** Invoke each `refresh-*` helper:
+6. **Refresh pass — gather slices.** Invoke each `refresh-*` helper (with
+   `HYDRATE_TEMP_DIR` still exported from step 1):
    ```bash
    .venv/bin/python .claude/skills/hydrate-ledger/helpers.py refresh-chapters
    .venv/bin/python .claude/skills/hydrate-ledger/helpers.py refresh-npcs
