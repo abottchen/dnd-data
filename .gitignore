@@ -17,6 +17,7 @@ session-log.json
 __pycache__/
 .pytest_cache/
 *.pyc
+.venv
 .venv/
 
 # Editor swap/temp files
