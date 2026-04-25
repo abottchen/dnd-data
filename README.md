@@ -4,12 +4,64 @@ A static GitHub Pages site visualizing data from an ongoing D&D campaign.
 
 ## How it works
 
-- `party.json`, `dicex-rolls-*.json`, and `session-log.json` are pushed here from upstream repos (gitignored from this repo's perspective).
-- `build.py` reads those files plus the authored prose store, validates every authored entry, and renders `index.html` via Jinja2 templates.
-- The committed `index.html` is a build artifact. GitHub Pages serves it directly from `main` (root); there is no CI build step.
-- When new upstream data lands, pull `main`, run `build.py` (or invoke the `hydrate-ledger` skill in a Claude session for any prose authoring), commit, push.
+Three upstream repos auto-push JSON snapshots into this repo (gitignored). A deterministic Python builder reads those snapshots plus a small store of human-authored prose, validates everything, and renders `index.html` via Jinja2 templates. GitHub Pages serves the committed `index.html` directly from `main` — there is no CI build step.
 
-See `CLAUDE.md` for architecture details, validation rules, and the hydration workflow.
+When new upstream data lands, the authored prose store needs new entries (kill verses, session summaries, NPC epithets, etc.) and existing entries may need a refresh. That work happens in a local Claude Code session via the `hydrate-ledger` skill — see [Hydration architecture](#hydration-architecture).
+
+See [`CLAUDE.md`](CLAUDE.md) for full architecture detail and validation rules.
+
+## Build pipeline
+
+```mermaid
+flowchart LR
+    subgraph up [upstream repos · auto-push]
+      direction TB
+      P1[party.json]
+      P2[dicex-rolls-*.json]
+      P3[session-log.json]
+    end
+    up --> B
+    A[authored/*.json] --> B
+    T[templates/*.html] --> B
+    B["build.py<br/>validate · compute · render"] --> I[index.html]
+    I --> GH((GitHub Pages))
+```
+
+The three upstream files are gitignored — they carry real player names that must never reach `index.html`. `build.py`'s loaders scrub names at read time using the substring map in `.claude/skills/hydrate-ledger/dice-players.json`. Versioned git hooks under `.githooks/` reject any commit, message, or pushed change whose content matches a known full-name pattern.
+
+## Hydration architecture
+
+`hydrate-ledger` is the local Claude Code skill that authors prose into `authored/*.json` and runs `build.py`. It splits into three layers so the orchestrator's context stays roughly constant as the campaign grows.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant U as upstream + authored
+    participant H as helpers.py
+    participant T as temp dir
+    participant O as orchestrator
+    participant S as subagent (×N parallel)
+    participant A as authored/*.json
+    participant B as build.py
+
+    O->>H: invoke append-* / refresh-*
+    H->>U: read state
+    H->>T: write one slice per entity
+    H-->>O: {path, count, key} only
+    O->>S: dispatch with slice path
+    S->>T: read slice + voice samples
+    S-->>O: JSON decision
+    O->>A: write prose
+    O->>B: run build.py
+```
+
+- **Orchestrator** — the skill itself. Reads `authored/*.json` and small upstream metadata for diffing; never reads narrative.
+- **Slice helpers** (`helpers.py`) — deterministic CLI subcommands that introspect upstream + authored state, write one slice file per entity to a per-run temp dir, and print only `{path, count, key}` to stdout.
+- **Dispatched subagents** — spawned via the Agent tool, in parallel. Each receives one slice path plus a category-specific prompt template under `.claude/skills/hydrate-ledger/dispatch/*.md`, reads the slice and `voice-samples.md`, and returns one JSON decision object.
+
+The core invariant: **the orchestrator never reads slice contents.** If it ever ingested slice bytes its context would grow with the campaign and the architecture would be pointless. The temp directory is cleaned only on full success; any failure preserves it so the user can inspect exactly what each agent saw.
+
+Full design: [`docs/superpowers/specs/2026-04-25-subagent-dispatch-architecture-design.md`](docs/superpowers/specs/2026-04-25-subagent-dispatch-architecture-design.md).
 
 ## Files
 
@@ -18,10 +70,14 @@ See `CLAUDE.md` for architecture details, validation rules, and the hydration wo
 - `templates/` — Jinja2 partials for page structure.
 - `authored/` — JSON prose store (`kills`, `sessions`, `chapters`, `npcs`, `characters`, `site`).
 - `styles.css` — the design system.
-- `tests/` — pytest suite (32 cases) covering validators, computation formulas, and bestiary lookup.
+- `tests/` — pytest suite (61 cases) covering validators, key matching, computation formulas, slice helpers, and bestiary lookup.
 - `requirements.txt` — Python dependencies.
 - `images/` — character portrait tokens, referenced by each entry's `image` field in `party.json`.
+- `.claude/skills/hydrate-ledger/` — orchestrator workflow, slice helpers, dispatch templates, voice samples, and the dice-player name map.
+- `.claude/skills/bestiarylookup/` — looks up creatures in 5etools data; used by `hydrate-ledger`.
+- `.claude/ext/5etools-src` — symlink to a local 5etools-src checkout, gitignored. See `.claude/ext/README.md`.
 - `.githooks/` — versioned `pre-commit` / `commit-msg` / `pre-push` hooks that block forbidden-name leaks.
+- `docs/superpowers/specs/`, `docs/superpowers/plans/` — design specs and implementation plans.
 - `party.json`, `dicex-rolls-*.json`, `session-log.json` — upstream data files (gitignored).
 
 ## Local setup
@@ -30,6 +86,7 @@ See `CLAUDE.md` for architecture details, validation rules, and the hydration wo
 python3 -m venv .venv
 .venv/bin/pip install -r requirements.txt
 git config core.hooksPath .githooks
+ln -s /path/to/5etools-src .claude/ext/5etools-src
 ```
 
 ## Local rebuild

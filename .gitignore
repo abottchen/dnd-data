@@ -1,6 +1,8 @@
 # Tooling / external deps
 .superpowers/
 .claude/ext/5etools-src
+.worktrees/
+/.mcp.json
 
 # Sensitive source data — contains real player names/handles.
 # Not needed to display index.html; hydration runs locally against these.
@@ -8,14 +10,11 @@ party.json
 dicex-rolls-*.json
 session-log.json
 
-# Hydration skill holds the real-name → character mapping.
-# Local-only until the mapping is extracted to a separate gitignored file.
-.claude/skills/hydrate-ledger/
-
 # Python build artifacts
 __pycache__/
 .pytest_cache/
 *.pyc
+.venv
 .venv/
 
 # Editor swap/temp files

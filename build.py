@@ -884,7 +884,7 @@ def load_data(data_dir: Path) -> dict:
             if not isinstance(pdata, dict):
                 continue
             upstream_name = pdata.get("name", "")
-            slug = dice_player_map.get(upstream_name)
+            slug = _resolve_dice_player(upstream_name, dice_player_map)
             if slug is None:
                 unmapped_players.add(upstream_name)
                 continue
@@ -958,8 +958,11 @@ def load_data(data_dir: Path) -> dict:
 DICE_PLAYER_MAP_PATH = Path(".claude/skills/hydrate-ledger/dice-players.json")
 
 def _load_dice_player_map() -> dict[str, str]:
-    """Read the gitignored dice-players mapping (real-name/handle -> site slug).
-    Empty dict if the file is missing; callers must surface unmapped players as errors."""
+    """Read the dice-players mapping (substring pattern -> site slug).
+    Empty dict if the file is missing; callers must surface unmapped players as errors.
+    Keys are first-name or handle substrings; the upstream player name from the dice
+    JSON resolves via `_resolve_dice_player` (longest-pattern-first substring match)
+    so the file never has to record full real names."""
     path = REPO_ROOT / DICE_PLAYER_MAP_PATH
     if not path.exists():
         return {}
@@ -969,6 +972,16 @@ def _load_dice_player_map() -> dict[str, str]:
         return {}
     m = content.get("mapping", {})
     return {k: v for k, v in m.items() if isinstance(k, str) and isinstance(v, str)}
+
+
+def _resolve_dice_player(upstream_name: str, mapping: dict[str, str]) -> str | None:
+    """Resolve an upstream dice-roll player name to a site slug via longest-first
+    substring match. Longest-first guards against pattern collisions if two
+    overlapping keys ever coexist (a longer specific key shadows a shorter prefix)."""
+    for pattern in sorted(mapping, key=len, reverse=True):
+        if pattern and pattern in upstream_name:
+            return mapping[pattern]
+    return None
 
 def load_authored(repo_root: Path) -> dict:
     """Load authored/*.json. Missing files become empty defaults so build can report MISSING errors."""

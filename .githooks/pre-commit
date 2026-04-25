@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Refuse to commit any staged changes that introduce a forbidden name.
-# Source list: .claude/skills/hydrate-ledger/dice-players.json -> forbidden_in_commits
+# Pattern source: .githooks/_forbidden-names.sh
 # Bypass (use sparingly): git commit --no-verify
 
 hook_dir="$(cd "$(dirname "$0")" && pwd)"

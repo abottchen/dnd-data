@@ -1,0 +1,14 @@
+{
+  "intro_epithet": "A small ledger.",
+  "page_title": "The Test Saga",
+  "page_subtitle": "by the test fellowship",
+  "road_ahead": {
+    "known": [{"name": "Azlund's offer", "gloss": "the merchant's pitch awaits answer"}],
+    "was_known": [],
+    "direction": "south, eventually"
+  },
+  "gm": {"name": "GM", "epithet": "behind the screen", "meta": ""},
+  "known_npcs": ["Azlund"],
+  "footnote": "fixtures only",
+  "refreshed_through_session": 1
+}
