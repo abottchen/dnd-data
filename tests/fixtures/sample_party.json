@@ -1,0 +1,27 @@
+{
+  "members": [
+    {
+      "id": "anton",
+      "name": "Anton Truebranch",
+      "image": "anton-truebranch.png",
+      "race": "Halfling",
+      "class": "Bard",
+      "kills": [
+        {"date": "2026-04-19", "creature": "Goblin", "method": "Vicious Mockery"},
+        {"date": "2026-04-23", "creature": "Bandit", "method": "Vicious Mockery"}
+      ],
+      "skills": {"Persuasion": {"mod": 5}}
+    },
+    {
+      "id": "vex",
+      "name": "Vex Stormcaller",
+      "image": "vex-stormcaller.png",
+      "race": "Tiefling",
+      "class": "Fighter",
+      "kills": [
+        {"date": "2026-04-19", "creature": "Goblin", "method": "Longsword"}
+      ],
+      "skills": {"Athletics": {"mod": 4}}
+    }
+  ]
+}

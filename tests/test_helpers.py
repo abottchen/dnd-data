@@ -1,0 +1,63 @@
+"""Tests for the hydrate-ledger slice helpers.
+
+The helpers live in a gitignored skill directory so a fresh clone (or CI
+without the skill installed) gracefully skips these tests. When the skill
+IS installed, the helpers module is imported by manipulating sys.path —
+the helpers themselves do the same dance for `import build`.
+"""
+import json
+import shutil
+import subprocess
+import sys
+from pathlib import Path
+
+import pytest
+
+REPO_ROOT = Path(__file__).resolve().parent.parent
+HELPERS_PATH = REPO_ROOT / ".claude/skills/hydrate-ledger/helpers.py"
+FIXTURES = REPO_ROOT / "tests/fixtures"
+
+if not HELPERS_PATH.exists():
+    pytest.skip("hydrate-ledger skill not installed", allow_module_level=True)
+
+
+def run_helper(subcommand: str, data_dir: Path, authored_dir: Path, temp_dir: Path) -> dict:
+    """Run a helper subcommand as a subprocess (matches real invocation) and
+    return parsed stdout JSON. data_dir / authored_dir / temp_dir override the
+    helper's default repo-relative paths via env vars."""
+    env = {
+        "HYDRATE_DATA_DIR": str(data_dir),
+        "HYDRATE_AUTHORED_DIR": str(authored_dir),
+        "HYDRATE_TEMP_DIR": str(temp_dir),
+        "PATH": "/usr/bin:/bin",
+    }
+    result = subprocess.run(
+        [sys.executable, str(HELPERS_PATH), subcommand],
+        capture_output=True, text=True, env=env, check=True,
+    )
+    return json.loads(result.stdout)
+
+
+@pytest.fixture
+def helper_env(tmp_path):
+    """Materialize a writable copy of the fixture data + authored store +
+    temp dir under tmp_path, so each test gets clean state."""
+    data_dir = tmp_path / "data"
+    data_dir.mkdir()
+    shutil.copy(FIXTURES / "sample_party.json", data_dir / "party.json")
+    shutil.copy(FIXTURES / "sample_session_log.json", data_dir / "session-log.json")
+    shutil.copy(FIXTURES / "sample_dicex_rolls.json", data_dir / "dicex-rolls-2026-04-23.json")
+
+    authored_dir = tmp_path / "authored"
+    authored_dir.mkdir()
+    for f in (FIXTURES / "sample_authored").iterdir():
+        shutil.copy(f, authored_dir / f.name)
+
+    temp_dir = tmp_path / "temp"
+    temp_dir.mkdir()
+    return {"data_dir": data_dir, "authored_dir": authored_dir, "temp_dir": temp_dir}
+
+
+def test_skill_directory_present():
+    """Sanity check that the skip guard would have triggered if absent."""
+    assert HELPERS_PATH.exists()
