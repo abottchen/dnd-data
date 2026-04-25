@@ -164,3 +164,19 @@ def test_refresh_chapters_count_zero_when_no_new_sessions(helper_env):
     # one entry per authored chapter; count derives from new-session membership
     keys = {s["key"] for s in slices}
     assert "1" in keys
+
+
+def test_refresh_npcs_count_reflects_mentions_since_marker(helper_env):
+    """Add 'Azlund' to authored npcs (with allegiance + epithet), then ensure
+    refresh-npcs reports a slice with count = mentions since marker.
+    Fixture: marker=1; session I has 'Azlund the merchant', session II does not.
+    Expect one slice with key='Azlund' and count=0 (no mentions postdate marker)."""
+    npcs_path = helper_env["authored_dir"] / "npcs.json"
+    npcs_path.write_text(json.dumps([
+        {"name": "Azlund", "allegiance": "with",
+         "epithet": "the merchant who brokers what others would not"}
+    ]))
+    out = run_helper("refresh-npcs", **helper_env)
+    slices = {s["key"]: s for s in out["slices"]}
+    assert "Azlund" in slices
+    assert slices["Azlund"]["count"] == 0
