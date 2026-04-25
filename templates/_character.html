@@ -1,0 +1,31 @@
+    <article class="character" id="{{ member.id }}">
+      <header class="character-header">
+        <img class="portrait" src="images/{{ member.image }}" alt="">
+        <div class="identity">
+          <div class="name">{{ member.name }}</div>
+          <div class="epithet">{{ member.identity | default("") | safe }}</div>
+          {%- set tier_labels = ["Zeroth", "First", "Second", "Third", "Fourth", "Fifth"] %}
+          {%- set lvl = (member.level | int) %}
+          {%- if lvl < 0 %}{% set lvl = 0 %}{% endif %}
+          {%- if lvl > 5 %}{% set lvl = 5 %}{% endif %}
+          <div class="meta">{{ member.class }} &middot; {{ tier_labels[lvl] }} Tier &middot; {{ member.background }}</div>
+        </div>
+        <div class="vitals-block">
+          <div class="vital"><span class="label">Armor</span><span class="val">{{ member.ac.value if member.ac.value is defined else member.ac }}</span></div>
+          <div class="vital"><span class="label">Hit Points</span><span class="val">{{ member.hp.max }}</span></div>
+          <div class="vital"><span class="label">Speed</span><span class="val">{{ member.speed }}</span></div>
+        </div>
+      </header>
+
+      <nav class="character-toc" aria-label="Sections">
+        <a href="#{{ member.id }}-trials">Trials</a>
+        <a href="#{{ member.id }}-fortune">Fortune</a>
+        <a href="#{{ member.id }}-reliquary">Reliquary</a>
+      </nav>
+
+      {% include "_trials.html" %}
+      {% include "_abilities.html" %}
+      {% include "_proficiencies.html" %}
+      {% include "_fortune.html" %}
+      {% include "_reliquary.html" %}
+    </article>
