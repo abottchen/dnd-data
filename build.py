@@ -77,7 +77,7 @@ REQUIRED_SESSION_FIELDS = ("title", "summary", "silent_roll")
 REQUIRED_CHAPTER_FIELDS = ("title", "epigraph")
 REQUIRED_NPC_FIELDS = ("epithet",)
 REQUIRED_CHAR_FIELDS = ("reliquary_header", "constellation_epithet",
-                         "distinction_title", "distinction_subtitle")
+                         "distinction_title", "distinction_subtitle", "distinction_detail")
 REQUIRED_SITE_FIELDS = ("intro_epithet", "intro_meta", "page_title", "page_subtitle")
 
 def _missing_or_blank(entry: dict, field: str) -> bool:
@@ -653,6 +653,7 @@ def compute_distinctions(party: dict, characters_authored: list) -> list[dict]:
             "name": m.get("name", m["id"].title()),
             "title": a.get("distinction_title", ""),
             "subtitle": a.get("distinction_subtitle", ""),
+            "detail": a.get("distinction_detail", ""),
         })
     return rows
 

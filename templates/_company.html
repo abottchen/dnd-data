@@ -112,6 +112,9 @@
         <div class="distinction-name">{{ d.name }} &middot; {{ d.title }}</div>
         <div class="distinction-title">{{ d.subtitle | safe }}</div>
       </div>
+      <div class="distinction-detail-wrap">
+        <div class="distinction-detail">{{ d.detail | safe }}</div>
+      </div>
       {%- endfor %}
     </div>
   </section>
