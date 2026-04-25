@@ -20,16 +20,16 @@ from pathlib import Path
 from typing import Callable
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
-sys.path.insert(0, str(REPO_ROOT))
+sys.path.insert(0, str(REPO_ROOT / "build"))
 import build  # noqa: E402
 
 
 def _data_dir() -> Path:
-    return Path(os.environ.get("HYDRATE_DATA_DIR", REPO_ROOT))
+    return Path(os.environ.get("HYDRATE_DATA_DIR", REPO_ROOT / "data"))
 
 
 def _authored_dir() -> Path:
-    return Path(os.environ.get("HYDRATE_AUTHORED_DIR", REPO_ROOT / "authored"))
+    return Path(os.environ.get("HYDRATE_AUTHORED_DIR", REPO_ROOT / "build" / "authored"))
 
 
 def _temp_dir() -> Path:
@@ -40,7 +40,7 @@ def _temp_dir() -> Path:
 
 
 def _load_authored() -> dict:
-    """Load all authored/*.json files, keyed by stem (kills, sessions, ...).
+    """Load all build/authored/*.json files, keyed by stem (kills, sessions, ...).
 
     site.json is loaded as a dict; the rest are lists.
     """
