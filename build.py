@@ -76,7 +76,7 @@ def validate_kills(party: dict, authored: list) -> list[ValidationError]:
 REQUIRED_SESSION_FIELDS = ("title", "summary", "silent_roll")
 REQUIRED_CHAPTER_FIELDS = ("title", "epigraph")
 REQUIRED_NPC_FIELDS = ("epithet",)
-REQUIRED_CHAR_FIELDS = ("reliquary_header", "constellation_epithet",
+REQUIRED_CHAR_FIELDS = ("epithet", "reliquary_header", "constellation_epithet",
                          "distinction_title", "distinction_subtitle", "distinction_detail")
 REQUIRED_SITE_FIELDS = ("intro_epithet", "intro_meta", "page_title", "page_subtitle")
 
@@ -395,9 +395,13 @@ def compute_fortune(events: list) -> dict:
                 physical_d20s.append(v)
                 if not d.get("dropped"):
                     kept_d20s.append(v)
-        # Heaviest blow: rolls involving non-d20 / non-d100 / non-mod dice
+        # Heaviest blow: pure damage rolls only. Excludes any event containing a d20
+        # (attack rolls, saves, ability checks) or a d100 (percentile rolls in this
+        # dice system pair d100 with a d10 for the units digit, so the d10 alone
+        # is not a damage signal).
         types_in_event = {d.get("type") for d in ev.get("rolls", [])}
-        is_damage = bool(types_in_event - {"d20", "d100", "mod"})
+        is_damage = (not (types_in_event & {"d20", "d100"})
+                     and bool(types_in_event - {"mod"}))
         if is_damage and ev.get("total", 0) > heaviest["total"]:
             heaviest = {"total": ev["total"], "notation": ev.get("notation", "")}
 
@@ -456,9 +460,15 @@ def compute_other_dice(events: list) -> list[dict]:
     by_die: dict[str, list[dict]] = {}
     for ev in events:
         date = ev.get("date", "")
+        # Percentile rolls in this dice system pair a d100 with a d10 for the
+        # units digit. Drop the units d10 so it doesn't pollute the d10 row.
+        types_in_event = {d.get("type") for d in ev.get("rolls", [])}
+        skip_units_d10 = "d100" in types_in_event
         for d in ev.get("rolls", []):
             t = d.get("type")
             if t in (None, "d20", "d100", "mod"):
+                continue
+            if t == "d10" and skip_units_d10:
                 continue
             if d.get("dropped"):
                 continue
@@ -489,6 +499,46 @@ def compute_other_dice(events: list) -> list[dict]:
                      for x, y, v, e in zip(xs, ys, values, entries)],
         })
     return rows
+
+SKILL_DISPLAY = {
+    "acrobatics": "Acrobatics",
+    "animalHandling": "Animal Handling",
+    "arcana": "Arcana",
+    "athletics": "Athletics",
+    "deception": "Deception",
+    "history": "History",
+    "insight": "Insight",
+    "intimidation": "Intimidation",
+    "investigation": "Investigation",
+    "medicine": "Medicine",
+    "nature": "Nature",
+    "perception": "Perception",
+    "performance": "Performance",
+    "persuasion": "Persuasion",
+    "religion": "Religion",
+    "sleightOfHand": "Sleight of Hand",
+    "stealth": "Stealth",
+    "survival": "Survival",
+}
+
+_PROF_RANK = {"expertise": 3, "full": 2, "half": 1, "none": 0}
+
+def compute_best_skill(member: dict) -> dict | None:
+    """Return {'name': 'Persuasion', 'mod': 5} for the member's strongest skill.
+    Tie-break: higher proficiency rank, then alphabetical skill key."""
+    skills = member.get("skills") or {}
+    if not skills:
+        return None
+    def sort_key(item):
+        key, info = item
+        return (info.get("mod", 0),
+                _PROF_RANK.get(info.get("prof", "none"), 0),
+                -ord(key[0]) if key else 0)
+    best_key, best = max(skills.items(), key=sort_key)
+    return {
+        "name": SKILL_DISPLAY.get(best_key, best_key),
+        "mod": best.get("mod", 0),
+    }
 
 def compute_constellation(party: dict, fortune_by_char: dict, trials: dict) -> dict:
     """Position each (non-GM) character by (xp, total rolls). Excludes GM."""
@@ -851,8 +901,9 @@ def compute_all(data: dict, authored: dict) -> dict:
     rolls_by_slug = data.get("rolls_by_slug", {})
 
     trials = compute_trials(party)
-    fortune_by_char = {m["id"]: compute_fortune(rolls_by_slug.get(m["id"], []))
-                       for m in party.get("members", [])}
+    fortune_ids = [m["id"] for m in party.get("members", [])] + ["gm"]
+    fortune_by_char = {cid: compute_fortune(rolls_by_slug.get(cid, []))
+                       for cid in fortune_ids}
     sessions_chart = compute_sessions_chart(party)
 
     # Histograms
@@ -868,6 +919,7 @@ def compute_all(data: dict, authored: dict) -> dict:
     ledger = compute_company_ledger(party, data.get("dice_rolls", []), session_log, trials, fortune_by_char)
     distinctions = compute_distinctions(party, authored["characters"])
     patron = compute_patron_die(fortune_by_char, party)
+    best_skill_by_id = {m["id"]: compute_best_skill(m) for m in party.get("members", [])}
 
     char_auth_by_id = {a["id"]: a for a in authored["characters"]}
 
@@ -890,6 +942,7 @@ def compute_all(data: dict, authored: dict) -> dict:
         "ledger": ledger,
         "distinctions": distinctions,
         "patron_die": patron,
+        "best_skill_by_id": best_skill_by_id,
         "npcs_by_allegiance": _split_npcs(authored["npcs"]),
     }
 

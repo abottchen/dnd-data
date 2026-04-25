@@ -1,6 +1,7 @@
 [
   {
     "id": "anton",
+    "epithet": "of the Halflings, whose tongue cuts sharper than his blade",
     "reliquary_header": "Fallen by his tongue",
     "constellation_epithet": "his rolls yet unwritten",
     "distinction_title": "Sharpest Tongue",
@@ -9,6 +10,7 @@
   },
   {
     "id": "grieg",
+    "epithet": "of the Wulven, sworn to the hunt",
     "reliquary_header": "Fallen by his hand",
     "constellation_epithet": "the ready hand",
     "distinction_title": "Cleanest Hand",
@@ -17,6 +19,7 @@
   },
   {
     "id": "vex",
+    "epithet": "of the Gold Dragonborn, born to breath and blade",
     "reliquary_header": "Fallen by his steel",
     "constellation_epithet": "blade in every fight",
     "distinction_title": "Widest Blade",
@@ -25,6 +28,7 @@
   },
   {
     "id": "urida",
+    "epithet": "of the Rock Gnomes, reader of the threefold weave",
     "reliquary_header": "Fallen by her bell",
     "constellation_epithet": "the heaviest lift",
     "distinction_title": "Most Souls Gathered",
@@ -33,6 +37,7 @@
   },
   {
     "id": "chumble",
+    "epithet": "of the Dhakaani, bound by pact to a shadow unseen",
     "reliquary_header": "Fallen by his pact-light",
     "constellation_epithet": "many rolls, one kill",
     "distinction_title": "Steadiest Hand",

@@ -58,6 +58,18 @@ End-to-end verification: run `build.py` and visually check the rendered page via
 
 `party.json` carries real player first names in the `player` field, dice-roll files carry real names or handles, and `session-log.json` narrative prose may reference real names. **None must appear on the rendered site.** All three source files are gitignored; the `hydrate-ledger` skill (also gitignored) holds the current name-to-character mapping and enforces scrubbing on every hydration.
 
+### Git hooks (forbidden-name guard)
+
+`.githooks/` contains versioned hooks (`pre-commit`, `commit-msg`, `pre-push`) that refuse to commit or push any change whose staged content, commit message, or pushed-commit content matches a forbidden name. The list is read at hook-time from the gitignored `.claude/skills/hydrate-ledger/dice-players.json` (`forbidden_in_commits` array), so the hook scripts themselves stay free of PII.
+
+Activate per clone with:
+
+```bash
+git config core.hooksPath .githooks
+```
+
+Bypass for a single commit/push (use sparingly): `--no-verify`.
+
 ## Preview locally
 
 `python3 -m http.server 8765 --bind 127.0.0.1 --directory .` from the repo root, then open `http://127.0.0.1:8765/`. It's a static site; no other tooling needed.

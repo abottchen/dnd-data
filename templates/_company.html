@@ -124,7 +124,7 @@
     <div class="patron-die">
       <div class="patron-die-chart">
         {%- for bar in patron_die %}
-        <div class="dice-col" data-val="{{ bar.value }}">
+        <div class="dice-col" data-val="{{ bar.value }}" data-count="{{ bar.count }}">
           <div class="dice-count{% if bar.zero %} zero{% endif %}">{% if bar.zero %}&middot;{% else %}{{ bar.count }}{% endif %}</div>
           <div class="dice-bar{% if bar.zero %} zero{% endif %}"{% if not bar.zero %} style="height:{{ bar.height_pct }}%"{% endif %}></div>
         </div>
@@ -132,7 +132,7 @@
       </div>
       <div class="dice-labels">
         {%- for bar in patron_die %}
-        <span class="lbl{% if bar.value == 1 or bar.value == 20 %} nat{% endif %}">{{ bar.value }}</span>
+        <span class="lbl{% if bar.value == 1 or bar.value == 20 %} nat{% endif %}" data-val="{{ bar.value }}">{{ bar.value }}</span>
         {%- endfor %}
       </div>
       <div class="patron-die-legend">

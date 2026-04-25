@@ -1,5 +1,5 @@
 <article class="character" id="gm">
-  {%- set gm_member = (party.members | selectattr("id", "equalto", "gm") | first) %}
+  {%- set gm_member = {"id": "gm"} %}
   {%- set gm_fortune = fortune.get("gm") if "gm" in fortune else None %}
   <header class="character-header">
     <img class="portrait" src="images/GM.png" alt="">

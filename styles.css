@@ -1204,6 +1204,7 @@ body {
 .dice-bar {
   background: var(--brass);
   width: 100%;
+  transition: filter 0.12s ease, box-shadow 0.12s ease;
 }
 
 .dice-bar.zero {
@@ -1217,6 +1218,11 @@ body {
 
 .dice-col[data-val="1"] .dice-bar:not(.zero) {
   background: #8a3a2a;
+}
+
+.dice-col:hover .dice-bar:not(.zero) {
+  filter: brightness(1.45);
+  box-shadow: 0 0 0 1px var(--paper);
 }
 
 .dice-labels {
@@ -1234,11 +1240,17 @@ body {
   font-size: 10px;
   color: var(--paper-dim);
   font-variant-numeric: tabular-nums;
+  transition: color 0.12s ease;
 }
 
 .dice-labels .lbl.nat {
   color: var(--brass);
   font-weight: 500;
+}
+
+.dice-labels .lbl.active {
+  color: var(--paper);
+  font-weight: 600;
 }
 
 /* ── Other Dice (non-d20 per-die breakdown) ─────────────── */

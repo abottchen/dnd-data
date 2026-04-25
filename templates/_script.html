@@ -20,15 +20,7 @@
     })();
 
     (function () {
-      // Sessions Chart ("Across the Ages") tooltips: show creatures killed per bar.
-      const KILLS_BY_CHAR_SESSION = {
-        anton:   { "29 MAR": [["Sahuagin Warrior", "Vicious Mockery"]], "19 APR": [] },
-        grieg:   { "29 MAR": [], "19 APR": [["Bandit", "Shoved off ship"], ["Pirate", "Shoved off ship"]] },
-        vex:     { "29 MAR": [["Sahuagin Warrior", "Scimitar"], ["Sahuagin Warrior", "Shortsword"]], "19 APR": [["Bandit", "Scimitar"]] },
-        urida:   { "29 MAR": [["Sahuagin Warrior", "Toll the Dead"]], "19 APR": [["Bandit", "Magic Missile"], ["Pirate", "Toll the Dead"]] },
-        chumble: { "29 MAR": [], "19 APR": [["Bandit", "Eldritch Blast"]] }
-      };
-
+      // Sessions Chart ("Across the Ages") tooltips: read kills from each bar's data-kills attribute.
       let sessionTip = document.querySelector('.dice-tooltip');
       if (!sessionTip) {
         sessionTip = document.createElement('div');
@@ -38,14 +30,15 @@
       let sessionHideTimer;
 
       document.querySelectorAll('.session-bar').forEach(bar => {
-        const article = bar.closest('article.character');
-        if (!article) return;
-        const charKills = KILLS_BY_CHAR_SESSION[article.id];
-        if (!charKills) return;
         const labelEl = bar.querySelector('.bar-label');
         if (!labelEl) return;
         const date = labelEl.textContent.trim();
-        const kills = charKills[date] || [];
+        let kills = [];
+        try {
+          kills = JSON.parse(bar.getAttribute('data-kills') || '[]');
+        } catch (e) {
+          kills = [];
+        }
         const barEl = bar.querySelector('.bar');
 
         const show = () => {
@@ -56,7 +49,7 @@
           if (count > 0) {
             html += '<ul class="tip-list">';
             kills.forEach(k => {
-              html += '<li>' + k[0] + ' <span class="method">' + k[1] + '</span></li>';
+              html += '<li>' + k.creature + ' <span class="method">' + k.method + '</span></li>';
             });
             html += '</ul>';
           }
@@ -72,6 +65,66 @@
         };
         bar.addEventListener('mouseenter', show);
         bar.addEventListener('mouseleave', hide);
+      });
+    })();
+
+    (function () {
+      // Twenty Faces histogram tooltips: face, count, % of casts, and (when sample size warrants) deviation from the fair share.
+      const DEVIATION_MIN_TOTAL = 40;
+      let tip = document.querySelector('.dice-tooltip');
+      if (!tip) {
+        tip = document.createElement('div');
+        tip.className = 'dice-tooltip';
+        document.body.appendChild(tip);
+      }
+      let hideTimer;
+
+      document.querySelectorAll('.dice-hist, .patron-die-chart').forEach(hist => {
+        const cols = Array.from(hist.querySelectorAll('.dice-col'));
+        const total = cols.reduce((s, c) => s + (parseInt(c.dataset.count, 10) || 0), 0);
+        if (total === 0) return;
+        const expected = total / 20;
+        const showDeviation = total >= DEVIATION_MIN_TOTAL;
+        const wrap = hist.parentElement;
+        const labelEls = wrap ? Array.from(wrap.querySelectorAll(':scope > .dice-labels .lbl')) : [];
+        const labelByVal = Object.fromEntries(labelEls.map(el => [el.dataset.val, el]));
+
+        cols.forEach(col => {
+          const value = parseInt(col.dataset.val, 10);
+          const count = parseInt(col.dataset.count, 10) || 0;
+          const pct = Math.round(count / total * 100);
+          const matchingLabel = labelByVal[col.dataset.val];
+
+          const show = () => {
+            clearTimeout(hideTimer);
+            let html = '<div class="tip-val">' + count + '</div>';
+            html += '<div class="tip-ctx">Face ' + value + ' &middot; ' + pct + '% of casts</div>';
+            if (showDeviation) {
+              const dev = count - expected;
+              let line;
+              if (Math.abs(dev) < 0.5) {
+                line = 'even with the fair share';
+              } else if (dev > 0) {
+                line = '+' + dev.toFixed(1) + ' above the fair share';
+              } else {
+                line = '&minus;' + Math.abs(dev).toFixed(1) + ' below the fair share';
+              }
+              html += '<div class="tip-ctx">' + line + '</div>';
+            }
+            tip.innerHTML = html;
+            const r = col.getBoundingClientRect();
+            tip.style.left = (r.left + r.width / 2) + 'px';
+            tip.style.top = r.top + 'px';
+            tip.classList.add('visible');
+            if (matchingLabel) matchingLabel.classList.add('active');
+          };
+          const hide = () => {
+            hideTimer = setTimeout(() => tip.classList.remove('visible'), 80);
+            if (matchingLabel) matchingLabel.classList.remove('active');
+          };
+          col.addEventListener('mouseenter', show);
+          col.addEventListener('mouseleave', hide);
+        });
       });
     })();
 
