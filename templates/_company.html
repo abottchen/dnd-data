@@ -1,0 +1,153 @@
+<article class="character" id="company">
+  <header class="company-intro">
+    <div class="company-intro-epithet">{{ site.intro_epithet }}</div>
+    <div class="company-intro-meta">{{ site.intro_meta | safe }}</div>
+  </header>
+
+  <section class="company-section company-ledger">
+    <div class="company-section-header">The Company's Ledger</div>
+    <div class="trials-grid">
+      <div class="trial">
+        <div class="trial-label">Souls Gathered</div>
+        <div class="trial-val">{{ ledger.total_xp }}</div>
+        <div class="trial-sub">Experience, total</div>
+      </div>
+      <div class="trial">
+        <div class="trial-label">Fallen by the Company</div>
+        <div class="trial-val">{{ ledger.total_kills }}</div>
+        <div class="trial-sub">Creatures, all hands</div>
+      </div>
+      <div class="trial">
+        <div class="trial-label">Rolls Cast</div>
+        <div class="trial-val">{{ ledger.total_rolls }}</div>
+        <div class="trial-sub">{{ ledger.total_d20s }} on the twenty</div>
+      </div>
+      <div class="trial">
+        <div class="trial-label">Sessions Kept</div>
+        <div class="trial-val">{{ ledger.sessions_kept }}</div>
+        <div class="trial-sub">Nights at the table</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="company-section">
+    <div class="company-section-header">The Constellation</div>
+    <div class="constellation">
+      <div class="constellation-plot">
+        <div class="constellation-axis-y-label">Presence &middot; rolls cast &rarr;</div>
+        <div class="constellation-axis-x-label">Contribution &middot; experience earned &rarr;</div>
+        <span class="constellation-tick-y" style="top: 0%;">{{ constellation.party_max_rolls }}</span>
+        <span class="constellation-tick-y" style="top: 50%;">{{ constellation.mid_rolls }}</span>
+        <span class="constellation-tick-y" style="top: 100%;">0</span>
+        <span class="constellation-tick-x" style="left: 4%;">0</span>
+        <span class="constellation-tick-x" style="left: 50%;">{{ constellation.mid_xp }}</span>
+        <span class="constellation-tick-x" style="left: 96%;">{{ constellation.party_max_xp }}</span>
+        {%- for star in constellation.stars %}
+          {%- set member = (party.members | selectattr("id", "equalto", star.id) | first) %}
+          {%- set auth = characters_authored[star.id] %}
+        <div class="constellation-star" style="top: {{ star.top_pct }}%; left: {{ star.left_pct }}%;">
+          <img class="portrait" src="images/{{ member.image }}" alt="">
+          <div class="star-name">{{ member.name }}</div>
+          <div class="star-epithet">{{ auth.constellation_epithet }}</div>
+        </div>
+        {%- endfor %}
+      </div>
+    </div>
+  </section>
+
+  <section class="company-section">
+    <div class="company-section-header">The Bestiary</div>
+    <div class="bestiary-grid">
+      {%- for group in bestiary %}
+      <div class="bestiary-group">
+        <div class="bestiary-group-label">{{ group.type | title }} <span class="count">{{ group.total }}</span></div>
+        <ul class="bestiary-list">
+          {%- for c in group.creatures %}
+          <li>
+            <span class="bestiary-creature">{{ c.name }}</span>
+            <span class="bestiary-marks">{% for _ in range(c.count) %}&#10013;{% if not loop.last %} {% endif %}{% endfor %}</span>
+          </li>
+          {%- endfor %}
+        </ul>
+      </div>
+      {%- endfor %}
+    </div>
+  </section>
+
+  <section class="company-section">
+    <div class="company-section-header">The Chronicle</div>
+    {% include "_chronicle.html" %}
+  </section>
+
+  <section class="company-section">
+    <div class="company-section-header">The Road Ahead</div>
+    <div class="road-ahead">
+      <div class="road-ahead-block">
+        <div class="road-ahead-sub">What Is Known</div>
+        <ul class="road-ahead-list">
+          {%- for entry in site.road_ahead.known %}
+          <li><span class="road-ahead-name">{{ entry.name | safe }}</span> &mdash; {{ entry.gloss | safe }}</li>
+          {%- endfor %}
+          {%- if site.road_ahead.was_known %}
+          {%- for entry in site.road_ahead.was_known %}
+          <li class="was-known"><span class="road-ahead-name">{{ entry.name | safe }}</span> &mdash; {{ entry.gloss | safe }}</li>
+          {%- endfor %}
+          {%- endif %}
+        </ul>
+      </div>
+      <div class="road-ahead-block">
+        <div class="road-ahead-sub">Where They Turn</div>
+        <p class="road-ahead-prose">{{ site.road_ahead.direction | safe }}</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="company-section">
+    <div class="company-section-header">Distinctions</div>
+    <div class="distinctions">
+      {%- for d in distinctions %}
+        {%- set member = (party.members | selectattr("id", "equalto", d.id) | first) %}
+      <div class="distinction-portrait-wrap"><img class="distinction-portrait" src="images/{{ member.image }}" alt=""></div>
+      <div class="distinction-title-wrap">
+        <div class="distinction-name">{{ d.name }} &middot; {{ d.title }}</div>
+        <div class="distinction-title">{{ d.subtitle | safe }}</div>
+      </div>
+      {%- endfor %}
+    </div>
+  </section>
+
+  <section class="company-section">
+    <div class="company-section-header">The Patron Die</div>
+    <div class="patron-die">
+      <div class="patron-die-chart">
+        {%- for bar in patron_die %}
+        <div class="dice-col" data-val="{{ bar.value }}">
+          <div class="dice-count{% if bar.zero %} zero{% endif %}">{% if bar.zero %}&middot;{% else %}{{ bar.count }}{% endif %}</div>
+          <div class="dice-bar{% if bar.zero %} zero{% endif %}"{% if not bar.zero %} style="height:{{ bar.height_pct }}%"{% endif %}></div>
+        </div>
+        {%- endfor %}
+      </div>
+      <div class="dice-labels">
+        {%- for bar in patron_die %}
+        <span class="lbl{% if bar.value == 1 or bar.value == 20 %} nat{% endif %}">{{ bar.value }}</span>
+        {%- endfor %}
+      </div>
+      <div class="patron-die-legend">
+        <span class="swatch"></span>The Company
+      </div>
+    </div>
+  </section>
+
+  <section class="company-section silent-roll">
+    <div class="company-section-header">The Silent Roll</div>
+    <ul class="silent-roll-list">
+      {%- for ch in chronicle.chapters %}
+        {%- for s in ch.sessions %}
+          {%- for line in s.silent_roll %}
+      <li><b>{{ s.real_date_label }}</b> {{ line | safe }}</li>
+          {%- endfor %}
+        {%- endfor %}
+      {%- endfor %}
+    </ul>
+  </section>
+</article>
