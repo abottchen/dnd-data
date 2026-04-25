@@ -1,0 +1,42 @@
+[
+  {
+    "id": "anton",
+    "reliquary_header": "Fallen by his tongue",
+    "constellation_epithet": "his rolls yet unwritten",
+    "distinction_title": "Sharpest Tongue",
+    "distinction_subtitle": "the only kill drawn with words alone",
+    "distinction_detail": "<b>1</b> kill &middot; Vicious Mockery"
+  },
+  {
+    "id": "grieg",
+    "reliquary_header": "Fallen by his hand",
+    "constellation_epithet": "the ready hand",
+    "distinction_title": "Cleanest Hand",
+    "distinction_subtitle": "whose kills left no blood on the deck",
+    "distinction_detail": "<b>2</b> kills &middot; shoved overboard"
+  },
+  {
+    "id": "vex",
+    "reliquary_header": "Fallen by his steel",
+    "constellation_epithet": "blade in every fight",
+    "distinction_title": "Widest Blade",
+    "distinction_subtitle": "who fells with every length of steel",
+    "distinction_detail": "<b>3</b> kills &middot; two weapons"
+  },
+  {
+    "id": "urida",
+    "reliquary_header": "Fallen by her bell",
+    "constellation_epithet": "the heaviest lift",
+    "distinction_title": "Most Souls Gathered",
+    "distinction_subtitle": "the heaviest lift the company has known",
+    "distinction_detail": "<b>325</b> XP &middot; 36% of the company"
+  },
+  {
+    "id": "chumble",
+    "reliquary_header": "Fallen by his pact-light",
+    "constellation_epithet": "many rolls, one kill",
+    "distinction_title": "Steadiest Hand",
+    "distinction_subtitle": "whose dice keep the highest company",
+    "distinction_detail": "avg <b>14.7</b> &middot; &sigma; 4.9"
+  }
+]
