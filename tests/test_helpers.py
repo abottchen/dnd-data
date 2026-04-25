@@ -90,7 +90,7 @@ def test_append_kills_emits_slice_per_session_with_new_kills(helper_env):
 
     # Slice file for 04-19 should describe Vex's Goblin and contain narrative.
     body = json.loads(Path(by_key["2026-04-19"]["path"]).read_text())
-    assert body["session"] == "I"
+    assert body["session"] == 1
     assert body["real_date"] == "2026-04-19"
     assert any(k["character"] == "vex" and k["creature"] == "Goblin" for k in body["kills"])
     assert "Daggerford" in body["narrative"]
@@ -102,11 +102,11 @@ def test_append_sessions_emits_slice_per_unauthored_session(helper_env):
     out = run_helper("append-sessions", **helper_env)
     slices = out["slices"]
     assert len(slices) == 1
-    assert slices[0]["key"] == "II"
+    assert slices[0]["key"] == 2
     assert slices[0]["count"] == 1
 
     body = json.loads(Path(slices[0]["path"]).read_text())
-    assert body["session"] == "II"
+    assert body["session"] == 2
     assert body["real_date"] == "2026-04-23"
     assert "crossroads" in body["narrative"]
     assert body["chapter_marker"] is True
@@ -120,7 +120,7 @@ def test_append_chapters_emits_slice_per_unauthored_marker(helper_env):
     assert len(slices) == 1
     assert slices[0]["key"] == "2"
     body = json.loads(Path(slices[0]["path"]).read_text())
-    assert body["starts_at_session"] == "II"
+    assert body["starts_at_session"] == 2
     assert "crossroads" in body["narrative"]
 
 

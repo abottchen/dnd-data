@@ -1,6 +1,6 @@
 [
   {
-    "session": "I",
+    "session": 1,
     "date": "2026-03-15",
     "title": "An Oath, a Map, and a Sending Stone",
     "summary": "No blade was drawn. The company took Azlund's oath under zone of truth, received the map of Chult and fifty gold apiece, and boarded The Horizon at the Waterdeep docks.",
@@ -8,7 +8,7 @@
     "chapter_id": 1
   },
   {
-    "session": "II",
+    "session": 2,
     "date": "2026-03-22",
     "title": "The Horizon, and the First Storm",
     "summary": "Days aboard the Horizon: Chumble hid in a pickle-barrel and woke with a familiar named Wickles. The storm came on the fourth day; six hands met it, and every rope held.",
@@ -16,7 +16,7 @@
     "chapter_id": 1
   },
   {
-    "session": "III",
+    "session": 3,
     "date": "2026-03-29",
     "title": "Blades in the Salt",
     "summary": "Sahuagin boarded at dusk. Corwin and Dragonbait held the prow; the company took the stern. Four fell to the party &mdash; blade, mockery, and bell. A flash of blue light behind a crate was not commented upon.",
@@ -24,7 +24,7 @@
     "chapter_id": 1
   },
   {
-    "session": "IV",
+    "session": 4,
     "date": "2026-04-12",
     "title": "The Ring, Revealed",
     "summary": "An arm-wrestle unmasked no secrets, but words did. Harlen was revealed a Zhentarim stowaway and the cheese-thief. Corwin showed his left hand, told his name, and named the Ring of Winter.",
@@ -32,7 +32,7 @@
     "chapter_id": 1
   },
   {
-    "session": "V",
+    "session": 5,
     "date": "2026-04-19",
     "title": "Through Pirate Steel, into Nyanzaru",
     "summary": "Pirates boarded in the night. The deck ran red. When it became clear the company could not win the tally, Artus Cimber teleported them to Port Nyanzaru in a flash of ice and turned alone to the remaining crew.",

@@ -107,15 +107,15 @@ def _mentions(name: str, text: str) -> bool:
     return False
 
 
-def _session_index(roman: str, session_log: dict) -> int | None:
+def _session_index(sid: int, session_log: dict) -> int | None:
     """Return the 1-based ordinal of a session id within the log."""
     for i, e in enumerate(session_log["entries"], start=1):
-        if e.get("session") == roman:
+        if e.get("session") == sid:
             return i
     return None
 
 
-def _chapter_session_ids(chapter_id: int, chapters: list, session_log: dict) -> list[str]:
+def _chapter_session_ids(chapter_id: int, chapters: list, session_log: dict) -> list[int]:
     """Return ordered list of session ids that belong to the given chapter.
 
     Returns empty list if the chapter's starts_at_session is not yet in the log.
