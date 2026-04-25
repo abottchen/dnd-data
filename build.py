@@ -76,7 +76,8 @@ def validate_kills(party: dict, authored: list) -> list[ValidationError]:
 REQUIRED_SESSION_FIELDS = ("title", "summary", "silent_roll")
 REQUIRED_CHAPTER_FIELDS = ("title", "epigraph")
 REQUIRED_NPC_FIELDS = ("epithet",)
-REQUIRED_CHAR_FIELDS = ("reliquary_header", "constellation_epithet")
+REQUIRED_CHAR_FIELDS = ("reliquary_header", "constellation_epithet",
+                         "distinction_title", "distinction_subtitle")
 REQUIRED_SITE_FIELDS = ("intro_epithet", "intro_meta", "page_title", "page_subtitle")
 
 def _missing_or_blank(entry: dict, field: str) -> bool:
@@ -628,6 +629,39 @@ def _render_session(entry: dict, auth_by_id: dict, kills_by_date: dict) -> dict:
         "kill_pips": kills,
     }
 
+def compute_distinctions(party: dict, characters_authored: list) -> list[dict]:
+    """Pair each non-GM character with their authored distinction crown."""
+    by_id = {a["id"]: a for a in characters_authored}
+    rows = []
+    for m in party.get("members", []):
+        if m["id"] == "gm":
+            continue
+        a = by_id.get(m["id"], {})
+        rows.append({
+            "id": m["id"],
+            "name": m.get("name", m["id"].title()),
+            "title": a.get("distinction_title", ""),
+            "subtitle": a.get("distinction_subtitle", ""),
+        })
+    return rows
+
+def validate_distinction_uniqueness(authored: list) -> list[ValidationError]:
+    """Distinction titles must be unique across the party."""
+    errors: list[ValidationError] = []
+    seen: dict[str, str] = {}
+    for a in authored:
+        t = a.get("distinction_title", "").strip().lower()
+        if not t:
+            continue
+        if t in seen:
+            errors.append(ValidationError(
+                KIND_MALFORMED, "characters", (a["id"],),
+                field=f"distinction_title duplicates '{seen[t]}'"
+            ))
+        else:
+            seen[t] = a["id"]
+    return errors
+
 def validate_all(data: dict, authored: dict) -> list[ValidationError]:
     errors: list[ValidationError] = []
     errors.extend(validate_kills(data["party"], authored["kills"]))
@@ -636,6 +670,7 @@ def validate_all(data: dict, authored: dict) -> list[ValidationError]:
     npcs = collect_npcs_from_log(data["session_log"], authored["site"])
     errors.extend(validate_npcs(npcs, authored["npcs"]))
     errors.extend(validate_characters(data["party"], authored["characters"]))
+    errors.extend(validate_distinction_uniqueness(authored["characters"]))
     errors.extend(validate_site(authored["site"]))
     return errors
 
