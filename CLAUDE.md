@@ -32,7 +32,7 @@ Configure once: Settings → Pages → Source: **GitHub Actions**.
 
 ## Tests
 
-`.venv/bin/pytest tests/` runs the test suite (27 tests covering validators, key matching, computation formulas, and bestiary lookup).
+`.venv/bin/pytest tests/` runs the test suite — covers validators, key matching, computation formulas, slice helpers, and bestiary lookup.
 
 End-to-end verification: run `build/build.py` and visually check the rendered page via the local preview server.
 

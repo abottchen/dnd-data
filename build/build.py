@@ -986,9 +986,9 @@ def _resolve_dice_player(upstream_name: str, mapping: dict[str, str]) -> str | N
             return mapping[pattern]
     return None
 
-def load_authored(repo_root: Path) -> dict:
-    """Load authored/*.json. Missing files become empty defaults so build can report MISSING errors."""
-    auth_dir = Path(repo_root) / "authored"
+def load_authored(build_dir: Path) -> dict:
+    """Load <build_dir>/authored/*.json. Missing files become empty defaults so build can report MISSING errors."""
+    auth_dir = Path(build_dir) / "authored"
     def read_or(default, name):
         p = auth_dir / name
         return json.loads(p.read_text()) if p.exists() else default
@@ -1118,7 +1118,7 @@ def main() -> int:
     templates_dir = BUILD_DIR / "templates"
     base_template = templates_dir / "base.html"
     if not base_template.exists():
-        print(f"build.py: no templates/base.html yet; skipping render (compute only). "
+        print(f"build.py: no {base_template} yet; skipping render (compute only). "
               f"Create templates first (plan tasks 18-24).")
         return 0
 

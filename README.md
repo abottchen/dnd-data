@@ -75,7 +75,7 @@ Full design: [`docs/superpowers/specs/2026-04-25-subagent-dispatch-architecture-
   - `build/build.py` — deterministic Python renderer (validates authored entries, computes derived data, renders via Jinja2).
   - `build/templates/` — Jinja2 partials for page structure.
   - `build/authored/` — JSON prose store (`kills`, `sessions`, `chapters`, `npcs`, `characters`, `site`); the only writable surface for the hydrate-ledger skill.
-- `tests/` — pytest suite (61 cases) covering validators, key matching, computation formulas, slice helpers, and bestiary lookup.
+- `tests/` — pytest suite covering validators, key matching, computation formulas, slice helpers, and bestiary lookup.
 - `requirements.txt` — Python dependencies.
 - `.github/workflows/deploy-pages.yml` — uploads `site/` to GitHub Pages on push to `main`.
 - `.claude/skills/hydrate-ledger/` — orchestrator workflow, slice helpers, dispatch templates, voice samples, and the dice-player name map.
