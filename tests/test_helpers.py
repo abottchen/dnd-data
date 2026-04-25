@@ -196,3 +196,17 @@ def test_refresh_npcs_count_reflects_mentions_since_marker(helper_env):
     slices = {s["key"]: s for s in out["slices"]}
     assert "Azlund" in slices
     assert slices["Azlund"]["count"] == 0
+
+
+def test_refresh_road_ahead_emits_singleton(helper_env):
+    """Always emits one slice; count = sessions postdating the marker."""
+    out = run_helper("refresh-road-ahead", **helper_env)
+    slices = out["slices"]
+    assert len(slices) == 1
+    assert slices[0]["key"] == "all"
+    # marker=1, latest=2 → 1 new session
+    assert slices[0]["count"] == 1
+    body = json.loads(Path(slices[0]["path"]).read_text())
+    assert "new_sessions" in body
+    assert "existing" in body
+    assert "Azlund's offer" in {e["name"] for e in body["existing"]["known"]}
