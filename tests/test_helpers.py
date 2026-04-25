@@ -73,3 +73,24 @@ def test_helpers_cli_unknown_subcommand_exits_nonzero(helper_env):
         capture_output=True, text=True,
     )
     assert result.returncode != 0
+
+
+def test_append_kills_emits_slice_per_session_with_new_kills(helper_env):
+    """Fixture has 3 kills total (Anton: Goblin Apr 19, Anton: Bandit Apr 23,
+    Vex: Goblin Apr 19) and 1 authored kill (Anton's Goblin). Expect:
+      - one slice for 2026-04-19 with count=1 (Vex's Goblin)
+      - one slice for 2026-04-23 with count=1 (Anton's Bandit)
+    """
+    out = run_helper("append-kills", **helper_env)
+    slices = out["slices"]
+    by_key = {s["key"]: s for s in slices}
+    assert set(by_key) == {"2026-04-19", "2026-04-23"}
+    assert by_key["2026-04-19"]["count"] == 1
+    assert by_key["2026-04-23"]["count"] == 1
+
+    # Slice file for 04-19 should describe Vex's Goblin and contain narrative.
+    body = json.loads(Path(by_key["2026-04-19"]["path"]).read_text())
+    assert body["session"] == "I"
+    assert body["real_date"] == "2026-04-19"
+    assert any(k["character"] == "vex" and k["creature"] == "Goblin" for k in body["kills"])
+    assert "Daggerford" in body["narrative"]
