@@ -8,9 +8,12 @@ Exit codes:
 """
 from __future__ import annotations
 import argparse
+import functools
 import json
 import sys
+from collections import Counter
 from pathlib import Path
+from typing import Optional
 
 REPO_ROOT = Path(__file__).resolve().parent
 
@@ -183,6 +186,53 @@ def collect_npcs_from_log(session_log: dict, site: dict) -> list[str]:
                 seen.append(n)
                 seen_set.add(n)
     return seen
+
+BESTIARY_GLOB = ".claude/ext/5etools-src/data/bestiary/bestiary-*.json"
+
+# Source priority: XMM (5e 2024 Monster Manual) first, then originals, then minor.
+_BESTIARY_SOURCE_PRIORITY = ["XMM", "MM", "MPMM", "VRGR", "FTD", "MTF", "VGM", "ToA"]
+
+@functools.lru_cache(maxsize=1)
+def _load_bestiary() -> dict[str, dict]:
+    """Return name (lowercased) -> best entry across all bestiary files."""
+    import glob as _glob
+    by_name: dict[str, dict] = {}
+    files = sorted(_glob.glob(str(REPO_ROOT / BESTIARY_GLOB)))
+    if not files:
+        return by_name
+
+    def priority(src: str) -> int:
+        try:
+            return _BESTIARY_SOURCE_PRIORITY.index(src)
+        except ValueError:
+            return len(_BESTIARY_SOURCE_PRIORITY)
+
+    for fpath in files:
+        with open(fpath) as f:
+            content = json.load(f)
+        for m in content.get("monster", []):
+            name = m.get("name", "")
+            if not name:
+                continue
+            key = name.casefold()
+            existing = by_name.get(key)
+            if existing is None or priority(m.get("source", "")) < priority(existing.get("source", "")):
+                # Normalize type to a string (it can be "humanoid" or {"type": "humanoid", "tags": [...]}).
+                t = m.get("type", "")
+                if isinstance(t, dict):
+                    t = t.get("type", "")
+                by_name[key] = {
+                    "name": name,
+                    "type": t,
+                    "cr": m.get("cr"),
+                    "source": m.get("source", ""),
+                }
+    return by_name
+
+@functools.lru_cache(maxsize=2048)
+def bestiary_lookup(creature: str) -> Optional[dict]:
+    """Return {name, type, cr, source} for a creature, or None."""
+    return _load_bestiary().get(creature.casefold())
 
 def validate_all(data: dict, authored: dict) -> list[ValidationError]:
     errors: list[ValidationError] = []
