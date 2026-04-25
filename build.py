@@ -475,6 +475,69 @@ def compute_other_dice(events: list) -> list[dict]:
         })
     return rows
 
+def compute_constellation(party: dict, fortune_by_char: dict, trials: dict) -> dict:
+    """Position each (non-GM) character by (xp, total rolls). Excludes GM."""
+    members = [m for m in party.get("members", []) if m["id"] != "gm"]
+    party_max_xp = max((trials["per_char"][m["id"]]["xp"] for m in members), default=0)
+    party_max_rolls = max(
+        (fortune_by_char[m["id"]]["rolls_total"] for m in members), default=0
+    )
+
+    stars = []
+    for m in members:
+        cid = m["id"]
+        xp = trials["per_char"][cid]["xp"]
+        rolls = fortune_by_char[cid]["rolls_total"]
+        left = round(xp / party_max_xp * 92 + 4) if party_max_xp else 4
+        top = round(96 - rolls / party_max_rolls * 92) if party_max_rolls else 96
+        stars.append({"id": cid, "left_pct": left, "top_pct": top})
+
+    return {
+        "stars": stars,
+        "party_max_xp": party_max_xp,
+        "party_max_rolls": party_max_rolls,
+        "mid_xp": round(party_max_xp / 2),
+        "mid_rolls": round(party_max_rolls / 2),
+    }
+
+def compute_bestiary(party: dict) -> list[dict]:
+    """Group every kill by creature type, then by creature name within type."""
+    by_type: dict[str, dict[str, int]] = {}
+    for m in party.get("members", []):
+        for k in m.get("kills", []):
+            info = bestiary_lookup(k["creature"])
+            if not info:
+                continue
+            t = info["type"]
+            by_type.setdefault(t, {}).setdefault(info["name"], 0)
+            by_type[t][info["name"]] += 1
+
+    groups = []
+    for t in sorted(by_type.keys()):
+        creatures = sorted(by_type[t].items(), key=lambda kv: (-kv[1], kv[0].lower()))
+        groups.append({
+            "type": t,
+            "total": sum(c for _, c in creatures),
+            "creatures": [{"name": n, "count": c} for n, c in creatures],
+        })
+    return groups
+
+def compute_company_ledger(party: dict, dice_files: list, session_log: dict, trials: dict, fortune_by_char: dict) -> dict:
+    members = [m for m in party.get("members", []) if m["id"] != "gm"]
+    total_xp = sum(trials["per_char"][m["id"]]["xp"] for m in members)
+    total_kills = sum(trials["per_char"][m["id"]]["kill_count"] for m in members)
+    total_rolls = sum(fortune_by_char[m["id"]]["rolls_total"] for m in members)
+    total_d20s = sum(fortune_by_char[m["id"]]["physical_d20s_count"] for m in members)
+    sessions_kept = len(session_log.get("entries", []))
+
+    return {
+        "total_xp": total_xp,
+        "total_kills": total_kills,
+        "total_rolls": total_rolls,
+        "total_d20s": total_d20s,
+        "sessions_kept": sessions_kept,
+    }
+
 def validate_all(data: dict, authored: dict) -> list[ValidationError]:
     errors: list[ValidationError] = []
     errors.extend(validate_kills(data["party"], authored["kills"]))
