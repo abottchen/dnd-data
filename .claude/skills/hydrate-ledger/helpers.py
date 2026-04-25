@@ -42,13 +42,17 @@ def _temp_dir() -> Path:
 def _load_authored() -> dict:
     """Load all build/authored/*.json files, keyed by stem (kills, sessions, ...).
 
-    site.json is loaded as a dict; the rest are lists.
+    site.json is loaded as a dict; the rest are lists. Missing files default to
+    empty containers so the skill can run on a true cold start (no authored
+    store on disk yet); build.py will then surface the per-entry MISSING errors.
     """
     auth_dir = _authored_dir()
     out = {}
     for stem in ("kills", "sessions", "chapters", "npcs", "characters"):
-        out[stem] = json.loads((auth_dir / f"{stem}.json").read_text())
-    out["site"] = json.loads((auth_dir / "site.json").read_text())
+        p = auth_dir / f"{stem}.json"
+        out[stem] = json.loads(p.read_text()) if p.exists() else []
+    site_path = auth_dir / "site.json"
+    out["site"] = json.loads(site_path.read_text()) if site_path.exists() else {}
     return out
 
 

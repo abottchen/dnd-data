@@ -219,3 +219,22 @@ def test_refresh_intro_epithet_emits_singleton(helper_env):
     assert "new_sessions" in body
     assert "road_ahead_known" in body
     assert body["existing"] == "A small ledger."
+
+
+@pytest.mark.parametrize("subcommand", [
+    "append-kills",
+    "append-sessions",
+    "append-chapters",
+    "append-npcs",
+    "append-characters",
+])
+def test_append_helpers_tolerate_missing_authored_files(helper_env, subcommand, tmp_path):
+    """Cold start: with an empty authored/ dir (no JSON files yet), append-*
+    helpers must succeed and treat the authored store as empty containers,
+    rather than crashing on FileNotFoundError. This is the state of a fresh
+    clone before the first hydrate run."""
+    empty_authored = tmp_path / "empty-authored"
+    empty_authored.mkdir()
+    env = {**helper_env, "authored_dir": empty_authored}
+    out = run_helper(subcommand, **env)
+    assert "slices" in out
