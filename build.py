@@ -320,6 +320,59 @@ def compute_trials(party: dict) -> dict:
         "party_kills": party_kills,
     }
 
+def _short_date(iso_date: str) -> str:
+    """'2026-04-23' -> '23 APR'."""
+    from datetime import date
+    d = date.fromisoformat(iso_date)
+    return d.strftime("%d %b").upper()
+
+def compute_sessions_chart(party: dict) -> dict:
+    """Bars + tooltip-ready KILLS_BY_CHAR_SESSION map."""
+    members = party.get("members", [])
+
+    # Distinct sorted session dates across the party
+    all_dates = sorted({k["date"] for m in members for k in m.get("kills", [])})
+
+    # Per-char per-date counts
+    per_char_per_date: dict[str, dict[str, list[dict]]] = {}
+    for m in members:
+        cid = m["id"]
+        bucket: dict[str, list[dict]] = {d: [] for d in all_dates}
+        for k in m.get("kills", []):
+            bucket[k["date"]].append({"creature": k["creature"], "method": k["method"]})
+        per_char_per_date[cid] = bucket
+
+    # Party max per (char,session) count
+    party_max = max(
+        (len(per_char_per_date[m["id"]][d]) for m in members for d in all_dates),
+        default=0,
+    )
+    scale = max(party_max, 3)
+
+    per_char_bars: dict[str, list[dict]] = {}
+    for m in members:
+        cid = m["id"]
+        bars = []
+        for d in all_dates:
+            kl = per_char_per_date[cid][d]
+            n = len(kl)
+            bars.append({
+                "date": d,
+                "label": _short_date(d),
+                "count": n,
+                "height_pct": round(n / scale * 100),
+                "zero": n == 0,
+                "kills": kl,
+            })
+        per_char_bars[cid] = bars
+
+    return {
+        "sessions": [{"date": d, "label": _short_date(d)} for d in all_dates],
+        "per_char": per_char_bars,
+        "party_max": party_max,
+        "scale": scale,
+    }
+
 def validate_all(data: dict, authored: dict) -> list[ValidationError]:
     errors: list[ValidationError] = []
     errors.extend(validate_kills(data["party"], authored["kills"]))
