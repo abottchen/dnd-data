@@ -101,9 +101,44 @@ def test_validate_characters_missing_constellation_epithet():
     assert any(e.field == "constellation_epithet" for e in errors)
 
 def test_validate_site_required_keys():
-    site = {"intro_epithet": "x"}  # missing intro_meta, page_title, page_subtitle
-    errors = validate_site(site)
+    site = {"intro_epithet": "x", "refreshed_through_session": 0}
+    errors = validate_site(site, latest_session=5)
     fields = {e.field for e in errors}
-    assert "intro_meta" in fields
     assert "page_title" in fields
     assert "page_subtitle" in fields
+    assert "intro_meta" not in fields  # intro_meta is now build-computed, not authored
+
+def test_validate_site_missing_refreshed_through_session():
+    site = {"intro_epithet": "x", "page_title": "t", "page_subtitle": "s"}
+    errors = validate_site(site, latest_session=5)
+    assert any(e.field == "refreshed_through_session" for e in errors)
+
+def test_validate_site_negative_refreshed_through_session():
+    site = {"intro_epithet": "x", "page_title": "t", "page_subtitle": "s",
+            "refreshed_through_session": -1}
+    errors = validate_site(site, latest_session=5)
+    assert any(e.field == "refreshed_through_session" for e in errors)
+
+def test_validate_site_refreshed_through_session_above_latest():
+    site = {"intro_epithet": "x", "page_title": "t", "page_subtitle": "s",
+            "refreshed_through_session": 6}
+    errors = validate_site(site, latest_session=5)
+    assert any(e.field == "refreshed_through_session" for e in errors)
+
+def test_validate_site_rejects_bool_refreshed_through_session():
+    site = {"intro_epithet": "x", "page_title": "t", "page_subtitle": "s",
+            "refreshed_through_session": True}
+    errors = validate_site(site, latest_session=5)
+    assert any(e.field == "refreshed_through_session" for e in errors)
+
+def test_validate_site_rejects_still_present_intro_meta():
+    site = {"intro_epithet": "x", "page_title": "t", "page_subtitle": "s",
+            "refreshed_through_session": 5, "intro_meta": "Five Sessions"}
+    errors = validate_site(site, latest_session=5)
+    assert any(e.field == "intro_meta" for e in errors)
+
+def test_validate_site_passes_with_complete_singleton():
+    site = {"intro_epithet": "x", "page_title": "t", "page_subtitle": "s",
+            "refreshed_through_session": 5}
+    errors = validate_site(site, latest_session=5)
+    assert errors == []
