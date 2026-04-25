@@ -210,6 +210,20 @@ def load_data(data_dir: Path) -> dict:
     if isinstance(party, list):
         party = {"members": party}
 
+    # Scrub real-name data from party members at the edge.
+    # Upstream `id` may embed a real player first name (e.g. "simon-fighter"); the site slug
+    # is derivable from the character `name` field's first word, lowercased. `player` carries
+    # the real first name and must never reach downstream code, the authored store, or git.
+    scrubbed_members = []
+    for m in party.get("members", []):
+        m = dict(m)
+        if m.get("name"):
+            m["id"] = m["name"].split()[0].lower()
+        m.pop("player", None)
+        scrubbed_members.append(m)
+    party = dict(party)
+    party["members"] = scrubbed_members
+
     # Normalize session-log: upstream uses "id" and "realDate"; validators expect "session" and "date".
     normalized_entries = []
     for e in session_log.get("entries", []):

@@ -23,3 +23,17 @@ def test_load_data_collects_all_dice_files(tmp_path: Path):
     data = load_data(tmp_path)
 
     assert len(data["dice_rolls"]) == 2
+
+def test_load_data_scrubs_realname_ids_and_drops_player_field(tmp_path: Path):
+    (tmp_path / "party.json").write_text(json.dumps([
+        {"id": "simon-fighter", "name": "Grieg", "player": "Simon", "kills": []},
+        {"id": "steve-wizard", "name": "Urida", "player": "Steve", "kills": []},
+        {"id": "anton", "name": "Anton Truebranch", "player": "Quinn", "kills": []},
+    ]))
+    (tmp_path / "session-log.json").write_text(json.dumps({"entries": []}))
+
+    data = load_data(tmp_path)
+    members = data["party"]["members"]
+
+    assert [m["id"] for m in members] == ["grieg", "urida", "anton"]
+    assert all("player" not in m for m in members)
