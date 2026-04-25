@@ -395,6 +395,31 @@ def load_data(data_dir: Path) -> dict:
     dice_paths = sorted(data_dir.glob("dicex-rolls-*.json"))
     dice_rolls = [json.loads(p.read_text()) for p in dice_paths]
 
+    # Build rolls_by_slug from dice files by mapping real-name players to site slugs.
+    # Upstream shape: {"players": {uuid: {"name": str, "rolls": [event]}}, "exportedAt": str}.
+    # Each event has: {"dice": [die...], "total": N, "notation": str, "timestamp": str}.
+    # We normalize dice->rolls (to match compute_fortune's expected shape) and extract a date.
+    dice_player_map = _load_dice_player_map()
+    unmapped_players: set[str] = set()
+    rolls_by_slug: dict[str, list[dict]] = {}
+    for f in dice_rolls:
+        if not isinstance(f, dict) or "players" not in f:
+            continue
+        for uuid, pdata in f.get("players", {}).items():
+            if not isinstance(pdata, dict):
+                continue
+            upstream_name = pdata.get("name", "")
+            slug = dice_player_map.get(upstream_name)
+            if slug is None:
+                unmapped_players.add(upstream_name)
+                continue
+            for ev in pdata.get("rolls", []):
+                ev2 = dict(ev)
+                ev2["rolls"] = ev2.pop("dice", [])
+                ts = ev2.get("timestamp", "")
+                ev2["date"] = ts[:10] if ts else ""
+                rolls_by_slug.setdefault(slug, []).append(ev2)
+
     # Normalize party: upstream may emit a bare list; wrap it for downstream validators.
     if isinstance(party, list):
         party = {"members": party}
@@ -427,9 +452,26 @@ def load_data(data_dir: Path) -> dict:
 
     return {
         "party": party,
-        "dice_rolls": dice_rolls,  # list of file contents (each itself a list)
+        "dice_rolls": dice_rolls,  # raw file contents; downstream should prefer rolls_by_slug
+        "rolls_by_slug": rolls_by_slug,
+        "unmapped_players": sorted(unmapped_players),
         "session_log": session_log,
     }
+
+DICE_PLAYER_MAP_PATH = Path(".claude/skills/hydrate-ledger/dice-players.json")
+
+def _load_dice_player_map() -> dict[str, str]:
+    """Read the gitignored dice-players mapping (real-name/handle -> site slug).
+    Empty dict if the file is missing; callers must surface unmapped players as errors."""
+    path = REPO_ROOT / DICE_PLAYER_MAP_PATH
+    if not path.exists():
+        return {}
+    try:
+        content = json.loads(path.read_text())
+    except json.JSONDecodeError:
+        return {}
+    m = content.get("mapping", {})
+    return {k: v for k, v in m.items() if isinstance(k, str) and isinstance(v, str)}
 
 def load_authored(repo_root: Path) -> dict:
     """Load authored/*.json. Missing files become empty defaults so build can report MISSING errors."""
