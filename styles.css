@@ -501,20 +501,20 @@ body {
   position: relative;
   max-width: 1080px;
   margin: 0 auto;
-  height: 440px;
-  padding: 24px 60px;
+  height: 460px;
+  padding: 24px 80px 36px;
 }
 
 .constellation-plot {
   position: relative;
   width: 100%;
   height: 100%;
-  border-left: 1px solid var(--rule);
-  border-bottom: 1px solid var(--rule);
+  border-left: 1px solid var(--rule-strong);
+  border-bottom: 1px solid var(--rule-strong);
 }
 
-.constellation-axis-y,
-.constellation-axis-x {
+.constellation-axis-y-label,
+.constellation-axis-x-label {
   font-family: 'IBM Plex Sans', sans-serif;
   font-size: 9px;
   letter-spacing: 2px;
@@ -523,19 +523,61 @@ body {
   position: absolute;
 }
 
-.constellation-axis-y {
-  left: -4px;
+.constellation-axis-y-label {
+  left: -52px;
   top: 50%;
   transform-origin: left top;
   transform: rotate(-90deg) translateX(-50%);
   white-space: nowrap;
 }
 
-.constellation-axis-x {
-  bottom: -22px;
+.constellation-axis-x-label {
+  bottom: -34px;
   left: 50%;
   transform: translateX(-50%);
   white-space: nowrap;
+}
+
+.constellation-tick-x,
+.constellation-tick-y {
+  position: absolute;
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 10px;
+  color: var(--paper-dim);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.5px;
+}
+
+.constellation-tick-x {
+  bottom: -18px;
+  transform: translateX(-50%);
+  white-space: nowrap;
+}
+
+.constellation-tick-x::before {
+  content: '';
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  width: 1px;
+  height: 5px;
+  background: var(--rule-strong);
+}
+
+.constellation-tick-y {
+  left: -10px;
+  transform: translate(-100%, -50%);
+  white-space: nowrap;
+}
+
+.constellation-tick-y::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: -10px;
+  width: 5px;
+  height: 1px;
+  background: var(--rule-strong);
 }
 
 .constellation-star {
@@ -545,16 +587,12 @@ body {
   flex-direction: column;
   align-items: center;
   text-align: center;
+  z-index: 2;
 }
 
 .constellation-star .portrait {
   width: 72px;
   height: 72px;
-}
-
-.constellation-star.absent .portrait {
-  opacity: 0.35;
-  filter: grayscale(100%);
 }
 
 .constellation-star .star-name {
@@ -716,26 +754,6 @@ body {
   background: #8a3a2a;
 }
 
-.patron-die-gm-overlay {
-  grid-column: 1 / -1;
-  grid-row: 1;
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  display: block;
-  pointer-events: none;
-}
-
-.patron-die-gm-line {
-  fill: none;
-  stroke: var(--paper-dim);
-  stroke-width: 1.5;
-  stroke-linejoin: round;
-  stroke-linecap: round;
-  opacity: 0.65;
-}
-
 .patron-die-legend {
   font-family: 'IBM Plex Sans', sans-serif;
   font-size: 10px;
@@ -753,15 +771,6 @@ body {
   background: var(--brass);
   margin-right: 6px;
   vertical-align: middle;
-}
-
-.patron-die-legend .swatch.gm {
-  background: transparent;
-  border-top: 2px solid var(--paper-dim);
-  height: 0;
-  margin-right: 6px;
-  vertical-align: middle;
-  opacity: 0.65;
 }
 
 /* ── The Silent Roll ────────────────────────────────────── */
@@ -1195,6 +1204,7 @@ body {
 .dice-bar {
   background: var(--brass);
   width: 100%;
+  transition: filter 0.12s ease, box-shadow 0.12s ease;
 }
 
 .dice-bar.zero {
@@ -1208,6 +1218,11 @@ body {
 
 .dice-col[data-val="1"] .dice-bar:not(.zero) {
   background: #8a3a2a;
+}
+
+.dice-col:hover .dice-bar:not(.zero) {
+  filter: brightness(1.45);
+  box-shadow: 0 0 0 1px var(--paper);
 }
 
 .dice-labels {
@@ -1225,11 +1240,17 @@ body {
   font-size: 10px;
   color: var(--paper-dim);
   font-variant-numeric: tabular-nums;
+  transition: color 0.12s ease;
 }
 
 .dice-labels .lbl.nat {
   color: var(--brass);
   font-weight: 500;
+}
+
+.dice-labels .lbl.active {
+  color: var(--paper);
+  font-weight: 600;
 }
 
 /* ── Other Dice (non-d20 per-die breakdown) ─────────────── */
@@ -1530,4 +1551,219 @@ body {
   padding-top: 32px;
   border-top: 1px solid var(--rule);
   opacity: 0.7;
+}
+
+/* ── The Road Ahead ─────────────────────────────────────── */
+
+.road-ahead {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 56px;
+  max-width: 1080px;
+  margin: 0 auto;
+  align-items: start;
+}
+
+.road-ahead-block {
+  padding: 6px 0;
+}
+
+.road-ahead-sub {
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 10px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--brass);
+  margin-bottom: 18px;
+  border-bottom: 1px solid var(--rule);
+  padding-bottom: 10px;
+}
+
+.road-ahead-list {
+  list-style: none;
+}
+
+.road-ahead-list li {
+  font-family: 'EB Garamond', serif;
+  font-size: 16px;
+  color: var(--paper-dim);
+  line-height: 1.55;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--rule);
+}
+
+.road-ahead-list li:last-child {
+  border-bottom: none;
+}
+
+.road-ahead-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 600;
+  font-size: 18px;
+  color: var(--paper);
+  letter-spacing: 0.3px;
+  margin-right: 4px;
+}
+
+.road-ahead-prose {
+  font-family: 'EB Garamond', serif;
+  font-style: italic;
+  font-size: 18px;
+  color: var(--paper);
+  line-height: 1.55;
+  max-width: 360px;
+}
+
+/* ── Dramatis Personae (GM tab) ─────────────────────────── */
+
+.dramatis-personae {
+  margin-bottom: 56px;
+}
+
+.dramatis-header {
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 11px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--brass);
+  margin-bottom: 28px;
+  text-align: center;
+}
+
+.dramatis-header::before,
+.dramatis-header::after {
+  content: '—';
+  color: var(--brass-dim);
+  margin: 0 14px;
+}
+
+.dramatis-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  background: var(--rule);
+  border: 1px solid var(--rule);
+  max-width: 1180px;
+  margin: 0 auto;
+}
+
+.dramatis-column {
+  background: var(--ink-soft);
+  padding: 24px 28px;
+}
+
+.dramatis-sub {
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 10px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--brass);
+  margin-bottom: 14px;
+  border-bottom: 1px solid var(--rule);
+  padding-bottom: 8px;
+}
+
+.dramatis-list {
+  list-style: none;
+}
+
+.dramatis-list .npc {
+  display: block;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--rule);
+}
+
+.dramatis-list .npc:last-child {
+  border-bottom: none;
+}
+
+.npc-name {
+  display: block;
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 600;
+  font-size: 20px;
+  color: var(--brass);
+  letter-spacing: 0.3px;
+  line-height: 1.1;
+}
+
+.npc-epithet {
+  display: block;
+  font-family: 'EB Garamond', serif;
+  font-style: italic;
+  font-size: 14px;
+  color: var(--paper-dim);
+  margin-top: 4px;
+  line-height: 1.4;
+}
+
+/* ── Character tab TOC nav (>15 reliquary entries) ──────── */
+
+.character-toc {
+  display: none;
+  position: sticky;
+  top: 0;
+  background: var(--ink);
+  border-bottom: 1px solid var(--rule);
+  padding: 10px 0;
+  margin-bottom: 24px;
+  z-index: 10;
+  text-align: center;
+}
+
+.character-toc a {
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 10px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--brass-dim);
+  text-decoration: none;
+  padding: 4px 14px;
+  margin: 0 6px;
+  transition: color 0.12s;
+}
+
+.character-toc a:hover {
+  color: var(--brass);
+}
+
+.character.toc-active .character-toc {
+  display: block;
+}
+
+/* ── Reliquary chapter scoping (>20 entries) ────────────── */
+
+.reliquary-chapter {
+  margin-bottom: 28px;
+  border: 1px solid var(--rule);
+  background: var(--ink-soft);
+}
+
+.reliquary-chapter > summary {
+  list-style: none;
+  cursor: pointer;
+  padding: 16px 24px;
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 11px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--brass);
+  border-bottom: 1px solid var(--rule);
+  transition: color 0.12s;
+}
+
+.reliquary-chapter > summary::-webkit-details-marker {
+  display: none;
+}
+
+.reliquary-chapter > summary:hover {
+  color: var(--paper);
+}
+
+.reliquary-chapter[open] > summary {
+  border-bottom: 1px solid var(--rule-strong);
+}
+
+.reliquary-chapter > .fallen {
+  padding: 8px 24px 16px;
 }

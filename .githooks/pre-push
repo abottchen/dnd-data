@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+# Refuse to push any commit (in any of the refs being pushed) whose content or
+# message contains a forbidden name. Catches anything pre-commit / commit-msg
+# missed (e.g. commits authored before the hooks existed).
+#
+# Source list: .claude/skills/hydrate-ledger/dice-players.json -> forbidden_in_commits
+# Bypass (use sparingly): git push --no-verify
+
+hook_dir="$(cd "$(dirname "$0")" && pwd)"
+patterns="$(bash "$hook_dir/_forbidden-names.sh")"
+[ -z "$patterns" ] && exit 0
+
+ZERO="0000000000000000000000000000000000000000"
+violations=""
+
+while read local_ref local_sha remote_ref remote_sha; do
+  # Branch deletion — nothing to scan.
+  [ "$local_sha" = "$ZERO" ] && continue
+
+  if [ "$remote_sha" = "$ZERO" ]; then
+    # New branch: limit scan to commits not yet on any other remote ref to keep things bounded.
+    range_log=$(git rev-list "$local_sha" --not --remotes 2>/dev/null)
+  else
+    range_log=$(git rev-list "$remote_sha..$local_sha" 2>/dev/null)
+  fi
+
+  for sha in $range_log; do
+    msg_hits=$(git log -1 --format="%B" "$sha" | grep -nE "$patterns" || true)
+    if [ -n "$msg_hits" ]; then
+      violations+="  $sha (message):"$'\n'
+      violations+="$(echo "$msg_hits" | sed 's/^/    /')"$'\n'
+    fi
+    diff_hits=$(git show "$sha" -- | grep -E "^\+" | grep -vE "^\+\+\+" | grep -E "$patterns" || true)
+    if [ -n "$diff_hits" ]; then
+      violations+="  $sha (content):"$'\n'
+      violations+="$(echo "$diff_hits" | head -10 | sed 's/^/    /')"$'\n'
+    fi
+  done
+done
+
+if [ -n "$violations" ]; then
+  echo "" >&2
+  echo "✗ pre-push: forbidden name(s) in commits being pushed:" >&2
+  echo "" >&2
+  echo "$violations" >&2
+  echo "  Rewrite history to remove them, or to override: git push --no-verify" >&2
+  echo "" >&2
+  exit 1
+fi
+exit 0

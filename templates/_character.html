@@ -1,0 +1,38 @@
+    <article class="character" id="{{ member.id }}">
+      <header class="character-header">
+        <img class="portrait" src="images/{{ member.image }}" alt="">
+        <div class="identity">
+          <div class="name">{{ member.name }}</div>
+          <div class="epithet">{{ characters_authored[member.id].epithet | safe }}</div>
+          {%- set tier_labels = ["First", "Second", "Third", "Fourth", "Fifth"] %}
+          {%- set lvl = (member.level | int) %}
+          {%- if lvl < 1 %}{% set lvl = 1 %}{% endif %}
+          {%- if lvl > 5 %}{% set lvl = 5 %}{% endif %}
+          <div class="meta">{{ member.class }} &middot; {{ tier_labels[lvl - 1] }} Tier &middot; {{ member.background }}</div>
+        </div>
+        <div class="vitals-block">
+          <div class="vital"><span class="label">Armor</span><span class="val">{{ member.ac.value if member.ac.value is defined else member.ac }}</span></div>
+          <div class="vital"><span class="label">Hit Points</span><span class="val">{{ member.hp.max }}</span></div>
+          {%- set best = best_skill_by_id[member.id] %}
+          {%- if best %}
+            {%- set skill_mod = best.mod %}
+            {%- set skill_str = ("+" if skill_mod >= 0 else "") ~ skill_mod %}
+          <div class="vital"><span class="label">{{ best.name }}</span><span class="val">{{ skill_str | replace("-", "&minus;") | safe }}</span></div>
+          {%- else %}
+          <div class="vital"><span class="label">Speed</span><span class="val">{{ member.speed }}</span></div>
+          {%- endif %}
+        </div>
+      </header>
+
+      <nav class="character-toc" aria-label="Sections">
+        <a href="#{{ member.id }}-trials">Trials</a>
+        <a href="#{{ member.id }}-fortune">Fortune</a>
+        <a href="#{{ member.id }}-reliquary">Reliquary</a>
+      </nav>
+
+      {% include "_abilities.html" %}
+      {% include "_proficiencies.html" %}
+      {% include "_trials.html" %}
+      {% include "_fortune.html" %}
+      {% include "_reliquary.html" %}
+    </article>

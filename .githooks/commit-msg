@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+# Refuse a commit message containing a forbidden name.
+# Source list: .claude/skills/hydrate-ledger/dice-players.json -> forbidden_in_commits
+# Bypass (use sparingly): git commit --no-verify
+
+hook_dir="$(cd "$(dirname "$0")" && pwd)"
+patterns="$(bash "$hook_dir/_forbidden-names.sh")"
+[ -z "$patterns" ] && exit 0
+
+msg_file="$1"
+[ -f "$msg_file" ] || exit 0
+
+if grep -qE "$patterns" "$msg_file"; then
+  echo "" >&2
+  echo "✗ commit-msg: forbidden name(s) in commit message:" >&2
+  grep -nE "$patterns" "$msg_file" | sed 's/^/    /' >&2
+  echo "" >&2
+  echo "  Edit the message, or to override: git commit --no-verify" >&2
+  echo "" >&2
+  exit 1
+fi
+exit 0

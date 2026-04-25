@@ -1,0 +1,28 @@
+      <section class="proficiencies">
+        <div class="prof-label">Skills</div>
+        {%- set skill_names = {
+            "acrobatics": "Acrobatics",
+            "animalHandling": "Animal Handling",
+            "arcana": "Arcana",
+            "athletics": "Athletics",
+            "deception": "Deception",
+            "history": "History",
+            "insight": "Insight",
+            "intimidation": "Intimidation",
+            "investigation": "Investigation",
+            "medicine": "Medicine",
+            "nature": "Nature",
+            "perception": "Perception",
+            "performance": "Performance",
+            "persuasion": "Persuasion",
+            "religion": "Religion",
+            "sleightOfHand": "Sleight of Hand",
+            "stealth": "Stealth",
+            "survival": "Survival"
+        } %}
+        {%- set prof_skills = [] %}
+        {%- for key, val in member.skills.items() if val.prof == "full" %}
+          {%- set _ = prof_skills.append(skill_names.get(key, key)) %}
+        {%- endfor %}
+        <div class="prof-list">{{ prof_skills | join(" &middot; ") | safe }}</div>
+      </section>

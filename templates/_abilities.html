@@ -1,0 +1,16 @@
+      <section class="abilities">
+        {%- set ability_keys = ["str", "dex", "con", "int", "wis", "cha"] %}
+        {%- set ability_labels = {"str": "Strength", "dex": "Dexterity", "con": "Constitution", "int": "Intelligence", "wis": "Wisdom", "cha": "Charisma"} %}
+        {%- for key in ability_keys %}
+          {%- set score = member.abilities[key] %}
+          {%- set mod = (score - 10) // 2 %}
+          {%- set mod_str = ("+" if mod >= 0 else "") ~ mod %}
+          {%- set mod_display = mod_str | replace("-", "&minus;") %}
+          {%- set st = member.savingThrows[key] %}
+          {%- set save_val = st.mod %}
+          {%- set save_str = ("+" if save_val >= 0 else "") ~ save_val %}
+          {%- set save_display = save_str | replace("-", "&minus;") %}
+          {%- set is_proficient = st.prof %}
+        <div class="stat-card"><div class="stat-label">{{ ability_labels[key] }}</div><div class="stat-val">{{ score }}</div><div class="stat-mod">{{ mod_display | safe }}</div><div class="stat-save{% if is_proficient %} proficient{% endif %}"><span class="save-mark"></span>Save {{ save_display | safe }}</div></div>
+        {%- endfor %}
+      </section>

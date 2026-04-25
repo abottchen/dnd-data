@@ -1,0 +1,195 @@
+    (function () {
+      const tabs = document.querySelectorAll('.tab');
+      const panels = document.querySelectorAll('.character');
+      const valid = new Set([...panels].map(p => p.id));
+      const defaultId = tabs[0] && tabs[0].dataset.tab;
+
+      const landingId = 'company';
+
+      function activate(id) {
+        if (!valid.has(id)) id = valid.has(landingId) ? landingId : defaultId;
+        tabs.forEach(t => t.classList.toggle('active', t.dataset.tab === id));
+        panels.forEach(p => p.classList.toggle('active', p.id === id));
+      }
+
+      window.addEventListener('hashchange', () => {
+        activate(location.hash.slice(1));
+      });
+
+      activate(location.hash.slice(1));
+    })();
+
+    (function () {
+      // Sessions Chart ("Across the Ages") tooltips: read kills from each bar's data-kills attribute.
+      let sessionTip = document.querySelector('.dice-tooltip');
+      if (!sessionTip) {
+        sessionTip = document.createElement('div');
+        sessionTip.className = 'dice-tooltip';
+        document.body.appendChild(sessionTip);
+      }
+      let sessionHideTimer;
+
+      document.querySelectorAll('.session-bar').forEach(bar => {
+        const labelEl = bar.querySelector('.bar-label');
+        if (!labelEl) return;
+        const date = labelEl.textContent.trim();
+        let kills = [];
+        try {
+          kills = JSON.parse(bar.getAttribute('data-kills') || '[]');
+        } catch (e) {
+          kills = [];
+        }
+        const barEl = bar.querySelector('.bar');
+
+        const show = () => {
+          clearTimeout(sessionHideTimer);
+          const count = kills.length;
+          let html = '<div class="tip-val">' + count + '</div>';
+          html += '<div class="tip-ctx">' + (count === 0 ? 'No blade drawn' : (count === 1 ? '1 fallen' : count + ' fallen')) + ' &middot; ' + date + '</div>';
+          if (count > 0) {
+            html += '<ul class="tip-list">';
+            kills.forEach(k => {
+              html += '<li>' + k.creature + ' <span class="method">' + k.method + '</span></li>';
+            });
+            html += '</ul>';
+          }
+          sessionTip.innerHTML = html;
+          const anchor = barEl || bar;
+          const r = anchor.getBoundingClientRect();
+          sessionTip.style.left = (r.left + r.width / 2) + 'px';
+          sessionTip.style.top = r.top + 'px';
+          sessionTip.classList.add('visible');
+        };
+        const hide = () => {
+          sessionHideTimer = setTimeout(() => sessionTip.classList.remove('visible'), 80);
+        };
+        bar.addEventListener('mouseenter', show);
+        bar.addEventListener('mouseleave', hide);
+      });
+    })();
+
+    (function () {
+      // Twenty Faces histogram tooltips: face, count, % of casts, and (when sample size warrants) deviation from the fair share.
+      const DEVIATION_MIN_TOTAL = 40;
+      let tip = document.querySelector('.dice-tooltip');
+      if (!tip) {
+        tip = document.createElement('div');
+        tip.className = 'dice-tooltip';
+        document.body.appendChild(tip);
+      }
+      let hideTimer;
+
+      document.querySelectorAll('.dice-hist, .patron-die-chart').forEach(hist => {
+        const cols = Array.from(hist.querySelectorAll('.dice-col'));
+        const total = cols.reduce((s, c) => s + (parseInt(c.dataset.count, 10) || 0), 0);
+        if (total === 0) return;
+        const expected = total / 20;
+        const showDeviation = total >= DEVIATION_MIN_TOTAL;
+        const wrap = hist.parentElement;
+        const labelEls = wrap ? Array.from(wrap.querySelectorAll(':scope > .dice-labels .lbl')) : [];
+        const labelByVal = Object.fromEntries(labelEls.map(el => [el.dataset.val, el]));
+
+        cols.forEach(col => {
+          const value = parseInt(col.dataset.val, 10);
+          const count = parseInt(col.dataset.count, 10) || 0;
+          const pct = Math.round(count / total * 100);
+          const matchingLabel = labelByVal[col.dataset.val];
+
+          const show = () => {
+            clearTimeout(hideTimer);
+            let html = '<div class="tip-val">' + count + '</div>';
+            html += '<div class="tip-ctx">Face ' + value + ' &middot; ' + pct + '% of casts</div>';
+            if (showDeviation) {
+              const dev = count - expected;
+              let line;
+              if (Math.abs(dev) < 0.5) {
+                line = 'even with the fair share';
+              } else if (dev > 0) {
+                line = '+' + dev.toFixed(1) + ' above the fair share';
+              } else {
+                line = '&minus;' + Math.abs(dev).toFixed(1) + ' below the fair share';
+              }
+              html += '<div class="tip-ctx">' + line + '</div>';
+            }
+            tip.innerHTML = html;
+            const r = col.getBoundingClientRect();
+            tip.style.left = (r.left + r.width / 2) + 'px';
+            tip.style.top = r.top + 'px';
+            tip.classList.add('visible');
+            if (matchingLabel) matchingLabel.classList.add('active');
+          };
+          const hide = () => {
+            hideTimer = setTimeout(() => tip.classList.remove('visible'), 80);
+            if (matchingLabel) matchingLabel.classList.remove('active');
+          };
+          col.addEventListener('mouseenter', show);
+          col.addEventListener('mouseleave', hide);
+        });
+      });
+    })();
+
+    (function () {
+      const tip = document.createElement('div');
+      tip.className = 'dice-tooltip';
+      document.body.appendChild(tip);
+      let hideTimer;
+
+      const SVG_NS = 'http://www.w3.org/2000/svg';
+      const CHART_LEFT = 0, CHART_RIGHT = 360, CHART_HEIGHT = 60;
+
+      document.querySelectorAll('.dt-row').forEach(row => {
+        const label = row.querySelector('.dt-label');
+        if (!label) return;
+        const dieStr = label.childNodes[0].textContent.trim();
+        const m = dieStr.match(/d(\d+)/);
+        if (!m) return;
+        const max = parseInt(m[1], 10);
+        const svg = row.querySelector('.dt-chart');
+        if (!svg) return;
+        const dots = Array.from(svg.querySelectorAll('.roll-dot'));
+        if (!dots.length) return;
+        const xs = dots.map(d => parseFloat(d.getAttribute('cx')));
+
+        dots.forEach((dot, idx) => {
+          const cy = parseFloat(dot.getAttribute('cy'));
+          const value = Math.round(1 + (56 - cy) / 52 * (max - 1));
+          const date = dot.getAttribute('data-date') || '';
+
+          // Voronoi column: boundaries at midpoints to neighbors; edges extend to chart bounds.
+          const left = idx === 0 ? CHART_LEFT : (xs[idx - 1] + xs[idx]) / 2;
+          const right = idx === dots.length - 1 ? CHART_RIGHT : (xs[idx] + xs[idx + 1]) / 2;
+
+          const hit = document.createElementNS(SVG_NS, 'rect');
+          hit.setAttribute('class', 'hit');
+          hit.setAttribute('x', left);
+          hit.setAttribute('y', 0);
+          hit.setAttribute('width', right - left);
+          hit.setAttribute('height', CHART_HEIGHT);
+          hit.setAttribute('tabindex', '0');
+          hit.setAttribute('role', 'img');
+          hit.setAttribute('aria-label', dieStr + ', rolled ' + value + (date ? ' on ' + date : ''));
+          svg.appendChild(hit);
+
+          const show = () => {
+            clearTimeout(hideTimer);
+            dot.classList.add('active');
+            tip.innerHTML =
+              '<div class="tip-val">' + value + '</div>' +
+              (date ? '<div class="tip-ctx">' + date + '</div>' : '');
+            const r = dot.getBoundingClientRect();
+            tip.style.left = (r.left + r.width / 2) + 'px';
+            tip.style.top = r.top + 'px';
+            tip.classList.add('visible');
+          };
+          const hide = () => {
+            dot.classList.remove('active');
+            hideTimer = setTimeout(() => tip.classList.remove('visible'), 80);
+          };
+
+          hit.addEventListener('mouseenter', show);
+          hit.addEventListener('mouseleave', hide);
+          hit.addEventListener('focus', show);
+          hit.addEventListener('blur', hide);
+        });
+      });
+    })();

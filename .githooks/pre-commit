@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+# Refuse to commit any staged changes that introduce a forbidden name.
+# Source list: .claude/skills/hydrate-ledger/dice-players.json -> forbidden_in_commits
+# Bypass (use sparingly): git commit --no-verify
+
+hook_dir="$(cd "$(dirname "$0")" && pwd)"
+patterns="$(bash "$hook_dir/_forbidden-names.sh")"
+[ -z "$patterns" ] && exit 0
+
+violations=$(git diff --cached -U0 | grep -E "^\+" | grep -vE "^\+\+\+" | grep -E "$patterns" || true)
+if [ -n "$violations" ]; then
+  echo "" >&2
+  echo "✗ pre-commit: forbidden name(s) found in staged changes:" >&2
+  echo "$violations" | head -20 | sed 's/^/    /' >&2
+  echo "" >&2
+  echo "  Edit them out, or to override: git commit --no-verify" >&2
+  echo "" >&2
+  exit 1
+fi
+exit 0

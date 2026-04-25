@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>{{ site.page_title }}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <header class="page-header">
+    <h1>{{ site.page_title }}</h1>
+    <div class="sub">{{ site.page_subtitle | safe }}</div>
+  </header>
+
+  <nav class="tabs" role="tablist">
+    <a href="#company" class="tab" data-tab="company"><span class="tab-sigil">&#10022;</span>The Company</a>
+    {%- for member in party.members if member.id != "gm" %}
+    <a href="#{{ member.id }}" class="tab" data-tab="{{ member.id }}"><img src="images/{{ member.image }}" alt="">{{ member.id | title }}</a>
+    {%- endfor %}
+    <a href="#gm" class="tab" data-tab="gm"><img src="images/GM.png" alt="">GM</a>
+  </nav>
+
+  <main>
+    {% include "_company.html" %}
+    {%- for member in party.members if member.id != "gm" %}
+      {% include "_character.html" %}
+    {%- endfor %}
+    {% include "_gm.html" %}
+  </main>
+
+  <footer class="footnote">{{ site.footnote | safe }}</footer>
+
+  {# The inline <script> below owns the tab switcher and the Other Dice tooltip IIFE.
+     It generates KILLS_BY_CHAR_SESSION at runtime from the rendered .session-bar elements'
+     data attributes, so the build need not pre-emit a JS map. #}
+  <script>
+{% include "_script.html" %}
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,19 @@
+      <section class="reliquary" id="{{ member.id }}-reliquary">
+        {%- set char_auth = characters_authored[member.id] %}
+        <div class="reliquary-header">{{ char_auth.reliquary_header }}</div>
+        {%- set kills = member.kills | sort(attribute="date") %}
+        <ul class="fallen">
+          {%- for k in kills %}
+            {%- set key = (member.id, k.date, k.creature | lower, k.method | lower) %}
+            {%- set auth = kills_authored_by_key[key] %}
+          <li>
+            <div class="mark">&#10013;</div>
+            <div class="verse">
+              {{ auth.verse | safe }}
+              <span class="what">{{ auth.annotation | safe }}</span>
+            </div>
+            <div class="when">{{ k.date | short_date }} &middot; CR {{ k.creature | cr_label | safe }}</div>
+          </li>
+          {%- endfor %}
+        </ul>
+      </section>

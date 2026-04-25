@@ -1,0 +1,61 @@
+{
+  "page_title": "The Company of the Wandering Star",
+  "page_subtitle": "A ledger of those who walk &middot; and those they have laid down",
+  "intro_epithet": "Five travellers and a storyteller, bound to a doomed road",
+  "intro_meta": "Five Sessions &middot; Kythorn 1494 DR",
+  "footnote": "The names above are the names given &middot; the ones who fell were given no names",
+  "road_ahead": {
+    "known": [
+      {
+        "name": "The Ring of Winter",
+        "gloss": "bound to Artus Cimber's hand, last seen opening an eye of frost on a deck of pirates."
+      },
+      {
+        "name": "The Soulmonger",
+        "gloss": "engine of the Death Curse, somewhere in Chult."
+      },
+      {
+        "name": "The Death Curse",
+        "gloss": "the dead will not stay raised, and the lately-raised waste in their flesh."
+      },
+      {
+        "name": "Azlund's Oath",
+        "gloss": "fifty gold paid in hand, one rare gift each on return, if the Curse can be broken."
+      },
+      {
+        "name": "The Map of Chult",
+        "gloss": "half-marked, given by Azlund at the Waterdeep docks."
+      },
+      {
+        "name": "The Sending Stone",
+        "gloss": "Vex carries the pair, and Azlund waits at the other end."
+      },
+      {
+        "name": "Saja N'baza",
+        "gloss": "a name in Chult, sought by Artus for word of his lost wife."
+      },
+      {
+        "name": "The Yuan-ti's Door",
+        "gloss": "a yuan-ti drew blood and fled within; Wickles watches from the eaves."
+      }
+    ],
+    "was_known": [],
+    "direction": "Port Nyanzaru is at their feet, and three guides offer the jungle road. Azlund's oath is half-kept, and Chult is still shoreless on the maps they have."
+  },
+  "gm": {
+    "name": "The Dungeon Master",
+    "epithet": "who rolls for every shadow, who speaks for the unseen",
+    "meta": "Game Master"
+  },
+  "known_npcs": [
+    "Azlund",
+    "Tessa",
+    "Rindal",
+    "Captain Brennan",
+    "Pip",
+    "Corwin, called Artus Cimber",
+    "Dragonbait",
+    "Harlen",
+    "The Fleeing Yuan-ti"
+  ]
+}
