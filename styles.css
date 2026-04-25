@@ -230,15 +230,29 @@ body {
 
 .bestiary-list li {
   display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 16px;
-  align-items: baseline;
+  grid-template-columns: 28px 1fr auto;
+  gap: 12px;
+  align-items: center;
   padding: 10px 0;
   border-bottom: 1px solid var(--rule);
 }
 
 .bestiary-list li:last-child {
   border-bottom: none;
+}
+
+.bestiary-token {
+  width: 28px;
+  height: 28px;
+  display: block;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.bestiary-token.pip-placeholder {
+  background: var(--rule);
+  border: 1px solid var(--brass-dim);
+  box-sizing: border-box;
 }
 
 .bestiary-creature {
@@ -378,10 +392,9 @@ body {
   align-items: center;
 }
 
-.chronicle-chapter-tally img {
+.chronicle-chapter-tally .chronicle-session-pip {
   width: 20px;
   height: 20px;
-  display: block;
 }
 
 /* Session entry — <details>/<summary> */
@@ -485,6 +498,15 @@ body {
   width: 24px;
   height: 24px;
   display: block;
+  border-radius: 50%;
+  object-fit: cover;
+  cursor: help;
+}
+
+.chronicle-session-pip.pip-placeholder {
+  background: var(--rule);
+  border: 1px solid var(--brass-dim);
+  box-sizing: border-box;
 }
 
 .chronicle-session-summary {
@@ -1385,6 +1407,12 @@ body {
   font-variant-numeric: tabular-nums;
 }
 
+.dice-tooltip .tip-val.tip-val-text {
+  font-size: 17px;
+  line-height: 1.1;
+  font-variant-numeric: normal;
+}
+
 .dice-tooltip .tip-ctx {
   font-size: 10px;
   letter-spacing: 1.8px;
@@ -1409,11 +1437,29 @@ body {
   line-height: 1.5;
   padding: 2px 0;
   white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .dice-tooltip .tip-list li .method {
   color: var(--paper-dim);
   font-style: italic;
+}
+
+.dice-tooltip .tip-list li .tip-token {
+  width: 18px;
+  height: 18px;
+  display: inline-block;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.dice-tooltip .tip-list li .tip-token.pip-placeholder {
+  background: var(--rule);
+  border: 1px solid var(--brass-dim);
+  box-sizing: border-box;
 }
 
 .session-bar {

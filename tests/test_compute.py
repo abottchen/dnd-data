@@ -1,5 +1,6 @@
 from build import (xp_for_cr, compute_trials, compute_sessions_chart, compute_fortune,
-                   compute_d20_histogram, compute_other_dice, compute_best_skill)
+                   compute_d20_histogram, compute_other_dice, compute_best_skill,
+                   _creature_token_url, _name_to_token_name)
 
 def test_xp_for_cr_handles_fractions():
     assert xp_for_cr("1/8") == 25
@@ -108,6 +109,27 @@ def test_best_skill_humanizes_camelcase_keys():
         "perception": {"mod": 1, "prof": "none"},
     }}
     assert compute_best_skill(member) == {"name": "Sleight of Hand", "mod": 4}
+
+def test_name_to_token_name_strips_diacritics_and_quotes():
+    assert _name_to_token_name("Naïve") == "Naive"
+    assert _name_to_token_name('Ælf "Foo" Bar') == "AElf Foo Bar"
+    assert _name_to_token_name("Sahuagin Warrior") == "Sahuagin Warrior"
+
+def test_creature_token_url_returns_none_when_hasToken_is_false():
+    assert _creature_token_url({"name": "Generic", "source": "MM", "hasToken": False}) is None
+    assert _creature_token_url({"name": "Generic", "source": "MM"}) is None
+
+def test_creature_token_url_constructs_5etools_path():
+    url = _creature_token_url({"name": "Sahuagin Warrior", "source": "XMM", "hasToken": True})
+    assert url == "https://5e.tools/img/bestiary/tokens/XMM/Sahuagin%20Warrior.webp"
+
+def test_creature_token_url_honors_token_override():
+    # 5etools entries can carry an explicit `token: {name, source}` override.
+    url = _creature_token_url({
+        "name": "Foo (variant)", "source": "MM", "hasToken": True,
+        "token": {"name": "Foo", "source": "VGM"},
+    })
+    assert url == "https://5e.tools/img/bestiary/tokens/VGM/Foo.webp"
 
 def test_d20_histogram_emits_all_20_bars():
     physicals = [20, 20, 1, 10]
