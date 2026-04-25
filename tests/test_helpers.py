@@ -94,3 +94,19 @@ def test_append_kills_emits_slice_per_session_with_new_kills(helper_env):
     assert body["real_date"] == "2026-04-19"
     assert any(k["character"] == "vex" and k["creature"] == "Goblin" for k in body["kills"])
     assert "Daggerford" in body["narrative"]
+
+
+def test_append_sessions_emits_slice_per_unauthored_session(helper_env):
+    """Fixture: session log has sessions I and II; authored has only I.
+    Expect one slice for session II."""
+    out = run_helper("append-sessions", **helper_env)
+    slices = out["slices"]
+    assert len(slices) == 1
+    assert slices[0]["key"] == "II"
+    assert slices[0]["count"] == 1
+
+    body = json.loads(Path(slices[0]["path"]).read_text())
+    assert body["session"] == "II"
+    assert body["real_date"] == "2026-04-23"
+    assert "crossroads" in body["narrative"]
+    assert body["chapter_marker"] is True
