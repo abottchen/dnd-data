@@ -19,9 +19,18 @@
           <span><b>{{ ch.session_count }}</b> session{% if ch.session_count != 1 %}s{% endif %}</span>
           <span><b>{{ ch.kill_count }}</b> fallen</span>
           <span class="chronicle-chapter-tally">
-            {%- for cid in ch.portrait_tally %}
-              {%- set member = (party.members | selectattr("id", "equalto", cid) | first) %}
-            <img src="images/{{ member.image }}" alt="">
+            {%- for k in ch.kill_pips %}
+              {%- if k.token_url %}
+            <img class="chronicle-session-pip" src="{{ k.token_url }}" alt="{{ k.creature }}"
+                 data-creature="{{ k.creature }}" data-killer-name="{{ k.killer_name }}"
+                 data-killer-image="{{ k.killer_image }}" data-method="{{ k.method }}"
+                 data-date="{{ k.date_label }}" loading="lazy">
+              {%- else %}
+            <span class="chronicle-session-pip pip-placeholder"
+                  data-creature="{{ k.creature }}" data-killer-name="{{ k.killer_name }}"
+                  data-killer-image="{{ k.killer_image }}" data-method="{{ k.method }}"
+                  data-date="{{ k.date_label }}" aria-label="{{ k.creature }}"></span>
+              {%- endif %}
             {%- endfor %}
           </span>
         </div>
@@ -42,9 +51,18 @@
         <div class="chronicle-session-body">
           {%- if s.kills_count > 0 %}
           <div class="chronicle-session-pips">
-            {%- for cid in s.kill_pips %}
-              {%- set member = (party.members | selectattr("id", "equalto", cid) | first) %}
-            <img class="chronicle-session-pip" src="images/{{ member.image }}" alt="">
+            {%- for k in s.kill_pips %}
+              {%- if k.token_url %}
+            <img class="chronicle-session-pip" src="{{ k.token_url }}" alt="{{ k.creature }}"
+                 data-creature="{{ k.creature }}" data-killer-name="{{ k.killer_name }}"
+                 data-killer-image="{{ k.killer_image }}" data-method="{{ k.method }}"
+                 data-date="{{ k.date_label }}" loading="lazy">
+              {%- else %}
+            <span class="chronicle-session-pip pip-placeholder"
+                  data-creature="{{ k.creature }}" data-killer-name="{{ k.killer_name }}"
+                  data-killer-image="{{ k.killer_image }}" data-method="{{ k.method }}"
+                  data-date="{{ k.date_label }}" aria-label="{{ k.creature }}"></span>
+              {%- endif %}
             {%- endfor %}
           </div>
           {%- endif %}

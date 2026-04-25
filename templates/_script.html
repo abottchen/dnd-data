@@ -20,6 +20,71 @@
     })();
 
     (function () {
+      // Chronicle pip tooltips: creature + killer + method + date. Falls back to a
+      // placeholder span when the 5e.tools token URL fails to load.
+      let tip = document.querySelector('.dice-tooltip');
+      if (!tip) {
+        tip = document.createElement('div');
+        tip.className = 'dice-tooltip';
+        document.body.appendChild(tip);
+      }
+      let hideTimer;
+
+      const attach = (el) => {
+        const show = () => {
+          clearTimeout(hideTimer);
+          const creature = el.getAttribute('data-creature') || '';
+          const killer = el.getAttribute('data-killer-name') || '';
+          const method = el.getAttribute('data-method') || '';
+          const date = el.getAttribute('data-date') || '';
+          let html = '<div class="tip-val tip-val-text">' + creature + '</div>';
+          if (killer) html += '<div class="tip-ctx">felled by ' + killer + '</div>';
+          if (method || date) {
+            html += '<div class="tip-ctx">' + method + (method && date ? ' &middot; ' : '') + date + '</div>';
+          }
+          tip.innerHTML = html;
+          const r = el.getBoundingClientRect();
+          tip.style.left = (r.left + r.width / 2) + 'px';
+          tip.style.top = r.top + 'px';
+          tip.classList.add('visible');
+        };
+        const hide = () => {
+          hideTimer = setTimeout(() => tip.classList.remove('visible'), 80);
+        };
+        el.addEventListener('mouseenter', show);
+        el.addEventListener('mouseleave', hide);
+      };
+
+      // Swap an <img> pip to a placeholder span if the token URL fails to load.
+      document.querySelectorAll('img.chronicle-session-pip').forEach(img => {
+        img.addEventListener('error', () => {
+          const span = document.createElement('span');
+          span.className = 'chronicle-session-pip pip-placeholder';
+          for (const a of img.attributes) {
+            if (a.name.startsWith('data-') || a.name === 'aria-label') {
+              span.setAttribute(a.name, a.value);
+            }
+          }
+          img.replaceWith(span);
+          attach(span);
+        }, { once: true });
+      });
+
+      document.querySelectorAll('.chronicle-session-pip').forEach(attach);
+
+      // Bestiary tokens: same 5e.tools URL → placeholder fallback, no tooltip
+      // (the creature name is already a sibling element).
+      document.querySelectorAll('img.bestiary-token').forEach(img => {
+        img.addEventListener('error', () => {
+          const span = document.createElement('span');
+          span.className = 'bestiary-token pip-placeholder';
+          span.setAttribute('aria-hidden', 'true');
+          img.replaceWith(span);
+        }, { once: true });
+      });
+    })();
+
+    (function () {
       // Sessions Chart ("Across the Ages") tooltips: read kills from each bar's data-kills attribute.
       let sessionTip = document.querySelector('.dice-tooltip');
       if (!sessionTip) {
@@ -49,7 +114,11 @@
           if (count > 0) {
             html += '<ul class="tip-list">';
             kills.forEach(k => {
-              html += '<li>' + k.creature + ' <span class="method">' + k.method + '</span></li>';
+              const tok = k.token_url
+                ? '<img class="tip-token" src="' + k.token_url + '" alt="" loading="lazy">'
+                : '<span class="tip-token pip-placeholder" aria-hidden="true"></span>';
+              html += '<li>' + tok + '<span class="creature">' + k.creature + '</span>' +
+                      ' <span class="method">' + k.method + '</span></li>';
             });
             html += '</ul>';
           }

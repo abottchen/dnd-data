@@ -64,6 +64,11 @@
         <ul class="bestiary-list">
           {%- for c in group.creatures %}
           <li>
+            {%- if c.token_url %}
+            <img class="bestiary-token" src="{{ c.token_url }}" alt="" loading="lazy">
+            {%- else %}
+            <span class="bestiary-token pip-placeholder" aria-hidden="true"></span>
+            {%- endif %}
             <span class="bestiary-creature">{{ c.name }}</span>
             <span class="bestiary-marks">{% for _ in range(c.count) %}&#10013;{% if not loop.last %} {% endif %}{% endfor %}</span>
           </li>

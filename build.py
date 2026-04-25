@@ -197,6 +197,30 @@ BESTIARY_GLOB = ".claude/ext/5etools-src/data/bestiary/bestiary-*.json"
 # Source priority: XMM (5e 2024 Monster Manual) first, then originals, then minor.
 _BESTIARY_SOURCE_PRIORITY = ["XMM", "MM", "MPMM", "VRGR", "FTD", "MTF", "VGM", "ToA"]
 
+TOKEN_URL_BASE = "https://5e.tools/img/bestiary/tokens"
+
+def _name_to_token_name(name: str) -> str:
+    """Mirror 5etools js/parser.js Parser.nameToTokenName: NFD normalize, strip
+    combining marks, replace Æ/æ → AE/ae, drop double quotes. Caller URL-encodes."""
+    import unicodedata
+    out = unicodedata.normalize("NFD", name)
+    out = "".join(c for c in out if not unicodedata.combining(c))
+    out = out.replace("Æ", "AE").replace("æ", "ae").replace('"', "")
+    return out
+
+def _creature_token_url(entry: dict) -> Optional[str]:
+    """Return the 5e.tools token URL for a bestiary entry, or None when the
+    entry has no token. Mirrors Renderer.monster.getTokenUrl in render.js."""
+    if not entry.get("hasToken"):
+        return None
+    from urllib.parse import quote
+    tok = entry.get("token") or {}
+    source = tok.get("source") or entry.get("source", "")
+    name = tok.get("name") or entry.get("name", "")
+    if not source or not name:
+        return None
+    return f"{TOKEN_URL_BASE}/{source}/{quote(_name_to_token_name(name))}.webp"
+
 @functools.lru_cache(maxsize=1)
 def _load_bestiary() -> dict[str, dict]:
     """Return name (lowercased) -> best entry across all bestiary files."""
@@ -226,17 +250,21 @@ def _load_bestiary() -> dict[str, dict]:
                 t = m.get("type", "")
                 if isinstance(t, dict):
                     t = t.get("type", "")
-                by_name[key] = {
+                entry = {
                     "name": name,
                     "type": t,
                     "cr": m.get("cr"),
                     "source": m.get("source", ""),
+                    "hasToken": bool(m.get("hasToken")),
+                    "token": m.get("token"),
                 }
+                entry["token_url"] = _creature_token_url(entry)
+                by_name[key] = entry
     return by_name
 
 @functools.lru_cache(maxsize=2048)
 def bestiary_lookup(creature: str) -> Optional[dict]:
-    """Return {name, type, cr, source} for a creature, or None."""
+    """Return {name, type, cr, source, hasToken, token, token_url} for a creature, or None."""
     return _load_bestiary().get(creature.casefold())
 
 XP_BY_CR = {
@@ -344,7 +372,12 @@ def compute_sessions_chart(party: dict) -> dict:
         cid = m["id"]
         bucket: dict[str, list[dict]] = {d: [] for d in all_dates}
         for k in m.get("kills", []):
-            bucket[k["date"]].append({"creature": k["creature"], "method": k["method"]})
+            info = bestiary_lookup(k["creature"]) or {}
+            bucket[k["date"]].append({
+                "creature": k["creature"],
+                "method": k["method"],
+                "token_url": info.get("token_url"),
+            })
         per_char_per_date[cid] = bucket
 
     # Party max per (char,session) count
@@ -568,14 +601,17 @@ def compute_constellation(party: dict, fortune_by_char: dict, trials: dict) -> d
 def compute_bestiary(party: dict) -> list[dict]:
     """Group every kill by creature type, then by creature name within type."""
     by_type: dict[str, dict[str, int]] = {}
+    token_by_name: dict[str, Optional[str]] = {}
     for m in party.get("members", []):
         for k in m.get("kills", []):
             info = bestiary_lookup(k["creature"])
             if not info:
                 continue
             t = info["type"]
-            by_type.setdefault(t, {}).setdefault(info["name"], 0)
-            by_type[t][info["name"]] += 1
+            n = info["name"]
+            by_type.setdefault(t, {}).setdefault(n, 0)
+            by_type[t][n] += 1
+            token_by_name.setdefault(n, info.get("token_url"))
 
     groups = []
     for t in by_type.keys():
@@ -583,7 +619,8 @@ def compute_bestiary(party: dict) -> list[dict]:
         groups.append({
             "type": t,
             "total": sum(c for _, c in creatures),
-            "creatures": [{"name": n, "count": c} for n, c in creatures],
+            "creatures": [{"name": n, "count": c, "token_url": token_by_name.get(n)}
+                          for n, c in creatures],
         })
     groups.sort(key=lambda g: (-g["total"], g["type"].lower()))
     return groups
@@ -628,25 +665,32 @@ def compute_chronicle(session_log: dict, sessions_authored: list, chapters_autho
             current = e["session"]
         session_to_chapter[e["session"]] = current
 
-    # Per-date -> [character ids] for portrait tallies + pip pips
-    party_kills_by_date: dict[str, list[str]] = {}
+    # Per-date -> [kill record] for portrait tallies + pip data. Each record carries
+    # the killer (id/name/image) and the creature so chronicle pips can render
+    # creature tokens with a tooltip naming the killer + method.
+    party_kills_by_date: dict[str, list[dict]] = {}
     for m in party.get("members", []):
         for k in m.get("kills", []):
-            party_kills_by_date.setdefault(k["date"], []).append(m["id"])
+            info = bestiary_lookup(k["creature"]) or {}
+            party_kills_by_date.setdefault(k["date"], []).append({
+                "killer_id": m["id"],
+                "killer_name": m.get("name", m["id"]).split()[0],
+                "killer_image": m.get("image", ""),
+                "creature": k["creature"],
+                "method": k["method"],
+                "date": k["date"],
+                "date_label": _short_date(k["date"]),
+                "token_url": info.get("token_url"),
+            })
 
     chapters = []
     for idx, start_id in enumerate(chapter_starts, start=1):
         ch = chapter_by_starts.get(start_id, {})
         sess_in_chapter = [e for e in entries if session_to_chapter[e["session"]] == start_id]
-        portrait_counts: Counter = Counter()
-        kill_total = 0
+        # Flatten chapter-level kill records in chronological session order.
+        chapter_kill_pips: list[dict] = []
         for e in sess_in_chapter:
-            for cid in party_kills_by_date.get(e["date"], []):
-                portrait_counts[cid] += 1
-                kill_total += 1
-        portraits: list[str] = []
-        for cid, n in sorted(portrait_counts.items(), key=lambda kv: (-kv[1], kv[0])):
-            portraits.extend([cid] * n)
+            chapter_kill_pips.extend(party_kills_by_date.get(e["date"], []))
 
         chapters.append({
             "label": _to_roman(idx),
@@ -654,8 +698,8 @@ def compute_chronicle(session_log: dict, sessions_authored: list, chapters_autho
             "epigraph": ch.get("epigraph", ""),
             "starts_at": start_id,
             "session_count": len(sess_in_chapter),
-            "kill_count": kill_total,
-            "portrait_tally": portraits,
+            "kill_count": len(chapter_kill_pips),
+            "kill_pips": chapter_kill_pips,
             "sessions": [_render_session(e, auth_session_by_id, party_kills_by_date)
                          for e in sess_in_chapter],
         })
