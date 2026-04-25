@@ -18,7 +18,7 @@
   <nav class="tabs" role="tablist">
     <a href="#company" class="tab" data-tab="company"><span class="tab-sigil">&#10022;</span>The Company</a>
     {%- for member in party.members if member.id != "gm" %}
-    <a href="#{{ member.id }}" class="tab" data-tab="{{ member.id }}"><img src="images/{{ member.image }}" alt="">{{ member.name }}</a>
+    <a href="#{{ member.id }}" class="tab" data-tab="{{ member.id }}"><img src="images/{{ member.image }}" alt="">{{ member.id | title }}</a>
     {%- endfor %}
     <a href="#gm" class="tab" data-tab="gm"><img src="images/GM.png" alt="">GM</a>
   </nav>

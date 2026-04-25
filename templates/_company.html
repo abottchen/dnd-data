@@ -47,7 +47,7 @@
           {%- set auth = characters_authored[star.id] %}
         <div class="constellation-star" style="top: {{ star.top_pct }}%; left: {{ star.left_pct }}%;">
           <img class="portrait" src="images/{{ member.image }}" alt="">
-          <div class="star-name">{{ member.name }}</div>
+          <div class="star-name">{{ member.id | title }}</div>
           <div class="star-epithet">{{ auth.constellation_epithet }}</div>
         </div>
         {%- endfor %}

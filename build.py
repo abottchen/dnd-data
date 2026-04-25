@@ -326,10 +326,10 @@ def compute_trials(party: dict) -> dict:
     }
 
 def _short_date(iso_date: str) -> str:
-    """'2026-04-23' -> '23 APR'."""
+    """'2026-04-23' -> '23 APR 2026'."""
     from datetime import date
     d = date.fromisoformat(iso_date)
-    return d.strftime("%d %b").upper()
+    return d.strftime("%d %b %Y").upper()
 
 def compute_sessions_chart(party: dict) -> dict:
     """Bars + tooltip-ready KILLS_BY_CHAR_SESSION map."""
@@ -511,8 +511,8 @@ def compute_constellation(party: dict, fortune_by_char: dict, trials: dict) -> d
         "stars": stars,
         "party_max_xp": party_max_xp,
         "party_max_rolls": party_max_rolls,
-        "mid_xp": round(party_max_xp / 2),
-        "mid_rolls": round(party_max_rolls / 2),
+        "mid_xp": (party_max_xp + 1) // 2,
+        "mid_rolls": (party_max_rolls + 1) // 2,
     }
 
 def compute_bestiary(party: dict) -> list[dict]:
@@ -528,13 +528,14 @@ def compute_bestiary(party: dict) -> list[dict]:
             by_type[t][info["name"]] += 1
 
     groups = []
-    for t in sorted(by_type.keys()):
+    for t in by_type.keys():
         creatures = sorted(by_type[t].items(), key=lambda kv: (-kv[1], kv[0].lower()))
         groups.append({
             "type": t,
             "total": sum(c for _, c in creatures),
             "creatures": [{"name": n, "count": c} for n, c in creatures],
         })
+    groups.sort(key=lambda g: (-g["total"], g["type"].lower()))
     return groups
 
 def compute_company_ledger(party: dict, dice_files: list, session_log: dict, trials: dict, fortune_by_char: dict) -> dict:
@@ -542,7 +543,7 @@ def compute_company_ledger(party: dict, dice_files: list, session_log: dict, tri
     total_xp = sum(trials["per_char"][m["id"]]["xp"] for m in members)
     total_kills = sum(trials["per_char"][m["id"]]["kill_count"] for m in members)
     total_rolls = sum(fortune_by_char[m["id"]]["rolls_total"] for m in members)
-    total_d20s = sum(fortune_by_char[m["id"]]["physical_d20s_count"] for m in members)
+    total_d20s = sum(fortune_by_char[m["id"]]["kept_d20s_count"] for m in members)
     sessions_kept = len(session_log.get("entries", []))
 
     return {
@@ -653,7 +654,7 @@ def compute_distinctions(party: dict, characters_authored: list) -> list[dict]:
         a = by_id.get(m["id"], {})
         rows.append({
             "id": m["id"],
-            "name": m.get("name", m["id"].title()),
+            "name": m["id"].title(),
             "title": a.get("distinction_title", ""),
             "subtitle": a.get("distinction_subtitle", ""),
             "detail": a.get("distinction_detail", ""),
