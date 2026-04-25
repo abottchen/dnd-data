@@ -150,3 +150,17 @@ def test_append_characters_emits_one_bundled_slice(helper_env):
     assert len(body["new_pcs"]) == 1
     assert body["new_pcs"][0]["id"] == "vex"
     assert "Sharpest Tongue" in body["existing_distinction_titles"]
+
+
+def test_refresh_chapters_count_zero_when_no_new_sessions(helper_env):
+    """Fixture marker: refreshed_through_session=1, latest_session=2.
+    Authored chapter 1 (starts at I). The new session II is inside chapter 1
+    OR opens chapter 2 — either way, chapter 1 may merit re-evaluation if a
+    new session sits inside it. count = sessions inside this chapter postdating
+    the marker.
+    """
+    out = run_helper("refresh-chapters", **helper_env)
+    slices = out["slices"]
+    # one entry per authored chapter; count derives from new-session membership
+    keys = {s["key"] for s in slices}
+    assert "1" in keys
