@@ -166,6 +166,22 @@ def test_refresh_chapters_count_zero_when_no_new_sessions(helper_env):
     assert "1" in keys
 
 
+def test_refresh_characters_emits_one_bundle_slice(helper_env):
+    """Fixture: anton authored, vex unauthored. refresh-characters cares about
+    authored PCs only — it always emits one bundle slice covering authored PCs,
+    with party rankings included. Expect one slice keyed 'all' with count=1
+    (one authored PC under refresh)."""
+    out = run_helper("refresh-characters", **helper_env)
+    slices = out["slices"]
+    assert len(slices) == 1
+    assert slices[0]["key"] == "all"
+    body = json.loads(Path(slices[0]["path"]).read_text())
+    assert any(c["id"] == "anton" for c in body["pcs"])
+    assert "trials_per_char" in body
+    assert "fortune_by_char" in body
+    assert "existing" in body
+
+
 def test_refresh_npcs_count_reflects_mentions_since_marker(helper_env):
     """Add 'Azlund' to authored npcs (with allegiance + epithet), then ensure
     refresh-npcs reports a slice with count = mentions since marker.
