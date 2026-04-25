@@ -1,0 +1,50 @@
+<article class="character" id="gm">
+  {%- set gm_member = (party.members | selectattr("id", "equalto", "gm") | first) %}
+  {%- set gm_fortune = fortune.get("gm") if "gm" in fortune else None %}
+  <header class="character-header">
+    <img class="portrait" src="images/GM.png" alt="">
+    <div class="identity">
+      <div class="name">{{ site.gm.name }}</div>
+      <div class="epithet">{{ site.gm.epithet | safe }}</div>
+      <div class="meta">{{ site.gm.meta }}</div>
+    </div>
+    <div class="vitals-block">
+      <div class="vital"><span class="label">Rolls</span><span class="val">{{ gm_fortune.rolls_total if gm_fortune else 0 }}</span></div>
+      <div class="vital"><span class="label">Crits</span><span class="val">{{ gm_fortune.crits if gm_fortune else 0 }}</span></div>
+      <div class="vital"><span class="label">Fumbles</span><span class="val">{{ gm_fortune.fumbles if gm_fortune else 0 }}</span></div>
+    </div>
+  </header>
+
+  <section class="dramatis-personae">
+    <div class="dramatis-header">Dramatis Personae</div>
+    <div class="dramatis-grid">
+      <div class="dramatis-column">
+        <div class="dramatis-sub">Those Who Stood With Them</div>
+        <ul class="dramatis-list">
+          {%- for n in npcs_by_allegiance.with %}
+          <li class="npc">
+            <span class="npc-name">{{ n.name }}</span>
+            <span class="npc-epithet">{{ n.epithet | safe }}</span>
+          </li>
+          {%- endfor %}
+        </ul>
+      </div>
+      <div class="dramatis-column">
+        <div class="dramatis-sub">Those Who Stood Against Them</div>
+        <ul class="dramatis-list">
+          {%- for n in npcs_by_allegiance.against %}
+          <li class="npc">
+            <span class="npc-name">{{ n.name }}</span>
+            <span class="npc-epithet">{{ n.epithet | safe }}</span>
+          </li>
+          {%- endfor %}
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  {%- if gm_fortune and gm_fortune.rolls_total > 0 %}
+    {%- set member = gm_member %}
+    {% include "_fortune.html" %}
+  {%- endif %}
+</article>
