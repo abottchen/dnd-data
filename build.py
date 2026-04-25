@@ -80,13 +80,16 @@ REQUIRED_CHAR_FIELDS = ("reliquary_header", "constellation_epithet",
                          "distinction_title", "distinction_subtitle", "distinction_detail")
 REQUIRED_SITE_FIELDS = ("intro_epithet", "intro_meta", "page_title", "page_subtitle")
 
+# Fields that are list-typed and legitimately may be empty lists (not MALFORMED).
+_LIST_EMPTY_OK = frozenset({"silent_roll"})
+
 def _missing_or_blank(entry: dict, field: str) -> bool:
     v = entry.get(field)
     if v is None:
         return True
     if isinstance(v, str) and not v.strip():
         return True
-    if isinstance(v, list) and len(v) == 0:
+    if isinstance(v, list) and len(v) == 0 and field not in _LIST_EMPTY_OK:
         return True
     return False
 
@@ -115,7 +118,7 @@ def validate_chapters(session_log: dict, authored: list) -> list[ValidationError
     by_starts = {a["starts_at_session"]: a for a in authored if "starts_at_session" in a}
     if session_log.get("entries"):
         first = session_log["entries"][0]["session"]
-        if first not in by_starts and first not in chapter_sessions:
+        if first not in chapter_sessions:
             chapter_sessions = [first] + chapter_sessions
     for s in chapter_sessions:
         a = by_starts.get(s)
@@ -610,7 +613,7 @@ def compute_chronicle(session_log: dict, sessions_authored: list, chapters_autho
     months_by_year: dict[str, dict[str, int]] = {}
     for e in entries:
         iu_m = e.get("iu_month") or "Kythorn"
-        iu_y = e.get("iu_year") or "1494"
+        iu_y = str(e.get("iu_year") or "1494")
         year = f"{iu_y} DR" if not iu_y.endswith("DR") else iu_y
         months_by_year.setdefault(year, {})
         months_by_year[year][iu_m] = months_by_year[year].get(iu_m, 0) + 1

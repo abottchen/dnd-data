@@ -47,5 +47,15 @@
     "epithet": "who rolls for every shadow, who speaks for the unseen",
     "meta": "Game Master"
   },
-  "known_npcs": []
+  "known_npcs": [
+    "Azlund",
+    "Tessa",
+    "Rindal",
+    "Captain Brennan",
+    "Pip",
+    "Corwin, called Artus Cimber",
+    "Dragonbait",
+    "Harlen",
+    "The Fleeing Yuan-ti"
+  ]
 }
