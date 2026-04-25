@@ -234,6 +234,92 @@ def bestiary_lookup(creature: str) -> Optional[dict]:
     """Return {name, type, cr, source} for a creature, or None."""
     return _load_bestiary().get(creature.casefold())
 
+XP_BY_CR = {
+    "0": 10, "1/8": 25, "1/4": 50, "1/2": 100,
+    "1": 200, "2": 450, "3": 700, "4": 1100, "5": 1800,
+    "6": 2300, "7": 2900, "8": 3900, "9": 5000, "10": 5900,
+    "11": 7200, "12": 8400, "13": 10000, "14": 11500, "15": 13000,
+    "16": 15000, "17": 18000, "18": 20000, "19": 22000, "20": 25000,
+}
+
+def xp_for_cr(cr) -> int:
+    """Lookup XP. Accepts strings, ints, or 5etools-style {"cr": "1/4"} dicts."""
+    if isinstance(cr, dict):
+        cr = cr.get("cr")
+    return XP_BY_CR.get(str(cr), 0)
+
+def _kill_cr(kill_creature: str) -> str:
+    info = bestiary_lookup(kill_creature)
+    if not info:
+        return "0"
+    cr = info["cr"]
+    if isinstance(cr, dict):
+        cr = cr.get("cr")
+    return str(cr)
+
+def _kill_xp(kill_creature: str) -> int:
+    return xp_for_cr(_kill_cr(kill_creature))
+
+def compute_trials(party: dict) -> dict:
+    """Return per-character trials dict + party-wide aggregates needed by templates."""
+    members = party.get("members", [])
+    per_char: dict[str, dict] = {}
+
+    for m in members:
+        cid = m["id"]
+        kills = m.get("kills", [])
+        xp = sum(_kill_xp(k["creature"]) for k in kills)
+        kill_count = len(kills)
+
+        # Means of Ending: most common method; tiebreak highest CR; then alphabetical.
+        method_counter = Counter(k["method"] for k in kills)
+        if method_counter:
+            top_n = method_counter.most_common(1)[0][1]
+            tied = [m_ for m_, n in method_counter.items() if n == top_n]
+            if len(tied) == 1:
+                means = tied[0]
+            else:
+                # Tiebreak by max CR among kills using that method
+                def max_cr_for_method(method):
+                    crs = [_kill_cr(k["creature"]) for k in kills if k["method"] == method]
+                    return max((XP_BY_CR.get(c, 0) for c in crs), default=0)
+                tied.sort(key=lambda mm: (-max_cr_for_method(mm), mm.lower()))
+                means = tied[0]
+            means_n = top_n
+        else:
+            means = "—"
+            means_n = 0
+
+        # Kinds Slain: distinct creature types
+        type_counter: Counter = Counter()
+        for k in kills:
+            info = bestiary_lookup(k["creature"])
+            if info:
+                type_counter[info["type"]] += 1
+        kinds = sorted(type_counter.items(), key=lambda kv: (-kv[1], kv[0].lower()))
+
+        per_char[cid] = {
+            "xp": xp,
+            "kill_count": kill_count,
+            "means": means,
+            "means_n": means_n,
+            "kinds": [{"type": t, "count": c} for t, c in kinds],
+            "kinds_count": len(kinds),
+        }
+
+    party_xp = sum(c["xp"] for c in per_char.values())
+    party_kills = sum(c["kill_count"] for c in per_char.values())
+
+    for cid, c in per_char.items():
+        c["xp_pct"] = round(c["xp"] / party_xp * 100) if party_xp else 0
+        c["kill_pct"] = round(c["kill_count"] / party_kills * 100) if party_kills else 0
+
+    return {
+        "per_char": per_char,
+        "party_xp": party_xp,
+        "party_kills": party_kills,
+    }
+
 def validate_all(data: dict, authored: dict) -> list[ValidationError]:
     errors: list[ValidationError] = []
     errors.extend(validate_kills(data["party"], authored["kills"]))
