@@ -1,6 +1,8 @@
+{% from "_macros.html" import section_head -%}
       <section class="reliquary" id="{{ member.id }}-reliquary">
         {%- set char_auth = characters_authored[member.id] %}
-        <div class="reliquary-header">{{ char_auth.reliquary_header }}</div>
+        {%- set first_name = member.name.split(' ') | first %}
+        {{ section_head("iii", "The Fallen", "Reliquary", char_auth.reliquary_header) }}
         {%- set kills = member.kills | sort(attribute="date") %}
         <ul class="fallen">
           {%- for k in kills %}

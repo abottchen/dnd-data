@@ -1,6 +1,7 @@
+{% from "_macros.html" import section_head, sub_head -%}
       <section class="trials" id="{{ member.id }}-trials">
-        <div class="trials-header">Trials</div>
-        <div class="trials-grid">
+        {{ section_head("i", "The Reckoning", "Trials", "What " ~ (member.name.split(' ') | first) ~ " has gathered, and what " ~ (member.name.split(' ') | first) ~ " has spent.") }}
+        <div class="trials-grid lead">
           {%- set t = trials.per_char[member.id] %}
           <div class="trial">
             <div class="trial-label">XP Earned</div>
@@ -10,22 +11,22 @@
           <div class="trial">
             <div class="trial-label">Laid to Rest</div>
             <div class="trial-val">{{ t.kill_count }}</div>
-            <div class="trial-sub">{{ t.kill_pct }}% of the company</div>
+            <div class="trial-sub seal">{{ t.kill_pct }}% of the company</div>
           </div>
           <div class="trial">
             <div class="trial-label">Means of Ending</div>
             <div class="trial-val text">{{ t.means }}</div>
-            <div class="trial-sub">{{ t.means_n }} kill{% if t.means_n != 1 %}s{% endif %}</div>
+            <div class="trial-sub"><b>{{ t.means_n }}</b> kill{% if t.means_n != 1 %}s{% endif %}</div>
           </div>
           <div class="trial">
             <div class="trial-label">Kinds Slain</div>
-            <div class="trial-val kinds">{% for kind in t.kinds %}{% if not loop.first %} {% endif %}{{ kind.type | title }} &times; {{ kind.count }}{% endfor %}</div>
-            <div class="trial-sub">{{ t.kinds_count }} kind{% if t.kinds_count != 1 %}s{% endif %}</div>
+            <div class="trial-val kinds">{% for kind in t.kinds %}{% if not loop.first %}<br>{% endif %}{{ kind.type | title }} &times; {{ kind.count }}{% endfor %}</div>
+            <div class="trial-sub"><b>{{ t.kinds_count }}</b> kind{% if t.kinds_count != 1 %}s{% endif %}</div>
           </div>
         </div>
 
         <div class="sessions">
-          <div class="sessions-header">Across the Ages</div>
+          {{ sub_head("Across the Ages") }}
           <div class="sessions-chart">
             {%- for bar in sessions_chart.per_char[member.id] %}
             <div class="session-bar" data-kills='{{ bar.kills | tojson }}'>

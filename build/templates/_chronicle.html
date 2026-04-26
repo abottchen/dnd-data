@@ -10,6 +10,7 @@
 
   <div class="chronicle-content">
     {%- for ch in chronicle.chapters %}
+      {%- set outer_loop = loop %}
     <div class="chronicle-chapter">
       <header class="chronicle-chapter-head">
         <div class="chronicle-chapter-label">Chapter {{ ch.label }}</div>
@@ -17,7 +18,7 @@
         <p class="chronicle-chapter-epigraph">{{ ch.epigraph | safe }}</p>
         <div class="chronicle-chapter-meta">
           <span><b>{{ ch.session_count }}</b> session{% if ch.session_count != 1 %}s{% endif %}</span>
-          <span><b>{{ ch.kill_count }}</b> fallen</span>
+          <span class="seal"><b>{{ ch.kill_count }}</b> fallen</span>
           <span class="chronicle-chapter-tally">
             {%- for k in ch.kill_pips %}
               {%- if k.token_url %}
@@ -36,7 +37,7 @@
         </div>
       </header>
       {%- for s in ch.sessions %}
-      <details class="chronicle-session">
+      <details class="chronicle-session"{% if outer_loop.last and loop.last %} open{% endif %}>
         <summary>
           <span class="chronicle-session-num">Session {{ s.label }}</span>
           <span class="chronicle-session-title">{{ s.title }}</span>

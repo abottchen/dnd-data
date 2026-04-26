@@ -1,3 +1,4 @@
+{% from "_macros.html" import section_head -%}
 <article class="character" id="gm">
   {%- set gm_member = {"id": "gm"} %}
   {%- set gm_fortune = fortune.get("gm") if "gm" in fortune else None %}
@@ -16,7 +17,7 @@
   </header>
 
   <section class="dramatis-personae">
-    <div class="dramatis-header">Dramatis Personae</div>
+    {{ section_head("i", "The Cast", "Dramatis Personae", "Those who walked beside, and those who stood athwart.", "trefoil") }}
     <div class="dramatis-grid">
       <div class="dramatis-column">
         <div class="dramatis-sub">Those Who Stood With Them</div>

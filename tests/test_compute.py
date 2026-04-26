@@ -1,6 +1,7 @@
 from build.render import (xp_for_cr, compute_trials, compute_sessions_chart, compute_fortune,
                    compute_d20_histogram, compute_other_dice, compute_best_skill,
-                   compute_intro_meta,
+                   compute_intro_meta, compute_constellation,
+                   _compute_party_top_xp, _compute_header_eyebrow,
                    _creature_token_url, _name_to_token_name)
 
 def test_xp_for_cr_handles_fractions():
@@ -174,3 +175,192 @@ def test_compute_intro_meta_empty_log():
 
 def test_compute_intro_meta_missing_entries_key():
     assert compute_intro_meta({}) == "No Sessions Yet"
+
+
+# ── _compute_party_top_xp ──────────────────────────────────────────────
+
+def _party_with_xp(*pairs):
+    """Build a (party, trials) pair from (id, xp) tuples. GM is always added."""
+    members = [{"id": cid, "name": cid.title(), "image": f"{cid}.png"}
+               for cid, _ in pairs]
+    members.append({"id": "gm", "name": "GM", "image": "GM.png"})
+    party = {"members": members}
+    per = {cid: {"xp": xp, "kill_count": 0} for cid, xp in pairs}
+    per["gm"] = {"xp": 9999, "kill_count": 0}  # GM XP must be ignored
+    return party, {"per_char": per}
+
+
+def test_party_top_xp_orders_by_xp_descending():
+    party, trials = _party_with_xp(("anton", 100), ("vex", 300), ("urida", 200))
+    top = _compute_party_top_xp(party, trials, n=3)
+    assert [m["id"] for m in top] == ["vex", "urida", "anton"]
+
+
+def test_party_top_xp_excludes_gm_even_if_gm_has_highest_xp():
+    party, trials = _party_with_xp(("anton", 100), ("vex", 50))
+    top = _compute_party_top_xp(party, trials, n=5)
+    assert "gm" not in [m["id"] for m in top]
+    assert [m["id"] for m in top] == ["anton", "vex"]
+
+
+def test_party_top_xp_tiebreak_alphabetical_by_id():
+    party, trials = _party_with_xp(("vex", 100), ("anton", 100), ("grieg", 100))
+    top = _compute_party_top_xp(party, trials, n=3)
+    assert [m["id"] for m in top] == ["anton", "grieg", "vex"]
+
+
+def test_party_top_xp_clamps_to_n():
+    party, trials = _party_with_xp(("a", 50), ("b", 40), ("c", 30), ("d", 20), ("e", 10))
+    top = _compute_party_top_xp(party, trials, n=3)
+    assert [m["id"] for m in top] == ["a", "b", "c"]
+
+
+def test_party_top_xp_handles_member_missing_from_trials():
+    # New party member with no rolls/kills yet — defaults to xp=0, sorts last by id.
+    party, trials = _party_with_xp(("vex", 50), ("anton", 50))
+    party["members"].insert(0, {"id": "newcomer", "name": "Newcomer", "image": "x.png"})
+    top = _compute_party_top_xp(party, trials, n=3)
+    assert [m["id"] for m in top] == ["anton", "vex", "newcomer"]
+
+
+# ── _compute_header_eyebrow ────────────────────────────────────────────
+
+def test_header_eyebrow_typical():
+    chronicle = {"rail": [{"month": "Kythorn", "year": "1494 DR"}]}
+    ledger = {"sessions_kept": 5}
+    assert _compute_header_eyebrow(chronicle, ledger) == [
+        "Volume I", "Kythorn 1494 DR", "5 Sessions Kept",
+    ]
+
+
+def test_header_eyebrow_uses_latest_rail_entry():
+    chronicle = {"rail": [
+        {"month": "Hammer",   "year": "1494 DR"},
+        {"month": "Flamerule","year": "1494 DR"},
+    ]}
+    assert _compute_header_eyebrow(chronicle, {"sessions_kept": 2})[1] == "Flamerule 1494 DR"
+
+
+def test_header_eyebrow_singular_session_word():
+    eyebrow = _compute_header_eyebrow(
+        {"rail": [{"month": "Hammer", "year": "1495 DR"}]},
+        {"sessions_kept": 1},
+    )
+    assert eyebrow[-1] == "1 Session Kept"
+
+
+def test_header_eyebrow_omits_session_line_when_zero():
+    eyebrow = _compute_header_eyebrow(
+        {"rail": [{"month": "Kythorn", "year": "1494 DR"}]},
+        {"sessions_kept": 0},
+    )
+    assert eyebrow == ["Volume I", "Kythorn 1494 DR"]
+
+
+def test_header_eyebrow_handles_empty_rail():
+    eyebrow = _compute_header_eyebrow({"rail": []}, {"sessions_kept": 3})
+    assert eyebrow == ["Volume I", "3 Sessions Kept"]
+
+
+def test_header_eyebrow_handles_missing_keys():
+    # Rail without month/year fields collapses to an empty-string line, which is filtered.
+    eyebrow = _compute_header_eyebrow({"rail": [{}]}, {})
+    assert eyebrow == ["Volume I"]
+
+
+# ── compute_constellation links ────────────────────────────────────────
+
+def _consteltation_inputs(*xp_pairs):
+    """Build (party, fortune_by_char, trials) for compute_constellation tests."""
+    members = [{"id": cid, "name": cid.title()} for cid, _ in xp_pairs]
+    party = {"members": members}
+    trials = {"per_char": {cid: {"xp": xp, "kill_count": 0}
+                            for cid, xp in xp_pairs}}
+    fortune_by_char = {cid: {
+        "rolls_total": 10, "kept_d20s_count": 8, "avg": 10.0, "sd": 1.0,
+        "crits": 0, "fumbles": 0,
+    } for cid, _ in xp_pairs}
+    return party, fortune_by_char, trials
+
+
+def test_constellation_links_empty_when_fewer_than_two_stars():
+    party, fortune, trials = _consteltation_inputs(("anton", 100))
+    result = compute_constellation(party, fortune, trials)
+    assert result["links"] == []
+
+
+def test_constellation_links_empty_when_no_stars():
+    result = compute_constellation({"members": []}, {}, {"per_char": {}})
+    assert result["links"] == []
+
+
+def test_constellation_links_form_a_closed_loop():
+    party, fortune, trials = _consteltation_inputs(
+        ("anton", 100), ("vex", 200), ("urida", 300)
+    )
+    result = compute_constellation(party, fortune, trials)
+    # Closed polygon: N stars → N segments, last connects back to first.
+    assert len(result["links"]) == 3
+    # Segments chain end-to-end (a→b, b→c, c→a).
+    for i in range(3):
+        a = result["links"][i]
+        b = result["links"][(i + 1) % 3]
+        assert (a["x2"], a["y2"]) == (b["x1"], b["y1"])
+
+
+def test_constellation_links_ordered_by_xp_ascending():
+    # Pass members in non-monotonic order to confirm the sort happens inside.
+    party, fortune, trials = _consteltation_inputs(
+        ("vex", 200), ("anton", 100), ("urida", 300)
+    )
+    result = compute_constellation(party, fortune, trials)
+    star_by_id = {s["id"]: s for s in result["stars"]}
+    # First link starts at lowest-xp star (anton), runs to next-lowest (vex).
+    first = result["links"][0]
+    assert (first["x1"], first["y1"]) == (
+        star_by_id["anton"]["left_pct"] * 10, star_by_id["anton"]["top_pct"] * 10,
+    )
+    assert (first["x2"], first["y2"]) == (
+        star_by_id["vex"]["left_pct"] * 10, star_by_id["vex"]["top_pct"] * 10,
+    )
+
+
+def test_constellation_links_tiebreak_by_id_when_xp_equal():
+    party, fortune, trials = _consteltation_inputs(
+        ("vex", 100), ("anton", 100), ("grieg", 100)
+    )
+    result = compute_constellation(party, fortune, trials)
+    # Sort key is (xp, id) ascending → anton, grieg, vex.
+    star_by_id = {s["id"]: s for s in result["stars"]}
+    expected_order = ["anton", "grieg", "vex"]
+    for i, cid in enumerate(expected_order):
+        nxt = expected_order[(i + 1) % 3]
+        link = result["links"][i]
+        assert (link["x1"], link["y1"]) == (
+            star_by_id[cid]["left_pct"] * 10, star_by_id[cid]["top_pct"] * 10,
+        )
+        assert (link["x2"], link["y2"]) == (
+            star_by_id[nxt]["left_pct"] * 10, star_by_id[nxt]["top_pct"] * 10,
+        )
+
+
+def test_constellation_links_excludes_gm():
+    # GM is filtered from the star list; must not appear as a link endpoint.
+    members = [
+        {"id": "anton", "name": "Anton"},
+        {"id": "vex",   "name": "Vex"},
+        {"id": "gm",    "name": "GM"},
+    ]
+    party = {"members": members}
+    trials = {"per_char": {
+        "anton": {"xp": 100, "kill_count": 0},
+        "vex":   {"xp": 200, "kill_count": 0},
+        "gm":    {"xp": 9999, "kill_count": 0},
+    }}
+    fortune_by_char = {cid: {
+        "rolls_total": 5, "kept_d20s_count": 4, "avg": 10.0, "sd": 1.0,
+        "crits": 0, "fumbles": 0,
+    } for cid in ("anton", "vex", "gm")}
+    result = compute_constellation(party, fortune_by_char, trials)
+    assert {s["id"] for s in result["stars"]} == {"anton", "vex"}
+    assert len(result["links"]) == 2  # two stars → closed loop has two segments
