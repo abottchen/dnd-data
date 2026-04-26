@@ -47,7 +47,7 @@ sequenceDiagram
     H->>T: persist slice + prompt body (debug artifact)
     H->>C: stdin=slice<br/>--system-prompt-file<br/>--json-schema
     C-->>H: structured_output (schema-validated)
-    H->>A: apply prose; bump marker on full refresh success
+    H->>A: apply prose, bump marker on full refresh success
     H->>B: run build.py
 ```
 
