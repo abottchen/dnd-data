@@ -1,4 +1,4 @@
-"""Tests for hydrate slice builders (replaces the retired test_helpers.py).
+"""Tests for build slice builders (replaces the retired test_helpers.py).
 
 Slice builders are pure functions of (data, authored) — no subprocess needed.
 Each test materializes the fixture data + authored store under tmp_path and
@@ -6,28 +6,20 @@ calls the builder directly.
 """
 import json
 import shutil
-import sys
 from pathlib import Path
 
 import pytest
 
+from build import render, slices, store
+
 REPO_ROOT = Path(__file__).resolve().parent.parent
 FIXTURES = REPO_ROOT / "tests/fixtures"
-
-# Make hydrate package importable.
-if str(REPO_ROOT) not in sys.path:
-    sys.path.insert(0, str(REPO_ROOT))
-
-from hydrate import slices, store  # noqa: E402
-
-# build is added to sys.path by conftest.py; safe to import.
-import build  # noqa: E402
 
 
 @pytest.fixture
 def slice_env(tmp_path, monkeypatch):
     """Materialize a writable copy of fixture data + authored store under
-    tmp_path. Returns (data_dict, authored_dict). HYDRATE_AUTHORED_DIR is
+    tmp_path. Returns (data_dict, authored_dict). BUILD_AUTHORED_DIR is
     monkeypatched so store.load_authored() points at the fixture copy."""
     data_dir = tmp_path / "data"
     data_dir.mkdir()
@@ -40,9 +32,9 @@ def slice_env(tmp_path, monkeypatch):
     for f in (FIXTURES / "sample_authored").iterdir():
         shutil.copy(f, authored_dir / f.name)
 
-    monkeypatch.setenv("HYDRATE_AUTHORED_DIR", str(authored_dir))
+    monkeypatch.setenv("BUILD_AUTHORED_DIR", str(authored_dir))
 
-    data = build.load_data(data_dir)
+    data = render.load_data(data_dir)
     authored = store.load_authored()
     return {"data": data, "authored": authored, "authored_dir": authored_dir}
 
@@ -178,7 +170,7 @@ def test_append_builders_tolerate_empty_authored(slice_env, builder_name, tmp_pa
     treating the authored store as empty rather than crashing."""
     empty_authored = tmp_path / "empty-authored"
     empty_authored.mkdir()
-    monkeypatch.setenv("HYDRATE_AUTHORED_DIR", str(empty_authored))
+    monkeypatch.setenv("BUILD_AUTHORED_DIR", str(empty_authored))
     authored = store.load_authored()
     builder = getattr(slices, builder_name)
     out = builder(slice_env["data"], authored)

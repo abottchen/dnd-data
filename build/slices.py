@@ -1,24 +1,19 @@
-"""Slice builders for hydrate.
+"""Slice builders for the build orchestrator.
 
 Each builder takes (data, authored) and returns a list of (key, slice_data)
 tuples. The orchestrator iterates and dispatches the matching transformer for
 each slice.
 
 Mirrors the slicing logic that lived in `helpers.py` under the retired
-hydrate-ledger skill. Per the project rule that build.py and hydrate code
-mirror patterns rather than extract a shared module, this file imports a few
-named helpers from `build` (the authoritative computation source) but does
-not factor a third common module.
+hydrate-ledger skill. Per the project rule that render.py and orchestrator
+code mirror patterns rather than extract a shared module, this file imports
+a few named helpers from `render` (the authoritative computation source)
+but does not factor a third common module.
 """
 import re
-import sys
 from collections import defaultdict
-from pathlib import Path
 
-_BUILD_DIR = Path(__file__).resolve().parents[1] / "build"
-if str(_BUILD_DIR) not in sys.path:
-    sys.path.insert(0, str(_BUILD_DIR))
-import build  # noqa: E402
+from . import render
 
 
 def iu_date(entry: dict) -> str:
@@ -88,7 +83,7 @@ def chapter_session_ids(chapter_id: int, chapters: list, session_log: dict) -> l
 # -- Append slice builders ---------------------------------------------------
 
 def append_kills(data: dict, authored: dict) -> list[tuple]:
-    auth_keys = {build.kill_key(k["character"], k["date"], k["creature"], k["method"])
+    auth_keys = {render.kill_key(k["character"], k["date"], k["creature"], k["method"])
                  for k in authored["kills"]}
 
     # First-seen wins on the rare same-date case (a long Saturday spanning two
@@ -101,7 +96,7 @@ def append_kills(data: dict, authored: dict) -> list[tuple]:
     for member in data["party"]["members"]:
         char = member["id"]
         for k in member.get("kills", []):
-            kk = build.kill_key(char, k["date"], k["creature"], k["method"])
+            kk = render.kill_key(char, k["date"], k["creature"], k["method"])
             if kk in auth_keys:
                 continue
             new_by_date[k["date"]].append({
@@ -172,7 +167,7 @@ def append_chapters(data: dict, authored: dict) -> list[tuple]:
 
 def append_npcs(data: dict, authored: dict) -> list[tuple]:
     auth_names = {n["name"] for n in authored["npcs"]}
-    expected = build.collect_npcs_from_log(data["session_log"], authored["site"])
+    expected = render.collect_npcs_from_log(data["session_log"], authored["site"])
     missing = [n for n in expected if n not in auth_names]
     out = []
     for name in missing:
@@ -201,9 +196,9 @@ def append_characters(data: dict, authored: dict) -> list[tuple]:
     if not new_pcs:
         return []
 
-    trials = build.compute_trials(data["party"])
+    trials = render.compute_trials(data["party"])
     fortune = {
-        m["id"]: build.compute_fortune(data["rolls_by_slug"].get(m["id"], []))
+        m["id"]: render.compute_fortune(data["rolls_by_slug"].get(m["id"], []))
         for m in data["party"]["members"]
     }
     return [("all", {
@@ -263,9 +258,9 @@ def refresh_characters(data: dict, authored: dict) -> list[tuple]:
         })
     if not pcs:
         return []
-    trials = build.compute_trials(data["party"])
+    trials = render.compute_trials(data["party"])
     fortune = {
-        m["id"]: build.compute_fortune(data["rolls_by_slug"].get(m["id"], []))
+        m["id"]: render.compute_fortune(data["rolls_by_slug"].get(m["id"], []))
         for m in data["party"]["members"]
     }
     existing = {c["id"]: c for c in authored["characters"]}

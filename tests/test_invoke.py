@@ -1,16 +1,9 @@
-"""Tests for hydrate.invoke._parse_frontmatter — exercises only the pure
+"""Tests for build.invoke._parse_frontmatter — exercises only the pure
 parsing logic, no subprocess. The CLI invocation path (call_transformer)
 needs an integration harness and is not covered here."""
-import sys
-from pathlib import Path
-
 import pytest
 
-REPO_ROOT = Path(__file__).resolve().parent.parent
-if str(REPO_ROOT) not in sys.path:
-    sys.path.insert(0, str(REPO_ROOT))
-
-from hydrate.invoke import FrontmatterError, _parse_frontmatter  # noqa: E402
+from build.invoke import FrontmatterError, _parse_frontmatter
 
 
 def test_standard_frontmatter_with_model_opus():

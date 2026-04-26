@@ -1,16 +1,9 @@
-"""Tests for hydrate.apply — the functions that mutate the in-memory authored
+"""Tests for build.apply — the functions that mutate the in-memory authored
 store from a transformer's structured_output. These tests use synthetic
 authored / slice / output dicts; no subprocess, no fixtures on disk."""
-import sys
-from pathlib import Path
-
 import pytest
 
-REPO_ROOT = Path(__file__).resolve().parent.parent
-if str(REPO_ROOT) not in sys.path:
-    sys.path.insert(0, str(REPO_ROOT))
-
-from hydrate import apply  # noqa: E402
+from build import apply
 
 
 # -- apply_append_kills ------------------------------------------------------

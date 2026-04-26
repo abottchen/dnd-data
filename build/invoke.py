@@ -1,4 +1,4 @@
-"""claude -p invocation for hydrate.
+"""claude -p invocation for the build orchestrator.
 
 For each transformer, reads .claude/prompts/<name>.md (frontmatter + body)
 and .claude/prompts/<name>.schema.json. Pipes the slice JSON to claude via

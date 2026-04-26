@@ -1,5 +1,5 @@
 {
-  "_comment": "Maps dice-roll player.name (from upstream dicex-rolls-*.json) to site character slugs via longest-first substring match. Keys are first-name or handle substrings — never full real names. build.py:_resolve_dice_player resolves upstream names against these patterns. Add entries here when a new player appears in dice rolls.",
+  "_comment": "Maps dice-roll player.name (from upstream dicex-rolls-*.json) to site character slugs via longest-first substring match. Keys are first-name or handle substrings — never full real names. render.py:_resolve_dice_player resolves upstream names against these patterns. Add entries here when a new player appears in dice rolls.",
   "mapping": {
     "Simon": "grieg",
     "Chumble": "chumble",

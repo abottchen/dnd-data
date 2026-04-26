@@ -1,6 +1,6 @@
 import json
 from pathlib import Path
-from build import load_data
+from build.render import load_data
 
 def test_load_data_returns_party_dice_and_sessionlog(tmp_path: Path):
     (tmp_path / "party.json").write_text(json.dumps({"members": []}))

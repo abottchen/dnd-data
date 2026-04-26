@@ -1,4 +1,4 @@
-from build import (xp_for_cr, compute_trials, compute_sessions_chart, compute_fortune,
+from build.render import (xp_for_cr, compute_trials, compute_sessions_chart, compute_fortune,
                    compute_d20_histogram, compute_other_dice, compute_best_skill,
                    compute_intro_meta,
                    _creature_token_url, _name_to_token_name)

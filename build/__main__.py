@@ -1,13 +1,13 @@
-"""Hydrate orchestrator entry point.
+"""Build orchestrator entry point.
 
-Run with: `python -m hydrate` (or `.venv/bin/python -m hydrate`).
+Run with: `python -m build` (or `.venv/bin/python -m build`).
 
 Workflow:
   1. Load upstream data + authored state.
   2. Append pass: invoke each append-* transformer for any unauthored entities.
   3. Refresh pass (only if latest_session > marker): invoke each refresh-*.
   4. Persist authored store. Bump marker on full refresh-pass success.
-  5. Run build.py. (Targeted MISSING/MALFORMED retry — TODO.)
+  5. Run render.py. (Targeted MISSING/MALFORMED retry — TODO.)
   6. Print end-of-run report.
 
 The temp directory is removed on full success and preserved on partial
@@ -20,17 +20,12 @@ import shutil
 import sys
 from pathlib import Path
 
-from . import apply, slices, store
-from .build_loop import run_build
+from . import apply, render, slices, store
+from .build_loop import run_render
 from .invoke import TransformerError, call_transformer
-from .paths import REPO_ROOT, data_dir, temp_dir
+from .paths import data_dir, temp_dir
 
 DEFAULT_CONCURRENCY = 5
-
-_BUILD_DIR = REPO_ROOT / "build"
-if str(_BUILD_DIR) not in sys.path:
-    sys.path.insert(0, str(_BUILD_DIR))
-import build  # noqa: E402
 
 
 APPEND_PASS = [
@@ -110,9 +105,9 @@ def _run_pass(pass_name: str, transformers, data, authored, run_dir: Path, concu
 
 
 def _print_report(*, append_results, refresh_results, marker_old, marker_new,
-                  build_result, run_dir: Path, full_success: bool, temp_kept: bool):
+                  render_result, run_dir: Path, full_success: bool, temp_kept: bool):
     _log("\n" + "=" * 60)
-    _log("HYDRATE RUN REPORT")
+    _log("BUILD RUN REPORT")
     _log("=" * 60)
 
     if append_results:
@@ -143,23 +138,23 @@ def _print_report(*, append_results, refresh_results, marker_old, marker_new,
     else:
         _log(f"\nMarker: {marker_old} → {marker_new}")
 
-    _log(f"\nBuild: {'OK' if build_result['ok'] else 'FAILED (returncode=' + str(build_result['returncode']) + ')'}")
-    if not build_result["ok"]:
-        _log("--- build stderr ---")
-        _log(build_result["stderr"][:2000])
+    _log(f"\nRender: {'OK' if render_result['ok'] else 'FAILED (returncode=' + str(render_result['returncode']) + ')'}")
+    if not render_result["ok"]:
+        _log("--- render stderr ---")
+        _log(render_result["stderr"][:2000])
 
     if temp_kept:
         _log(f"\nTemp dir: {run_dir} (preserved; rm -rf when done)")
     else:
         _log(f"\nTemp dir: {run_dir} (removed)")
-    _log(f"Overall: {'SUCCESS' if full_success and build_result['ok'] else 'PARTIAL/FAILED'}")
+    _log(f"Overall: {'SUCCESS' if full_success and render_result['ok'] else 'PARTIAL/FAILED'}")
 
 
 def main(argv=None) -> int:
-    parser = argparse.ArgumentParser(prog="hydrate")
+    parser = argparse.ArgumentParser(prog="build")
     parser.add_argument(
-        "--skip-build", action="store_true",
-        help="Skip running build.py at the end (useful for iteration).",
+        "--skip-render", action="store_true",
+        help="Skip running render.py at the end (useful for iteration).",
     )
     parser.add_argument(
         "--no-refresh", action="store_true",
@@ -178,13 +173,13 @@ def main(argv=None) -> int:
     if args.concurrency < 1:
         parser.error("--concurrency must be >= 1")
 
-    data = build.load_data(str(data_dir()))
+    data = render.load_data(str(data_dir()))
     authored = store.load_authored()
     latest = len(data["session_log"]["entries"])
     marker = authored["site"].get("refreshed_through_session", 0)
 
     run_dir = temp_dir()
-    _log(f"hydrate run temp dir: {run_dir}")
+    _log(f"build run temp dir: {run_dir}")
     _log(f"latest_session={latest}, marker={marker}")
 
     # --- Append pass ---
@@ -209,15 +204,15 @@ def main(argv=None) -> int:
         else:
             _log("\nrefresh pass skipped (marker up to date)")
 
-    # --- Build ---
-    if args.skip_build:
-        _log("\nbuild step skipped (--skip-build)")
-        build_result = {"ok": True, "stdout": "", "stderr": "", "returncode": 0}
+    # --- Render ---
+    if args.skip_render:
+        _log("\nrender step skipped (--skip-render)")
+        render_result = {"ok": True, "stdout": "", "stderr": "", "returncode": 0}
     else:
-        _log("\n--- running build.py ---")
-        build_result = run_build()
+        _log("\n--- running render.py ---")
+        render_result = run_render()
 
-    full_success = append_ok and refresh_ok and build_result["ok"]
+    full_success = append_ok and refresh_ok and render_result["ok"]
 
     # Clean up the temp dir on full success unless --keep-temp.
     # On partial failure we always preserve it so the user can inspect
@@ -231,7 +226,7 @@ def main(argv=None) -> int:
         refresh_results=refresh_results,
         marker_old=marker,
         marker_new=marker_new,
-        build_result=build_result,
+        render_result=render_result,
         run_dir=run_dir,
         full_success=full_success,
         temp_kept=temp_kept,

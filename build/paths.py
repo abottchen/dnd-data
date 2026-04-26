@@ -1,8 +1,8 @@
-"""Path resolution for the hydrate package.
+"""Path resolution for the build package.
 
 Every path resolves from REPO_ROOT (the repo this package lives in). Test
-isolation overrides via env vars: HYDRATE_DATA_DIR, HYDRATE_AUTHORED_DIR,
-HYDRATE_TEMP_DIR.
+isolation overrides via env vars: BUILD_DATA_DIR, BUILD_AUTHORED_DIR,
+BUILD_TEMP_DIR.
 """
 import os
 import tempfile
@@ -13,11 +13,11 @@ PROMPTS_DIR = REPO_ROOT / ".claude" / "prompts"
 
 
 def data_dir() -> Path:
-    return Path(os.environ.get("HYDRATE_DATA_DIR", REPO_ROOT / "data"))
+    return Path(os.environ.get("BUILD_DATA_DIR", REPO_ROOT / "data"))
 
 
 def authored_dir() -> Path:
-    return Path(os.environ.get("HYDRATE_AUTHORED_DIR", REPO_ROOT / "build" / "authored"))
+    return Path(os.environ.get("BUILD_AUTHORED_DIR", REPO_ROOT / "build" / "authored"))
 
 
 def temp_dir() -> Path:
@@ -26,9 +26,9 @@ def temp_dir() -> Path:
     The dir is preserved on failure and cleaned only on full-run success.
     Cleaning is the orchestrator's responsibility, not this function's.
     """
-    override = os.environ.get("HYDRATE_TEMP_DIR")
+    override = os.environ.get("BUILD_TEMP_DIR")
     if override:
         p = Path(override)
         p.mkdir(parents=True, exist_ok=True)
         return p
-    return Path(tempfile.mkdtemp(prefix="hydrate-"))
+    return Path(tempfile.mkdtemp(prefix="build-"))
