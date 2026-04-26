@@ -5,7 +5,6 @@ and .claude/prompts/<name>.schema.json. Pipes the slice JSON to claude via
 stdin. Returns the structured_output dict (schema-validated by the harness).
 """
 import json
-import re
 import subprocess
 from pathlib import Path
 
@@ -18,26 +17,54 @@ DISALLOWED_TOOLS = (
 PERMISSION_MODE = "plan"
 MAX_BUDGET_USD = "1.00"
 
-_FRONTMATTER_RE = re.compile(r"^---\n(.*?)\n---\n(.*)$", re.DOTALL)
-
 
 class TransformerError(RuntimeError):
     """Raised when claude -p returns an error or an invalid response."""
 
 
+class FrontmatterError(ValueError):
+    """Raised when prompt frontmatter is malformed (open `---` with no close,
+    or a non-blank line that is not `key: value`). A file with no leading
+    `---` is not an error — it returns ({}, text)."""
+
+
 def _parse_frontmatter(text: str) -> tuple[dict, str]:
     """Parse single-level YAML-like frontmatter (`key: value` per line) from a
-    prompt file. Returns (frontmatter_dict, body_text)."""
-    m = _FRONTMATTER_RE.match(text)
-    if not m:
+    prompt file. Returns (frontmatter_dict, body_text).
+
+    - No leading `---\\n` (or `---\\r\\n`) → returns ({}, text) unchanged.
+    - Leading `---` with no matching closing `---` → FrontmatterError.
+    - Non-empty, non-comment line without ':' inside the block → FrontmatterError.
+
+    CRLF line endings are tolerated (normalized to LF before parsing).
+    """
+    normalized = text.replace("\r\n", "\n")
+    if not normalized.startswith("---\n"):
         return {}, text
+    rest = normalized[len("---\n"):]
+    if rest.startswith("---\n"):
+        # Empty frontmatter: `---\n---\n...` — close marker immediately
+        # follows open, so there is no leading `\n` for the find() below.
+        fm_text, body = "", rest[len("---\n"):]
+    elif (end_idx := rest.find("\n---\n")) != -1:
+        fm_text, body = rest[:end_idx], rest[end_idx + len("\n---\n"):]
+    elif rest.endswith("\n---"):
+        fm_text, body = rest[:-len("\n---")], ""
+    else:
+        raise FrontmatterError(
+            "frontmatter started with '---' but no closing '---' found"
+        )
+
     fm: dict = {}
-    for line in m.group(1).splitlines():
-        if not line.strip() or line.strip().startswith("#"):
+    for raw_line in fm_text.splitlines():
+        line = raw_line.strip()
+        if not line or line.startswith("#"):
             continue
+        if ":" not in line:
+            raise FrontmatterError(f"malformed frontmatter line (no ':'): {raw_line!r}")
         k, _, v = line.partition(":")
         fm[k.strip()] = v.strip()
-    return fm, m.group(2)
+    return fm, body
 
 
 def call_transformer(name: str, slice_data: dict, run_dir: Path) -> dict:

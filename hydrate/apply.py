@@ -70,9 +70,12 @@ def apply_append_chapters(authored: dict, key, slice_data: dict, output: dict) -
 
 
 def apply_append_npcs(authored: dict, key, slice_data: dict, output: dict) -> None:
+    """`key` is the upstream-derived NPC name; we use it verbatim rather than
+    trusting the model's echoed `name`, so casing/whitespace drift in the
+    structured output cannot create duplicate authored entries."""
     fields = output["fields"]
     authored["npcs"].append({
-        "name": fields["name"],
+        "name": key,
         "epithet": fields["epithet"],
         "allegiance": fields.get("allegiance"),
     })

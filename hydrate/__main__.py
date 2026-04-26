@@ -10,11 +10,13 @@ Workflow:
   5. Run build.py. (Targeted MISSING/MALFORMED retry — TODO.)
   6. Print end-of-run report.
 
-The temp directory is preserved on failure. On full success the user can rm
-it manually; auto-cleanup is not done so partial successes are inspectable.
+The temp directory is removed on full success and preserved on partial
+failure so the user can inspect slice / body / stderr artifacts. Pass
+`--keep-temp` to preserve it on success too.
 """
 import argparse
 import concurrent.futures
+import shutil
 import sys
 from pathlib import Path
 
@@ -108,7 +110,7 @@ def _run_pass(pass_name: str, transformers, data, authored, run_dir: Path, concu
 
 
 def _print_report(*, append_results, refresh_results, marker_old, marker_new,
-                  build_result, run_dir: Path, full_success: bool):
+                  build_result, run_dir: Path, full_success: bool, temp_kept: bool):
     _log("\n" + "=" * 60)
     _log("HYDRATE RUN REPORT")
     _log("=" * 60)
@@ -146,7 +148,10 @@ def _print_report(*, append_results, refresh_results, marker_old, marker_new,
         _log("--- build stderr ---")
         _log(build_result["stderr"][:2000])
 
-    _log(f"\nTemp dir: {run_dir} (preserved; rm -rf when done)")
+    if temp_kept:
+        _log(f"\nTemp dir: {run_dir} (preserved; rm -rf when done)")
+    else:
+        _log(f"\nTemp dir: {run_dir} (removed)")
     _log(f"Overall: {'SUCCESS' if full_success and build_result['ok'] else 'PARTIAL/FAILED'}")
 
 
@@ -163,6 +168,11 @@ def main(argv=None) -> int:
     parser.add_argument(
         "--concurrency", type=int, default=DEFAULT_CONCURRENCY,
         help=f"Max parallel `claude -p` calls per pass (default: {DEFAULT_CONCURRENCY}).",
+    )
+    parser.add_argument(
+        "--keep-temp", action="store_true",
+        help="Preserve the per-run temp dir even on full success "
+             "(default: remove on success, preserve on partial failure).",
     )
     args = parser.parse_args(argv)
     if args.concurrency < 1:
@@ -209,6 +219,13 @@ def main(argv=None) -> int:
 
     full_success = append_ok and refresh_ok and build_result["ok"]
 
+    # Clean up the temp dir on full success unless --keep-temp.
+    # On partial failure we always preserve it so the user can inspect
+    # the slice / body / stderr artifacts.
+    temp_kept = args.keep_temp or not full_success
+    if not temp_kept:
+        shutil.rmtree(run_dir, ignore_errors=True)
+
     _print_report(
         append_results=append_results,
         refresh_results=refresh_results,
@@ -217,6 +234,7 @@ def main(argv=None) -> int:
         build_result=build_result,
         run_dir=run_dir,
         full_success=full_success,
+        temp_kept=temp_kept,
     )
 
     return 0 if full_success else 1

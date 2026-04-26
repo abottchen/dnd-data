@@ -12,9 +12,10 @@ The user message is a JSON object with this shape:
 
 # Output fields
 
-- `name`: echo the input `name` back unchanged.
 - `epithet`: a single sentence-fragment that places this NPC — what they do, where they stand, the company's relationship to them. No terminal punctuation.
 - `allegiance`: one of `"with"` (allied / friendly), `"against"` (hostile), or `null` (genuinely ambiguous from the mentions).
+
+The orchestrator carries the canonical name forward from the input slice; you do not return it.
 
 # Authorial restraint (critical)
 
