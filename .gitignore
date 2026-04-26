@@ -4,6 +4,10 @@
 .worktrees/
 /.mcp.json
 
+# Scratch / mockups
+.scratch/
+.playwright-mcp/
+
 # Sensitive source data — contains real player names/handles.
 # Not needed to display index.html; hydration runs locally against these.
 data/party.json

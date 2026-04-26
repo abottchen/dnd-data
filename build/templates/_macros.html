@@ -1,0 +1,22 @@
+{# Section head: asymmetric eyebrow / title / margin note + ornamental divider.
+
+   Args:
+     num       — Roman numeral (string, e.g. "I" or "iii")
+     label     — eyebrow descriptor (e.g. "The Stars")
+     title     — section title (e.g. "The Constellation")
+     margin    — italic margin note on the right (HTML safe)
+     ornament  — divider variant: "fleuron" (default), "rule", or "trefoil"
+#}
+{% macro section_head(num, label, title, margin, ornament="fleuron") -%}
+<div class="section-head">
+  <div class="section-eyebrow"><span class="roman">{{ num }}</span>{{ label }}</div>
+  <h2 class="section-title">{{ title }}</h2>
+  <div class="section-margin">{{ margin | safe }}</div>
+</div>
+<div class="divider"><div class="line"></div><svg width="32" height="16" aria-hidden="true"><use href="#div-{{ ornament }}"/></svg><div class="line"></div></div>
+{%- endmacro %}
+
+{# Lightweight in-section sub-header (not a full section-head; quieter visual weight) #}
+{% macro sub_head(text) -%}
+<div class="sub-head">{{ text }}</div>
+{%- endmacro %}

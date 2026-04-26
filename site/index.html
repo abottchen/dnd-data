@@ -10,13 +10,55 @@
 </head>
 <body>
 
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="div-fleuron" viewBox="0 0 32 16">
+      <path d="M16 2 C18 5, 22 6, 26 4 C24 8, 24 10, 26 12 C22 10, 18 11, 16 14 C14 11, 10 10, 6 12 C8 10, 8 8, 6 4 C10 6, 14 5, 16 2 Z" fill="currentColor" opacity="0.9"/>
+      <circle cx="16" cy="8" r="1.4" fill="currentColor"/>
+    </symbol>
+    <symbol id="div-rule" viewBox="0 0 24 16">
+      <rect x="0" y="7" width="24" height="2" fill="currentColor" opacity="0.4"/>
+      <rect x="11" y="3" width="2" height="10" fill="currentColor" transform="rotate(45 12 8)"/>
+    </symbol>
+    <symbol id="div-trefoil" viewBox="0 0 36 16">
+      <circle cx="9" cy="8" r="2.4" fill="none" stroke="currentColor" stroke-width="1"/>
+      <circle cx="18" cy="8" r="3" fill="currentColor"/>
+      <circle cx="27" cy="8" r="2.4" fill="none" stroke="currentColor" stroke-width="1"/>
+    </symbol>
+    <symbol id="d6" viewBox="0 0 24 24">
+      <rect x="3" y="3" width="18" height="18" rx="2" fill="none" stroke="currentColor" stroke-width="1.4"/>
+      <circle cx="8" cy="8" r="1.3" fill="currentColor"/>
+      <circle cx="16" cy="16" r="1.3" fill="currentColor"/>
+    </symbol>
+    <symbol id="d8" viewBox="0 0 24 24">
+      <path d="M12 3 L21 12 L12 21 L3 12 Z" fill="none" stroke="currentColor" stroke-width="1.4"/>
+      <path d="M12 3 L12 21 M3 12 L21 12" stroke="currentColor" stroke-width="0.8" opacity="0.5"/>
+    </symbol>
+    <symbol id="d10" viewBox="0 0 24 24">
+      <path d="M12 2 L22 10 L18 21 L6 21 L2 10 Z" fill="none" stroke="currentColor" stroke-width="1.4"/>
+      <path d="M12 2 L12 21 M2 10 L22 10" stroke="currentColor" stroke-width="0.8" opacity="0.5"/>
+    </symbol>
+  </defs>
+</svg>
+
   <header class="page-header">
+    <div class="header-eyebrow">
+      <div><span class="ornament">+</span>Volume I</div>
+      <div><span class="ornament">+</span>Kythorn 1494 DR</div>
+      <div><span class="ornament">+</span>5 Sessions Kept</div>
+    </div>
     <h1>The Company of the Wandering Star</h1>
     <div class="sub">A ledger of those who walk &middot; and those they have laid down</div>
   </header>
 
   <nav class="tabs" role="tablist">
-    <a href="#company" class="tab" data-tab="company"><span class="tab-sigil">&#10022;</span>The Company</a>
+    <a href="#company" class="tab" data-tab="company">
+      <span class="tab-cluster">
+        <img src="images/urida.png" alt="" data-rank="1">
+        <img src="images/grieg.png" alt="" data-rank="2">
+        <img src="images/vex.png" alt="" data-rank="3">
+      </span>The Company
+    </a>
     <a href="#anton" class="tab" data-tab="anton"><img src="images/anton.png" alt="">Anton</a>
     <a href="#grieg" class="tab" data-tab="grieg"><img src="images/grieg.png" alt="">Grieg</a>
     <a href="#vex" class="tab" data-tab="vex"><img src="images/vex.png" alt="">Vex</a>
@@ -27,41 +69,48 @@
 
   <main>
     <article class="character" id="company">
-  <header class="company-intro">
-    <div class="company-intro-epithet">Five travellers and a storyteller, bound to a doomed road</div>
-    <div class="company-intro-meta">Five Sessions &middot; Kythorn 1494 DR</div>
-  </header>
 
   <section class="company-section company-ledger">
-    <div class="company-section-header">The Company's Ledger</div>
-    <div class="trials-grid">
-      <div class="trial">
-        <div class="trial-label">Souls Gathered</div>
-        <div class="trial-val">900</div>
-        <div class="trial-sub">Experience, total</div>
+    <div class="section-head">
+  <div class="section-eyebrow"><span class="roman">I</span>The Reckoning</div>
+  <h2 class="section-title">The Company's Ledger</h2>
+  <div class="section-margin">Five travellers and a storyteller, bound to a doomed road</div>
+</div>
+<div class="divider"><div class="line"></div><svg width="32" height="16" aria-hidden="true"><use href="#div-fleuron"/></svg><div class="line"></div></div>
+    <div class="ledger-grid lead">
+      <div class="ledger-cell">
+        <div class="ledger-eyebrow">Souls Gathered</div>
+        <div class="ledger-val">900</div>
+        <div class="ledger-sub"><b>experience</b> &middot; total earned at the table</div>
       </div>
-      <div class="trial">
-        <div class="trial-label">Fallen by the Company</div>
-        <div class="trial-val">10</div>
-        <div class="trial-sub">Creatures, all hands</div>
+      <div class="ledger-cell">
+        <div class="ledger-eyebrow">Fallen by the Company</div>
+        <div class="ledger-val">10</div>
+        <div class="ledger-sub seal"><b>creatures</b> &middot; all hands</div>
       </div>
-      <div class="trial">
-        <div class="trial-label">Rolls Cast</div>
-        <div class="trial-val">76</div>
-        <div class="trial-sub">44 on the twenty</div>
+      <div class="ledger-cell">
+        <div class="ledger-eyebrow">Rolls Cast</div>
+        <div class="ledger-val">76</div>
+        <div class="ledger-sub"><b>44</b> on the twenty</div>
       </div>
-      <div class="trial">
-        <div class="trial-label">Sessions Kept</div>
-        <div class="trial-val">5</div>
-        <div class="trial-sub">Nights at the table</div>
+      <div class="ledger-cell">
+        <div class="ledger-eyebrow">Sessions Kept</div>
+        <div class="ledger-val">5</div>
+        <div class="ledger-sub">nights at the table</div>
       </div>
     </div>
   </section>
 
   <section class="company-section">
-    <div class="company-section-header">The Constellation</div>
+    <div class="section-head">
+  <div class="section-eyebrow"><span class="roman">II</span>The Stars</div>
+  <h2 class="section-title">The Constellation</h2>
+  <div class="section-margin">Each star a player. Brighter stars walk the road more often, distant stars carry the heavier load.</div>
+</div>
+<div class="divider"><div class="line"></div><svg width="32" height="16" aria-hidden="true"><use href="#div-rule"/></svg><div class="line"></div></div>
     <div class="constellation">
       <div class="constellation-plot">
+        <div class="constellation-grid"></div>
         <div class="constellation-axis-y-label">Presence &middot; rolls cast &rarr;</div>
         <div class="constellation-axis-x-label">Contribution &middot; experience earned &rarr;</div>
         <span class="constellation-tick-y" style="top: 0%;">25</span>
@@ -70,6 +119,13 @@
         <span class="constellation-tick-x" style="left: 4%;">0</span>
         <span class="constellation-tick-x" style="left: 50%;">163</span>
         <span class="constellation-tick-x" style="left: 96%;">325</span>
+        <svg class="constellation-lines" preserveAspectRatio="none" viewBox="0 0 1000 1000" aria-hidden="true">
+          <path class="link" d="M 110 260 L 320 960"/>
+          <path class="link" d="M 320 960 L 680 40"/>
+          <path class="link" d="M 680 40 L 680 220"/>
+          <path class="link" d="M 680 220 L 960 520"/>
+          <path class="link" d="M 960 520 L 110 260"/>
+        </svg>
         <div class="constellation-star" style="top: 96%; left: 32%;"
              data-name="Anton Truebranch"
              data-epithet="his rolls yet unwritten"
@@ -150,7 +206,12 @@
   </section>
 
   <section class="company-section">
-    <div class="company-section-header">The Bestiary</div>
+    <div class="section-head">
+  <div class="section-eyebrow"><span class="roman">III</span>The Tally</div>
+  <h2 class="section-title">The Bestiary</h2>
+  <div class="section-margin">Of every kind that fell, and the count of each.</div>
+</div>
+<div class="divider"><div class="line"></div><svg width="32" height="16" aria-hidden="true"><use href="#div-trefoil"/></svg><div class="line"></div></div>
     <div class="bestiary-grid">
       <div class="bestiary-group">
         <div class="bestiary-group-label">Humanoid <span class="count">6</span></div>
@@ -181,7 +242,12 @@
   </section>
 
   <section class="company-section">
-    <div class="company-section-header">The Chronicle</div>
+    <div class="section-head">
+  <div class="section-eyebrow"><span class="roman">IV</span>The Calendar</div>
+  <h2 class="section-title">The Chronicle</h2>
+  <div class="section-margin">Each session set down by hand, with date and hour, and what was done.</div>
+</div>
+<div class="divider"><div class="line"></div><svg width="32" height="16" aria-hidden="true"><use href="#div-fleuron"/></svg><div class="line"></div></div>
     <div class="chronicle">
   <aside class="chronicle-rail">
     <div class="chronicle-rail-label">Regnal</div>
@@ -198,7 +264,7 @@
         <p class="chronicle-chapter-epigraph">From the House of Healing to the docks of Port Nyanzaru &mdash; by word, by storm, by blade, by ice.</p>
         <div class="chronicle-chapter-meta">
           <span><b>5</b> sessions</span>
-          <span><b>10</b> fallen</span>
+          <span class="seal"><b>10</b> fallen</span>
           <span class="chronicle-chapter-tally">
             <img class="chronicle-session-pip" src="https://5e.tools/img/bestiary/tokens/XMM/Sahuagin%20Warrior.webp" alt="Sahuagin Warrior"
                  data-creature="Sahuagin Warrior" data-killer-name="Anton"
@@ -309,7 +375,7 @@
           <div class="chronicle-session-summary">An arm-wrestle unmasked no secrets, but words did. Harlen was revealed a Zhentarim stowaway and the cheese-thief. Corwin showed his left hand, told his name, and named the Ring of Winter.</div>
         </div>
       </details>
-      <details class="chronicle-session">
+      <details class="chronicle-session" open>
         <summary>
           <span class="chronicle-session-num">Session V</span>
           <span class="chronicle-session-title">Through Pirate Steel, into Nyanzaru</span>
@@ -354,7 +420,12 @@
   </section>
 
   <section class="company-section">
-    <div class="company-section-header">The Road Ahead</div>
+    <div class="section-head">
+  <div class="section-eyebrow"><span class="roman">V</span>The Horizon</div>
+  <h2 class="section-title">The Road Ahead</h2>
+  <div class="section-margin">What is known, and where they turn.</div>
+</div>
+<div class="divider"><div class="line"></div><svg width="32" height="16" aria-hidden="true"><use href="#div-rule"/></svg><div class="line"></div></div>
     <div class="road-ahead">
       <div class="road-ahead-block">
         <div class="road-ahead-sub">What Is Known</div>
@@ -377,7 +448,12 @@
   </section>
 
   <section class="company-section">
-    <div class="company-section-header">Distinctions</div>
+    <div class="section-head">
+  <div class="section-eyebrow"><span class="roman">VI</span>The Crowns</div>
+  <h2 class="section-title">Distinctions</h2>
+  <div class="section-margin">Each carries some honour the others do not.</div>
+</div>
+<div class="divider"><div class="line"></div><svg width="32" height="16" aria-hidden="true"><use href="#div-trefoil"/></svg><div class="line"></div></div>
     <div class="distinctions">
       <div class="distinction-portrait-wrap"><img class="distinction-portrait" src="images/anton.png" alt=""></div>
       <div class="distinction-title-wrap">
@@ -423,7 +499,12 @@
   </section>
 
   <section class="company-section">
-    <div class="company-section-header">The Patron Die</div>
+    <div class="section-head">
+  <div class="section-eyebrow"><span class="roman">VII</span>The Fates</div>
+  <h2 class="section-title">The Patron Die</h2>
+  <div class="section-margin">Of the rolls cast upon the twenty, here is how the die fell.</div>
+</div>
+<div class="divider"><div class="line"></div><svg width="32" height="16" aria-hidden="true"><use href="#div-fleuron"/></svg><div class="line"></div></div>
     <div class="patron-die">
       <div class="patron-die-chart">
         <div class="dice-col" data-val="1" data-count="1">
@@ -530,13 +611,20 @@
         <span class="lbl nat" data-val="20">20</span>
       </div>
       <div class="patron-die-legend">
-        <span class="swatch"></span>The Company
+        <span><span class="swatch seal"></span>Fumble</span>
+        <span><span class="swatch brass"></span>The Company</span>
+        <span><span class="swatch paper"></span>Critical</span>
       </div>
     </div>
   </section>
 
   <section class="company-section silent-roll">
-    <div class="company-section-header">The Silent Roll</div>
+    <div class="section-head">
+  <div class="section-eyebrow"><span class="roman">VIII</span>The Quiet Margins</div>
+  <h2 class="section-title">The Silent Roll</h2>
+  <div class="section-margin">Sessions where no blade was lifted.</div>
+</div>
+<div class="divider"><div class="line"></div><svg width="32" height="16" aria-hidden="true"><use href="#div-rule"/></svg><div class="line"></div></div>
     <ul class="silent-roll-list">
       <li><b>15 MAR 2026</b> No blade was drawn; only a name was pressed into a sending stone.</li>
       <li><b>22 MAR 2026</b> A familiar was pulled from a pickle-barrel, and the company called him Wickles.</li>
@@ -580,9 +668,14 @@
         <div class="prof-list">Acrobatics &middot; Animal Handling &middot; Intimidation &middot; Persuasion &middot; Sleight of Hand</div>
       </section>
 
-            <section class="trials" id="anton-trials">
-        <div class="trials-header">Trials</div>
-        <div class="trials-grid">
+      <section class="trials" id="anton-trials">
+        <div class="section-head">
+  <div class="section-eyebrow"><span class="roman">i</span>The Reckoning</div>
+  <h2 class="section-title">Trials</h2>
+  <div class="section-margin">What Anton has gathered, and what Anton has spent.</div>
+</div>
+<div class="divider"><div class="line"></div><svg width="32" height="16" aria-hidden="true"><use href="#div-fleuron"/></svg><div class="line"></div></div>
+        <div class="trials-grid lead">
           <div class="trial">
             <div class="trial-label">XP Earned</div>
             <div class="trial-val">100</div>
@@ -591,22 +684,22 @@
           <div class="trial">
             <div class="trial-label">Laid to Rest</div>
             <div class="trial-val">1</div>
-            <div class="trial-sub">10% of the company</div>
+            <div class="trial-sub seal">10% of the company</div>
           </div>
           <div class="trial">
             <div class="trial-label">Means of Ending</div>
             <div class="trial-val text">Vicious Mockery</div>
-            <div class="trial-sub">1 kill</div>
+            <div class="trial-sub"><b>1</b> kill</div>
           </div>
           <div class="trial">
             <div class="trial-label">Kinds Slain</div>
             <div class="trial-val kinds">Fiend &times; 1</div>
-            <div class="trial-sub">1 kind</div>
+            <div class="trial-sub"><b>1</b> kind</div>
           </div>
         </div>
 
         <div class="sessions">
-          <div class="sessions-header">Across the Ages</div>
+          <div class="sub-head">Across the Ages</div>
           <div class="sessions-chart">
             <div class="session-bar" data-kills='[{"creature": "Sahuagin Warrior", "method": "Vicious Mockery", "token_url": "https://5e.tools/img/bestiary/tokens/XMM/Sahuagin%20Warrior.webp"}]'>
               <div class="bar-stack">
@@ -626,13 +719,23 @@
         </div>
       </section>
 
-            <section class="fortune" id="anton-fortune">
-        <div class="fortune-header">Fortune</div>
+      <section class="fortune" id="anton-fortune">
+        <div class="section-head">
+  <div class="section-eyebrow"><span class="roman">ii</span>The Dice</div>
+  <h2 class="section-title">Fortune</h2>
+  <div class="section-margin">No rolls yet recorded for Anton.</div>
+</div>
+<div class="divider"><div class="line"></div><svg width="32" height="16" aria-hidden="true"><use href="#div-fleuron"/></svg><div class="line"></div></div>
         <div class="fortune-empty">No rolls yet recorded for this adventurer.</div>
       </section>
 
-            <section class="reliquary" id="anton-reliquary">
-        <div class="reliquary-header">Fallen by his tongue</div>
+      <section class="reliquary" id="anton-reliquary">
+        <div class="section-head">
+  <div class="section-eyebrow"><span class="roman">iii</span>The Fallen</div>
+  <h2 class="section-title">Reliquary</h2>
+  <div class="section-margin">Fallen by his tongue</div>
+</div>
+<div class="divider"><div class="line"></div><svg width="32" height="16" aria-hidden="true"><use href="#div-fleuron"/></svg><div class="line"></div></div>
         <ul class="fallen">
           <li>
             <div class="mark">&#10013;</div>
@@ -682,9 +785,14 @@
         <div class="prof-list">Animal Handling &middot; Perception &middot; Survival</div>
       </section>
 
-            <section class="trials" id="grieg-trials">
-        <div class="trials-header">Trials</div>
-        <div class="trials-grid">
+      <section class="trials" id="grieg-trials">
+        <div class="section-head">
+  <div class="section-eyebrow"><span class="roman">i</span>The Reckoning</div>
+  <h2 class="section-title">Trials</h2>
+  <div class="section-margin">What Grieg has gathered, and what Grieg has spent.</div>
+</div>
+<div class="divider"><div class="line"></div><svg width="32" height="16" aria-hidden="true"><use href="#div-fleuron"/></svg><div class="line"></div></div>
+        <div class="trials-grid lead">
           <div class="trial">
             <div class="trial-label">XP Earned</div>
             <div class="trial-val">225</div>
@@ -693,22 +801,22 @@
           <div class="trial">
             <div class="trial-label">Laid to Rest</div>
             <div class="trial-val">2</div>
-            <div class="trial-sub">20% of the company</div>
+            <div class="trial-sub seal">20% of the company</div>
           </div>
           <div class="trial">
             <div class="trial-label">Means of Ending</div>
             <div class="trial-val text">Shoved off ship</div>
-            <div class="trial-sub">2 kills</div>
+            <div class="trial-sub"><b>2</b> kills</div>
           </div>
           <div class="trial">
             <div class="trial-label">Kinds Slain</div>
             <div class="trial-val kinds">Humanoid &times; 2</div>
-            <div class="trial-sub">1 kind</div>
+            <div class="trial-sub"><b>1</b> kind</div>
           </div>
         </div>
 
         <div class="sessions">
-          <div class="sessions-header">Across the Ages</div>
+          <div class="sub-head">Across the Ages</div>
           <div class="sessions-chart">
             <div class="session-bar" data-kills='[]'>
               <div class="bar-stack">
@@ -728,13 +836,18 @@
         </div>
       </section>
 
-            <section class="fortune" id="grieg-fortune">
-        <div class="fortune-header">Fortune</div>
-        <div class="trials-grid">
+      <section class="fortune" id="grieg-fortune">
+        <div class="section-head">
+  <div class="section-eyebrow"><span class="roman">ii</span>The Dice</div>
+  <h2 class="section-title">Fortune</h2>
+  <div class="section-margin">How the dice have spoken for Grieg.</div>
+</div>
+<div class="divider"><div class="line"></div><svg width="32" height="16" aria-hidden="true"><use href="#div-fleuron"/></svg><div class="line"></div></div>
+        <div class="trials-grid lead">
           <div class="trial">
             <div class="trial-label">Rolls Cast</div>
             <div class="trial-val">25</div>
-            <div class="trial-sub">14 on the twenty</div>
+            <div class="trial-sub"><b>14</b> on the twenty</div>
           </div>
           <div class="trial">
             <div class="trial-label">Average d20</div>
@@ -744,7 +857,7 @@
           <div class="trial">
             <div class="trial-label">Critical Hits</div>
             <div class="trial-val">1</div>
-            <div class="trial-sub">0 fumbles</div>
+            <div class="trial-sub seal"><b>0</b> fumbles</div>
           </div>
           <div class="trial">
             <div class="trial-label">Heaviest Blow</div>
@@ -754,7 +867,7 @@
         </div>
 
         <div class="dice-hist-wrap">
-          <div class="dice-hist-title">The Twenty Faces</div>
+          <div class="sub-head">The Twenty Faces</div>
           <div class="dice-hist">
             <div class="dice-col" data-val="1" data-count="1"><div class="dice-count">1</div><div class="dice-bar" style="height:14%"></div></div>
             <div class="dice-col" data-val="2" data-count="1"><div class="dice-count">1</div><div class="dice-bar" style="height:14%"></div></div>
@@ -801,15 +914,17 @@
           </div>
         </div>
         <div class="other-dice">
-          <div class="other-dice-title">Other Dice</div>
+          <div class="sub-head">Other Dice</div>
           <ul class="dt-list">
             <li class="dt-row">
-              <span class="dt-label">d6<span class="dt-count"> &times; 11</span></span>
+              <span class="dt-label"><svg width="22" height="22" aria-hidden="true"><use href="#d6"/></svg>d6<span class="dt-count"> &times; 11</span>
+              </span>
               <svg class="dt-chart" viewBox="0 0 360 60"><line class="avg-line" x1="16" y1="30" x2="360" y2="30"/><polyline class="roll-line" points="24,14 57,4 90,4 123,25 156,56 189,46 222,25 255,25 288,14 321,35 354,56 "/><circle class="roll-dot" data-date="2026-04-20" cx="24" cy="14" r="2.5"/><circle class="roll-dot" data-date="2026-04-20" cx="57" cy="4" r="2.5"/><circle class="roll-dot" data-date="2026-04-20" cx="90" cy="4" r="2.5"/><circle class="roll-dot" data-date="2026-04-20" cx="123" cy="25" r="2.5"/><circle class="roll-dot" data-date="2026-04-20" cx="156" cy="56" r="2.5"/><circle class="roll-dot" data-date="2026-04-20" cx="189" cy="46" r="2.5"/><circle class="roll-dot" data-date="2026-04-20" cx="222" cy="25" r="2.5"/><circle class="roll-dot" data-date="2026-04-20" cx="255" cy="25" r="2.5"/><circle class="roll-dot" data-date="2026-04-20" cx="288" cy="14" r="2.5"/><circle class="roll-dot" data-date="2026-04-20" cx="321" cy="35" r="2.5"/><circle class="roll-dot" data-date="2026-04-20" cx="354" cy="56" r="2.5"/></svg>
               <span class="dt-stat">avg <b>3.7</b> &middot; best <b>6</b></span>
             </li>
             <li class="dt-row">
-              <span class="dt-label">d8<span class="dt-count"> &times; 5</span></span>
+              <span class="dt-label"><svg width="22" height="22" aria-hidden="true"><use href="#d8"/></svg>d8<span class="dt-count"> &times; 5</span>
+              </span>
               <svg class="dt-chart" viewBox="0 0 360 60"><line class="avg-line" x1="16" y1="30" x2="360" y2="30"/><polyline class="roll-line" points="24,34 106,56 189,26 272,49 354,41 "/><circle class="roll-dot" data-date="2026-04-20" cx="24" cy="34" r="2.5"/><circle class="roll-dot" data-date="2026-04-20" cx="106" cy="56" r="2.5"/><circle class="roll-dot" data-date="2026-04-20" cx="189" cy="26" r="2.5"/><circle class="roll-dot" data-date="2026-04-20" cx="272" cy="49" r="2.5"/><circle class="roll-dot" data-date="2026-04-20" cx="354" cy="41" r="2.5"/></svg>
               <span class="dt-stat">avg <b>3.0</b> &middot; best <b>5</b></span>
             </li>
@@ -817,8 +932,13 @@
         </div>
       </section>
 
-            <section class="reliquary" id="grieg-reliquary">
-        <div class="reliquary-header">Fallen by his hand</div>
+      <section class="reliquary" id="grieg-reliquary">
+        <div class="section-head">
+  <div class="section-eyebrow"><span class="roman">iii</span>The Fallen</div>
+  <h2 class="section-title">Reliquary</h2>
+  <div class="section-margin">Fallen by his hand</div>
+</div>
+<div class="divider"><div class="line"></div><svg width="32" height="16" aria-hidden="true"><use href="#div-fleuron"/></svg><div class="line"></div></div>
         <ul class="fallen">
           <li>
             <div class="mark">&#10013;</div>
@@ -876,9 +996,14 @@
         <div class="prof-list">Athletics &middot; History &middot; Perception &middot; Performance &middot; Persuasion &middot; Stealth &middot; Survival</div>
       </section>
 
-            <section class="trials" id="vex-trials">
-        <div class="trials-header">Trials</div>
-        <div class="trials-grid">
+      <section class="trials" id="vex-trials">
+        <div class="section-head">
+  <div class="section-eyebrow"><span class="roman">i</span>The Reckoning</div>
+  <h2 class="section-title">Trials</h2>
+  <div class="section-margin">What Vex has gathered, and what Vex has spent.</div>
+</div>
+<div class="divider"><div class="line"></div><svg width="32" height="16" aria-hidden="true"><use href="#div-fleuron"/></svg><div class="line"></div></div>
+        <div class="trials-grid lead">
           <div class="trial">
             <div class="trial-label">XP Earned</div>
             <div class="trial-val">225</div>
@@ -887,22 +1012,22 @@
           <div class="trial">
             <div class="trial-label">Laid to Rest</div>
             <div class="trial-val">3</div>
-            <div class="trial-sub">30% of the company</div>
+            <div class="trial-sub seal">30% of the company</div>
           </div>
           <div class="trial">
             <div class="trial-label">Means of Ending</div>
             <div class="trial-val text">Scimitar</div>
-            <div class="trial-sub">2 kills</div>
+            <div class="trial-sub"><b>2</b> kills</div>
           </div>
           <div class="trial">
             <div class="trial-label">Kinds Slain</div>
-            <div class="trial-val kinds">Fiend &times; 2 Humanoid &times; 1</div>
-            <div class="trial-sub">2 kinds</div>
+            <div class="trial-val kinds">Fiend &times; 2<br>Humanoid &times; 1</div>
+            <div class="trial-sub"><b>2</b> kinds</div>
           </div>
         </div>
 
         <div class="sessions">
-          <div class="sessions-header">Across the Ages</div>
+          <div class="sub-head">Across the Ages</div>
           <div class="sessions-chart">
             <div class="session-bar" data-kills='[{"creature": "Sahuagin Warrior", "method": "Scimitar", "token_url": "https://5e.tools/img/bestiary/tokens/XMM/Sahuagin%20Warrior.webp"}, {"creature": "Sahuagin Warrior", "method": "Shortsword", "token_url": "https://5e.tools/img/bestiary/tokens/XMM/Sahuagin%20Warrior.webp"}]'>
               <div class="bar-stack">
@@ -922,13 +1047,18 @@
         </div>
       </section>
 
-            <section class="fortune" id="vex-fortune">
-        <div class="fortune-header">Fortune</div>
-        <div class="trials-grid">
+      <section class="fortune" id="vex-fortune">
+        <div class="section-head">
+  <div class="section-eyebrow"><span class="roman">ii</span>The Dice</div>
+  <h2 class="section-title">Fortune</h2>
+  <div class="section-margin">How the dice have spoken for Vex.</div>
+</div>
+<div class="divider"><div class="line"></div><svg width="32" height="16" aria-hidden="true"><use href="#div-fleuron"/></svg><div class="line"></div></div>
+        <div class="trials-grid lead">
           <div class="trial">
             <div class="trial-label">Rolls Cast</div>
             <div class="trial-val">20</div>
-            <div class="trial-sub">11 on the twenty</div>
+            <div class="trial-sub"><b>11</b> on the twenty</div>
           </div>
           <div class="trial">
             <div class="trial-label">Average d20</div>
@@ -938,7 +1068,7 @@
           <div class="trial">
             <div class="trial-label">Critical Hits</div>
             <div class="trial-val">0</div>
-            <div class="trial-sub">0 fumbles</div>
+            <div class="trial-sub seal"><b>0</b> fumbles</div>
           </div>
           <div class="trial">
             <div class="trial-label">Heaviest Blow</div>
@@ -948,7 +1078,7 @@
         </div>
 
         <div class="dice-hist-wrap">
-          <div class="dice-hist-title">The Twenty Faces</div>
+          <div class="sub-head">The Twenty Faces</div>
           <div class="dice-hist">
             <div class="dice-col" data-val="1" data-count="0"><div class="dice-count zero">&middot;</div><div class="dice-bar zero"></div></div>
             <div class="dice-col" data-val="2" data-count="0"><div class="dice-count zero">&middot;</div><div class="dice-bar zero"></div></div>
@@ -995,20 +1125,23 @@
           </div>
         </div>
         <div class="other-dice">
-          <div class="other-dice-title">Other Dice</div>
+          <div class="sub-head">Other Dice</div>
           <ul class="dt-list">
             <li class="dt-row">
-              <span class="dt-label">d6<span class="dt-count"> &times; 6</span></span>
+              <span class="dt-label"><svg width="22" height="22" aria-hidden="true"><use href="#d6"/></svg>d6<span class="dt-count"> &times; 6</span>
+              </span>
               <svg class="dt-chart" viewBox="0 0 360 60"><line class="avg-line" x1="16" y1="30" x2="360" y2="30"/><polyline class="roll-line" points="24,56 90,4 156,14 222,14 288,4 354,14 "/><circle class="roll-dot" data-date="2026-04-20" cx="24" cy="56" r="2.5"/><circle class="roll-dot" data-date="2026-04-20" cx="90" cy="4" r="2.5"/><circle class="roll-dot" data-date="2026-04-20" cx="156" cy="14" r="2.5"/><circle class="roll-dot" data-date="2026-04-20" cx="222" cy="14" r="2.5"/><circle class="roll-dot" data-date="2026-04-20" cx="288" cy="4" r="2.5"/><circle class="roll-dot" data-date="2026-04-20" cx="354" cy="14" r="2.5"/></svg>
               <span class="dt-stat">avg <b>4.7</b> &middot; best <b>6</b></span>
             </li>
             <li class="dt-row">
-              <span class="dt-label">d8<span class="dt-count"> &times; 1</span></span>
+              <span class="dt-label"><svg width="22" height="22" aria-hidden="true"><use href="#d8"/></svg>d8<span class="dt-count"> &times; 1</span>
+              </span>
               <svg class="dt-chart" viewBox="0 0 360 60"><line class="avg-line" x1="16" y1="30" x2="360" y2="30"/><circle class="roll-dot" data-date="2026-04-20" cx="189" cy="19" r="3"/></svg>
               <span class="dt-stat">avg <b>6.0</b> &middot; best <b>6</b></span>
             </li>
             <li class="dt-row">
-              <span class="dt-label">d10<span class="dt-count"> &times; 1</span></span>
+              <span class="dt-label"><svg width="22" height="22" aria-hidden="true"><use href="#d10"/></svg>d10<span class="dt-count"> &times; 1</span>
+              </span>
               <svg class="dt-chart" viewBox="0 0 360 60"><line class="avg-line" x1="16" y1="30" x2="360" y2="30"/><circle class="roll-dot" data-date="2026-04-20" cx="189" cy="4" r="3"/></svg>
               <span class="dt-stat">avg <b>10.0</b> &middot; best <b>10</b></span>
             </li>
@@ -1016,8 +1149,13 @@
         </div>
       </section>
 
-            <section class="reliquary" id="vex-reliquary">
-        <div class="reliquary-header">Fallen by his steel</div>
+      <section class="reliquary" id="vex-reliquary">
+        <div class="section-head">
+  <div class="section-eyebrow"><span class="roman">iii</span>The Fallen</div>
+  <h2 class="section-title">Reliquary</h2>
+  <div class="section-margin">Fallen by his steel</div>
+</div>
+<div class="divider"><div class="line"></div><svg width="32" height="16" aria-hidden="true"><use href="#div-fleuron"/></svg><div class="line"></div></div>
         <ul class="fallen">
           <li>
             <div class="mark">&#10013;</div>
@@ -1083,9 +1221,14 @@
         <div class="prof-list">Arcana &middot; History &middot; Insight &middot; Investigation</div>
       </section>
 
-            <section class="trials" id="urida-trials">
-        <div class="trials-header">Trials</div>
-        <div class="trials-grid">
+      <section class="trials" id="urida-trials">
+        <div class="section-head">
+  <div class="section-eyebrow"><span class="roman">i</span>The Reckoning</div>
+  <h2 class="section-title">Trials</h2>
+  <div class="section-margin">What Urida has gathered, and what Urida has spent.</div>
+</div>
+<div class="divider"><div class="line"></div><svg width="32" height="16" aria-hidden="true"><use href="#div-fleuron"/></svg><div class="line"></div></div>
+        <div class="trials-grid lead">
           <div class="trial">
             <div class="trial-label">XP Earned</div>
             <div class="trial-val">325</div>
@@ -1094,22 +1237,22 @@
           <div class="trial">
             <div class="trial-label">Laid to Rest</div>
             <div class="trial-val">3</div>
-            <div class="trial-sub">30% of the company</div>
+            <div class="trial-sub seal">30% of the company</div>
           </div>
           <div class="trial">
             <div class="trial-label">Means of Ending</div>
             <div class="trial-val text">Toll the Dead</div>
-            <div class="trial-sub">2 kills</div>
+            <div class="trial-sub"><b>2</b> kills</div>
           </div>
           <div class="trial">
             <div class="trial-label">Kinds Slain</div>
-            <div class="trial-val kinds">Humanoid &times; 2 Fiend &times; 1</div>
-            <div class="trial-sub">2 kinds</div>
+            <div class="trial-val kinds">Humanoid &times; 2<br>Fiend &times; 1</div>
+            <div class="trial-sub"><b>2</b> kinds</div>
           </div>
         </div>
 
         <div class="sessions">
-          <div class="sessions-header">Across the Ages</div>
+          <div class="sub-head">Across the Ages</div>
           <div class="sessions-chart">
             <div class="session-bar" data-kills='[{"creature": "Sahuagin Warrior", "method": "Toll the Dead", "token_url": "https://5e.tools/img/bestiary/tokens/XMM/Sahuagin%20Warrior.webp"}]'>
               <div class="bar-stack">
@@ -1129,13 +1272,18 @@
         </div>
       </section>
 
-            <section class="fortune" id="urida-fortune">
-        <div class="fortune-header">Fortune</div>
-        <div class="trials-grid">
+      <section class="fortune" id="urida-fortune">
+        <div class="section-head">
+  <div class="section-eyebrow"><span class="roman">ii</span>The Dice</div>
+  <h2 class="section-title">Fortune</h2>
+  <div class="section-margin">How the dice have spoken for Urida.</div>
+</div>
+<div class="divider"><div class="line"></div><svg width="32" height="16" aria-hidden="true"><use href="#div-fleuron"/></svg><div class="line"></div></div>
+        <div class="trials-grid lead">
           <div class="trial">
             <div class="trial-label">Rolls Cast</div>
             <div class="trial-val">12</div>
-            <div class="trial-sub">8 on the twenty</div>
+            <div class="trial-sub"><b>8</b> on the twenty</div>
           </div>
           <div class="trial">
             <div class="trial-label">Average d20</div>
@@ -1145,7 +1293,7 @@
           <div class="trial">
             <div class="trial-label">Critical Hits</div>
             <div class="trial-val">0</div>
-            <div class="trial-sub">0 fumbles</div>
+            <div class="trial-sub seal"><b>0</b> fumbles</div>
           </div>
           <div class="trial">
             <div class="trial-label">Heaviest Blow</div>
@@ -1155,7 +1303,7 @@
         </div>
 
         <div class="dice-hist-wrap">
-          <div class="dice-hist-title">The Twenty Faces</div>
+          <div class="sub-head">The Twenty Faces</div>
           <div class="dice-hist">
             <div class="dice-col" data-val="1" data-count="0"><div class="dice-count zero">&middot;</div><div class="dice-bar zero"></div></div>
             <div class="dice-col" data-val="2" data-count="0"><div class="dice-count zero">&middot;</div><div class="dice-bar zero"></div></div>
@@ -1202,20 +1350,23 @@
           </div>
         </div>
         <div class="other-dice">
-          <div class="other-dice-title">Other Dice</div>
+          <div class="sub-head">Other Dice</div>
           <ul class="dt-list">
             <li class="dt-row">
-              <span class="dt-label">d4<span class="dt-count"> &times; 6</span></span>
+              <span class="dt-label">d4<span class="dt-count"> &times; 6</span>
+              </span>
               <svg class="dt-chart" viewBox="0 0 360 60"><line class="avg-line" x1="16" y1="30" x2="360" y2="30"/><polyline class="roll-line" points="24,4 90,21 156,21 222,4 288,4 354,39 "/><circle class="roll-dot" data-date="2026-04-20" cx="24" cy="4" r="2.5"/><circle class="roll-dot" data-date="2026-04-20" cx="90" cy="21" r="2.5"/><circle class="roll-dot" data-date="2026-04-20" cx="156" cy="21" r="2.5"/><circle class="roll-dot" data-date="2026-04-20" cx="222" cy="4" r="2.5"/><circle class="roll-dot" data-date="2026-04-20" cx="288" cy="4" r="2.5"/><circle class="roll-dot" data-date="2026-04-20" cx="354" cy="39" r="2.5"/></svg>
               <span class="dt-stat">avg <b>3.3</b> &middot; best <b>4</b></span>
             </li>
             <li class="dt-row">
-              <span class="dt-label">d6<span class="dt-count"> &times; 1</span></span>
+              <span class="dt-label"><svg width="22" height="22" aria-hidden="true"><use href="#d6"/></svg>d6<span class="dt-count"> &times; 1</span>
+              </span>
               <svg class="dt-chart" viewBox="0 0 360 60"><line class="avg-line" x1="16" y1="30" x2="360" y2="30"/><circle class="roll-dot" data-date="2026-04-20" cx="189" cy="56" r="3"/></svg>
               <span class="dt-stat">avg <b>1.0</b> &middot; best <b>1</b></span>
             </li>
             <li class="dt-row">
-              <span class="dt-label">d12<span class="dt-count"> &times; 1</span></span>
+              <span class="dt-label">d12<span class="dt-count"> &times; 1</span>
+              </span>
               <svg class="dt-chart" viewBox="0 0 360 60"><line class="avg-line" x1="16" y1="30" x2="360" y2="30"/><circle class="roll-dot" data-date="2026-04-20" cx="189" cy="23" r="3"/></svg>
               <span class="dt-stat">avg <b>8.0</b> &middot; best <b>8</b></span>
             </li>
@@ -1223,8 +1374,13 @@
         </div>
       </section>
 
-            <section class="reliquary" id="urida-reliquary">
-        <div class="reliquary-header">Fallen by her bell</div>
+      <section class="reliquary" id="urida-reliquary">
+        <div class="section-head">
+  <div class="section-eyebrow"><span class="roman">iii</span>The Fallen</div>
+  <h2 class="section-title">Reliquary</h2>
+  <div class="section-margin">Fallen by her bell</div>
+</div>
+<div class="divider"><div class="line"></div><svg width="32" height="16" aria-hidden="true"><use href="#div-fleuron"/></svg><div class="line"></div></div>
         <ul class="fallen">
           <li>
             <div class="mark">&#10013;</div>
@@ -1290,9 +1446,14 @@
         <div class="prof-list">Arcana &middot; Deception</div>
       </section>
 
-            <section class="trials" id="chumble-trials">
-        <div class="trials-header">Trials</div>
-        <div class="trials-grid">
+      <section class="trials" id="chumble-trials">
+        <div class="section-head">
+  <div class="section-eyebrow"><span class="roman">i</span>The Reckoning</div>
+  <h2 class="section-title">Trials</h2>
+  <div class="section-margin">What Chumble has gathered, and what Chumble has spent.</div>
+</div>
+<div class="divider"><div class="line"></div><svg width="32" height="16" aria-hidden="true"><use href="#div-fleuron"/></svg><div class="line"></div></div>
+        <div class="trials-grid lead">
           <div class="trial">
             <div class="trial-label">XP Earned</div>
             <div class="trial-val">25</div>
@@ -1301,22 +1462,22 @@
           <div class="trial">
             <div class="trial-label">Laid to Rest</div>
             <div class="trial-val">1</div>
-            <div class="trial-sub">10% of the company</div>
+            <div class="trial-sub seal">10% of the company</div>
           </div>
           <div class="trial">
             <div class="trial-label">Means of Ending</div>
             <div class="trial-val text">Eldritch Blast</div>
-            <div class="trial-sub">1 kill</div>
+            <div class="trial-sub"><b>1</b> kill</div>
           </div>
           <div class="trial">
             <div class="trial-label">Kinds Slain</div>
             <div class="trial-val kinds">Humanoid &times; 1</div>
-            <div class="trial-sub">1 kind</div>
+            <div class="trial-sub"><b>1</b> kind</div>
           </div>
         </div>
 
         <div class="sessions">
-          <div class="sessions-header">Across the Ages</div>
+          <div class="sub-head">Across the Ages</div>
           <div class="sessions-chart">
             <div class="session-bar" data-kills='[]'>
               <div class="bar-stack">
@@ -1336,13 +1497,18 @@
         </div>
       </section>
 
-            <section class="fortune" id="chumble-fortune">
-        <div class="fortune-header">Fortune</div>
-        <div class="trials-grid">
+      <section class="fortune" id="chumble-fortune">
+        <div class="section-head">
+  <div class="section-eyebrow"><span class="roman">ii</span>The Dice</div>
+  <h2 class="section-title">Fortune</h2>
+  <div class="section-margin">How the dice have spoken for Chumble.</div>
+</div>
+<div class="divider"><div class="line"></div><svg width="32" height="16" aria-hidden="true"><use href="#div-fleuron"/></svg><div class="line"></div></div>
+        <div class="trials-grid lead">
           <div class="trial">
             <div class="trial-label">Rolls Cast</div>
             <div class="trial-val">19</div>
-            <div class="trial-sub">11 on the twenty</div>
+            <div class="trial-sub"><b>11</b> on the twenty</div>
           </div>
           <div class="trial">
             <div class="trial-label">Average d20</div>
@@ -1352,7 +1518,7 @@
           <div class="trial">
             <div class="trial-label">Critical Hits</div>
             <div class="trial-val">1</div>
-            <div class="trial-sub">0 fumbles</div>
+            <div class="trial-sub seal"><b>0</b> fumbles</div>
           </div>
           <div class="trial">
             <div class="trial-label">Heaviest Blow</div>
@@ -1362,7 +1528,7 @@
         </div>
 
         <div class="dice-hist-wrap">
-          <div class="dice-hist-title">The Twenty Faces</div>
+          <div class="sub-head">The Twenty Faces</div>
           <div class="dice-hist">
             <div class="dice-col" data-val="1" data-count="0"><div class="dice-count zero">&middot;</div><div class="dice-bar zero"></div></div>
             <div class="dice-col" data-val="2" data-count="0"><div class="dice-count zero">&middot;</div><div class="dice-bar zero"></div></div>
@@ -1409,20 +1575,23 @@
           </div>
         </div>
         <div class="other-dice">
-          <div class="other-dice-title">Other Dice</div>
+          <div class="sub-head">Other Dice</div>
           <ul class="dt-list">
             <li class="dt-row">
-              <span class="dt-label">d4<span class="dt-count"> &times; 1</span></span>
+              <span class="dt-label">d4<span class="dt-count"> &times; 1</span>
+              </span>
               <svg class="dt-chart" viewBox="0 0 360 60"><line class="avg-line" x1="16" y1="30" x2="360" y2="30"/><circle class="roll-dot" data-date="2026-04-20" cx="189" cy="39" r="3"/></svg>
               <span class="dt-stat">avg <b>2.0</b> &middot; best <b>2</b></span>
             </li>
             <li class="dt-row">
-              <span class="dt-label">d8<span class="dt-count"> &times; 5</span></span>
+              <span class="dt-label"><svg width="22" height="22" aria-hidden="true"><use href="#d8"/></svg>d8<span class="dt-count"> &times; 5</span>
+              </span>
               <svg class="dt-chart" viewBox="0 0 360 60"><line class="avg-line" x1="16" y1="30" x2="360" y2="30"/><polyline class="roll-line" points="24,26 106,19 189,11 272,19 354,11 "/><circle class="roll-dot" data-date="2026-04-20" cx="24" cy="26" r="2.5"/><circle class="roll-dot" data-date="2026-04-20" cx="106" cy="19" r="2.5"/><circle class="roll-dot" data-date="2026-04-20" cx="189" cy="11" r="2.5"/><circle class="roll-dot" data-date="2026-04-20" cx="272" cy="19" r="2.5"/><circle class="roll-dot" data-date="2026-04-20" cx="354" cy="11" r="2.5"/></svg>
               <span class="dt-stat">avg <b>6.2</b> &middot; best <b>7</b></span>
             </li>
             <li class="dt-row">
-              <span class="dt-label">d10<span class="dt-count"> &times; 4</span></span>
+              <span class="dt-label"><svg width="22" height="22" aria-hidden="true"><use href="#d10"/></svg>d10<span class="dt-count"> &times; 4</span>
+              </span>
               <svg class="dt-chart" viewBox="0 0 360 60"><line class="avg-line" x1="16" y1="30" x2="360" y2="30"/><polyline class="roll-line" points="24,56 134,27 244,27 354,56 "/><circle class="roll-dot" data-date="2026-04-20" cx="24" cy="56" r="2.5"/><circle class="roll-dot" data-date="2026-04-20" cx="134" cy="27" r="2.5"/><circle class="roll-dot" data-date="2026-04-20" cx="244" cy="27" r="2.5"/><circle class="roll-dot" data-date="2026-04-20" cx="354" cy="56" r="2.5"/></svg>
               <span class="dt-stat">avg <b>3.5</b> &middot; best <b>6</b></span>
             </li>
@@ -1430,8 +1599,13 @@
         </div>
       </section>
 
-            <section class="reliquary" id="chumble-reliquary">
-        <div class="reliquary-header">Fallen by his pact-light</div>
+      <section class="reliquary" id="chumble-reliquary">
+        <div class="section-head">
+  <div class="section-eyebrow"><span class="roman">iii</span>The Fallen</div>
+  <h2 class="section-title">Reliquary</h2>
+  <div class="section-margin">Fallen by his pact-light</div>
+</div>
+<div class="divider"><div class="line"></div><svg width="32" height="16" aria-hidden="true"><use href="#div-fleuron"/></svg><div class="line"></div></div>
         <ul class="fallen">
           <li>
             <div class="mark">&#10013;</div>
@@ -1462,7 +1636,12 @@
   </header>
 
   <section class="dramatis-personae">
-    <div class="dramatis-header">Dramatis Personae</div>
+    <div class="section-head">
+  <div class="section-eyebrow"><span class="roman">i</span>The Cast</div>
+  <h2 class="section-title">Dramatis Personae</h2>
+  <div class="section-margin">Those who walked beside, and those who stood athwart.</div>
+</div>
+<div class="divider"><div class="line"></div><svg width="32" height="16" aria-hidden="true"><use href="#div-trefoil"/></svg><div class="line"></div></div>
     <div class="dramatis-grid">
       <div class="dramatis-column">
         <div class="dramatis-sub">Those Who Stood With Them</div>
@@ -1512,13 +1691,18 @@
       </div>
     </div>
   </section>
-          <section class="fortune" id="gm-fortune">
-        <div class="fortune-header">Fortune</div>
-        <div class="trials-grid">
+    <section class="fortune" id="gm-fortune">
+        <div class="section-head">
+  <div class="section-eyebrow"><span class="roman">ii</span>The Dice</div>
+  <h2 class="section-title">Fortune</h2>
+  <div class="section-margin">How the dice have spoken for the GM.</div>
+</div>
+<div class="divider"><div class="line"></div><svg width="32" height="16" aria-hidden="true"><use href="#div-fleuron"/></svg><div class="line"></div></div>
+        <div class="trials-grid lead">
           <div class="trial">
             <div class="trial-label">Rolls Cast</div>
             <div class="trial-val">19</div>
-            <div class="trial-sub">16 on the twenty</div>
+            <div class="trial-sub"><b>16</b> on the twenty</div>
           </div>
           <div class="trial">
             <div class="trial-label">Average d20</div>
@@ -1528,7 +1712,7 @@
           <div class="trial">
             <div class="trial-label">Critical Hits</div>
             <div class="trial-val">1</div>
-            <div class="trial-sub">0 fumbles</div>
+            <div class="trial-sub seal"><b>0</b> fumbles</div>
           </div>
           <div class="trial">
             <div class="trial-label">Heaviest Blow</div>
@@ -1538,7 +1722,7 @@
         </div>
 
         <div class="dice-hist-wrap">
-          <div class="dice-hist-title">The Twenty Faces</div>
+          <div class="sub-head">The Twenty Faces</div>
           <div class="dice-hist">
             <div class="dice-col" data-val="1" data-count="0"><div class="dice-count zero">&middot;</div><div class="dice-bar zero"></div></div>
             <div class="dice-col" data-val="2" data-count="0"><div class="dice-count zero">&middot;</div><div class="dice-bar zero"></div></div>
@@ -1585,15 +1769,17 @@
           </div>
         </div>
         <div class="other-dice">
-          <div class="other-dice-title">Other Dice</div>
+          <div class="sub-head">Other Dice</div>
           <ul class="dt-list">
             <li class="dt-row">
-              <span class="dt-label">d4<span class="dt-count"> &times; 4</span></span>
+              <span class="dt-label">d4<span class="dt-count"> &times; 4</span>
+              </span>
               <svg class="dt-chart" viewBox="0 0 360 60"><line class="avg-line" x1="16" y1="30" x2="360" y2="30"/><polyline class="roll-line" points="24,21 134,39 244,21 354,56 "/><circle class="roll-dot" data-date="2026-04-20" cx="24" cy="21" r="2.5"/><circle class="roll-dot" data-date="2026-04-20" cx="134" cy="39" r="2.5"/><circle class="roll-dot" data-date="2026-04-20" cx="244" cy="21" r="2.5"/><circle class="roll-dot" data-date="2026-04-20" cx="354" cy="56" r="2.5"/></svg>
               <span class="dt-stat">avg <b>2.2</b> &middot; best <b>3</b></span>
             </li>
             <li class="dt-row">
-              <span class="dt-label">d6<span class="dt-count"> &times; 1</span></span>
+              <span class="dt-label"><svg width="22" height="22" aria-hidden="true"><use href="#d6"/></svg>d6<span class="dt-count"> &times; 1</span>
+              </span>
               <svg class="dt-chart" viewBox="0 0 360 60"><line class="avg-line" x1="16" y1="30" x2="360" y2="30"/><circle class="roll-dot" data-date="2026-04-20" cx="189" cy="56" r="3"/></svg>
               <span class="dt-stat">avg <b>1.0</b> &middot; best <b>1</b></span>
             </li>
@@ -1869,7 +2055,9 @@
       document.querySelectorAll('.dt-row').forEach(row => {
         const label = row.querySelector('.dt-label');
         if (!label) return;
-        const dieStr = label.childNodes[0].textContent.trim();
+        // Read the full textContent so a leading <svg> icon (if present) doesn't
+        // shadow the die name. The first \d+ after a 'd' wins.
+        const dieStr = (label.textContent || '').trim();
         const m = dieStr.match(/d(\d+)/);
         if (!m) return;
         const max = parseInt(m[1], 10);

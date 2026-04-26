@@ -258,7 +258,9 @@
       document.querySelectorAll('.dt-row').forEach(row => {
         const label = row.querySelector('.dt-label');
         if (!label) return;
-        const dieStr = label.childNodes[0].textContent.trim();
+        // Read the full textContent so a leading <svg> icon (if present) doesn't
+        // shadow the die name. The first \d+ after a 'd' wins.
+        const dieStr = (label.textContent || '').trim();
         const m = dieStr.match(/d(\d+)/);
         if (!m) return;
         const max = parseInt(m[1], 10);

@@ -620,8 +620,25 @@ def compute_constellation(party: dict, fortune_by_char: dict, trials: dict) -> d
             "fumbles": fortune_by_char[cid]["fumbles"],
         })
 
+    # Constellation links: trace a closed polygon by sorting stars by XP ascending,
+    # connecting each to the next, and closing the loop. Coordinates are in a
+    # 1000×1000 viewBox (preserveAspectRatio="none" stretches it to the plot).
+    links: list[dict] = []
+    if len(stars) >= 2:
+        ordered = sorted(stars, key=lambda s: (s["xp"], s["id"]))
+        for i in range(len(ordered)):
+            a = ordered[i]
+            b = ordered[(i + 1) % len(ordered)]
+            links.append({
+                "x1": a["left_pct"] * 10,
+                "y1": a["top_pct"] * 10,
+                "x2": b["left_pct"] * 10,
+                "y2": b["top_pct"] * 10,
+            })
+
     return {
         "stars": stars,
+        "links": links,
         "party_max_xp": party_max_xp,
         "party_max_rolls": party_max_rolls,
         "mid_xp": (party_max_xp + 1) // 2,
@@ -1031,10 +1048,14 @@ def compute_all(data: dict, authored: dict) -> dict:
 
     site = dict(authored["site"])
     site["intro_meta"] = compute_intro_meta(session_log)
+    site["header_eyebrow"] = _compute_header_eyebrow(chronicle, ledger)
+
+    party_top_xp = _compute_party_top_xp(party, trials, n=3)
 
     return {
         "site": site,
         "party": party,
+        "party_top_xp": party_top_xp,
         "characters_authored": char_auth_by_id,
         "kills_authored_by_key": {
             kill_key(k["character"], k["date"], k["creature"], k["method"]): k
@@ -1054,6 +1075,36 @@ def compute_all(data: dict, authored: dict) -> dict:
         "best_skill_by_id": best_skill_by_id,
         "npcs_by_allegiance": _split_npcs(authored["npcs"]),
     }
+
+
+def _compute_party_top_xp(party: dict, trials: dict, n: int = 3) -> list[dict]:
+    """Top-N party members ordered by XP earned, descending. GM excluded.
+
+    Returns a list of member dicts (with their existing fields like image, id, name)
+    so the template can iterate them directly. Tiebreaker is alphabetical by id —
+    deterministic and stable across runs.
+    """
+    members = [m for m in party.get("members", []) if m.get("id") != "gm"]
+    per = trials.get("per_char", {})
+    members_sorted = sorted(
+        members,
+        key=lambda m: (-int(per.get(m["id"], {}).get("xp", 0)), m.get("id", "")),
+    )
+    return members_sorted[:n]
+
+
+def _compute_header_eyebrow(chronicle: dict, ledger: dict) -> list[str]:
+    """Three short lines for the upper-left of the page header."""
+    lines = ["Volume I"]
+    rail = chronicle.get("rail") or []
+    if rail:
+        latest = rail[-1]
+        lines.append(f"{latest.get('month', '')} {latest.get('year', '')}".strip())
+    sessions = ledger.get("sessions_kept", 0)
+    if sessions:
+        word = "Session" if sessions == 1 else "Sessions"
+        lines.append(f"{sessions} {word} Kept")
+    return [ln for ln in lines if ln]
 
 def _split_npcs(npcs: list) -> dict:
     return {

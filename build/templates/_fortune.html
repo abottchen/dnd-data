@@ -1,15 +1,17 @@
+{% from "_macros.html" import section_head, sub_head -%}
       <section class="fortune" id="{{ member.id }}-fortune">
         {%- set f = fortune[member.id] %}
+        {%- if member.id == "gm" %}{%- set first_name = "the GM" %}{%- else %}{%- set first_name = member.name.split(' ') | first %}{%- endif %}
         {%- if f.rolls_total == 0 and member.id != "gm" %}
-        <div class="fortune-header">Fortune</div>
+        {{ section_head("ii", "The Dice", "Fortune", "No rolls yet recorded for " ~ first_name ~ ".") }}
         <div class="fortune-empty">No rolls yet recorded for this adventurer.</div>
         {%- else %}
-        <div class="fortune-header">Fortune</div>
-        <div class="trials-grid">
+        {{ section_head("ii", "The Dice", "Fortune", "How the dice have spoken for " ~ first_name ~ ".") }}
+        <div class="trials-grid lead">
           <div class="trial">
             <div class="trial-label">Rolls Cast</div>
             <div class="trial-val">{{ f.rolls_total }}</div>
-            <div class="trial-sub">{{ f.kept_d20s_count }} on the twenty</div>
+            <div class="trial-sub"><b>{{ f.kept_d20s_count }}</b> on the twenty</div>
           </div>
           <div class="trial">
             <div class="trial-label">Average d20</div>
@@ -19,7 +21,7 @@
           <div class="trial">
             <div class="trial-label">Critical Hits</div>
             <div class="trial-val">{{ f.crits }}</div>
-            <div class="trial-sub">{{ f.fumbles }} fumbles</div>
+            <div class="trial-sub seal"><b>{{ f.fumbles }}</b> fumbles</div>
           </div>
           <div class="trial">
             <div class="trial-label">Heaviest Blow</div>
@@ -29,7 +31,7 @@
         </div>
 
         <div class="dice-hist-wrap">
-          <div class="dice-hist-title">The Twenty Faces</div>
+          {{ sub_head("The Twenty Faces") }}
           <div class="dice-hist">
             {%- for bar in histograms[member.id] %}
             <div class="dice-col" data-val="{{ bar.value }}" data-count="{{ bar.count }}"><div class="dice-count{% if bar.zero %} zero{% endif %}">{% if bar.zero %}&middot;{% else %}{{ bar.count }}{% endif %}</div><div class="dice-bar{% if bar.zero %} zero{% endif %}"{% if not bar.zero %} style="height:{{ bar.height_pct }}%"{% endif %}></div></div>
@@ -44,11 +46,15 @@
 
         {%- if other_dice[member.id] %}
         <div class="other-dice">
-          <div class="other-dice-title">Other Dice</div>
+          {{ sub_head("Other Dice") }}
           <ul class="dt-list">
             {%- for row in other_dice[member.id] %}
             <li class="dt-row">
-              <span class="dt-label">{{ row.die }}<span class="dt-count"> &times; {{ row.count }}</span></span>
+              <span class="dt-label">
+                {%- set die_glyph = row.die | replace('d', '') -%}
+                {%- if row.die in ['d6', 'd8', 'd10'] -%}<svg width="22" height="22" aria-hidden="true"><use href="#{{ row.die }}"/></svg>{%- endif -%}
+                {{ row.die }}<span class="dt-count"> &times; {{ row.count }}</span>
+              </span>
               <svg class="dt-chart" viewBox="0 0 360 60"><line class="avg-line" x1="16" y1="30" x2="360" y2="30"/>{% if row.dots | length > 1 %}<polyline class="roll-line" points="{% for d in row.dots %}{{ d.x }},{{ d.y }} {% endfor %}"/>{% endif %}{% for d in row.dots %}<circle class="roll-dot" data-date="{{ d.date }}" cx="{{ d.x }}" cy="{{ d.y }}" r="{% if row.dots | length == 1 %}3{% else %}2.5{% endif %}"/>{% endfor %}</svg>
               <span class="dt-stat">avg <b>{{ "%.1f" | format(row.avg) }}</b> &middot; best <b>{{ row.best }}</b></span>
             </li>

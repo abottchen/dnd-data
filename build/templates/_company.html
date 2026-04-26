@@ -1,39 +1,37 @@
+{% from "_macros.html" import section_head -%}
 <article class="character" id="company">
-  <header class="company-intro">
-    <div class="company-intro-epithet">{{ site.intro_epithet }}</div>
-    <div class="company-intro-meta">{{ site.intro_meta | safe }}</div>
-  </header>
 
   <section class="company-section company-ledger">
-    <div class="company-section-header">The Company's Ledger</div>
-    <div class="trials-grid">
-      <div class="trial">
-        <div class="trial-label">Souls Gathered</div>
-        <div class="trial-val">{{ ledger.total_xp }}</div>
-        <div class="trial-sub">Experience, total</div>
+    {{ section_head("I", "The Reckoning", "The Company's Ledger", site.intro_epithet) }}
+    <div class="ledger-grid lead">
+      <div class="ledger-cell">
+        <div class="ledger-eyebrow">Souls Gathered</div>
+        <div class="ledger-val">{{ ledger.total_xp }}</div>
+        <div class="ledger-sub"><b>experience</b> &middot; total earned at the table</div>
       </div>
-      <div class="trial">
-        <div class="trial-label">Fallen by the Company</div>
-        <div class="trial-val">{{ ledger.total_kills }}</div>
-        <div class="trial-sub">Creatures, all hands</div>
+      <div class="ledger-cell">
+        <div class="ledger-eyebrow">Fallen by the Company</div>
+        <div class="ledger-val">{{ ledger.total_kills }}</div>
+        <div class="ledger-sub seal"><b>creatures</b> &middot; all hands</div>
       </div>
-      <div class="trial">
-        <div class="trial-label">Rolls Cast</div>
-        <div class="trial-val">{{ ledger.total_rolls }}</div>
-        <div class="trial-sub">{{ ledger.total_d20s }} on the twenty</div>
+      <div class="ledger-cell">
+        <div class="ledger-eyebrow">Rolls Cast</div>
+        <div class="ledger-val">{{ ledger.total_rolls }}</div>
+        <div class="ledger-sub"><b>{{ ledger.total_d20s }}</b> on the twenty</div>
       </div>
-      <div class="trial">
-        <div class="trial-label">Sessions Kept</div>
-        <div class="trial-val">{{ ledger.sessions_kept }}</div>
-        <div class="trial-sub">Nights at the table</div>
+      <div class="ledger-cell">
+        <div class="ledger-eyebrow">Sessions Kept</div>
+        <div class="ledger-val">{{ ledger.sessions_kept }}</div>
+        <div class="ledger-sub">nights at the table</div>
       </div>
     </div>
   </section>
 
   <section class="company-section">
-    <div class="company-section-header">The Constellation</div>
+    {{ section_head("II", "The Stars", "The Constellation", "Each star a player. Brighter stars walk the road more often, distant stars carry the heavier load.", "rule") }}
     <div class="constellation">
       <div class="constellation-plot">
+        <div class="constellation-grid"></div>
         <div class="constellation-axis-y-label">Presence &middot; rolls cast &rarr;</div>
         <div class="constellation-axis-x-label">Contribution &middot; experience earned &rarr;</div>
         <span class="constellation-tick-y" style="top: 0%;">{{ constellation.party_max_rolls }}</span>
@@ -42,6 +40,13 @@
         <span class="constellation-tick-x" style="left: 4%;">0</span>
         <span class="constellation-tick-x" style="left: 50%;">{{ constellation.mid_xp }}</span>
         <span class="constellation-tick-x" style="left: 96%;">{{ constellation.party_max_xp }}</span>
+        {%- if constellation.links %}
+        <svg class="constellation-lines" preserveAspectRatio="none" viewBox="0 0 1000 1000" aria-hidden="true">
+          {%- for link in constellation.links %}
+          <path class="link" d="M {{ link.x1 }} {{ link.y1 }} L {{ link.x2 }} {{ link.y2 }}"/>
+          {%- endfor %}
+        </svg>
+        {%- endif %}
         {%- for star in constellation.stars %}
           {%- set member = (party.members | selectattr("id", "equalto", star.id) | first) %}
           {%- set auth = characters_authored[star.id] %}
@@ -66,7 +71,7 @@
   </section>
 
   <section class="company-section">
-    <div class="company-section-header">The Bestiary</div>
+    {{ section_head("III", "The Tally", "The Bestiary", "Of every kind that fell, and the count of each.", "trefoil") }}
     <div class="bestiary-grid">
       {%- for group in bestiary %}
       <div class="bestiary-group">
@@ -90,12 +95,12 @@
   </section>
 
   <section class="company-section">
-    <div class="company-section-header">The Chronicle</div>
+    {{ section_head("IV", "The Calendar", "The Chronicle", "Each session set down by hand, with date and hour, and what was done.") }}
     {% include "_chronicle.html" %}
   </section>
 
   <section class="company-section">
-    <div class="company-section-header">The Road Ahead</div>
+    {{ section_head("V", "The Horizon", "The Road Ahead", "What is known, and where they turn.", "rule") }}
     <div class="road-ahead">
       <div class="road-ahead-block">
         <div class="road-ahead-sub">What Is Known</div>
@@ -118,7 +123,7 @@
   </section>
 
   <section class="company-section">
-    <div class="company-section-header">Distinctions</div>
+    {{ section_head("VI", "The Crowns", "Distinctions", "Each carries some honour the others do not.", "trefoil") }}
     <div class="distinctions">
       {%- for d in distinctions %}
         {%- set member = (party.members | selectattr("id", "equalto", d.id) | first) %}
@@ -135,7 +140,7 @@
   </section>
 
   <section class="company-section">
-    <div class="company-section-header">The Patron Die</div>
+    {{ section_head("VII", "The Fates", "The Patron Die", "Of the rolls cast upon the twenty, here is how the die fell.") }}
     <div class="patron-die">
       <div class="patron-die-chart">
         {%- for bar in patron_die %}
@@ -151,13 +156,15 @@
         {%- endfor %}
       </div>
       <div class="patron-die-legend">
-        <span class="swatch"></span>The Company
+        <span><span class="swatch seal"></span>Fumble</span>
+        <span><span class="swatch brass"></span>The Company</span>
+        <span><span class="swatch paper"></span>Critical</span>
       </div>
     </div>
   </section>
 
   <section class="company-section silent-roll">
-    <div class="company-section-header">The Silent Roll</div>
+    {{ section_head("VIII", "The Quiet Margins", "The Silent Roll", "Sessions where no blade was lifted.", "rule") }}
     <ul class="silent-roll-list">
       {%- for ch in chronicle.chapters %}
         {%- for s in ch.sessions %}
