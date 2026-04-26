@@ -1,4 +1,9 @@
 {% from "_macros.html" import section_head, sub_head -%}
+{#- Dice with a glyph in base.html's <defs>. Keep this in sync with the
+    <symbol id="dN"> entries; an entry here without a symbol there will render
+    a blank 22×22 box. Standard D&D dice are d4/d6/d8/d10/d12/d20/d100, and
+    d20 is excluded from "Other Dice" by the orchestrator. #}
+{%- set DICE_WITH_GLYPHS = ['d4', 'd6', 'd8', 'd10', 'd12', 'd100'] -%}
       <section class="fortune" id="{{ member.id }}-fortune">
         {%- set f = fortune[member.id] %}
         {%- if member.id == "gm" %}{%- set first_name = "the GM" %}{%- else %}{%- set first_name = member.name.split(' ') | first %}{%- endif %}
@@ -50,11 +55,7 @@
           <ul class="dt-list">
             {%- for row in other_dice[member.id] %}
             <li class="dt-row">
-              <span class="dt-label">
-                {%- set die_glyph = row.die | replace('d', '') -%}
-                {%- if row.die in ['d6', 'd8', 'd10'] -%}<svg width="22" height="22" aria-hidden="true"><use href="#{{ row.die }}"/></svg>{%- endif -%}
-                {{ row.die }}<span class="dt-count"> &times; {{ row.count }}</span>
-              </span>
+              <span class="dt-label">{% if row.die in DICE_WITH_GLYPHS %}<svg width="22" height="22" aria-hidden="true"><use href="#{{ row.die }}"/></svg>{% endif %}{{ row.die }}<span class="dt-count"> &times; {{ row.count }}</span></span>
               <svg class="dt-chart" viewBox="0 0 360 60"><line class="avg-line" x1="16" y1="30" x2="360" y2="30"/>{% if row.dots | length > 1 %}<polyline class="roll-line" points="{% for d in row.dots %}{{ d.x }},{{ d.y }} {% endfor %}"/>{% endif %}{% for d in row.dots %}<circle class="roll-dot" data-date="{{ d.date }}" cx="{{ d.x }}" cy="{{ d.y }}" r="{% if row.dots | length == 1 %}3{% else %}2.5{% endif %}"/>{% endfor %}</svg>
               <span class="dt-stat">avg <b>{{ "%.1f" | format(row.avg) }}</b> &middot; best <b>{{ row.best }}</b></span>
             </li>
