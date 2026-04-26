@@ -1,0 +1,20 @@
+{
+  "type": "object",
+  "required": ["fields", "reason"],
+  "additionalProperties": false,
+  "properties": {
+    "fields": {
+      "type": "object",
+      "required": ["epithet", "allegiance"],
+      "additionalProperties": false,
+      "properties": {
+        "epithet": {"type": "string"},
+        "allegiance": {
+          "type": ["string", "null"],
+          "enum": ["with", "against", null]
+        }
+      }
+    },
+    "reason": {"type": "string"}
+  }
+}

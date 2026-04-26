@@ -1,0 +1,24 @@
+{
+  "type": "object",
+  "required": ["decision", "fields", "reason"],
+  "additionalProperties": false,
+  "properties": {
+    "decision": {
+      "type": "string",
+      "enum": ["no_change", "rewrite"]
+    },
+    "fields": {
+      "type": ["object", "null"],
+      "required": ["epithet", "allegiance"],
+      "additionalProperties": false,
+      "properties": {
+        "epithet": {"type": "string"},
+        "allegiance": {
+          "type": "string",
+          "enum": ["with", "against"]
+        }
+      }
+    },
+    "reason": {"type": "string"}
+  }
+}

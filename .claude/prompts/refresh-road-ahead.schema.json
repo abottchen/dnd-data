@@ -1,0 +1,44 @@
+{
+  "type": "object",
+  "required": ["decision", "fields", "reason"],
+  "additionalProperties": false,
+  "properties": {
+    "decision": {
+      "type": "string",
+      "enum": ["no_change", "rewrite"]
+    },
+    "fields": {
+      "type": ["object", "null"],
+      "required": ["known", "was_known", "direction"],
+      "additionalProperties": false,
+      "properties": {
+        "known": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["name", "gloss"],
+            "additionalProperties": false,
+            "properties": {
+              "name": {"type": "string"},
+              "gloss": {"type": "string"}
+            }
+          }
+        },
+        "was_known": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["name", "gloss"],
+            "additionalProperties": false,
+            "properties": {
+              "name": {"type": "string"},
+              "gloss": {"type": "string"}
+            }
+          }
+        },
+        "direction": {"type": "string"}
+      }
+    },
+    "reason": {"type": "string"}
+  }
+}
