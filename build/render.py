@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""build.py — render index.html from data + authored store + templates.
+"""render.py — render index.html from data + authored store + templates.
 
 Exit codes:
   0  render succeeded
@@ -1096,29 +1096,29 @@ def main() -> int:
                         help="Abort on any validation error (default: True).")
     args = parser.parse_args()
 
-    print(f"build.py: starting (data_dir={args.data_dir})")
+    print(f"render.py: starting (data_dir={args.data_dir})")
     data = load_data(Path(args.data_dir))
     authored = load_authored(BUILD_DIR)
     party_count = len(data['party']) if isinstance(data['party'], list) else len(data['party'].get('members', []))
     session_count = len(data['session_log'].get('entries', []))
     dice_count = sum(len(r) for r in data['dice_rolls'])
-    print(f"build.py: loaded {party_count} party members, "
+    print(f"render.py: loaded {party_count} party members, "
           f"{dice_count} dice events, "
           f"{session_count} session entries")
-    print(f"build.py: authored kills={len(authored['kills'])} sessions={len(authored['sessions'])} "
+    print(f"render.py: authored kills={len(authored['kills'])} sessions={len(authored['sessions'])} "
           f"npcs={len(authored['npcs'])} chapters={len(authored['chapters'])}")
     errors = validate_all(data, authored)
     if errors:
-        print(f"build.py: {len(errors)} validation error(s):", file=sys.stderr)
+        print(f"render.py: {len(errors)} validation error(s):", file=sys.stderr)
         for e in errors:
             print(f"  {e}", file=sys.stderr)
         return 1
-    print("build.py: validation passed")
+    print("render.py: validation passed")
 
     templates_dir = BUILD_DIR / "templates"
     base_template = templates_dir / "base.html"
     if not base_template.exists():
-        print(f"build.py: no {base_template} yet; skipping render (compute only). "
+        print(f"render.py: no {base_template} yet; skipping render (compute only). "
               f"Create templates first (plan tasks 18-24).")
         return 0
 
@@ -1126,9 +1126,9 @@ def main() -> int:
         context = compute_all(data, authored)
         render_page(context, templates_dir, Path(args.out))
     except Exception as e:
-        print(f"build.py: render failed: {type(e).__name__}: {e}", file=sys.stderr)
+        print(f"render.py: render failed: {type(e).__name__}: {e}", file=sys.stderr)
         return 2
-    print(f"build.py: rendered {args.out}")
+    print(f"render.py: rendered {args.out}")
     return 0
 
 if __name__ == "__main__":

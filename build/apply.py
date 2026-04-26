@@ -12,21 +12,15 @@ Signature: apply_*(authored, key, slice_data, output) -> None | dict
 `apply_refresh_road_ahead` returns a graduations dict so the orchestrator can
 include it in the end-of-run report; the others return None.
 """
-import sys
-from pathlib import Path
-
-_BUILD_DIR = Path(__file__).resolve().parents[1] / "build"
-if str(_BUILD_DIR) not in sys.path:
-    sys.path.insert(0, str(_BUILD_DIR))
-import build  # noqa: E402
+from . import render
 
 
 def apply_append_kills(authored: dict, key, slice_data: dict, output: dict) -> None:
     """Each entry in output['fields'] keys by <char>__<date>__<creature>__<method>;
-    we look the kill up in the slice's kills array (using build.kill_key for
+    we look the kill up in the slice's kills array (using render.kill_key for
     case-insensitive matching of creature/method) to recover the canonical row."""
     by_normalized = {
-        build.kill_key(k["character"], k["date"], k["creature"], k["method"]): k
+        render.kill_key(k["character"], k["date"], k["creature"], k["method"]): k
         for k in slice_data["kills"]
     }
     for kk_str, vals in output["fields"].items():
@@ -34,7 +28,7 @@ def apply_append_kills(authored: dict, key, slice_data: dict, output: dict) -> N
         if len(parts) != 4:
             raise ValueError(f"malformed kill key from model: {kk_str!r}")
         char, date, creature, method = parts
-        normalized = build.kill_key(char, date, creature, method)
+        normalized = render.kill_key(char, date, creature, method)
         kill = by_normalized.get(normalized)
         if kill is None:
             raise ValueError(f"kill key not in slice: {kk_str!r}")

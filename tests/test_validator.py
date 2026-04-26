@@ -1,5 +1,5 @@
 import pytest
-from build import (
+from build.render import (
     ValidationError, KIND_MISSING, KIND_MALFORMED, KIND_ORPHAN, validate_kills,
     validate_sessions, validate_chapters, validate_npcs, validate_characters, validate_site,
 )

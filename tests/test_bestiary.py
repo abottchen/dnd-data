@@ -1,6 +1,6 @@
 from pathlib import Path
 import pytest
-from build import bestiary_lookup, BESTIARY_GLOB
+from build.render import bestiary_lookup, BESTIARY_GLOB
 
 @pytest.fixture
 def bestiary_dir():
