@@ -177,6 +177,33 @@ def validate_characters(party: dict, authored: list) -> list[ValidationError]:
             errors.append(ValidationError(KIND_ORPHAN, "characters", (cid,)))
     return errors
 
+def validate_portraits(party: dict, images_dir: Path) -> list[ValidationError]:
+    """Each non-GM party member's `image` must resolve to a file in site/images/."""
+    errors: list[ValidationError] = []
+    for member in party.get("members", []):
+        if member.get("id") == "gm":
+            continue
+        image = member.get("image")
+        if not image:
+            continue
+        if not (images_dir / image).exists():
+            errors.append(ValidationError(
+                KIND_MISSING, "portraits", (member["id"],),
+                field=f"image '{image}' not found in site/images/ — add the portrait file",
+            ))
+    return errors
+
+def validate_dice_player_mapping(unmapped_players: list[str]) -> list[ValidationError]:
+    """Each upstream dice-roll player name must resolve to a slug via build/dice-players.json."""
+    errors: list[ValidationError] = []
+    for upstream in unmapped_players:
+        errors.append(ValidationError(
+            KIND_MISSING, "dice_player_map", (upstream,),
+            field='no entry in build/dice-players.json matches this upstream player — '
+                  'add a "<first-name-or-handle>": "<character-slug>" entry',
+        ))
+    return errors
+
 def validate_site(site: dict, latest_session: int) -> list[ValidationError]:
     errors: list[ValidationError] = []
     for f in REQUIRED_SITE_FIELDS:
@@ -837,7 +864,7 @@ def validate_distinction_uniqueness(authored: list) -> list[ValidationError]:
             seen[t] = a["id"]
     return errors
 
-def validate_all(data: dict, authored: dict) -> list[ValidationError]:
+def validate_all(data: dict, authored: dict, images_dir: Path) -> list[ValidationError]:
     errors: list[ValidationError] = []
     errors.extend(validate_kills(data["party"], authored["kills"]))
     errors.extend(validate_sessions(data["session_log"], authored["sessions"]))
@@ -847,6 +874,8 @@ def validate_all(data: dict, authored: dict) -> list[ValidationError]:
     errors.extend(validate_characters(data["party"], authored["characters"]))
     errors.extend(validate_distinction_uniqueness(authored["characters"]))
     errors.extend(validate_site(authored["site"], len(data["session_log"].get("entries", []))))
+    errors.extend(validate_portraits(data["party"], images_dir))
+    errors.extend(validate_dice_player_mapping(data.get("unmapped_players", [])))
     return errors
 
 _ROMAN_PAIRS = [(1000,"M"),(900,"CM"),(500,"D"),(400,"CD"),(100,"C"),(90,"XC"),
@@ -1158,7 +1187,8 @@ def main() -> int:
           f"{session_count} session entries")
     print(f"render.py: authored kills={len(authored['kills'])} sessions={len(authored['sessions'])} "
           f"npcs={len(authored['npcs'])} chapters={len(authored['chapters'])}")
-    errors = validate_all(data, authored)
+    images_dir = Path(args.out).parent / "images"
+    errors = validate_all(data, authored, images_dir)
     if errors:
         print(f"render.py: {len(errors)} validation error(s):", file=sys.stderr)
         for e in errors:

@@ -2,6 +2,7 @@ import pytest
 from build.render import (
     ValidationError, KIND_MISSING, KIND_MALFORMED, KIND_ORPHAN, validate_kills,
     validate_sessions, validate_chapters, validate_npcs, validate_characters, validate_site,
+    validate_portraits, validate_dice_player_mapping,
 )
 
 def test_validation_error_format_missing():
@@ -142,3 +143,48 @@ def test_validate_site_passes_with_complete_singleton():
             "refreshed_through_session": 5}
     errors = validate_site(site, latest_session=5)
     assert errors == []
+
+
+# --- Portrait + dice-player-map validators ---
+
+def test_validate_portraits_missing_file(tmp_path):
+    images_dir = tmp_path / "images"
+    images_dir.mkdir()
+    party = {"members": [{"id": "anton", "image": "anton.png"}]}
+    errors = validate_portraits(party, images_dir)
+    assert len(errors) == 1
+    assert errors[0].kind == "MISSING"
+    assert errors[0].kind_type == "portraits"
+    assert errors[0].key == ("anton",)
+    assert "anton.png" in errors[0].field
+    assert "site/images/" in errors[0].field
+
+def test_validate_portraits_passes_when_file_present(tmp_path):
+    images_dir = tmp_path / "images"
+    images_dir.mkdir()
+    (images_dir / "anton.png").write_bytes(b"")
+    party = {"members": [{"id": "anton", "image": "anton.png"}]}
+    assert validate_portraits(party, images_dir) == []
+
+def test_validate_portraits_skips_gm(tmp_path):
+    images_dir = tmp_path / "images"
+    images_dir.mkdir()
+    party = {"members": [{"id": "gm", "image": "GM.png"}]}
+    assert validate_portraits(party, images_dir) == []
+
+def test_validate_portraits_skips_member_without_image(tmp_path):
+    images_dir = tmp_path / "images"
+    images_dir.mkdir()
+    party = {"members": [{"id": "anton"}]}
+    assert validate_portraits(party, images_dir) == []
+
+def test_validate_dice_player_mapping_reports_unmapped():
+    errors = validate_dice_player_mapping(["NewPlayer"])
+    assert len(errors) == 1
+    assert errors[0].kind == "MISSING"
+    assert errors[0].kind_type == "dice_player_map"
+    assert errors[0].key == ("NewPlayer",)
+    assert "build/dice-players.json" in errors[0].field
+
+def test_validate_dice_player_mapping_passes_when_empty():
+    assert validate_dice_player_mapping([]) == []
