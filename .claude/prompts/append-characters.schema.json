@@ -1,0 +1,31 @@
+{
+  "type": "object",
+  "required": ["fields", "reason"],
+  "additionalProperties": false,
+  "properties": {
+    "fields": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": [
+          "epithet",
+          "reliquary_header",
+          "constellation_epithet",
+          "distinction_title",
+          "distinction_subtitle",
+          "distinction_detail"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "epithet": {"type": "string"},
+          "reliquary_header": {"type": "string"},
+          "constellation_epithet": {"type": "string"},
+          "distinction_title": {"type": "string"},
+          "distinction_subtitle": {"type": "string"},
+          "distinction_detail": {"type": "string"}
+        }
+      }
+    },
+    "reason": {"type": "string"}
+  }
+}

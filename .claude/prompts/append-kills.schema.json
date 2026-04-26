@@ -1,0 +1,20 @@
+{
+  "type": "object",
+  "required": ["fields", "reason"],
+  "additionalProperties": false,
+  "properties": {
+    "fields": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["verse", "annotation"],
+        "additionalProperties": false,
+        "properties": {
+          "verse": {"type": "string"},
+          "annotation": {"type": "string"}
+        }
+      }
+    },
+    "reason": {"type": "string"}
+  }
+}

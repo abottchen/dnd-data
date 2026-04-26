@@ -958,7 +958,7 @@ def load_data(data_dir: Path) -> dict:
         "session_log": session_log,
     }
 
-DICE_PLAYER_MAP_PATH = Path(".claude/skills/hydrate-ledger/dice-players.json")
+DICE_PLAYER_MAP_PATH = BUILD_DIR / "dice-players.json"
 
 def _load_dice_player_map() -> dict[str, str]:
     """Read the dice-players mapping (substring pattern -> site slug).
@@ -966,7 +966,7 @@ def _load_dice_player_map() -> dict[str, str]:
     Keys are first-name or handle substrings; the upstream player name from the dice
     JSON resolves via `_resolve_dice_player` (longest-pattern-first substring match)
     so the file never has to record full real names."""
-    path = REPO_ROOT / DICE_PLAYER_MAP_PATH
+    path = DICE_PLAYER_MAP_PATH
     if not path.exists():
         return {}
     try:

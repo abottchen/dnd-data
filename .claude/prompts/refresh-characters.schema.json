@@ -1,0 +1,33 @@
+{
+  "type": "object",
+  "required": ["decision", "fields", "reason"],
+  "additionalProperties": false,
+  "properties": {
+    "decision": {
+      "type": "string",
+      "enum": ["no_change", "rewrite"]
+    },
+    "fields": {
+      "type": ["object", "null"],
+      "additionalProperties": {
+        "type": "object",
+        "required": [
+          "epithet",
+          "constellation_epithet",
+          "distinction_title",
+          "distinction_subtitle",
+          "distinction_detail"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "epithet": {"type": "string"},
+          "constellation_epithet": {"type": "string"},
+          "distinction_title": {"type": "string"},
+          "distinction_subtitle": {"type": "string"},
+          "distinction_detail": {"type": "string"}
+        }
+      }
+    },
+    "reason": {"type": "string"}
+  }
+}

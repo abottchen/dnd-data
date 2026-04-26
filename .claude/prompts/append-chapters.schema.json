@@ -1,0 +1,17 @@
+{
+  "type": "object",
+  "required": ["fields", "reason"],
+  "additionalProperties": false,
+  "properties": {
+    "fields": {
+      "type": "object",
+      "required": ["title", "epigraph"],
+      "additionalProperties": false,
+      "properties": {
+        "title": {"type": "string"},
+        "epigraph": {"type": "string"}
+      }
+    },
+    "reason": {"type": "string"}
+  }
+}

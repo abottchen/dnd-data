@@ -1,0 +1,21 @@
+{
+  "type": "object",
+  "required": ["decision", "fields", "reason"],
+  "additionalProperties": false,
+  "properties": {
+    "decision": {
+      "type": "string",
+      "enum": ["no_change", "rewrite"]
+    },
+    "fields": {
+      "type": ["object", "null"],
+      "required": ["title", "epigraph"],
+      "additionalProperties": false,
+      "properties": {
+        "title": {"type": "string"},
+        "epigraph": {"type": "string"}
+      }
+    },
+    "reason": {"type": "string"}
+  }
+}

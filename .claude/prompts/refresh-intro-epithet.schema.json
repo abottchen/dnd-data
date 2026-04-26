@@ -1,0 +1,20 @@
+{
+  "type": "object",
+  "required": ["decision", "fields", "reason"],
+  "additionalProperties": false,
+  "properties": {
+    "decision": {
+      "type": "string",
+      "enum": ["no_change", "rewrite"]
+    },
+    "fields": {
+      "type": ["object", "null"],
+      "required": ["intro_epithet"],
+      "additionalProperties": false,
+      "properties": {
+        "intro_epithet": {"type": "string"}
+      }
+    },
+    "reason": {"type": "string"}
+  }
+}
