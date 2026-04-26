@@ -30,6 +30,12 @@ Run `.venv/bin/python -m build` to author new prose and rebuild `site/index.html
 
 Validation gates the render: any `MISSING` or `MALFORMED` authored entry causes `build/render.py` to exit 1 with an error message before writing output. Fix the authored entry and re-run.
 
+CLI flags for `python -m build`:
+- `--skip-render` — author prose, but skip the final render step. Useful when iterating on authoring logic.
+- `--no-refresh` — skip the refresh pass even when `latest_session > marker`.
+- `--concurrency N` — parallel `claude -p` calls per pass (default 5).
+- `--keep-temp` — preserve the per-run temp dir on success (default: removed on success, kept on failure).
+
 To publish: pull `main`, run `python -m build`, commit, push. The deploy workflow uploads the committed `site/` directory to GitHub Pages — it does not invoke `build/render.py` or the orchestrator.
 
 Configure once: Settings → Pages → Source: **GitHub Actions**.
@@ -39,8 +45,8 @@ Configure once: Settings → Pages → Source: **GitHub Actions**.
 The `build` package authors new prose into `build/authored/*.json` and then runs `build/render.py`. Each transformer is a single non-interactive `claude -p` call: a system prompt from `.claude/prompts/<name>.md`, a slice JSON delivered on stdin, and a JSON Schema-validated response. The orchestrator is deterministic Python; the model's only job is to produce schema-conformant prose for one slice at a time.
 
 Pipeline:
-1. Load upstream `data/` + authored `build/authored/`.
-2. **Append pass** — for each category (`kills`, `sessions`, `chapters`, `npcs`, `characters`), build slices for unauthored entities and call the matching `append-*` transformer.
+1. Load source data from `data/` + authored prose from `build/authored/`.
+2. **Append pass** — for each category (`kills`, `sessions`, `chapters`, `npcs`, `characters`), the slice builder in `build/slices.py` computes a set difference between `data/` and `build/authored/` (keyed on `(character, date, creature, method)` for kills, `session` id for sessions, `name` for NPCs, etc.). One slice is emitted per missing entity, and one `claude -p` call is dispatched per slice. Deleting a single entry from an authored file causes that one entry to be re-authored on the next run; nothing else moves.
 3. **Refresh pass** — when `latest_session > site.refreshed_through_session`, evaluate each `refresh-*` transformer (`chapters`, `npcs`, `characters`, `road-ahead`, `intro-epithet`); each returns `no_change` or `rewrite`.
 4. Apply returns to authored sections; bump `site.refreshed_through_session` on full refresh-pass success.
 5. Run `build/render.py`.
@@ -64,6 +70,8 @@ Tool denylist + plan mode close off all model agency: each transformer is purely
 ## Tests
 
 `.venv/bin/pytest tests/` runs the test suite — covers validators, key matching, computation formulas, slice builders, and bestiary lookup.
+
+`build/paths.py` honors three env vars for test isolation: `BUILD_DATA_DIR`, `BUILD_AUTHORED_DIR`, `BUILD_TEMP_DIR`. `tests/test_slices.py` monkeypatches `BUILD_AUTHORED_DIR` to point at a fixture copy under `tmp_path`.
 
 End-to-end verification: run `python -m build` (or just `build/render.py`) and visually check the rendered page via the local preview server.
 
