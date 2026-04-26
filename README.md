@@ -20,8 +20,10 @@ flowchart LR
       P2[data/dicex-rolls-*.json]
       P3[data/session-log.json]
     end
+    up --> H["hydrate<br/>python -m hydrate"]
+    H --> A[build/authored/*.json]
     up --> B
-    A[build/authored/*.json] --> B
+    A --> B
     T[build/templates/*.html] --> B
     B["build/build.py<br/>validate · compute · render"] --> I[site/index.html]
     I --> GH((GitHub Pages))
@@ -47,7 +49,7 @@ sequenceDiagram
     H->>T: persist slice + prompt body (debug artifact)
     H->>C: stdin=slice<br/>--system-prompt-file<br/>--json-schema
     C-->>H: structured_output (schema-validated)
-    H->>A: apply prose; bump marker on full refresh success
+    H->>A: apply prose, bump marker on full refresh success
     H->>B: run build.py
 ```
 
