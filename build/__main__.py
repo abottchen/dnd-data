@@ -28,6 +28,10 @@ from .paths import data_dir, temp_dir
 DEFAULT_CONCURRENCY = 5
 
 
+DISCOVERY_PASS = [
+    ("refresh-known-npcs", slices.refresh_known_npcs, apply.apply_refresh_known_npcs),
+]
+
 APPEND_PASS = [
     ("append-kills", slices.append_kills, apply.apply_append_kills),
     ("append-sessions", slices.append_sessions, apply.apply_append_sessions),
@@ -104,11 +108,19 @@ def _run_pass(pass_name: str, transformers, data, authored, run_dir: Path, concu
     return results, full_success
 
 
-def _print_report(*, append_results, refresh_results, marker_old, marker_new,
+def _print_report(*, discovery_results, append_results, refresh_results,
+                  marker_old, marker_new,
                   render_result, run_dir: Path, full_success: bool, temp_kept: bool):
     _log("\n" + "=" * 60)
     _log("BUILD RUN REPORT")
     _log("=" * 60)
+
+    if discovery_results:
+        _log("\nDiscovery decisions:")
+        for category, items in discovery_results.items():
+            _log(f"  {category}:")
+            for key, decision, reason, _grads in items:
+                _log(f"    {key}: {decision} — {reason}")
 
     if append_results:
         _log("\nAppend additions:")
@@ -158,7 +170,11 @@ def main(argv=None) -> int:
     )
     parser.add_argument(
         "--no-refresh", action="store_true",
-        help="Skip the refresh pass even if the marker is behind.",
+        help="Skip the discovery and refresh passes even if the marker is behind.",
+    )
+    parser.add_argument(
+        "--force-refresh", action="store_true",
+        help="Run the discovery and refresh passes even if the marker is up to date.",
     )
     parser.add_argument(
         "--concurrency", type=int, default=DEFAULT_CONCURRENCY,
@@ -182,6 +198,18 @@ def main(argv=None) -> int:
     _log(f"build run temp dir: {run_dir}")
     _log(f"latest_session={latest}, marker={marker}")
 
+    # --- Discovery pass ---
+    # Runs before append so newly discovered NPC names flow into append-npcs
+    # on the same build. Gated on latest > marker (no work to do otherwise),
+    # bypassed by --force-refresh.
+    discovery_results: dict = {}
+    discovery_ok = True
+    refresh_gate = not args.no_refresh and (latest > marker or args.force_refresh)
+    if refresh_gate:
+        _log("\n--- discovery pass ---")
+        discovery_results, discovery_ok = _run_pass("discovery", DISCOVERY_PASS, data, authored, run_dir, args.concurrency)
+        store.persist(authored)
+
     # --- Append pass ---
     _log("\n--- append pass ---")
     append_results, append_ok = _run_pass("append", APPEND_PASS, data, authored, run_dir, args.concurrency)
@@ -191,7 +219,7 @@ def main(argv=None) -> int:
     refresh_results: dict = {}
     refresh_ok = True
     marker_new = marker
-    if not args.no_refresh and latest > marker:
+    if refresh_gate:
         _log("\n--- refresh pass ---")
         refresh_results, refresh_ok = _run_pass("refresh", REFRESH_PASS, data, authored, run_dir, args.concurrency)
         store.persist(authored)
@@ -212,7 +240,7 @@ def main(argv=None) -> int:
         _log("\n--- running render.py ---")
         render_result = run_render()
 
-    full_success = append_ok and refresh_ok and render_result["ok"]
+    full_success = discovery_ok and append_ok and refresh_ok and render_result["ok"]
 
     # Clean up the temp dir on full success unless --keep-temp.
     # On partial failure we always preserve it so the user can inspect
@@ -222,6 +250,7 @@ def main(argv=None) -> int:
         shutil.rmtree(run_dir, ignore_errors=True)
 
     _print_report(
+        discovery_results=discovery_results,
         append_results=append_results,
         refresh_results=refresh_results,
         marker_old=marker,

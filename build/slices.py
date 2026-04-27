@@ -293,3 +293,19 @@ def refresh_intro_epithet(data: dict, authored: dict) -> list[tuple]:
         "road_ahead_known": authored["site"]["road_ahead"]["known"],
         "existing": authored["site"]["intro_epithet"],
     })]
+
+
+def refresh_known_npcs(data: dict, authored: dict) -> list[tuple]:
+    """Discover NPC names from session text and append them to the canonical
+    `site.known_npcs` list. Runs in the discovery pass before append-npcs so
+    newly named NPCs flow into per-NPC epithet authoring on the same build.
+
+    Unlike road-ahead / intro-epithet (which evaluate new evidence against
+    existing belief), this task is name-extraction over the full corpus. We
+    pass every session so the model can catch names missed in earlier runs;
+    `existing` tells it which names are already covered.
+    """
+    return [("all", {
+        "sessions": list(data["session_log"]["entries"]),
+        "existing": list(authored["site"].get("known_npcs", [])),
+    })]
