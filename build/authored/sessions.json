@@ -4,7 +4,9 @@
     "date": "2026-03-15",
     "title": "An Oath, a Map, and a Sending Stone",
     "summary": "No blade was drawn. The company took Azlund's oath under zone of truth, received the map of Chult and fifty gold apiece, and boarded The Horizon at the Waterdeep docks.",
-    "silent_roll": ["No blade was drawn; only a name was pressed into a sending stone."],
+    "silent_roll": [
+      "No blade was drawn; only a name was pressed into a sending stone."
+    ],
     "chapter_id": 1
   },
   {
@@ -12,7 +14,9 @@
     "date": "2026-03-22",
     "title": "The Horizon, and the First Storm",
     "summary": "Days aboard the Horizon: Chumble hid in a pickle-barrel and woke with a familiar named Wickles. The storm came on the fourth day; six hands met it, and every rope held.",
-    "silent_roll": ["A familiar was pulled from a pickle-barrel, and the company called him Wickles."],
+    "silent_roll": [
+      "A familiar was pulled from a pickle-barrel, and the company called him Wickles."
+    ],
     "chapter_id": 1
   },
   {
@@ -28,7 +32,9 @@
     "date": "2026-04-12",
     "title": "The Ring, Revealed",
     "summary": "An arm-wrestle unmasked no secrets, but words did. Harlen was revealed a Zhentarim stowaway and the cheese-thief. Corwin showed his left hand, told his name, and named the Ring of Winter.",
-    "silent_roll": ["A ring opened its eye in the galley, and a cheese-thief was revealed a spy."],
+    "silent_roll": [
+      "A ring opened its eye in the galley, and a cheese-thief was revealed a spy."
+    ],
     "chapter_id": 1
   },
   {
@@ -38,5 +44,16 @@
     "summary": "Pirates boarded in the night. The deck ran red. When it became clear the company could not win the tally, Artus Cimber teleported them to Port Nyanzaru in a flash of ice and turned alone to the remaining crew.",
     "silent_roll": [],
     "chapter_id": 1
+  },
+  {
+    "session": 6,
+    "date": "2026-04-26",
+    "title": "Three Riders and a Ring",
+    "summary": "The party rented three dinosaurs from the Tiryki Anchorage pens, crossed paths with Volo Geddarm on the march to Goldenthrone where they heard the history of Chult and bought his book, and ran the city race circuit — Lilac Mist took first place, and Greig finished third to claim Ubtao's Ring.",
+    "silent_roll": [
+      "Half a goat was bought for five silver before the start; Scarback failed the last trench regardless.",
+      "A cage was opened mid-race, and the monkey chose the winner's shoulder over the open sky.",
+      "Tej was taken from a Grand Souk vendor at a full gallop, and the crowd roared."
+    ]
   }
 ]

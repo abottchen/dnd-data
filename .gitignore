@@ -1,6 +1,7 @@
 # Tooling / external deps
 .superpowers/
 .claude/ext/5etools-src
+.claude/worktrees/
 .worktrees/
 /.mcp.json
 
