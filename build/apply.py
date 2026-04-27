@@ -154,3 +154,10 @@ def apply_refresh_intro_epithet(authored: dict, key, slice_data: dict, output: d
         return
     fields = output["fields"] or {}
     authored["site"]["intro_epithet"] = fields["intro_epithet"]
+
+
+def apply_refresh_known_npcs(authored: dict, key, slice_data: dict, output: dict) -> None:
+    if output["decision"] == "no_change":
+        return
+    fields = output["fields"] or {}
+    authored["site"]["known_npcs"] = list(fields["known_npcs"])

@@ -1,6 +1,7 @@
 # Tooling / external deps
 .superpowers/
 .claude/ext/5etools-src
+.claude/worktrees/
 .worktrees/
 /.mcp.json
 
@@ -10,9 +11,8 @@
 
 # Sensitive source data — contains real player names/handles.
 # Not needed to display index.html; hydration runs locally against these.
-data/party.json
-data/dicex-rolls-*.json
-data/session-log.json
+data/*
+!data/.gitkeep
 
 # Python build artifacts
 __pycache__/

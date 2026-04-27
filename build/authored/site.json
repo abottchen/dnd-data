@@ -3,7 +3,7 @@
   "page_subtitle": "A ledger of those who walk &middot; and those they have laid down",
   "intro_epithet": "Five travellers and a storyteller, bound to a doomed road",
   "footnote": "The names above are the names given &middot; the ones who fell were given no names",
-  "refreshed_through_session": 5,
+  "refreshed_through_session": 6,
   "road_ahead": {
     "known": [
       {
@@ -56,6 +56,10 @@
     "Corwin, called Artus Cimber",
     "Dragonbait",
     "Harlen",
-    "The Fleeing Yuan-ti"
+    "The Fleeing Yuan-ti",
+    "Kessra",
+    "Torgg",
+    "Lilac Mist",
+    "Volo"
   ]
 }

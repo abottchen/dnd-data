@@ -1,0 +1,24 @@
+{
+  "type": "object",
+  "required": ["decision", "fields", "reason"],
+  "additionalProperties": false,
+  "properties": {
+    "decision": {
+      "type": "string",
+      "enum": ["no_change", "rewrite"]
+    },
+    "fields": {
+      "type": ["object", "null"],
+      "required": ["known_npcs"],
+      "additionalProperties": false,
+      "properties": {
+        "known_npcs": {
+          "type": "array",
+          "items": {"type": "string"},
+          "uniqueItems": true
+        }
+      }
+    },
+    "reason": {"type": "string"}
+  }
+}

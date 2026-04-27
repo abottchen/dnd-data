@@ -201,3 +201,34 @@ def test_refresh_intro_epithet_rewrite_replaces_string():
     apply.apply_refresh_intro_epithet(authored, key="all",
                                       slice_data={}, output=output)
     assert authored["site"]["intro_epithet"] == "A larger ledger, lately."
+
+
+# -- apply_refresh_known_npcs ------------------------------------------------
+
+def test_refresh_known_npcs_no_change_is_noop():
+    authored = {"site": {"known_npcs": ["Azlund", "Tessa"]}}
+    output = {"decision": "no_change", "fields": None, "reason": ""}
+    apply.apply_refresh_known_npcs(authored, key="all",
+                                   slice_data={}, output=output)
+    assert authored["site"]["known_npcs"] == ["Azlund", "Tessa"]
+
+
+def test_refresh_known_npcs_rewrite_replaces_list():
+    authored = {"site": {"known_npcs": ["Azlund", "Tessa"]}}
+    output = {"decision": "rewrite",
+              "fields": {"known_npcs": ["Azlund", "Tessa", "Lilac Mist"]},
+              "reason": "session 6 introduced Lilac Mist"}
+    apply.apply_refresh_known_npcs(authored, key="all",
+                                   slice_data={}, output=output)
+    assert authored["site"]["known_npcs"] == ["Azlund", "Tessa", "Lilac Mist"]
+
+
+def test_refresh_known_npcs_rewrite_preserves_order():
+    """Apply is a verbatim replace — order from the model output is honored."""
+    authored = {"site": {"known_npcs": ["A"]}}
+    output = {"decision": "rewrite",
+              "fields": {"known_npcs": ["A", "B", "C"]},
+              "reason": ""}
+    apply.apply_refresh_known_npcs(authored, key="all",
+                                   slice_data={}, output=output)
+    assert authored["site"]["known_npcs"] == ["A", "B", "C"]

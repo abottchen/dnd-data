@@ -155,6 +155,34 @@ def test_refresh_intro_epithet_emits_singleton(slice_env):
     assert body["existing"] == "A small ledger."
 
 
+def test_refresh_known_npcs_emits_singleton(slice_env):
+    out = slices.refresh_known_npcs(slice_env["data"], slice_env["authored"])
+    assert len(out) == 1
+    key, body = out[0]
+    assert key == "all"
+    assert "sessions" in body
+    assert body["existing"] == ["Azlund"]
+
+
+def test_refresh_known_npcs_passes_full_session_history(slice_env):
+    """Discovery is name-extraction, not new-evidence evaluation: every
+    session entry is passed regardless of refreshed_through_session."""
+    out = slices.refresh_known_npcs(slice_env["data"], slice_env["authored"])
+    _, body = out[0]
+    total = len(slice_env["data"]["session_log"]["entries"])
+    assert len(body["sessions"]) == total
+
+
+def test_refresh_known_npcs_tolerates_missing_known_npcs_field(slice_env):
+    """Cold-start friendly: site.json without `known_npcs` yields existing=[]."""
+    authored = dict(slice_env["authored"])
+    authored["site"] = {**authored["site"]}
+    authored["site"].pop("known_npcs", None)
+    out = slices.refresh_known_npcs(slice_env["data"], authored)
+    _, body = out[0]
+    assert body["existing"] == []
+
+
 # -- Cold-start coverage -----------------------------------------------------
 
 @pytest.mark.parametrize("builder_name", [
