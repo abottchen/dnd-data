@@ -43,5 +43,14 @@
     "distinction_title": "Steadiest Hand",
     "distinction_subtitle": "whose dice keep the highest company",
     "distinction_detail": "avg <b>14.7</b> &middot; σ 4.9"
+  },
+  {
+    "id": "lilac",
+    "epithet": "of the Tabaxi, mist-pawed and green-eyed in the hunter's hour",
+    "reliquary_header": "The hunt unbegun",
+    "constellation_epithet": "her dice still in the cup",
+    "distinction_title": "Unblooded",
+    "distinction_subtitle": "the only blade yet to draw",
+    "distinction_detail": "<b>0</b> kills &middot; the newest of the company"
   }
 ]
