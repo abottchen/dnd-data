@@ -10,6 +10,7 @@ from __future__ import annotations
 import argparse
 import functools
 import json
+import math
 import sys
 from collections import Counter
 from pathlib import Path
@@ -618,21 +619,28 @@ def compute_best_skill(member: dict) -> dict | None:
     }
 
 def compute_constellation(party: dict, fortune_by_char: dict, trials: dict) -> dict:
-    """Position each (non-GM) character by (xp, total rolls). Excludes GM."""
+    """Position each (non-GM) character by (xp, total rolls). Excludes GM.
+
+    When two or more characters round to the same plot coordinate they form
+    a 'system': portraits get an orbital offset around the shared center so
+    they no longer occlude each other, and a dashed brass ring is drawn
+    around the cluster. The constellation polygon connects cluster centers,
+    so a system counts as one node in the link sort.
+    """
     members = [m for m in party.get("members", []) if m["id"] != "gm"]
     party_max_xp = max((trials["per_char"][m["id"]]["xp"] for m in members), default=0)
     party_max_rolls = max(
         (fortune_by_char[m["id"]]["rolls_total"] for m in members), default=0
     )
 
-    stars = []
+    raw: list[dict] = []
     for m in members:
         cid = m["id"]
         xp = trials["per_char"][cid]["xp"]
         rolls = fortune_by_char[cid]["rolls_total"]
         left = round(xp / party_max_xp * 92 + 4) if party_max_xp else 4
         top = round(96 - rolls / party_max_rolls * 92) if party_max_rolls else 96
-        stars.append({
+        raw.append({
             "id": cid,
             "left_pct": left,
             "top_pct": top,
@@ -647,24 +655,114 @@ def compute_constellation(party: dict, fortune_by_char: dict, trials: dict) -> d
             "fumbles": fortune_by_char[cid]["fumbles"],
         })
 
-    # Constellation links: trace a closed polygon by sorting stars by XP ascending,
-    # connecting each to the next, and closing the loop. Coordinates are in a
-    # 1000×1000 viewBox (preserveAspectRatio="none" stretches it to the plot).
+    # Cluster stars whose portraits would visually collide on the rendered
+    # plot — not just exact coordinate ties, since the chart-space rounding
+    # leaves near-ties (e.g. dy=2%) that still overlap by ~80% of a portrait.
+    # Threshold = portrait diameter; plot dims approximate the rendered area
+    # (.constellation max-width 1100 minus 80px side padding; height 480
+    # minus 24+36 vertical padding — see styles.css).
+    PLOT_W_PX = 940
+    PLOT_H_PX = 420
+    COLLISION_THRESHOLD_PX = 72
+
+    # Per-star pixel offset around the cluster center. Tuned to fit shrunken
+    # 52px portraits (see .constellation-star.in-system in styles.css) with
+    # a small visual gap inside the orbit ring.
+    ORBIT_RADIUS_PX = 36
+
+    # Single-linkage clustering via union-find over portrait-overlap pairs.
+    parent = list(range(len(raw)))
+
+    def find(i: int) -> int:
+        while parent[i] != i:
+            parent[i] = parent[parent[i]]
+            i = parent[i]
+        return i
+
+    def union(i: int, j: int) -> None:
+        ri, rj = find(i), find(j)
+        if ri != rj:
+            parent[ri] = rj
+
+    for i in range(len(raw)):
+        for j in range(i + 1, len(raw)):
+            dx_px = (raw[i]["left_pct"] - raw[j]["left_pct"]) / 100 * PLOT_W_PX
+            dy_px = (raw[i]["top_pct"] - raw[j]["top_pct"]) / 100 * PLOT_H_PX
+            if math.hypot(dx_px, dy_px) <= COLLISION_THRESHOLD_PX:
+                union(i, j)
+
+    groups: dict[int, list[dict]] = {}
+    for i, s in enumerate(raw):
+        groups.setdefault(find(i), []).append(s)
+    # Sort group members by id so a given star always occupies the same
+    # orbit slot across runs.
+    for group in groups.values():
+        group.sort(key=lambda s: s["id"])
+
+    stars: list[dict] = []
+    systems: list[dict] = []
+    cluster_centers: list[tuple[float, float, int, str]] = []  # (left, top, min_xp, min_id) for link sort
+
+    for group in groups.values():
+        n = len(group)
+        if n == 1:
+            s = group[0]
+            s["system_size"] = 1
+            s["orbit_x_px"] = 0
+            s["orbit_y_px"] = 0
+            stars.append(s)
+            cluster_centers.append((s["left_pct"], s["top_pct"], s["xp"], s["id"]))
+            continue
+
+        # Cluster center = centroid of member coords. Override each star's
+        # left_pct/top_pct so portraits anchor at the shared center; the
+        # orbit translate then fans them around it.
+        center_left = sum(s["left_pct"] for s in group) / n
+        center_top = sum(s["top_pct"] for s in group) / n
+
+        # n=2 reads as a true binary: place horizontally on either side.
+        # n>=3 fans evenly around the center starting from the top.
+        for i, s in enumerate(group):
+            if n == 2:
+                angle_deg = 180.0 if i == 0 else 0.0
+            else:
+                angle_deg = -90.0 + (360.0 / n) * i
+            angle_rad = math.radians(angle_deg)
+            s["left_pct"] = center_left
+            s["top_pct"] = center_top
+            s["system_size"] = n
+            s["orbit_x_px"] = round(ORBIT_RADIUS_PX * math.cos(angle_rad), 2)
+            s["orbit_y_px"] = round(ORBIT_RADIUS_PX * math.sin(angle_rad), 2)
+            stars.append(s)
+        systems.append({
+            "left_pct": center_left,
+            "top_pct": center_top,
+            "size": n,
+        })
+        cluster_centers.append((
+            center_left, center_top,
+            min(s["xp"] for s in group),
+            min(s["id"] for s in group),
+        ))
+
+    # Constellation links: one node per cluster center (so a system is a
+    # single vertex), sorted by (min xp, min id) for stability.
     links: list[dict] = []
-    if len(stars) >= 2:
-        ordered = sorted(stars, key=lambda s: (s["xp"], s["id"]))
-        for i in range(len(ordered)):
-            a = ordered[i]
-            b = ordered[(i + 1) % len(ordered)]
+    if len(cluster_centers) >= 2:
+        cluster_centers.sort(key=lambda c: (c[2], c[3]))
+        for i in range(len(cluster_centers)):
+            a = cluster_centers[i]
+            b = cluster_centers[(i + 1) % len(cluster_centers)]
             links.append({
-                "x1": a["left_pct"] * 10,
-                "y1": a["top_pct"] * 10,
-                "x2": b["left_pct"] * 10,
-                "y2": b["top_pct"] * 10,
+                "x1": a[0] * 10,
+                "y1": a[1] * 10,
+                "x2": b[0] * 10,
+                "y2": b[1] * 10,
             })
 
     return {
         "stars": stars,
+        "systems": systems,
         "links": links,
         "party_max_xp": party_max_xp,
         "party_max_rolls": party_max_rolls,

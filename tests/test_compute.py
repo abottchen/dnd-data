@@ -326,9 +326,14 @@ def test_constellation_links_ordered_by_xp_ascending():
 
 
 def test_constellation_links_tiebreak_by_id_when_xp_equal():
+    # Identical xp but different rolls → each star is its own cluster, so
+    # the (xp, id) tiebreak in the link sort is what matters here.
     party, fortune, trials = _consteltation_inputs(
         ("vex", 100), ("anton", 100), ("grieg", 100)
     )
+    fortune["anton"]["rolls_total"] = 30
+    fortune["grieg"]["rolls_total"] = 20
+    fortune["vex"]["rolls_total"] = 10
     result = compute_constellation(party, fortune, trials)
     # Sort key is (xp, id) ascending → anton, grieg, vex.
     star_by_id = {s["id"]: s for s in result["stars"]}
@@ -342,6 +347,76 @@ def test_constellation_links_tiebreak_by_id_when_xp_equal():
         assert (link["x2"], link["y2"]) == (
             star_by_id[nxt]["left_pct"] * 10, star_by_id[nxt]["top_pct"] * 10,
         )
+
+
+# ── compute_constellation systems (collision handling) ────────────────
+
+def test_constellation_no_collision_means_no_systems():
+    party, fortune, trials = _consteltation_inputs(("anton", 100), ("vex", 200))
+    result = compute_constellation(party, fortune, trials)
+    assert result["systems"] == []
+    for s in result["stars"]:
+        assert s["system_size"] == 1
+        assert s["orbit_x_px"] == 0
+        assert s["orbit_y_px"] == 0
+
+
+def test_constellation_collision_creates_system():
+    # Identical xp + identical rolls → both stars round to the same coord.
+    party, fortune, trials = _consteltation_inputs(("vex", 100), ("grieg", 100))
+    result = compute_constellation(party, fortune, trials)
+    assert len(result["systems"]) == 1
+    sys = result["systems"][0]
+    assert sys["size"] == 2
+    for s in result["stars"]:
+        assert s["system_size"] == 2
+        assert (s["left_pct"], s["top_pct"]) == (sys["left_pct"], sys["top_pct"])
+
+
+def test_constellation_binary_orbit_offsets_are_mirrored():
+    # n=2 → horizontal pair, offsets sum to zero on x and stay flat on y.
+    party, fortune, trials = _consteltation_inputs(("vex", 100), ("grieg", 100))
+    result = compute_constellation(party, fortune, trials)
+    xs = sorted(s["orbit_x_px"] for s in result["stars"])
+    assert xs[0] == -xs[1]
+    assert xs[1] > 0
+    for s in result["stars"]:
+        assert s["orbit_y_px"] == 0
+
+
+def test_constellation_clusters_near_misses():
+    # Stars whose portraits would visibly overlap on the rendered plot
+    # cluster even when their rounded coords aren't identical. Here vex and
+    # grieg have nearly the same rolls — a 1-vs-2 difference rounds to
+    # adjacent (top_pct = 4 vs 6), which puts the 72px portraits ~8px apart
+    # on the y-axis and almost fully on top of each other.
+    party, fortune, trials = _consteltation_inputs(
+        ("vex", 100), ("grieg", 100)
+    )
+    fortune["vex"]["rolls_total"] = 100
+    fortune["grieg"]["rolls_total"] = 98
+    result = compute_constellation(party, fortune, trials)
+    assert len(result["systems"]) == 1
+    assert result["systems"][0]["size"] == 2
+
+
+def test_constellation_links_dedupe_through_clusters():
+    # vex + grieg collide; anton stands alone. Two cluster nodes → two links.
+    party, fortune, trials = _consteltation_inputs(
+        ("anton", 50), ("vex", 200), ("grieg", 200)
+    )
+    result = compute_constellation(party, fortune, trials)
+    assert len(result["systems"]) == 1
+    assert len(result["links"]) == 2  # closed loop of 2 nodes
+    sys_center = (result["systems"][0]["left_pct"] * 10,
+                  result["systems"][0]["top_pct"] * 10)
+    anton = next(s for s in result["stars"] if s["id"] == "anton")
+    anton_pos = (anton["left_pct"] * 10, anton["top_pct"] * 10)
+    endpoints = set()
+    for link in result["links"]:
+        endpoints.add((link["x1"], link["y1"]))
+        endpoints.add((link["x2"], link["y2"]))
+    assert endpoints == {sys_center, anton_pos}
 
 
 def test_constellation_links_excludes_gm():

@@ -47,10 +47,21 @@
           {%- endfor %}
         </svg>
         {%- endif %}
+        {%- for sys in constellation.systems %}
+        <svg class="constellation-orbit" style="top: {{ sys.top_pct }}%; left: {{ sys.left_pct }}%;"
+             viewBox="-100 -100 200 200" aria-hidden="true">
+          {%- if sys.size == 2 %}
+          <ellipse cx="0" cy="0" rx="86" ry="32" class="orbit-ring"/>
+          {%- else %}
+          <circle cx="0" cy="0" r="74" class="orbit-ring"/>
+          {%- endif %}
+        </svg>
+        {%- endfor %}
         {%- for star in constellation.stars %}
           {%- set member = (party.members | selectattr("id", "equalto", star.id) | first) %}
           {%- set auth = characters_authored[star.id] %}
-        <div class="constellation-star" style="top: {{ star.top_pct }}%; left: {{ star.left_pct }}%;"
+        <div class="constellation-star{% if star.system_size > 1 %} in-system{% endif %}"
+             style="top: {{ star.top_pct }}%; left: {{ star.left_pct }}%;{% if star.system_size > 1 %} --orbit-x: {{ star.orbit_x_px }}px; --orbit-y: {{ star.orbit_y_px }}px;{% endif %}"
              data-name="{{ star.name }}"
              data-epithet="{{ auth.constellation_epithet }}"
              data-xp="{{ star.xp }}"

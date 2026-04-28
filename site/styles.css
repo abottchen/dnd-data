@@ -1259,6 +1259,51 @@ main > article > section.proficiencies,
   line-height: 1.2;
 }
 
+/* A 'system' is two or more characters tied at the same plot coordinate.
+   The orbit ring frames the cluster; portraits sit on a small orbit around
+   the shared center so they no longer occlude each other. */
+.constellation-orbit {
+  position: absolute;
+  width: 200px;
+  height: 200px;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  overflow: visible;
+  z-index: 1;
+}
+
+.constellation-orbit .orbit-ring {
+  fill: none;
+  stroke: var(--brass-hi);
+  stroke-width: 1.25;
+  stroke-dasharray: 2 5;
+  opacity: 0.85;
+}
+
+.constellation-star.in-system {
+  transform: translate(-50%, -50%) translate(var(--orbit-x), var(--orbit-y));
+}
+
+.constellation-star.in-system:hover {
+  transform: translate(-50%, -50%) translate(var(--orbit-x), var(--orbit-y)) translateY(-3px);
+}
+
+.constellation-star.in-system .portrait {
+  width: 52px;
+  height: 52px;
+}
+
+.constellation-star.in-system .star-name {
+  font-size: 15px;
+  margin-top: 14px;
+}
+
+/* Inside a system the per-star epithet would overlap its neighbour's;
+   the epithet remains in the hover tooltip (data-epithet) instead. */
+.constellation-star.in-system .star-epithet {
+  display: none;
+}
+
 /* ─────────────────────────────────────────────────────────────────
    Bestiary
    ───────────────────────────────────────────────────────────────── */

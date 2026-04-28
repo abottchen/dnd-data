@@ -134,12 +134,16 @@
         <span class="constellation-tick-x" style="left: 96%;">325</span>
         <svg class="constellation-lines" preserveAspectRatio="none" viewBox="0 0 1000 1000" aria-hidden="true">
           <path class="link" d="M 110 610 L 320 960"/>
-          <path class="link" d="M 320 960 L 680 60"/>
-          <path class="link" d="M 680 60 L 680 40"/>
-          <path class="link" d="M 680 40 L 960 500"/>
+          <path class="link" d="M 320 960 L 680.0 50.0"/>
+          <path class="link" d="M 680.0 50.0 L 960 500"/>
           <path class="link" d="M 960 500 L 110 610"/>
         </svg>
-        <div class="constellation-star" style="top: 96%; left: 32%;"
+        <svg class="constellation-orbit" style="top: 5.0%; left: 68.0%;"
+             viewBox="-100 -100 200 200" aria-hidden="true">
+          <ellipse cx="0" cy="0" rx="86" ry="32" class="orbit-ring"/>
+        </svg>
+        <div class="constellation-star"
+             style="top: 96%; left: 32%;"
              data-name="Anton Truebranch"
              data-epithet="his rolls yet unwritten"
              data-xp="100"
@@ -154,7 +158,8 @@
           <div class="star-name">Anton</div>
           <div class="star-epithet">his rolls yet unwritten</div>
         </div>
-        <div class="constellation-star" style="top: 6%; left: 68%;"
+        <div class="constellation-star in-system"
+             style="top: 5.0%; left: 68.0%; --orbit-x: -36.0px; --orbit-y: 0.0px;"
              data-name="Grieg"
              data-epithet="the ready hand"
              data-xp="225"
@@ -169,7 +174,8 @@
           <div class="star-name">Grieg</div>
           <div class="star-epithet">the ready hand</div>
         </div>
-        <div class="constellation-star" style="top: 4%; left: 68%;"
+        <div class="constellation-star in-system"
+             style="top: 5.0%; left: 68.0%; --orbit-x: 36.0px; --orbit-y: 0.0px;"
              data-name="Vex"
              data-epithet="blade in every fight"
              data-xp="225"
@@ -184,7 +190,8 @@
           <div class="star-name">Vex</div>
           <div class="star-epithet">blade in every fight</div>
         </div>
-        <div class="constellation-star" style="top: 50%; left: 96%;"
+        <div class="constellation-star"
+             style="top: 50%; left: 96%;"
              data-name="Urida"
              data-epithet="the heaviest lift"
              data-xp="325"
@@ -199,7 +206,8 @@
           <div class="star-name">Urida</div>
           <div class="star-epithet">the heaviest lift</div>
         </div>
-        <div class="constellation-star" style="top: 61%; left: 11%;"
+        <div class="constellation-star"
+             style="top: 61%; left: 11%;"
              data-name="Chumble Crudluck"
              data-epithet="many rolls, one kill"
              data-xp="25"
@@ -1712,6 +1720,10 @@
           <li class="npc">
             <span class="npc-name">Lilac Mist</span>
             <span class="npc-epithet">tabaxi dinosaur racer of Port Nyanzaru, whose wayward triceratops first brought her to the company's attention, and who finished the track ahead of them all</span>
+          </li>
+          <li class="npc">
+            <span class="npc-name">Wakanga</span>
+            <span class="npc-epithet">one of seven merchant princes of Port Nyanzaru, commended by Corwin above the rest and sought out on Volo's word</span>
           </li>
         </ul>
       </div>
