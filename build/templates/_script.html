@@ -313,3 +313,152 @@
         });
       });
     })();
+
+    // --- Pack: Rack item tooltips ---
+    (function () {
+      let tip = document.querySelector('.dice-tooltip');
+      if (!tip) {
+        tip = document.createElement('div');
+        tip.className = 'dice-tooltip';
+        document.body.appendChild(tip);
+      }
+      document.querySelectorAll('.rack-item').forEach(el => {
+        el.addEventListener('mouseenter', () => {
+          const name = el.getAttribute('data-name') || '';
+          const count = el.getAttribute('data-count') || '';
+          const weight = el.getAttribute('data-weight') || '';
+          const desc = el.getAttribute('data-description') || '';
+          let html = '<div class="tip-val tip-val-text">' + name + '</div>';
+          html += '<div class="tip-ctx">' + (count !== '1' ? '&times;' + count + ' &middot; ' : '') +
+                  weight + ' lb</div>';
+          if (desc) html += '<div class="tip-ctx">' + desc + '</div>';
+          tip.innerHTML = html;
+          const r = el.getBoundingClientRect();
+          tip.style.left = (r.left + r.width / 2) + 'px';
+          tip.style.top = r.top + 'px';
+          tip.classList.add('visible');
+        });
+        el.addEventListener('mouseleave', () => { tip.classList.remove('visible'); });
+      });
+    })();
+
+    // --- Pack: Spotlight card tooltips ---
+    (function () {
+      let tip = document.querySelector('.dice-tooltip');
+      if (!tip) {
+        tip = document.createElement('div');
+        tip.className = 'dice-tooltip';
+        document.body.appendChild(tip);
+      }
+      document.querySelectorAll('.spotlight-card').forEach(el => {
+        el.addEventListener('mouseenter', () => {
+          const name = el.getAttribute('data-name') || '';
+          const rarity = el.getAttribute('data-rarity') || '';
+          const desc = el.getAttribute('data-description') || '';
+          let html = '<div class="tip-val tip-val-text">' + name + '</div>';
+          if (rarity) html += '<div class="tip-ctx">' + rarity + '</div>';
+          if (desc) html += '<div class="tip-ctx">' + desc + '</div>';
+          tip.innerHTML = html;
+          const r = el.getBoundingClientRect();
+          tip.style.left = (r.left + r.width / 2) + 'px';
+          tip.style.top = r.top + 'px';
+          tip.classList.add('visible');
+        });
+        el.addEventListener('mouseleave', () => { tip.classList.remove('visible'); });
+      });
+    })();
+
+    // --- Pack: Manifest chip tooltips ---
+    (function () {
+      let tip = document.querySelector('.dice-tooltip');
+      if (!tip) {
+        tip = document.createElement('div');
+        tip.className = 'dice-tooltip';
+        document.body.appendChild(tip);
+      }
+      document.querySelectorAll('.manifest-chip').forEach(el => {
+        el.addEventListener('mouseenter', () => {
+          const name = el.getAttribute('data-name') || '';
+          const count = el.getAttribute('data-count') || '';
+          const weight = el.getAttribute('data-weight') || '';
+          const cat = el.getAttribute('data-category') || '';
+          const desc = el.getAttribute('data-description') || '';
+          const total = (parseFloat(weight) * parseInt(count, 10)) || 0;
+          let html = '<div class="tip-val tip-val-text">' + name + '</div>';
+          html += '<div class="tip-ctx">' + (count !== '1' ? '&times;' + count + ' &middot; ' : '') +
+                  weight + ' lb each &middot; ' + total + ' lb total</div>';
+          if (cat) html += '<div class="tip-ctx">' + cat + '</div>';
+          if (desc) html += '<div class="tip-ctx">' + desc + '</div>';
+          tip.innerHTML = html;
+          const r = el.getBoundingClientRect();
+          tip.style.left = (r.left + r.width / 2) + 'px';
+          tip.style.top = r.top + 'px';
+          tip.classList.add('visible');
+        });
+        el.addEventListener('mouseleave', () => { tip.classList.remove('visible'); });
+      });
+    })();
+
+    // --- Company strip bar tooltips ---
+    (function () {
+      let tip = document.querySelector('.dice-tooltip');
+      if (!tip) {
+        tip = document.createElement('div');
+        tip.className = 'dice-tooltip';
+        document.body.appendChild(tip);
+      }
+      document.querySelectorAll('.company-strip-bar').forEach(el => {
+        el.addEventListener('mouseenter', () => {
+          const name = el.getAttribute('data-shortname') || '';
+          const w = parseFloat(el.getAttribute('data-weight') || '0');
+          const cap = parseFloat(el.getAttribute('data-capacity') || '0');
+          const rack = el.getAttribute('data-rack') || '0';
+          const spot = el.getAttribute('data-spotlight') || '0';
+          const man = el.getAttribute('data-manifest') || '0';
+          const pct = cap > 0 ? Math.round(w / cap * 100) : 0;
+          let html = '<div class="tip-val tip-val-text">' + name + '</div>';
+          if (cap > 0) {
+            html += '<div class="tip-ctx">Rack ' + rack + ' &middot; Spotlight ' + spot +
+                    ' &middot; Manifest ' + man + ' = ' + w + ' lb</div>';
+            html += '<div class="tip-ctx">' + pct + '% of capacity</div>';
+          } else {
+            html += '<div class="tip-ctx">Awaiting manifest</div>';
+          }
+          tip.innerHTML = html;
+          const r = el.getBoundingClientRect();
+          tip.style.left = (r.left + r.width / 2) + 'px';
+          tip.style.top = r.top + 'px';
+          tip.classList.add('visible');
+        });
+        el.addEventListener('mouseleave', () => { tip.classList.remove('visible'); });
+        el.addEventListener('click', () => {
+          const slug = el.getAttribute('data-slug');
+          if (slug) {
+            const target = document.getElementById(slug + '-pack');
+            if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        });
+      });
+    })();
+
+    // --- Archetype badge tooltips ---
+    (function () {
+      let tip = document.querySelector('.dice-tooltip');
+      if (!tip) {
+        tip = document.createElement('div');
+        tip.className = 'dice-tooltip';
+        document.body.appendChild(tip);
+      }
+      document.querySelectorAll('.archetype').forEach(el => {
+        el.addEventListener('mouseenter', () => {
+          const text = el.getAttribute('data-inscription') || '';
+          if (!text) return;
+          tip.innerHTML = '<div class="tip-ctx">' + text + '</div>';
+          const r = el.getBoundingClientRect();
+          tip.style.left = (r.left + r.width / 2) + 'px';
+          tip.style.top = r.top + 'px';
+          tip.classList.add('visible');
+        });
+        el.addEventListener('mouseleave', () => { tip.classList.remove('visible'); });
+      });
+    })();
