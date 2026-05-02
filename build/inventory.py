@@ -132,3 +132,65 @@ def _zone_breakdown(rack: list, spotlight: list, manifest: list) -> dict[str, fl
         "spotlight": _total_weight(spotlight),
         "manifest": _total_weight(manifest),
     }
+
+
+# --- Archetype scoring ------------------------------------------------------
+# Each scorer takes (items, member) and returns a numeric score. Higher is
+# stronger except for Featherfoot, which is scored separately because it
+# needs the carrying capacity from `member`.
+
+def _name_lower(it: dict) -> str:
+    return (it.get("name") or "").lower()
+
+
+def _matches_any(it: dict, keywords: tuple[str, ...]) -> bool:
+    name = _name_lower(it)
+    return any(kw in name for kw in keywords)
+
+
+def _sum_count_where(items: list[dict], predicate) -> int:
+    return sum((it.get("count") or 1) for it in items if predicate(it))
+
+
+def score_pack_mule(items: list[dict], member: dict) -> float:
+    return _total_weight(items)
+
+
+def score_armorer(items: list[dict], member: dict) -> float:
+    return sum(
+        (it.get("weight") or 0) * (it.get("count") or 1)
+        for it in items
+        if it.get("category") in ("Weapon", "Armor")
+    )
+
+
+def score_glaive_hand(items: list[dict], member: dict) -> int:
+    return len({it["id"] for it in items if it.get("category") == "Weapon"})
+
+
+def score_quiver(items: list[dict], member: dict) -> int:
+    return _sum_count_where(items, lambda it: it.get("category") == "Ammunition")
+
+
+def score_curio_keeper(items: list[dict], member: dict) -> int:
+    def is_curio(it: dict) -> bool:
+        rarity = (it.get("rarity") or "common").lower()
+        return rarity != "common" or it.get("category") == "Wondrous Item"
+    return _sum_count_where(items, is_curio)
+
+
+_SCHOLAR_KW = ("book", "parchment", "ink", "scroll", "spellbook")
+_NATURALIST_KW = ("druidic", "mistletoe", "yew", "totem", "natural")
+_TONGUES_KW = ("sending stone", "message", "speaking", "whisper")
+
+
+def score_scholar(items: list[dict], member: dict) -> int:
+    return _sum_count_where(items, lambda it: _matches_any(it, _SCHOLAR_KW))
+
+
+def score_naturalist(items: list[dict], member: dict) -> int:
+    return _sum_count_where(items, lambda it: _matches_any(it, _NATURALIST_KW))
+
+
+def score_tongues(items: list[dict], member: dict) -> int:
+    return _sum_count_where(items, lambda it: _matches_any(it, _TONGUES_KW))

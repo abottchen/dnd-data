@@ -157,3 +157,76 @@ def test_zone_breakdown_matches_total():
 
     assert breakdown == {"rack": 8, "spotlight": 0, "manifest": 11}
     assert sum(breakdown.values()) == 19
+
+
+def test_pack_mule_score_is_total_weight():
+    items = [{"weight": 4, "count": 2}, {"weight": 1, "count": 3}]
+    assert inventory.score_pack_mule(items, member={}) == 11.0
+
+
+def test_armorer_sums_weapons_and_armor_only():
+    items = [
+        {"category": "Weapon", "weight": 5, "count": 1},
+        {"category": "Armor", "weight": 45, "count": 1},
+        {"category": "Adventuring Gear - Camping & Travel", "weight": 10, "count": 1},
+        {"category": "Ammunition", "weight": 1, "count": 20},  # not in armorer
+    ]
+    assert inventory.score_armorer(items, member={}) == 50.0
+
+
+def test_glaive_hand_counts_distinct_weapon_ids():
+    items = [
+        {"category": "Weapon", "id": "a", "count": 1},
+        {"category": "Weapon", "id": "b", "count": 1},
+        {"category": "Weapon", "id": "a", "count": 1},  # same id; not distinct
+        {"category": "Armor", "id": "c", "count": 1},
+    ]
+    assert inventory.score_glaive_hand(items, member={}) == 2
+
+
+def test_quiver_sums_ammunition_counts():
+    items = [
+        {"category": "Ammunition", "count": 20},
+        {"category": "Ammunition", "count": 12},
+        {"category": "Weapon", "count": 1},
+    ]
+    assert inventory.score_quiver(items, member={}) == 32
+
+
+def test_curio_keeper_counts_non_common_or_wondrous():
+    items = [
+        {"rarity": "rare", "category": "Weapon"},
+        {"rarity": "common", "category": "Wondrous Item"},
+        {"rarity": "common", "category": "Weapon"},
+        {"rarity": "uncommon", "category": "Adventuring Gear - Utility & Equipment"},
+    ]
+    assert inventory.score_curio_keeper(items, member={}) == 3
+
+
+def test_scholar_substring_match_on_lore_keywords():
+    items = [
+        {"name": "Spellbook", "count": 1},
+        {"name": "Parchment (x10)", "count": 10},
+        {"name": "Ink Pen", "count": 1},
+        {"name": "Sword", "count": 1},  # no match
+    ]
+    # spellbook + parchment + ink → 3 matches; counts summed
+    assert inventory.score_scholar(items, member={}) == 12
+
+
+def test_naturalist_substring_match():
+    items = [
+        {"name": "Sprig of Mistletoe (Druidic Focus)", "count": 1},
+        {"name": "Yew Wand", "count": 1},
+        {"name": "Sword", "count": 1},
+    ]
+    assert inventory.score_naturalist(items, member={}) == 2
+
+
+def test_tongues_substring_match():
+    items = [
+        {"name": "Sending Stone (Azlund)", "count": 1},
+        {"name": "Whisper Charm", "count": 1},
+        {"name": "Sword", "count": 1},
+    ]
+    assert inventory.score_tongues(items, member={}) == 2
