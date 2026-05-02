@@ -20,10 +20,10 @@ import shutil
 import sys
 from pathlib import Path
 
-from . import apply, render, slices, store
+from . import apply, inventory, render, slices, store
 from .build_loop import run_render
 from .invoke import TransformerError, call_transformer
-from .paths import data_dir, temp_dir
+from .paths import REPO_ROOT, data_dir, temp_dir
 
 DEFAULT_CONCURRENCY = 5
 
@@ -46,6 +46,9 @@ REFRESH_PASS = [
     ("refresh-characters", slices.refresh_characters, apply.apply_refresh_characters),
     ("refresh-road-ahead", slices.refresh_road_ahead, apply.apply_refresh_road_ahead),
     ("refresh-intro-epithet", slices.refresh_intro_epithet, apply.apply_refresh_intro_epithet),
+    ("refresh-archetype-inscription",
+     slices.refresh_archetype_inscription,
+     apply.apply_refresh_archetype_inscription),
 ]
 
 
@@ -193,6 +196,11 @@ def main(argv=None) -> int:
     authored = store.load_authored()
     latest = len(data["session_log"]["entries"])
     marker = authored["site"].get("refreshed_through_session", 0)
+
+    # Inventory math is consumed by the refresh-archetype-inscription slice
+    # builder. Stash under a key store.persist does not serialize.
+    inv_bundle = inventory.load(REPO_ROOT, party=data["party"])
+    authored["inventory_by_id"] = inv_bundle["by_id"]
 
     run_dir = temp_dir()
     _log(f"build run temp dir: {run_dir}")
