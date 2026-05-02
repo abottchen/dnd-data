@@ -30,3 +30,14 @@ def load(repo_root: Path) -> dict:
     this as "every character awaiting manifest" rather than failing.
     """
     return {"by_id": {}, "company_strip": []}
+
+
+SNAPSHOT_GLOB = "obr-inv-backup-*.json"
+
+
+def _resolve_snapshot_path(data_dir: Path) -> Optional[Path]:
+    """Pick the lexicographically maximal matching file. The upstream
+    timestamp format (ISO with T-separator and Z suffix) sorts as text
+    in the same order as time, so a string max equals the time max."""
+    matches = sorted(data_dir.glob(SNAPSHOT_GLOB))
+    return matches[-1] if matches else None
