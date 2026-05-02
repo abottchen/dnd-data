@@ -404,3 +404,55 @@ def test_assign_archetypes_unawarded_when_top_score_zero():
     )
 
     assert inventory._assign_archetypes(chars, slate) == {}
+
+
+def test_build_bundle_classifies_totals_and_assigns():
+    parsed = {
+        "grieg": {"items": [
+            {"id": "wh", "name": "Warhammer", "category": "Weapon",
+             "weight": 5, "count": 1, "rarity": "common", "icon": "", "description": ""},
+            {"id": "rations", "name": "Rations (x9)",
+             "category": "Adventuring Gear - Camping & Travel",
+             "weight": 2, "count": 9, "rarity": "common", "icon": "", "description": ""},
+        ]},
+    }
+    party = {"members": [{"id": "grieg", "name": "Grieg",
+                          "abilities": {"str": 17}}]}
+
+    bundle = inventory._build_bundle(parsed, party)
+
+    g = bundle["by_id"]["grieg"]
+    assert {it["name"] for it in g["rack"]} == {"Warhammer"}
+    assert {it["name"] for it in g["manifest"]} == {"Rations (x9)"}
+    assert g["total_weight"] == 23  # 5 + 2*9
+    assert g["capacity"] == 255
+    # Cellarer keyword "ration" matches Rations.
+    assert g["archetype"] == "cellarer"
+
+
+def test_company_strip_includes_placeholders_for_missing_inventories():
+    parsed = {"grieg": {"items": []}}
+    party = {"members": [
+        {"id": "grieg", "name": "Grieg", "abilities": {"str": 17}},
+        {"id": "lilac", "name": "Lilac Mist", "abilities": {"str": 8}},
+    ]}
+
+    bundle = inventory._build_bundle(parsed, party)
+    strip = bundle["company_strip"]
+
+    assert [s["slug"] for s in strip] == ["grieg", "lilac"]
+    assert strip[0]["status"] == "ok"
+    assert strip[1]["status"] == "awaiting_manifest"
+    assert strip[1]["shortname"] == "Lilac"
+
+
+def test_company_strip_excludes_gm_member():
+    parsed = {}
+    party = {"members": [
+        {"id": "grieg", "name": "Grieg", "abilities": {"str": 17}},
+        {"id": "gm", "name": "GM", "abilities": {"str": 10}},
+    ]}
+
+    strip = inventory._build_bundle(parsed, party)["company_strip"]
+
+    assert [s["slug"] for s in strip] == ["grieg"]

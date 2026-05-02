@@ -337,3 +337,80 @@ def _assign_archetypes(
             changed = True
 
     return assigned
+
+
+def _shortname(name: str) -> str:
+    """First whitespace-split token. 'Lilac Mist' -> 'Lilac'."""
+    return (name or "").split()[0] if name else ""
+
+
+def _build_bundle(parsed: dict[str, dict], party: dict) -> dict:
+    """Combine parsed inventories with party members.
+
+    Returns:
+      {
+        "by_id": {<slug>: {rack, spotlight, manifest, total_weight,
+                          capacity, breakdown, archetype, item_count}, ...},
+        "company_strip": [{slug, shortname, status,
+                           total_weight, capacity, breakdown}, ...],
+      }
+
+    Status is "ok" when the character has parsed inventory data, or
+    "awaiting_manifest" when they don't (Anton/Lilac before their data
+    arrives).
+    """
+    members_by_id = {m["id"]: m for m in party.get("members", [])
+                     if m.get("id") != "gm"}
+
+    by_id: dict[str, dict] = {}
+    chars_for_assignment: dict[str, dict] = {}
+    for slug, inv in parsed.items():
+        member = members_by_id.get(slug)
+        if member is None:
+            continue
+        items = inv["items"]
+        rack, spotlight, manifest = _classify(items)
+        capacity = _carrying_capacity(member)
+        total_weight = _total_weight(items)
+        by_id[slug] = {
+            "rack": rack,
+            "spotlight": spotlight,
+            "manifest": manifest,
+            "total_weight": total_weight,
+            "capacity": capacity,
+            "breakdown": _zone_breakdown(rack, spotlight, manifest),
+            "item_count": sum((it.get("count") or 1) for it in items),
+            "archetype": None,
+        }
+        chars_for_assignment[slug] = {"items": items, "member": member}
+
+    assignments = _assign_archetypes(chars_for_assignment, ARCHETYPE_SLATE)
+    for slug, arc_slug in assignments.items():
+        by_id[slug]["archetype"] = arc_slug
+
+    strip: list[dict] = []
+    for member in party.get("members", []):
+        slug = member.get("id")
+        if slug == "gm":
+            continue
+        rec = by_id.get(slug)
+        if rec is None:
+            strip.append({
+                "slug": slug,
+                "shortname": _shortname(member.get("name", "")),
+                "status": "awaiting_manifest",
+                "total_weight": 0,
+                "capacity": _carrying_capacity(member),
+                "breakdown": {"rack": 0, "spotlight": 0, "manifest": 0},
+            })
+        else:
+            strip.append({
+                "slug": slug,
+                "shortname": _shortname(member.get("name", "")),
+                "status": "ok",
+                "total_weight": rec["total_weight"],
+                "capacity": rec["capacity"],
+                "breakdown": rec["breakdown"],
+            })
+
+    return {"by_id": by_id, "company_strip": strip}
