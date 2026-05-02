@@ -499,3 +499,23 @@ def test_load_full_pipeline_with_fixture(tmp_path, monkeypatch):
     assert bundle["by_id"]["grieg"]["total_weight"] == 5
     assert "Weil" not in json.dumps(bundle)  # surname scrubbed
     assert [s["slug"] for s in bundle["company_strip"]] == ["grieg", "vex"]
+
+
+def test_math_inscription_for_pack_mule():
+    rec = {"archetype": "pack-mule", "total_weight": 175.5, "item_count": 31}
+    line = inventory.math_inscription(rec, ranks={"pack-mule": 1})
+    assert "175.5 lb" in line
+    assert "31 items" in line
+    assert "most in the party" in line
+
+
+def test_math_inscription_returns_empty_for_no_archetype():
+    rec = {"archetype": None, "total_weight": 0, "item_count": 0}
+    assert inventory.math_inscription(rec, ranks={}) == ""
+
+
+def test_math_inscription_for_featherfoot():
+    rec = {"archetype": "featherfoot", "total_weight": 10,
+           "capacity": 90, "item_count": 3}
+    line = inventory.math_inscription(rec, ranks={"featherfoot": 1})
+    assert "11%" in line  # 10/90

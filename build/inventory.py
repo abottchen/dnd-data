@@ -425,3 +425,25 @@ def _build_bundle(parsed: dict[str, dict], party: dict) -> dict:
             })
 
     return {"by_id": by_id, "company_strip": strip}
+
+
+def math_inscription(rec: dict, ranks: dict[str, int]) -> str:
+    """Generate a deterministic stats-line tooltip for a character record.
+
+    `rec` is a single entry from inventory_by_id (with `archetype`,
+    `total_weight`, `item_count`, etc.). `ranks` maps archetype slug to
+    the holder's rank (1 = winner). When the holder is rank 1, append
+    "most in the party" to anchor the framing.
+    """
+    arc = rec.get("archetype")
+    if not arc:
+        return ""
+    weight = rec.get("total_weight", 0)
+    n = rec.get("item_count", 0)
+    is_winner = ranks.get(arc) == 1
+    suffix = " — most in the party" if is_winner else ""
+    if arc == "featherfoot":
+        cap = rec.get("capacity", 0) or 1
+        pct = round(weight / cap * 100)
+        return f"Carries {weight:g} lb of {cap} ({pct}% of capacity){suffix}."
+    return f"Carries {weight:g} lb across {n} items{suffix}."
