@@ -324,3 +324,83 @@ def test_each_archetype_has_label_and_scorer():
         assert a["label"].startswith("THE ")
         assert callable(a["score"])
         assert isinstance(a.get("min_lead", 0), (int, float))
+
+
+def test_assign_archetypes_picks_top_scorer_per_metric():
+    # Two characters, two metrics. Each character should get the metric
+    # they decisively dominate.
+    chars = {
+        "alice": {"items": [{"id": "rope", "name": "Rope", "count": 1}],
+                  "member": {"abilities": {"str": 10}}},
+        "bob": {"items": [{"id": "book", "name": "Book", "count": 5}],
+                "member": {"abilities": {"str": 10}}},
+    }
+    slate = (
+        {"slug": "scholar", "label": "THE SCHOLAR",
+         "score": inventory.score_scholar, "min_lead": 0},
+        {"slug": "pathfinder", "label": "THE PATHFINDER",
+         "score": inventory.score_pathfinder, "min_lead": 0},
+    )
+
+    assignments = inventory._assign_archetypes(chars, slate)
+
+    assert assignments == {"alice": "pathfinder", "bob": "scholar"}
+
+
+def test_assign_archetypes_largest_lead_wins_when_one_char_tops_two():
+    # Alice tops both archetypes. Her larger lead is on Pack-Mule (lead=10
+    # vs Quartermaster lead=1), so Alice keeps Pack-Mule and Quartermaster
+    # falls through to Bob.
+    chars = {
+        "alice": {"items": [{"id": "x", "weight": 100, "count": 1}],
+                  "member": {"abilities": {"str": 10}}},
+        "bob": {"items": [{"id": "x", "weight": 90, "count": 1},
+                          {"id": "y", "weight": 0, "count": 1}],
+                "member": {"abilities": {"str": 10}}},
+    }
+    slate = (
+        {"slug": "pack-mule", "label": "THE PACK-MULE",
+         "score": inventory.score_pack_mule, "min_lead": 0},
+        {"slug": "quartermaster", "label": "THE QUARTERMASTER",
+         "score": inventory.score_quartermaster, "min_lead": 0},
+    )
+
+    assignments = inventory._assign_archetypes(chars, slate)
+
+    assert assignments == {"alice": "pack-mule", "bob": "quartermaster"}
+
+
+def test_assign_archetypes_unawarded_when_min_lead_unmet():
+    # Both characters tie on Featherfoot (lead = 0). min_lead = 5 means it
+    # goes unawarded.
+    chars = {
+        "alice": {"items": [{"weight": 0, "count": 1}],
+                  "member": {"abilities": {"str": 10}}},
+        "bob": {"items": [{"weight": 0, "count": 1}],
+                "member": {"abilities": {"str": 10}}},
+    }
+    slate = (
+        {"slug": "featherfoot", "label": "THE FEATHERFOOT",
+         "score": inventory.score_featherfoot, "min_lead": 5},
+    )
+
+    assignments = inventory._assign_archetypes(chars, slate)
+
+    assert assignments == {}
+
+
+def test_assign_archetypes_unawarded_when_top_score_zero():
+    # Nobody has any books → score_scholar returns 0 for both.
+    # No award.
+    chars = {
+        "alice": {"items": [{"name": "Sword"}],
+                  "member": {"abilities": {"str": 10}}},
+        "bob": {"items": [{"name": "Hat"}],
+                "member": {"abilities": {"str": 10}}},
+    }
+    slate = (
+        {"slug": "scholar", "label": "THE SCHOLAR",
+         "score": inventory.score_scholar, "min_lead": 0},
+    )
+
+    assert inventory._assign_archetypes(chars, slate) == {}

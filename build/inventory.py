@@ -267,3 +267,73 @@ ARCHETYPE_SLATE: tuple[dict, ...] = (
     # difference in inverted utilization).
     {"slug": "featherfoot",     "label": "THE FEATHERFOOT",     "score": score_featherfoot,     "min_lead": 5},
 )
+
+
+def _assign_archetypes(
+    chars: dict[str, dict],
+    slate: tuple[dict, ...] = ARCHETYPE_SLATE,
+) -> dict[str, str]:
+    """Assign each character at most one archetype slug.
+
+    Algorithm:
+      1. Score every (character, archetype) pair.
+      2. For each archetype, find the leader and the lead size (leader
+         minus runner-up; or leader minus 0 when the field is one wide).
+         Discard archetypes where lead < min_lead OR leader's score == 0.
+      3. Iterate: each unassigned character collects every archetype
+         they currently lead. They keep the one with the largest lead
+         (slate-order tiebreak). Surrendered archetypes recompute their
+         leader against remaining (unassigned + still-eligible) chars and
+         re-enter the pool.
+      4. Repeat step 3 until stable.
+
+    Returns: {char_slug: archetype_slug}. Characters without any winning
+    archetype are simply absent from the dict.
+    """
+    candidate_pool: dict[str, list[tuple[str, float]]] = {}
+    slate_by_slug = {a["slug"]: a for a in slate}
+    slate_order = [a["slug"] for a in slate]
+
+    for arc in slate:
+        scored = sorted(
+            ((cs, arc["score"](cd["items"], cd["member"])) for cs, cd in chars.items()),
+            key=lambda p: -p[1],
+        )
+        candidate_pool[arc["slug"]] = scored
+
+    def lead(scored: list[tuple[str, float]]) -> float:
+        if not scored:
+            return 0.0
+        if len(scored) == 1:
+            return scored[0][1]
+        return scored[0][1] - scored[1][1]
+
+    assigned: dict[str, str] = {}
+    claimed_archetypes: set[str] = set()
+    changed = True
+    while changed:
+        changed = False
+        wins_by_char: dict[str, list[tuple[str, float]]] = {}
+        for arc_slug, scored in candidate_pool.items():
+            if arc_slug in claimed_archetypes:
+                continue
+            scored_live = [(cs, sc) for cs, sc in scored if cs not in assigned]
+            if not scored_live:
+                continue
+            min_lead = slate_by_slug[arc_slug]["min_lead"]
+            ld = lead(scored_live)
+            top_char, top_score = scored_live[0]
+            if top_score <= 0 or ld < min_lead:
+                continue
+            wins_by_char.setdefault(top_char, []).append((arc_slug, ld))
+
+        for cs, wins in wins_by_char.items():
+            if not wins:
+                continue
+            wins.sort(key=lambda p: (-p[1], slate_order.index(p[0])))
+            keeper = wins[0][0]
+            assigned[cs] = keeper
+            claimed_archetypes.add(keeper)
+            changed = True
+
+    return assigned
