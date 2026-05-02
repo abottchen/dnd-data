@@ -8,9 +8,20 @@
 Surface the upstream inventory snapshot (`data/obr-inv-backup-*.json`) on the
 site as a per-character **Pack** section, a top-of-page **Company strip** of
 weight gauges, and an **archetype badge** in each character header. The
-feature is render-only: no `claude -p` calls, no authored prose, no entries in
-`build/authored/`. It mirrors the dice-data integration in shape — read latest
-glob, resolve names through `build/dice-players.json`, render deterministically.
+read-and-render path mirrors the dice-data integration in shape — read latest
+glob, resolve names through `build/dice-players.json`, render
+deterministically.
+
+The bulk of the work is render-only deterministic Python; the one place a
+model contributes is the **archetype badge tooltip prose**. The archetype
+*assignment* is computed by math (counts, weights, keyword matches against
+upstream item names) — testable, reproducible, no model in the loop. The
+*inscription* shown on hover is one short in-voice line per character,
+written by a single new refresh-pass transformer
+(`refresh-archetype-inscription`) and stored in
+`build/authored/characters.json[<id>].archetype_badge`. If the inscription
+is missing or stale, the renderer falls back to a math-derived stats line —
+the badge is never render-blocking on prose.
 
 The campaign uses 2024 (5.5e) rules, and the 2024 optional encumbrance rule is
 **not** in effect at this table. The weight gauge therefore shows pure
@@ -93,17 +104,20 @@ catches accidental leaks elsewhere.
 ## Pipeline placement
 
 The build orchestrator pipeline (discovery → append → refresh → render) is
-unchanged. The new feature lives entirely inside the **render step**:
+extended in two places:
 
-- `build/render.py` already loads `data/party.json`, `data/dicex-rolls-*.json`,
-  `build/authored/*.json` and the dice-player resolver.
-- A new module **`build/inventory.py`** loads and shapes the inventory snapshot
-  (see "Module: build/inventory.py" below).
-- `render.py` calls `inventory.load(repo_root)` once at render time and
-  passes the shaped result into the Jinja2 context as `inventory_by_id` and
-  `company_strip`.
-- No `claude -p` invocations. No new entries in `build/authored/`. No new
-  slice builders. No changes to `build/__main__.py`.
+- The **render step** does almost all of the inventory work. A new module
+  **`build/inventory.py`** loads the snapshot, shapes it, derives totals,
+  picks archetypes, and exposes the result to the Jinja2 context as
+  `inventory_by_id` and `company_strip`. `render.py` calls
+  `inventory.load(repo_root)` once at render time. The substring resolver,
+  data loaders, and validation gates are unchanged.
+- The **refresh pass** gains one new transformer,
+  **`refresh-archetype-inscription`** (see "Archetype inscription
+  (authored)" below), that produces a one-line in-voice tooltip blurb per
+  character to accompany the math-derived archetype pick. Authored prose
+  lives in `build/authored/characters.json`. No append-pass changes; no new
+  slice categories; no other changes to `build/__main__.py`.
 
 ## Module: `build/inventory.py`
 
@@ -359,8 +373,131 @@ remaining 12 archetypes wait in the slate.
 
 - Default: flat chip, 1px border in a muted accent colour.
 - Hover: 0.18s, chip rotates `2deg` and lifts `translateY(-2px)` with a
-  brighter glow; tooltip explains the math, e.g.
-  *"Carries 175.5 lb across 31 items — most in the party."*
+  brighter glow; tooltip shows the authored inscription
+  (`archetype_badge.inscription`) when present and the stored archetype
+  matches the current math pick. Falls back to a deterministic stats line
+  otherwise — e.g. *"Carries 175.5 lb across 31 items — most in the party."* —
+  so the badge always has a tooltip even on a fresh build before the
+  refresh transformer has run, or when the archetype pick has shifted
+  since the last refresh.
+
+## Archetype inscription (authored)
+
+The math picks the archetype; `claude -p` writes the in-voice line that
+appears on hover. Without this, the badge tooltip would clash with the
+voice of the rest of the page (epithets, kill prose, road-ahead) — which
+is uniformly authored. Splitting the work this way keeps assignment
+deterministic and verifiable while letting the prose carry the site's
+register.
+
+### Authored storage
+
+`build/authored/characters.json` already contains a per-character object
+keyed by character `id`, with at minimum an `epithet` field. This spec
+adds one new sibling field:
+
+```jsonc
+{
+  "grieg": {
+    "epithet": "...",
+    "archetype_badge": {
+      "archetype": "pack-mule",
+      "inscription": "Grieg drags more steel up the trail than the other three together — and only the wulven shoulders haven't started complaining."
+    }
+  },
+  ...
+}
+```
+
+- `archetype` is the slug of the archetype the inscription was written for
+  (e.g. `pack-mule`, `featherfoot`, `quartermaster`). Set by the apply step
+  from the slice — the model does not pick the archetype, only the prose.
+- `inscription` is one short line of in-voice prose, ~120–200 chars. The
+  schema enforces an upper bound so the tooltip never overflows.
+
+The whole `archetype_badge` object is optional: a character without one (or
+with `MISSING` / `MALFORMED` per the renderer's existing validation) simply
+gets the deterministic stats line on hover. The render step never fails on
+a missing or stale inscription — it logs at info level and falls through.
+
+### Transformer: `refresh-archetype-inscription`
+
+A new transformer pair under `.claude/prompts/`:
+
+- `.claude/prompts/refresh-archetype-inscription.md` — the system prompt,
+  with YAML frontmatter declaring the model preference (sonnet is sufficient
+  here; this is short prose, not heavy reasoning).
+- `.claude/prompts/refresh-archetype-inscription.schema.json` — the JSON
+  Schema for the response: `{ result: "no_change" | "rewrite", inscription?:
+  string }`, with `inscription` required when `result == "rewrite"` and a
+  `maxLength` of ~200.
+
+**Pass placement.** Refresh pass, gated by the existing
+`latest_session > site.refreshed_through_session` condition. Runs
+per-character — one slice and one `claude -p` call per character with
+inventory data. Returns `no_change` when the existing inscription still
+fits, or `rewrite` with new prose. Standard refresh-pass apply logic; no
+new orchestrator code beyond registering the transformer.
+
+**Why refresh and not append.** Inscriptions don't grow row-by-row;
+there's exactly one per character, and which archetype the character holds
+can shift as inventory changes. Refresh-with-no-change is the right shape:
+the model decides whether the existing prose still tells the right story.
+
+**Slice contents** (`build/slices.py` gains a builder for this category;
+the slice JSON delivered on stdin to `claude -p` includes):
+
+- The character's site-facing identity: `id`, `name`, `class`, `race`,
+  `background`, `epithet` (so the prose can match the character's voice).
+- The math-derived archetype assignment: archetype slug, archetype
+  display label, the metric used, the character's score, the runner-up's
+  score, the lead size.
+- The items that earned the archetype: a list filtered to the items the
+  metric scored on (e.g. for The Lamplighter, the slice contains only the
+  matched fire/light items with their counts and weights — not the whole
+  inventory).
+- The current `archetype_badge` object if any (so the model can decide
+  whether to keep or rewrite, and so it has prior phrasing to avoid
+  repeating verbatim).
+- The site's tone hints used by other transformers (the existing voice
+  rubric in the prompt body covers this — no per-call duplication).
+
+**Skipped characters.** A character with no inventory (Anton, Lilac
+today) is excluded from the slice set — no archetype to inscribe. A
+character with inventory but no archetype awarded this build (every
+metric they topped was claimed by someone with a larger lead, and they
+have no second-place metric available either) is also excluded; their
+badge simply doesn't render.
+
+### Apply step
+
+The orchestrator's apply step writes the model's `inscription` plus the
+slice's `archetype` slug into
+`build/authored/characters.json[<char_id>].archetype_badge`. If the model
+returns `result: "no_change"`, the existing object is left in place
+unchanged.
+
+The renderer's validation, on read:
+
+- If `archetype_badge` is absent → use the math fallback line, no warning.
+- If `archetype_badge.archetype` differs from the current math pick →
+  use the math fallback line; log info ("archetype shifted since last
+  refresh; falling back to stats line for `<char_id>`"). The next refresh
+  resolves it.
+- If `archetype_badge.inscription` is missing or the field is
+  `MISSING`/`MALFORMED` per the existing validation gate → use the math
+  fallback. (Unlike kill or session prose, archetype inscriptions are
+  *not* render-blocking — see "Risks" below for why.)
+
+### Why this isn't render-blocking
+
+Other authored fields (kill prose, session prose) are render-blocking:
+the build exits non-zero if any are MISSING or MALFORMED. That's correct
+because those rows are the primary content of their pages. The archetype
+inscription is a 120-character flourish on a hover tooltip; a missing one
+should not stop a build of the entire site. The deterministic stats line
+is a perfectly serviceable fallback. The renderer logs the gap so the
+user notices, and the next refresh fills it in.
 
 ## Templates touched
 
@@ -413,12 +550,29 @@ loader contract on fixture data placed under `tests/fixtures/inventory/`:
   no exception.
 - Spotlight cap of 3 — supplying 5 wondrous items keeps the top 3.
 - Archetype assignment determinism — fixed scores produce the expected
-  badge map.
+  badge map. Includes a fixture exercising the lead-based fall-through
+  (one character holds a primary win and a smaller-lead win that has to
+  pass to the runner-up).
 - The company strip preserves `data/party.json` member order including
   placeholder entries for characters without inventory.
 
-Tests use the existing `BUILD_DATA_DIR` env-var override (`build/paths.py`)
-to point at the fixture directory; no monkeypatching of internals.
+Add a new file **`tests/test_archetype_inscription.py`** for the
+authored-prose path:
+
+- Slice builder for `refresh-archetype-inscription` includes only the
+  matched items for the awarded archetype (e.g. The Lamplighter slice
+  contains lights, not the whole inventory).
+- Renderer uses `archetype_badge.inscription` when
+  `archetype_badge.archetype` matches the current math pick.
+- Renderer falls back to the deterministic stats line when
+  `archetype_badge` is absent.
+- Renderer falls back when `archetype_badge.archetype` no longer matches
+  the current math pick (stale inscription); the build does not fail.
+- A character with no inventory data does not appear in the slice set.
+
+Tests use the existing `BUILD_DATA_DIR` and `BUILD_AUTHORED_DIR` env-var
+overrides (`build/paths.py`) to point at fixture directories; no
+monkeypatching of internals.
 
 End-to-end verification still happens by running `python -m build` and
 visually checking the rendered page in the local preview server.
@@ -456,6 +610,21 @@ present in current inventory fixtures). The test is part of
   on Featherfoot guards against the most pathological tie. If specific
   archetypes feel wrong in practice, the slate is a single dictionary in
   `inventory.py` — easy to retune.
+- **Stale inscription after a mid-arc inventory shift.** The math pick can
+  change between sessions (e.g. someone picks up a sending stone and
+  becomes The Tongues), but the inscription only refreshes on the
+  session-boundary refresh gate. *Mitigation:* the renderer detects
+  staleness by comparing `archetype_badge.archetype` to the current pick;
+  when they diverge it falls back to the deterministic stats line, so a
+  user never sees prose written for the wrong archetype. The mismatch is
+  logged at info level and the next refresh resolves it.
+- **Off-tone inscription from the model.** A single `claude -p` call can
+  produce prose that doesn't fit the site's voice. *Mitigation:* same
+  safety net as other authored fields — the schema bounds length, a
+  manual rerun of the refresh transformer can replace any single line, and
+  the deterministic stats line is always available as a fallback (delete
+  the `archetype_badge.inscription` field to use the fallback for one
+  build while the transformer regenerates).
 
 ## Open follow-ups (not in this spec)
 
