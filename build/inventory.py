@@ -107,3 +107,28 @@ def _classify(items: list[dict]) -> tuple[list, list, list]:
     spillover = candidates_for_spotlight[SPOTLIGHT_CAP:]
 
     return rack, spotlight, rest + spillover
+
+
+def _total_weight(items: list[dict]) -> float:
+    """Sum of weight×count, treating null weight as 0."""
+    total = 0.0
+    for it in items:
+        w = it.get("weight")
+        if w is None:
+            w = 0
+        c = it.get("count") or 1
+        total += w * c
+    return total
+
+
+def _carrying_capacity(member: dict) -> int:
+    """5e 2024 carrying capacity (15 × STR), in pounds."""
+    return 15 * int(member.get("abilities", {}).get("str", 0))
+
+
+def _zone_breakdown(rack: list, spotlight: list, manifest: list) -> dict[str, float]:
+    return {
+        "rack": _total_weight(rack),
+        "spotlight": _total_weight(spotlight),
+        "manifest": _total_weight(manifest),
+    }

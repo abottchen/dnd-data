@@ -130,3 +130,30 @@ def test_classify_spotlight_ranks_higher_rarity_first():
 
     spotlight_names = [it["name"] for it in spotlight]
     assert spotlight_names == ["Marvel", "Greater Curio", "Lesser Curio"]
+
+
+def test_total_weight_sums_count_times_weight_with_null_as_zero():
+    items = [
+        {"weight": 4, "count": 1},
+        {"weight": 2, "count": 5},
+        {"weight": None, "count": 1},
+        {"weight": 0, "count": 3},
+    ]
+    assert inventory._total_weight(items) == 14
+
+
+def test_carrying_capacity_is_15_times_str():
+    member = {"abilities": {"str": 17}}
+    assert inventory._carrying_capacity(member) == 255
+
+
+def test_zone_breakdown_matches_total():
+    rack = [{"weight": 4, "count": 2}]            # 8
+    spotlight = [{"weight": None, "count": 1}]     # 0
+    manifest = [{"weight": 1, "count": 5},         # 5
+                {"weight": 2, "count": 3}]         # 6
+
+    breakdown = inventory._zone_breakdown(rack, spotlight, manifest)
+
+    assert breakdown == {"rack": 8, "spotlight": 0, "manifest": 11}
+    assert sum(breakdown.values()) == 19
