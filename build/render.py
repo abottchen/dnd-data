@@ -1177,7 +1177,7 @@ def compute_all(data: dict, authored: dict) -> dict:
     char_auth_by_id = {a["id"]: a for a in authored["characters"]}
 
     from build import inventory  # local import to avoid render <-> inventory circular import
-    inventory_bundle = inventory.load(REPO_ROOT)
+    inventory_bundle = inventory.load(REPO_ROOT, party=party)
 
     archetype_ranks: dict[str, int] = {}
     for slug, rec in inventory_bundle["by_id"].items():
