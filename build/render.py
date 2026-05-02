@@ -1179,6 +1179,17 @@ def compute_all(data: dict, authored: dict) -> dict:
     from build import inventory  # local import to avoid render <-> inventory circular import
     inventory_bundle = inventory.load(REPO_ROOT)
 
+    archetype_ranks: dict[str, int] = {}
+    for slug, rec in inventory_bundle["by_id"].items():
+        arc = rec.get("archetype")
+        if arc:
+            archetype_ranks[arc] = 1  # at most one holder per archetype
+
+    inscriptions: dict[str, str] = {}
+    for slug, rec in inventory_bundle["by_id"].items():
+        authored_badge = char_auth_by_id.get(slug, {}).get("archetype_badge")
+        inscriptions[slug] = inventory.resolve_inscription(rec, authored_badge, archetype_ranks)
+
     site = dict(authored["site"])
     site["intro_meta"] = compute_intro_meta(session_log)
     site["header_eyebrow"] = _compute_header_eyebrow(chronicle, ledger)
@@ -1209,6 +1220,7 @@ def compute_all(data: dict, authored: dict) -> dict:
         "npcs_by_allegiance": _split_npcs(authored["npcs"]),
         "inventory_by_id": inventory_bundle["by_id"],
         "company_strip": inventory_bundle["company_strip"],
+        "archetype_inscriptions": inscriptions,
     }
 
 

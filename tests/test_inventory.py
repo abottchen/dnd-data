@@ -519,3 +519,31 @@ def test_math_inscription_for_featherfoot():
            "capacity": 90, "item_count": 3}
     line = inventory.math_inscription(rec, ranks={"featherfoot": 1})
     assert "11%" in line  # 10/90
+
+
+def test_resolve_inscription_uses_authored_when_archetype_matches():
+    rec = {"archetype": "pack-mule", "total_weight": 100, "item_count": 10}
+    authored = {"archetype": "pack-mule",
+                "inscription": "Hauls a smithy on her shoulders."}
+    assert (inventory.resolve_inscription(rec, authored, ranks={"pack-mule": 1})
+            == "Hauls a smithy on her shoulders.")
+
+
+def test_resolve_inscription_falls_back_when_archetype_stale():
+    rec = {"archetype": "scholar", "total_weight": 5, "item_count": 8}
+    authored = {"archetype": "pack-mule",  # stale!
+                "inscription": "old prose for the wrong archetype"}
+    out = inventory.resolve_inscription(rec, authored, ranks={"scholar": 1})
+    assert "Hauls" not in out
+    assert "5 lb" in out
+
+
+def test_resolve_inscription_falls_back_when_authored_missing():
+    rec = {"archetype": "scholar", "total_weight": 5, "item_count": 8}
+    out = inventory.resolve_inscription(rec, None, ranks={"scholar": 1})
+    assert "5 lb" in out
+
+
+def test_resolve_inscription_empty_when_no_archetype():
+    rec = {"archetype": None, "total_weight": 0, "item_count": 0}
+    assert inventory.resolve_inscription(rec, None, ranks={}) == ""

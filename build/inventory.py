@@ -447,3 +447,29 @@ def math_inscription(rec: dict, ranks: dict[str, int]) -> str:
         pct = round(weight / cap * 100)
         return f"Carries {weight:g} lb of {cap} ({pct}% of capacity){suffix}."
     return f"Carries {weight:g} lb across {n} items{suffix}."
+
+
+def resolve_inscription(
+    rec: dict,
+    authored: dict | None,
+    ranks: dict[str, int],
+) -> str:
+    """Pick the right tooltip text for a character's archetype badge.
+
+    Use the authored inscription when:
+      - `authored` is a dict with both `archetype` and `inscription`,
+      - and `authored["archetype"]` matches the current math pick.
+
+    Otherwise, fall back to math_inscription. Returns "" when there is no
+    current archetype (the badge will not render).
+    """
+    if not rec.get("archetype"):
+        return ""
+    if (
+        isinstance(authored, dict)
+        and authored.get("archetype") == rec["archetype"]
+        and isinstance(authored.get("inscription"), str)
+        and authored["inscription"].strip()
+    ):
+        return authored["inscription"]
+    return math_inscription(rec, ranks)
