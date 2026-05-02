@@ -1,4 +1,7 @@
 """Tests for build/inventory.py — the inventory loader/classifier/scorer."""
+import json
+from pathlib import Path
+
 import pytest
 
 from build import inventory
@@ -468,3 +471,31 @@ def test_company_strip_excludes_gm_member():
     strip = inventory._build_bundle(parsed, party)["company_strip"]
 
     assert [s["slug"] for s in strip] == ["grieg"]
+
+
+def test_load_returns_empty_bundle_when_no_snapshot(tmp_path, monkeypatch):
+    monkeypatch.setenv("BUILD_DATA_DIR", str(tmp_path))
+    bundle = inventory.load(tmp_path.parent)
+    assert bundle == {"by_id": {}, "company_strip": []}
+
+
+def test_load_full_pipeline_with_fixture(tmp_path, monkeypatch):
+    fixture_dir = tmp_path / "data"
+    fixture_dir.mkdir()
+    src = (
+        Path(__file__).parent / "fixtures" / "inventory"
+        / "obr-inv-backup-2026-05-02T04-21-16-825Z.json"
+    )
+    (fixture_dir / src.name).write_text(src.read_text())
+    (fixture_dir / "party.json").write_text(json.dumps([
+        {"id": "grieg", "name": "Grieg", "abilities": {"str": 17}},
+        {"id": "vex",   "name": "Vex",   "abilities": {"str": 12}},
+    ]))
+    monkeypatch.setenv("BUILD_DATA_DIR", str(fixture_dir))
+
+    bundle = inventory.load(fixture_dir.parent)
+
+    assert set(bundle["by_id"].keys()) == {"grieg", "vex"}
+    assert bundle["by_id"]["grieg"]["total_weight"] == 5
+    assert "Weil" not in json.dumps(bundle)  # surname scrubbed
+    assert [s["slug"] for s in bundle["company_strip"]] == ["grieg", "vex"]

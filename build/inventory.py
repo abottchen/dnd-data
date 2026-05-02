@@ -13,25 +13,36 @@ tooltip inscription on each archetype badge — that's authored elsewhere
 back at render time.
 """
 from __future__ import annotations
+import json
 from pathlib import Path
 from typing import Optional
 
-from build.render import _resolve_dice_player
+from build.render import _load_dice_player_map, _resolve_dice_player
 
 
 def load(repo_root: Path) -> dict:
-    """Return an inventory bundle keyed for the renderer.
+    """Load the latest inventory snapshot under <repo_root>/data and shape
+    it for the renderer. Returns an empty bundle if no snapshot is found.
 
-    Shape:
-      {
-        "by_id": {"<slug>": CharacterInventory, ...},
-        "company_strip": [StripEntry, ...],
-      }
-
-    Empty bundle if no snapshot file is present — the renderer treats
-    this as "every character awaiting manifest" rather than failing.
+    The function reads from <repo_root>/data and party.json from the same
+    directory; tests can override this via the BUILD_DATA_DIR env var
+    (handled by build.paths.data_dir()).
     """
-    return {"by_id": {}, "company_strip": []}
+    from build.paths import data_dir
+
+    d = data_dir()
+    snapshot = _resolve_snapshot_path(d)
+    if snapshot is None:
+        return {"by_id": {}, "company_strip": []}
+
+    raw = json.loads(snapshot.read_text())
+    party_path = d / "party.json"
+    party_raw = json.loads(party_path.read_text()) if party_path.exists() else []
+    party = party_raw if isinstance(party_raw, dict) else {"members": party_raw}
+
+    mapping = _load_dice_player_map()
+    parsed = _parse_inventories(raw, mapping)
+    return _build_bundle(parsed, party)
 
 
 SNAPSHOT_GLOB = "obr-inv-backup-*.json"

@@ -1,0 +1,32 @@
+{
+  "exportedAt": "2026-05-02T04:21:16.825Z",
+  "inventories": {
+    "uuid-grieg": {
+      "name": "Simon Weil",
+      "items": [
+        {"id": "wh", "name": "Warhammer", "category": "Weapon",
+         "weight": 5, "count": 1, "rarity": "common",
+         "icon": "https://5e.tools/img/items/XPHB/Warhammer.webp",
+         "description": "1d8 bludgeoning."}
+      ]
+    },
+    "uuid-vex": {
+      "name": "Vex",
+      "items": [
+        {"id": "rope", "name": "Rope (50 ft)",
+         "category": "Adventuring Gear - Utility & Equipment",
+         "weight": 5, "count": 1, "rarity": "common",
+         "icon": "", "description": ""}
+      ]
+    },
+    "uuid-gm": {
+      "name": "GM",
+      "items": [
+        {"id": "junk", "name": "Junk",
+         "category": "Adventuring Gear - Utility & Equipment",
+         "weight": 1, "count": 1, "rarity": "common",
+         "icon": "", "description": ""}
+      ]
+    }
+  }
+}
