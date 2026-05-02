@@ -930,7 +930,7 @@
           <div class="name">Grieg</div>
           <div class="epithet">of the Wulven, sworn to the hunt</div>
           <div class="meta">Fighter &middot; Second Tier &middot; Beast Hunter</div>
-          <div class="archetype" data-inscription="Carries 175.5 lb across 45 items — most in the party.">
+          <div class="archetype" data-inscription="Carries 175.5 lb across the whole pack — the heaviest load in the party.">
             THE PACK-MULE
           </div>
         </div>
@@ -1419,7 +1419,7 @@
           <div class="name">Vex</div>
           <div class="epithet">of the Gold Dragonborn, born to breath and blade</div>
           <div class="meta">Fighter &middot; Second Tier &middot; Noble</div>
-          <div class="archetype" data-inscription="Carries 85.5 lb across 40 items — most in the party.">
+          <div class="archetype" data-inscription="Carries 11 rations and provisions — the most provisions in the party.">
             THE CELLARER
           </div>
         </div>
@@ -1830,7 +1830,7 @@
           <div class="name">Urida</div>
           <div class="epithet">of the Rock Gnomes, reader of the threefold weave</div>
           <div class="meta">Wizard &middot; Second Tier &middot; None</div>
-          <div class="archetype" data-inscription="Carries 10 lb of 90 (11% of capacity) — most in the party.">
+          <div class="archetype" data-inscription="Carries 10 lb of 90 (11% of capacity) — lightest of the company.">
             THE FEATHERFOOT
           </div>
         </div>
@@ -2100,7 +2100,7 @@
           <div class="name">Chumble Crudluck</div>
           <div class="epithet">of the Dhakaani, bound by pact to a shadow unseen</div>
           <div class="meta">Warlock (Pact of the Chain) &middot; Second Tier &middot; Custom</div>
-          <div class="archetype" data-inscription="Carries 104 lb across 67 items — most in the party.">
+          <div class="archetype" data-inscription="Carries 14 books, scrolls, and pages — the broadest library in the party.">
             THE SCHOLAR
           </div>
         </div>
@@ -3194,14 +3194,39 @@
       });
     })();
 
-    // --- Pack: Rack item tooltips ---
-    (function () {
+    // Shared tooltip helper for Pack zones, company strip, and archetype badge.
+    // Toggles the .tip-wide variant (so descriptions wrap with a max-width) and
+    // clamps the horizontal position so the tooltip never extends past the
+    // viewport edge — the previous nowrap version clipped at the window margin
+    // when item descriptions ran long.
+    function _packShowTip(tip, anchor, html, wide) {
+      tip.innerHTML = html;
+      tip.classList.toggle('tip-wide', !!wide);
+      tip.classList.add('visible');
+      const tipWidth = tip.offsetWidth;
+      const halfWidth = tipWidth / 2;
+      const margin = 8;
+      const r = anchor.getBoundingClientRect();
+      let cx = r.left + r.width / 2;
+      cx = Math.max(halfWidth + margin,
+                    Math.min(window.innerWidth - halfWidth - margin, cx));
+      tip.style.left = cx + 'px';
+      tip.style.top = r.top + 'px';
+    }
+
+    function _packGetTip() {
       let tip = document.querySelector('.dice-tooltip');
       if (!tip) {
         tip = document.createElement('div');
         tip.className = 'dice-tooltip';
         document.body.appendChild(tip);
       }
+      return tip;
+    }
+
+    // --- Pack: Rack item tooltips ---
+    (function () {
+      const tip = _packGetTip();
       document.querySelectorAll('.rack-item').forEach(el => {
         el.addEventListener('mouseenter', () => {
           const name = el.getAttribute('data-name') || '';
@@ -3212,11 +3237,7 @@
           html += '<div class="tip-ctx">' + (count !== '1' ? '&times;' + count + ' &middot; ' : '') +
                   weight + ' lb</div>';
           if (desc) html += '<div class="tip-ctx">' + desc + '</div>';
-          tip.innerHTML = html;
-          const r = el.getBoundingClientRect();
-          tip.style.left = (r.left + r.width / 2) + 'px';
-          tip.style.top = r.top + 'px';
-          tip.classList.add('visible');
+          _packShowTip(tip, el, html, !!desc);
         });
         el.addEventListener('mouseleave', () => { tip.classList.remove('visible'); });
       });
@@ -3224,12 +3245,7 @@
 
     // --- Pack: Spotlight card tooltips ---
     (function () {
-      let tip = document.querySelector('.dice-tooltip');
-      if (!tip) {
-        tip = document.createElement('div');
-        tip.className = 'dice-tooltip';
-        document.body.appendChild(tip);
-      }
+      const tip = _packGetTip();
       document.querySelectorAll('.spotlight-card').forEach(el => {
         el.addEventListener('mouseenter', () => {
           const name = el.getAttribute('data-name') || '';
@@ -3238,11 +3254,7 @@
           let html = '<div class="tip-val tip-val-text">' + name + '</div>';
           if (rarity) html += '<div class="tip-ctx">' + rarity + '</div>';
           if (desc) html += '<div class="tip-ctx">' + desc + '</div>';
-          tip.innerHTML = html;
-          const r = el.getBoundingClientRect();
-          tip.style.left = (r.left + r.width / 2) + 'px';
-          tip.style.top = r.top + 'px';
-          tip.classList.add('visible');
+          _packShowTip(tip, el, html, !!desc);
         });
         el.addEventListener('mouseleave', () => { tip.classList.remove('visible'); });
       });
@@ -3250,12 +3262,7 @@
 
     // --- Pack: Manifest chip tooltips ---
     (function () {
-      let tip = document.querySelector('.dice-tooltip');
-      if (!tip) {
-        tip = document.createElement('div');
-        tip.className = 'dice-tooltip';
-        document.body.appendChild(tip);
-      }
+      const tip = _packGetTip();
       document.querySelectorAll('.manifest-chip').forEach(el => {
         el.addEventListener('mouseenter', () => {
           const name = el.getAttribute('data-name') || '';
@@ -3269,11 +3276,7 @@
                   weight + ' lb each &middot; ' + total + ' lb total</div>';
           if (cat) html += '<div class="tip-ctx">' + cat + '</div>';
           if (desc) html += '<div class="tip-ctx">' + desc + '</div>';
-          tip.innerHTML = html;
-          const r = el.getBoundingClientRect();
-          tip.style.left = (r.left + r.width / 2) + 'px';
-          tip.style.top = r.top + 'px';
-          tip.classList.add('visible');
+          _packShowTip(tip, el, html, !!desc);
         });
         el.addEventListener('mouseleave', () => { tip.classList.remove('visible'); });
       });
@@ -3281,12 +3284,7 @@
 
     // --- Company strip bar tooltips ---
     (function () {
-      let tip = document.querySelector('.dice-tooltip');
-      if (!tip) {
-        tip = document.createElement('div');
-        tip.className = 'dice-tooltip';
-        document.body.appendChild(tip);
-      }
+      const tip = _packGetTip();
       document.querySelectorAll('.company-strip-bar').forEach(el => {
         el.addEventListener('mouseenter', () => {
           const name = el.getAttribute('data-shortname') || '';
@@ -3304,11 +3302,7 @@
           } else {
             html += '<div class="tip-ctx">Awaiting manifest</div>';
           }
-          tip.innerHTML = html;
-          const r = el.getBoundingClientRect();
-          tip.style.left = (r.left + r.width / 2) + 'px';
-          tip.style.top = r.top + 'px';
-          tip.classList.add('visible');
+          _packShowTip(tip, el, html, false);
         });
         el.addEventListener('mouseleave', () => { tip.classList.remove('visible'); });
         el.addEventListener('click', () => {
@@ -3321,23 +3315,42 @@
       });
     })();
 
+    // --- Pack icons: rotate non-square art onto the square host's diagonal ---
+    // Catalog icons (5e.tools weapons especially) are markedly non-square.
+    // With object-fit:contain in a square cell, a 2:1 scimitar renders at
+    // 100%×50% — small and surrounded by empty space. Rotating 45° places
+    // the long axis on the diagonal and (past ~2.4:1) increases rendered
+    // size. scale = √2·R/(R+1) is the largest factor that keeps the rotated
+    // bounding box inside the host.
+    (function () {
+      const ROTATE_THRESHOLD = 1.4;
+      function fitIcon(img) {
+        const w = img.naturalWidth, h = img.naturalHeight;
+        if (!w || !h) return;
+        const ratio = w / h;
+        if (ratio > ROTATE_THRESHOLD) {
+          const scale = (Math.SQRT2 * ratio) / (ratio + 1);
+          img.style.transform = 'rotate(-45deg) scale(' + scale.toFixed(3) + ')';
+        } else if (ratio < 1 / ROTATE_THRESHOLD) {
+          const inv = 1 / ratio;
+          const scale = (Math.SQRT2 * inv) / (inv + 1);
+          img.style.transform = 'rotate(45deg) scale(' + scale.toFixed(3) + ')';
+        }
+      }
+      document.querySelectorAll('.rack-icon, .spotlight-icon, .manifest-icon').forEach(img => {
+        if (img.complete && img.naturalWidth) fitIcon(img);
+        else img.addEventListener('load', () => fitIcon(img), { once: true });
+      });
+    })();
+
     // --- Archetype badge tooltips ---
     (function () {
-      let tip = document.querySelector('.dice-tooltip');
-      if (!tip) {
-        tip = document.createElement('div');
-        tip.className = 'dice-tooltip';
-        document.body.appendChild(tip);
-      }
+      const tip = _packGetTip();
       document.querySelectorAll('.archetype').forEach(el => {
         el.addEventListener('mouseenter', () => {
           const text = el.getAttribute('data-inscription') || '';
           if (!text) return;
-          tip.innerHTML = '<div class="tip-ctx">' + text + '</div>';
-          const r = el.getBoundingClientRect();
-          tip.style.left = (r.left + r.width / 2) + 'px';
-          tip.style.top = r.top + 'px';
-          tip.classList.add('visible');
+          _packShowTip(tip, el, '<div class="tip-ctx">' + text + '</div>', true);
         });
         el.addEventListener('mouseleave', () => { tip.classList.remove('visible'); });
       });

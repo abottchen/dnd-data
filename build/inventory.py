@@ -400,6 +400,8 @@ def _build_bundle(parsed: dict[str, dict], party: dict) -> dict:
     assignments = _assign_archetypes(chars_for_assignment, ARCHETYPE_SLATE)
     for slug, arc_slug in assignments.items():
         by_id[slug]["archetype"] = arc_slug
+        items = chars_for_assignment[slug]["items"]
+        by_id[slug]["archetype_items"] = archetype_match(arc_slug, items)
 
     strip: list[dict] = []
     for member in party.get("members", []):
@@ -429,26 +431,108 @@ def _build_bundle(parsed: dict[str, dict], party: dict) -> dict:
     return {"by_id": by_id, "company_strip": strip}
 
 
+# Per-archetype filter: which items earned the archetype. Used both by
+# the slice builder (so the model only sees relevant items) and by
+# math_inscription (so the fallback line names the actual matched gear
+# instead of total inventory). Mirrors the scorer logic for each archetype.
+_KEYWORDS: dict[str, tuple[str, ...]] = {
+    "scholar":        ("book", "parchment", "ink", "scroll", "spellbook"),
+    "naturalist":     ("druidic", "mistletoe", "yew", "totem", "natural"),
+    "tongues":        ("sending stone", "message", "speaking", "whisper"),
+    "lamplighter":    ("oil", "torch", "lantern", "candle", "tinderbox", "lamp"),
+    "pathfinder":     ("rope", "crowbar", "grapple", "piton", "spike", "climber"),
+    "cellarer":       ("ration", "waterskin", "mess kit", "trail", "wineskin"),
+    "trapper":        ("caltrop", "trap", "snare", "hunter's trap"),
+    "costume-master": ("costume", "disguise", "perfume", "fine clothes", "noble"),
+}
+
+
+def archetype_match(arc_slug: str, items: list[dict]) -> list[dict]:
+    """Return only the items that contributed to this archetype's score.
+
+    Pack-mule, quartermaster, and featherfoot count the whole inventory.
+    Every other archetype filters by category or keyword.
+    """
+    if arc_slug in ("pack-mule", "quartermaster", "featherfoot"):
+        return list(items)
+    if arc_slug == "armorer":
+        return [it for it in items if it.get("category") in ("Weapon", "Armor")]
+    if arc_slug == "glaive-hand":
+        return [it for it in items if it.get("category") == "Weapon"]
+    if arc_slug == "quiver":
+        return [it for it in items if it.get("category") == "Ammunition"]
+    if arc_slug == "curio-keeper":
+        return [it for it in items
+                if (it.get("rarity") or "common").lower() != "common"
+                or it.get("category") == "Wondrous Item"]
+    if arc_slug == "apothecary":
+        return [it for it in items if it.get("category") == "Consumable"]
+    keywords = _KEYWORDS.get(arc_slug)
+    if keywords:
+        return [it for it in items
+                if any(kw in (it.get("name") or "").lower() for kw in keywords)]
+    return list(items)
+
+
+# Inscription template per archetype: (verb, what's-being-carried-noun, metric).
+# `metric` is "count" (sum of count*1 for matched items), "weight" (sum of
+# weight*count), or "distinct" (count of distinct ids in matched list).
+# `superlative` is the trailing fragment used when the holder is rank 1.
+_INSCRIPTION = {
+    "pack-mule":      ("Carries", "across the whole pack", "weight",  "the heaviest load in the party"),
+    "armorer":        ("Carries", "of weapons and armor",   "weight",  "the heaviest kit in the party"),
+    "glaive-hand":    ("Bears",   "different blades",       "distinct","the broadest blade-rack in the party"),
+    "quiver":         ("Carries", "rounds of ammunition",   "count",   "the deepest quiver in the party"),
+    "curio-keeper":   ("Holds",   "uncommon and wondrous things", "count", "the most curios in the party"),
+    "naturalist":     ("Carries", "tokens of the wild",     "count",   "the most natural lore in the party"),
+    "scholar":        ("Carries", "books, scrolls, and pages", "count","the broadest library in the party"),
+    "tongues":        ("Carries", "voice-stones and whispering charms", "count", "the most channels in the party"),
+    "lamplighter":    ("Carries", "lights against the dark","count",   "the brightest lamp in the party"),
+    "pathfinder":     ("Carries", "tools for the path",     "count",   "the most road-gear in the party"),
+    "apothecary":     ("Carries", "consumables",            "count",   "the deepest stores in the party"),
+    "cellarer":       ("Carries", "rations and provisions", "count",   "the most provisions in the party"),
+    "trapper":        ("Carries", "traps and snares",       "count",   "the most traps in the party"),
+    "costume-master": ("Carries", "disguises and persona pieces", "count", "the broadest wardrobe in the party"),
+    "quartermaster":  ("Holds",   "distinct items",         "distinct","the broadest kit in the party"),
+}
+
+
 def math_inscription(rec: dict, ranks: dict[str, int]) -> str:
     """Generate a deterministic stats-line tooltip for a character record.
 
     `rec` is a single entry from inventory_by_id (with `archetype`,
-    `total_weight`, `item_count`, etc.). `ranks` maps archetype slug to
-    the holder's rank (1 = winner). When the holder is rank 1, append
-    "most in the party" to anchor the framing.
+    `archetype_items`, `total_weight`, `capacity`, etc.). `ranks` maps
+    archetype slug to the holder's rank (1 = winner) — only rank 1 gets
+    the "most in the party" superlative.
     """
     arc = rec.get("archetype")
     if not arc:
         return ""
-    weight = rec.get("total_weight", 0)
-    n = rec.get("item_count", 0)
     is_winner = ranks.get(arc) == 1
-    suffix = " — most in the party" if is_winner else ""
+
     if arc == "featherfoot":
+        weight = rec.get("total_weight", 0)
         cap = rec.get("capacity", 0) or 1
         pct = round(weight / cap * 100)
+        suffix = " — lightest of the company" if is_winner else ""
         return f"Carries {weight:g} lb of {cap} ({pct}% of capacity){suffix}."
-    return f"Carries {weight:g} lb across {n} items{suffix}."
+
+    matched = rec.get("archetype_items") or []
+    template = _INSCRIPTION.get(arc)
+    if not template:
+        # Unknown archetype: fall back to a generic line.
+        n = sum((it.get("count") or 1) for it in matched)
+        return f"Carries {n} items."
+    verb, noun, metric, superlative = template
+    suffix = f" — {superlative}" if is_winner else ""
+    if metric == "weight":
+        wt = sum((it.get("weight") or 0) * (it.get("count") or 1) for it in matched)
+        return f"{verb} {wt:g} lb {noun}{suffix}."
+    if metric == "distinct":
+        n = len({it.get("id") for it in matched if it.get("id")})
+        return f"{verb} {n} {noun}{suffix}."
+    n = sum((it.get("count") or 1) for it in matched)
+    return f"{verb} {n} {noun}{suffix}."
 
 
 def resolve_inscription(

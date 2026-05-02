@@ -501,12 +501,40 @@ def test_load_full_pipeline_with_fixture(tmp_path, monkeypatch):
     assert [s["slug"] for s in bundle["company_strip"]] == ["grieg", "vex"]
 
 
-def test_math_inscription_for_pack_mule():
-    rec = {"archetype": "pack-mule", "total_weight": 175.5, "item_count": 31}
+def test_math_inscription_for_pack_mule_uses_total_weight():
+    rec = {
+        "archetype": "pack-mule",
+        "archetype_items": [{"weight": 100, "count": 1}, {"weight": 5, "count": 11}],
+        "total_weight": 155.5,
+    }
     line = inventory.math_inscription(rec, ranks={"pack-mule": 1})
-    assert "175.5 lb" in line
-    assert "31 items" in line
-    assert "most in the party" in line
+    assert "155 lb" in line  # 100*1 + 5*11 = 155
+    assert "heaviest load" in line
+
+
+def test_math_inscription_for_cellarer_names_the_provisions():
+    rec = {
+        "archetype": "cellarer",
+        "archetype_items": [
+            {"name": "Rations", "count": 9, "weight": 2},
+            {"name": "Waterskin", "count": 1, "weight": 5},
+        ],
+    }
+    line = inventory.math_inscription(rec, ranks={"cellarer": 1})
+    assert "10" in line  # 9 + 1
+    assert "rations and provisions" in line
+    assert "most provisions" in line
+
+
+def test_math_inscription_for_quartermaster_counts_distinct():
+    rec = {
+        "archetype": "quartermaster",
+        "archetype_items": [
+            {"id": "a", "count": 1}, {"id": "b", "count": 4}, {"id": "c", "count": 1},
+        ],
+    }
+    line = inventory.math_inscription(rec, ranks={"quartermaster": 1})
+    assert "3 distinct items" in line
 
 
 def test_math_inscription_returns_empty_for_no_archetype():
@@ -519,6 +547,7 @@ def test_math_inscription_for_featherfoot():
            "capacity": 90, "item_count": 3}
     line = inventory.math_inscription(rec, ranks={"featherfoot": 1})
     assert "11%" in line  # 10/90
+    assert "lightest" in line
 
 
 def test_resolve_inscription_uses_authored_when_archetype_matches():
@@ -530,18 +559,24 @@ def test_resolve_inscription_uses_authored_when_archetype_matches():
 
 
 def test_resolve_inscription_falls_back_when_archetype_stale():
-    rec = {"archetype": "scholar", "total_weight": 5, "item_count": 8}
+    rec = {
+        "archetype": "scholar",
+        "archetype_items": [{"name": "Spellbook", "count": 3}],
+    }
     authored = {"archetype": "pack-mule",  # stale!
                 "inscription": "old prose for the wrong archetype"}
     out = inventory.resolve_inscription(rec, authored, ranks={"scholar": 1})
     assert "Hauls" not in out
-    assert "5 lb" in out
+    assert "books, scrolls" in out
 
 
 def test_resolve_inscription_falls_back_when_authored_missing():
-    rec = {"archetype": "scholar", "total_weight": 5, "item_count": 8}
+    rec = {
+        "archetype": "scholar",
+        "archetype_items": [{"name": "Parchment", "count": 5}],
+    }
     out = inventory.resolve_inscription(rec, None, ranks={"scholar": 1})
-    assert "5 lb" in out
+    assert "books, scrolls" in out
 
 
 def test_resolve_inscription_empty_when_no_archetype():
