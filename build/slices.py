@@ -309,3 +309,63 @@ def refresh_known_npcs(data: dict, authored: dict) -> list[tuple]:
         "sessions": list(data["session_log"]["entries"]),
         "existing": list(authored["site"].get("known_npcs", [])),
     })]
+
+
+# -- Refresh: archetype inscription ------------------------------------------
+
+from build.inventory import archetype_match, ARCHETYPE_SLATE
+
+_ARCHETYPE_LABELS = {a["slug"]: a["label"] for a in ARCHETYPE_SLATE}
+
+
+def refresh_archetype_inscription(data: dict, authored: dict) -> list[tuple]:
+    """One slice per character whose math archetype is set.
+
+    `authored` is expected to carry an `inventory_by_id` field — the
+    orchestrator wiring places it there before calling this builder.
+    """
+    inv_by_id = authored.get("inventory_by_id", {})
+    auth_by_id = {a["id"]: a for a in authored.get("characters", [])}
+    out: list[tuple] = []
+    for member in data["party"].get("members", []):
+        cid = member.get("id")
+        if cid == "gm":
+            continue
+        rec = inv_by_id.get(cid)
+        if not rec or not rec.get("archetype"):
+            continue
+        arc_slug = rec["archetype"]
+        all_items = (
+            rec.get("rack", []) + rec.get("spotlight", []) + rec.get("manifest", [])
+        )
+        slice_items = [
+            {
+                "name": it.get("name"),
+                "count": it.get("count", 1),
+                "weight": it.get("weight"),
+                "description": it.get("description", ""),
+            }
+            for it in archetype_match(arc_slug, all_items)
+        ]
+        existing = auth_by_id.get(cid, {}).get("archetype_badge")
+        out.append((cid, {
+            "character": {
+                "id": cid,
+                "name": member.get("name"),
+                "race": member.get("race"),
+                "class": member.get("class"),
+                "background": member.get("background"),
+                "epithet": auth_by_id.get(cid, {}).get("epithet", ""),
+            },
+            "archetype": {
+                "slug": arc_slug,
+                "label": _ARCHETYPE_LABELS.get(arc_slug, arc_slug.upper()),
+                "metric": arc_slug,
+                "score": rec.get("total_weight", 0),
+                "runner_up_score": 0,
+                "lead": 0,
+            },
+            "items": slice_items,
+            "existing": existing,
+        }))
+    return out

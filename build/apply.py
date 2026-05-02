@@ -161,3 +161,26 @@ def apply_refresh_known_npcs(authored: dict, key, slice_data: dict, output: dict
         return
     fields = output["fields"] or {}
     authored["site"]["known_npcs"] = list(fields["known_npcs"])
+
+
+def apply_refresh_archetype_inscription(authored: dict, key, slice_data: dict, output: dict) -> None:
+    """Write characters[<id>].archetype_badge = {archetype, inscription}.
+
+    On `no_change`, leaves any existing badge untouched. On `rewrite`,
+    sets the badge to the slice's archetype slug + the model's
+    inscription. Raises ValueError if the character id is not present in
+    the authored store.
+    """
+    if output["decision"] == "no_change":
+        return
+    fields = output["fields"] or {}
+    char_id = slice_data["character"]["id"]
+    arc_slug = slice_data["archetype"]["slug"]
+    for c in authored["characters"]:
+        if c["id"] == char_id:
+            c["archetype_badge"] = {
+                "archetype": arc_slug,
+                "inscription": fields["inscription"],
+            }
+            return
+    raise ValueError(f"character {char_id!r} not found in authored store")

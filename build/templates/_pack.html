@@ -1,0 +1,66 @@
+{# _pack.html — per-character Pack section: Rack, Spotlight, Manifest. #}
+{%- set pack = inventory_by_id.get(member.id) %}
+
+<section class="pack" id="{{ member.id }}-pack">
+  <h3 class="section-title">Pack</h3>
+
+  {%- if pack is none %}
+    <p class="empty-state">Awaiting manifest.</p>
+  {%- else %}
+    {%- if pack.rack %}
+    <div class="rack">
+      <div class="rack-shelf"></div>
+      {%- for it in pack.rack %}
+        <div class="rack-item"
+             data-name="{{ it.name }}"
+             data-count="{{ it.count }}"
+             data-weight="{{ it.weight if it.weight is not none else 0 }}"
+             data-description="{{ it.description }}">
+          <img class="rack-icon" src="{{ it.icon }}" alt="{{ it.name }}" loading="lazy">
+          {%- if it.count > 1 %}
+            <span class="count-badge">&times;{{ it.count }}</span>
+          {%- endif %}
+        </div>
+      {%- endfor %}
+    </div>
+    {%- endif %}
+    {%- if pack.spotlight %}
+    <div class="spotlight">
+      {%- for it in pack.spotlight %}
+        <div class="spotlight-card spotlight-rarity-{{ (it.rarity or 'common') | replace(' ', '-') }}"
+             data-name="{{ it.name }}"
+             data-count="{{ it.count }}"
+             data-weight="{{ it.weight if it.weight is not none else 0 }}"
+             data-rarity="{{ it.rarity or 'common' }}"
+             data-description="{{ it.description }}">
+          <div class="spotlight-sheen"></div>
+          <img class="spotlight-icon" src="{{ it.icon }}" alt="{{ it.name }}" loading="lazy">
+          <div class="spotlight-name">{{ it.name }}</div>
+        </div>
+      {%- endfor %}
+    </div>
+    {%- endif %}
+    {%- if pack.manifest %}
+    <div class="manifest">
+      <div class="manifest-meta">
+        {{ pack.item_count }} items &middot; {{ pack.total_weight }} lb
+      </div>
+      <div class="manifest-grid">
+        {%- for it in pack.manifest %}
+          <div class="manifest-chip"
+               data-name="{{ it.name }}"
+               data-count="{{ it.count }}"
+               data-weight="{{ it.weight if it.weight is not none else 0 }}"
+               data-category="{{ it.category }}"
+               data-description="{{ it.description }}">
+            <img class="manifest-icon" src="{{ it.icon }}" alt="{{ it.name }}" loading="lazy">
+            {%- if it.count > 1 %}
+              <span class="count-badge">&times;{{ it.count }}</span>
+            {%- endif %}
+          </div>
+        {%- endfor %}
+      </div>
+    </div>
+    {%- endif %}
+  {%- endif %}
+</section>

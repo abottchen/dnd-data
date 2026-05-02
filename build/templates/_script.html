@@ -313,3 +313,165 @@
         });
       });
     })();
+
+    // Shared tooltip helper for Pack zones, company strip, and archetype badge.
+    // Toggles the .tip-wide variant (so descriptions wrap with a max-width) and
+    // clamps the horizontal position so the tooltip never extends past the
+    // viewport edge — the previous nowrap version clipped at the window margin
+    // when item descriptions ran long.
+    function _packShowTip(tip, anchor, html, wide) {
+      tip.innerHTML = html;
+      tip.classList.toggle('tip-wide', !!wide);
+      tip.classList.add('visible');
+      const tipWidth = tip.offsetWidth;
+      const halfWidth = tipWidth / 2;
+      const margin = 8;
+      const r = anchor.getBoundingClientRect();
+      let cx = r.left + r.width / 2;
+      cx = Math.max(halfWidth + margin,
+                    Math.min(window.innerWidth - halfWidth - margin, cx));
+      tip.style.left = cx + 'px';
+      tip.style.top = r.top + 'px';
+    }
+
+    function _packGetTip() {
+      let tip = document.querySelector('.dice-tooltip');
+      if (!tip) {
+        tip = document.createElement('div');
+        tip.className = 'dice-tooltip';
+        document.body.appendChild(tip);
+      }
+      return tip;
+    }
+
+    // --- Pack: Rack item tooltips ---
+    (function () {
+      const tip = _packGetTip();
+      document.querySelectorAll('.rack-item').forEach(el => {
+        el.addEventListener('mouseenter', () => {
+          const name = el.getAttribute('data-name') || '';
+          const count = el.getAttribute('data-count') || '';
+          const weight = el.getAttribute('data-weight') || '';
+          const desc = el.getAttribute('data-description') || '';
+          let html = '<div class="tip-val tip-val-text">' + name + '</div>';
+          html += '<div class="tip-ctx">' + (count !== '1' ? '&times;' + count + ' &middot; ' : '') +
+                  weight + ' lb</div>';
+          if (desc) html += '<div class="tip-ctx">' + desc + '</div>';
+          _packShowTip(tip, el, html, !!desc);
+        });
+        el.addEventListener('mouseleave', () => { tip.classList.remove('visible'); });
+      });
+    })();
+
+    // --- Pack: Spotlight card tooltips ---
+    (function () {
+      const tip = _packGetTip();
+      document.querySelectorAll('.spotlight-card').forEach(el => {
+        el.addEventListener('mouseenter', () => {
+          const name = el.getAttribute('data-name') || '';
+          const rarity = el.getAttribute('data-rarity') || '';
+          const desc = el.getAttribute('data-description') || '';
+          let html = '<div class="tip-val tip-val-text">' + name + '</div>';
+          if (rarity) html += '<div class="tip-ctx">' + rarity + '</div>';
+          if (desc) html += '<div class="tip-ctx">' + desc + '</div>';
+          _packShowTip(tip, el, html, !!desc);
+        });
+        el.addEventListener('mouseleave', () => { tip.classList.remove('visible'); });
+      });
+    })();
+
+    // --- Pack: Manifest chip tooltips ---
+    (function () {
+      const tip = _packGetTip();
+      document.querySelectorAll('.manifest-chip').forEach(el => {
+        el.addEventListener('mouseenter', () => {
+          const name = el.getAttribute('data-name') || '';
+          const count = el.getAttribute('data-count') || '';
+          const weight = el.getAttribute('data-weight') || '';
+          const cat = el.getAttribute('data-category') || '';
+          const desc = el.getAttribute('data-description') || '';
+          const total = (parseFloat(weight) * parseInt(count, 10)) || 0;
+          let html = '<div class="tip-val tip-val-text">' + name + '</div>';
+          html += '<div class="tip-ctx">' + (count !== '1' ? '&times;' + count + ' &middot; ' : '') +
+                  weight + ' lb each &middot; ' + total + ' lb total</div>';
+          if (cat) html += '<div class="tip-ctx">' + cat + '</div>';
+          if (desc) html += '<div class="tip-ctx">' + desc + '</div>';
+          _packShowTip(tip, el, html, !!desc);
+        });
+        el.addEventListener('mouseleave', () => { tip.classList.remove('visible'); });
+      });
+    })();
+
+    // --- Company strip bar tooltips ---
+    (function () {
+      const tip = _packGetTip();
+      document.querySelectorAll('.company-strip-bar').forEach(el => {
+        el.addEventListener('mouseenter', () => {
+          const name = el.getAttribute('data-shortname') || '';
+          const w = parseFloat(el.getAttribute('data-weight') || '0');
+          const cap = parseFloat(el.getAttribute('data-capacity') || '0');
+          const rack = el.getAttribute('data-rack') || '0';
+          const spot = el.getAttribute('data-spotlight') || '0';
+          const man = el.getAttribute('data-manifest') || '0';
+          const pct = cap > 0 ? Math.round(w / cap * 100) : 0;
+          let html = '<div class="tip-val tip-val-text">' + name + '</div>';
+          if (cap > 0) {
+            html += '<div class="tip-ctx">Rack ' + rack + ' &middot; Spotlight ' + spot +
+                    ' &middot; Manifest ' + man + ' = ' + w + ' lb</div>';
+            html += '<div class="tip-ctx">' + pct + '% of capacity</div>';
+          } else {
+            html += '<div class="tip-ctx">Awaiting manifest</div>';
+          }
+          _packShowTip(tip, el, html, false);
+        });
+        el.addEventListener('mouseleave', () => { tip.classList.remove('visible'); });
+        el.addEventListener('click', () => {
+          const slug = el.getAttribute('data-slug');
+          if (slug) {
+            const target = document.getElementById(slug + '-pack');
+            if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        });
+      });
+    })();
+
+    // --- Pack icons: rotate non-square art onto the square host's diagonal ---
+    // Catalog icons (5e.tools weapons especially) are markedly non-square.
+    // With object-fit:contain in a square cell, a 2:1 scimitar renders at
+    // 100%×50% — small and surrounded by empty space. Rotating 45° places
+    // the long axis on the diagonal and (past ~2.4:1) increases rendered
+    // size. scale = √2·R/(R+1) is the largest factor that keeps the rotated
+    // bounding box inside the host.
+    (function () {
+      const ROTATE_THRESHOLD = 1.4;
+      function fitIcon(img) {
+        const w = img.naturalWidth, h = img.naturalHeight;
+        if (!w || !h) return;
+        const ratio = w / h;
+        if (ratio > ROTATE_THRESHOLD) {
+          const scale = (Math.SQRT2 * ratio) / (ratio + 1);
+          img.style.transform = 'rotate(-45deg) scale(' + scale.toFixed(3) + ')';
+        } else if (ratio < 1 / ROTATE_THRESHOLD) {
+          const inv = 1 / ratio;
+          const scale = (Math.SQRT2 * inv) / (inv + 1);
+          img.style.transform = 'rotate(45deg) scale(' + scale.toFixed(3) + ')';
+        }
+      }
+      document.querySelectorAll('.rack-icon, .spotlight-icon, .manifest-icon').forEach(img => {
+        if (img.complete && img.naturalWidth) fitIcon(img);
+        else img.addEventListener('load', () => fitIcon(img), { once: true });
+      });
+    })();
+
+    // --- Archetype badge tooltips ---
+    (function () {
+      const tip = _packGetTip();
+      document.querySelectorAll('.archetype').forEach(el => {
+        el.addEventListener('mouseenter', () => {
+          const text = el.getAttribute('data-inscription') || '';
+          if (!text) return;
+          _packShowTip(tip, el, '<div class="tip-ctx">' + text + '</div>', true);
+        });
+        el.addEventListener('mouseleave', () => { tip.classList.remove('visible'); });
+      });
+    })();
