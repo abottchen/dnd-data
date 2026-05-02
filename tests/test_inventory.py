@@ -70,3 +70,63 @@ def test_parse_inventories_skips_unresolved_name():
     parsed = inventory._parse_inventories(raw, mapping)
 
     assert set(parsed.keys()) == {"vex"}
+
+
+def _item(name, category, rarity="common", weight=1, count=1):
+    return {
+        "id": name.lower().replace(" ", "-"),
+        "name": name,
+        "category": category,
+        "rarity": rarity,
+        "weight": weight,
+        "count": count,
+        "icon": "",
+        "description": "",
+    }
+
+
+def test_classify_separates_rack_spotlight_manifest():
+    items = [
+        _item("Warhammer", "Weapon"),
+        _item("Scale Mail", "Armor", weight=45),
+        _item("Crossbow Bolts", "Ammunition", count=20),
+        _item("Sending Stones", "Wondrous Item", rarity="uncommon"),
+        _item("Staff", "Spellcasting Focus"),
+        _item("Rations", "Adventuring Gear - Camping & Travel", count=5),
+        _item("Backpack", "Adventuring Gear - Containers & Storage"),
+        _item("Costume", "Clothing"),
+    ]
+
+    rack, spotlight, manifest = inventory._classify(items)
+
+    rack_names = {it["name"] for it in rack}
+    spotlight_names = {it["name"] for it in spotlight}
+    manifest_names = {it["name"] for it in manifest}
+
+    assert rack_names == {"Warhammer", "Scale Mail", "Crossbow Bolts"}
+    assert spotlight_names == {"Sending Stones", "Staff"}
+    assert manifest_names == {"Rations", "Backpack", "Costume"}
+
+
+def test_classify_caps_spotlight_at_three():
+    items = [_item(f"Curio {i}", "Wondrous Item", rarity="rare") for i in range(5)]
+
+    rack, spotlight, manifest = inventory._classify(items)
+
+    assert len(spotlight) == 3
+    assert len(manifest) == 2  # spillover lands in Manifest
+    assert rack == []
+
+
+def test_classify_spotlight_ranks_higher_rarity_first():
+    items = [
+        _item("Bauble", "Wondrous Item", rarity="common"),
+        _item("Greater Curio", "Wondrous Item", rarity="rare"),
+        _item("Lesser Curio", "Wondrous Item", rarity="uncommon"),
+        _item("Marvel", "Wondrous Item", rarity="legendary"),
+    ]
+
+    _, spotlight, _ = inventory._classify(items)
+
+    spotlight_names = [it["name"] for it in spotlight]
+    assert spotlight_names == ["Marvel", "Greater Curio", "Lesser Curio"]

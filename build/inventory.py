@@ -65,3 +65,45 @@ def _parse_inventories(raw: dict, mapping: dict[str, str]) -> dict[str, dict]:
             continue
         out[slug] = {"items": list(inv.get("items", []))}
     return out
+
+
+RACK_CATEGORIES = frozenset({"Weapon", "Armor", "Ammunition"})
+SPOTLIGHT_CATEGORIES = frozenset({"Wondrous Item", "Spellcasting Focus"})
+SPOTLIGHT_CAP = 3
+
+_RARITY_ORDER = {
+    "legendary": 0, "very rare": 1, "rare": 2, "uncommon": 3,
+    "common": 4,
+}
+
+
+def _classify(items: list[dict]) -> tuple[list, list, list]:
+    """Partition items into (rack, spotlight, manifest) zones.
+
+    Rack: weapons, armor, ammunition.
+    Spotlight: items with rarity != "common" OR a wondrous/focus category.
+      Capped at SPOTLIGHT_CAP, ranked by rarity (legendary first), with
+      spillover landing in Manifest.
+    Manifest: everything else (and spotlight spillover).
+    """
+    rack: list[dict] = []
+    candidates_for_spotlight: list[dict] = []
+    rest: list[dict] = []
+
+    for it in items:
+        cat = it.get("category", "")
+        rarity = (it.get("rarity") or "common").lower()
+        if cat in RACK_CATEGORIES:
+            rack.append(it)
+        elif cat in SPOTLIGHT_CATEGORIES or rarity != "common":
+            candidates_for_spotlight.append(it)
+        else:
+            rest.append(it)
+
+    candidates_for_spotlight.sort(
+        key=lambda it: _RARITY_ORDER.get((it.get("rarity") or "common").lower(), 99)
+    )
+    spotlight = candidates_for_spotlight[:SPOTLIGHT_CAP]
+    spillover = candidates_for_spotlight[SPOTLIGHT_CAP:]
+
+    return rack, spotlight, rest + spillover
