@@ -1,6 +1,41 @@
 {% from "_macros.html" import section_head -%}
 <article class="character" id="company">
 
+  {%- if company_strip %}
+  <div class="company-strip">
+    <div class="company-strip-title">Burden of Carry</div>
+    <div class="company-strip-bars">
+      {%- for s in company_strip %}
+        <div class="company-strip-bar
+                    {%- if s.status == 'awaiting_manifest' %} awaiting{% endif %}"
+             data-slug="{{ s.slug }}"
+             data-shortname="{{ s.shortname }}"
+             data-weight="{{ s.total_weight }}"
+             data-capacity="{{ s.capacity }}"
+             data-rack="{{ s.breakdown.rack }}"
+             data-spotlight="{{ s.breakdown.spotlight }}"
+             data-manifest="{{ s.breakdown.manifest }}">
+          <div class="company-strip-name">{{ s.shortname }}</div>
+          <div class="company-strip-track">
+            {%- if s.status == 'ok' and s.capacity > 0 %}
+              {%- set pct = (s.total_weight / s.capacity * 100) | round %}
+              <div class="company-strip-fill"
+                   style="--target-width: {{ pct }}%; animation-delay: {{ loop.index0 * 80 }}ms;"></div>
+            {%- endif %}
+          </div>
+          <div class="company-strip-numbers">
+            {%- if s.status == 'ok' %}
+              {{ s.total_weight }} / {{ s.capacity }} lb
+            {%- else %}
+              &mdash;
+            {%- endif %}
+          </div>
+        </div>
+      {%- endfor %}
+    </div>
+  </div>
+  {%- endif %}
+
   <section class="company-section company-ledger">
     {{ section_head("I", "The Reckoning", "The Company's Ledger", site.intro_epithet) }}
     <div class="ledger-grid lead">
