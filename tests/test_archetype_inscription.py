@@ -73,3 +73,63 @@ def test_slice_skips_characters_with_no_archetype():
         {"characters": [{"id": "vex"}], "inventory_by_id": inv_by_id},
     )
     assert out == []
+
+
+from build import apply
+
+
+def test_apply_writes_archetype_badge_on_rewrite():
+    authored = {"characters": [{"id": "grieg", "epithet": "..."}]}
+    slice_data = {
+        "character": {"id": "grieg"},
+        "archetype": {"slug": "pack-mule", "label": "THE PACK-MULE"},
+        "items": [],
+        "existing": None,
+    }
+    output = {
+        "decision": "rewrite",
+        "fields": {"inscription": "Hauls a smithy on her shoulders."},
+        "reason": "no existing inscription",
+    }
+
+    apply.apply_refresh_archetype_inscription(authored, "grieg", slice_data, output)
+
+    badge = authored["characters"][0]["archetype_badge"]
+    assert badge["archetype"] == "pack-mule"
+    assert badge["inscription"] == "Hauls a smithy on her shoulders."
+
+
+def test_apply_no_change_leaves_existing_alone():
+    authored = {"characters": [{
+        "id": "grieg",
+        "epithet": "...",
+        "archetype_badge": {
+            "archetype": "pack-mule",
+            "inscription": "old, but fits",
+        },
+    }]}
+    slice_data = {
+        "character": {"id": "grieg"},
+        "archetype": {"slug": "pack-mule"},
+        "items": [],
+        "existing": authored["characters"][0]["archetype_badge"],
+    }
+    output = {"decision": "no_change", "fields": None, "reason": "still fits"}
+
+    apply.apply_refresh_archetype_inscription(authored, "grieg", slice_data, output)
+
+    assert authored["characters"][0]["archetype_badge"]["inscription"] == "old, but fits"
+
+
+def test_apply_raises_for_missing_character():
+    authored = {"characters": []}
+    slice_data = {
+        "character": {"id": "ghost"},
+        "archetype": {"slug": "scholar"},
+        "items": [], "existing": None,
+    }
+    output = {"decision": "rewrite",
+              "fields": {"inscription": "x"},
+              "reason": "."}
+    with pytest.raises(ValueError, match="ghost"):
+        apply.apply_refresh_archetype_inscription(authored, "ghost", slice_data, output)
