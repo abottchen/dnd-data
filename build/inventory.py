@@ -243,3 +243,27 @@ def score_featherfoot(items: list[dict], member: dict) -> float:
     weight = _total_weight(items)
     util_pct = weight / cap * 100
     return 100.0 - util_pct
+
+
+# Listed in priority order — used as the tiebreaker when a character has two
+# archetype wins with equal lead. Pack-Mule resolves before Armorer, etc.
+ARCHETYPE_SLATE: tuple[dict, ...] = (
+    {"slug": "pack-mule",       "label": "THE PACK-MULE",       "score": score_pack_mule,       "min_lead": 0},
+    {"slug": "armorer",         "label": "THE ARMORER",         "score": score_armorer,         "min_lead": 0},
+    {"slug": "glaive-hand",     "label": "THE GLAIVE-HAND",     "score": score_glaive_hand,     "min_lead": 0},
+    {"slug": "quiver",          "label": "THE QUIVER",          "score": score_quiver,          "min_lead": 0},
+    {"slug": "curio-keeper",    "label": "THE CURIO-KEEPER",    "score": score_curio_keeper,    "min_lead": 0},
+    {"slug": "naturalist",      "label": "THE NATURALIST",      "score": score_naturalist,      "min_lead": 0},
+    {"slug": "scholar",         "label": "THE SCHOLAR",         "score": score_scholar,         "min_lead": 0},
+    {"slug": "tongues",         "label": "THE TONGUES",         "score": score_tongues,         "min_lead": 0},
+    {"slug": "lamplighter",     "label": "THE LAMPLIGHTER",     "score": score_lamplighter,     "min_lead": 0},
+    {"slug": "pathfinder",      "label": "THE PATHFINDER",      "score": score_pathfinder,      "min_lead": 0},
+    {"slug": "apothecary",      "label": "THE APOTHECARY",      "score": score_apothecary,      "min_lead": 0},
+    {"slug": "cellarer",        "label": "THE CELLARER",        "score": score_cellarer,        "min_lead": 0},
+    {"slug": "trapper",         "label": "THE TRAPPER",         "score": score_trapper,         "min_lead": 0},
+    {"slug": "costume-master",  "label": "THE COSTUME-MASTER",  "score": score_costume_master,  "min_lead": 0},
+    {"slug": "quartermaster",   "label": "THE QUARTERMASTER",   "score": score_quartermaster,   "min_lead": 0},
+    # Featherfoot needs a meaningful gap to feel earned (5 percentage-point
+    # difference in inverted utilization).
+    {"slug": "featherfoot",     "label": "THE FEATHERFOOT",     "score": score_featherfoot,     "min_lead": 5},
+)

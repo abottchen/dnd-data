@@ -305,3 +305,22 @@ def test_featherfoot_is_carry_ratio_inverted():
     # Score is inverted utilization (so higher = more decisively unburdened).
     # 10% utilization → score 90.0
     assert inventory.score_featherfoot(items, member) == pytest.approx(90.0)
+
+
+def test_archetype_slate_contains_all_sixteen():
+    slugs = [a["slug"] for a in inventory.ARCHETYPE_SLATE]
+    assert slugs == [
+        "pack-mule", "armorer", "glaive-hand", "quiver",
+        "curio-keeper", "naturalist", "scholar", "tongues",
+        "lamplighter", "pathfinder", "apothecary", "cellarer", "trapper",
+        "costume-master",
+        "quartermaster", "featherfoot",
+    ]
+
+
+def test_each_archetype_has_label_and_scorer():
+    for a in inventory.ARCHETYPE_SLATE:
+        assert isinstance(a["slug"], str)
+        assert a["label"].startswith("THE ")
+        assert callable(a["score"])
+        assert isinstance(a.get("min_lead", 0), (int, float))
