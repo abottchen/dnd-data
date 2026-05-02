@@ -309,3 +309,106 @@ def refresh_known_npcs(data: dict, authored: dict) -> list[tuple]:
         "sessions": list(data["session_log"]["entries"]),
         "existing": list(authored["site"].get("known_npcs", [])),
     })]
+
+
+# -- Refresh: archetype inscription ------------------------------------------
+
+# Lifted from build/inventory.py to keep slice composition self-contained;
+# duplicated rather than imported because keyword sets are part of slice
+# semantics (which items count for which archetype) and may evolve here
+# independently of the scorer registry.
+_ARCHETYPE_LABELS = {
+    "pack-mule": "THE PACK-MULE", "armorer": "THE ARMORER",
+    "glaive-hand": "THE GLAIVE-HAND", "quiver": "THE QUIVER",
+    "curio-keeper": "THE CURIO-KEEPER", "naturalist": "THE NATURALIST",
+    "scholar": "THE SCHOLAR", "tongues": "THE TONGUES",
+    "lamplighter": "THE LAMPLIGHTER", "pathfinder": "THE PATHFINDER",
+    "apothecary": "THE APOTHECARY", "cellarer": "THE CELLARER",
+    "trapper": "THE TRAPPER", "costume-master": "THE COSTUME-MASTER",
+    "quartermaster": "THE QUARTERMASTER", "featherfoot": "THE FEATHERFOOT",
+}
+
+
+def _kw_filter(items: list[dict], keywords: tuple[str, ...]) -> list[dict]:
+    return [it for it in items
+            if any(kw in (it.get("name") or "").lower() for kw in keywords)]
+
+
+_ARCHETYPE_ITEMS = {
+    "pack-mule":      lambda items: items,
+    "armorer":        lambda items: [it for it in items
+                                     if it.get("category") in ("Weapon", "Armor")],
+    "glaive-hand":    lambda items: [it for it in items
+                                     if it.get("category") == "Weapon"],
+    "quiver":         lambda items: [it for it in items
+                                     if it.get("category") == "Ammunition"],
+    "curio-keeper":   lambda items: [it for it in items
+                                     if (it.get("rarity") or "common").lower() != "common"
+                                     or it.get("category") == "Wondrous Item"],
+    "apothecary":     lambda items: [it for it in items
+                                     if it.get("category") == "Consumable"],
+    "quartermaster":  lambda items: items,
+    "featherfoot":    lambda items: items,
+    "scholar":        lambda items: _kw_filter(items, ("book", "parchment", "ink", "scroll", "spellbook")),
+    "naturalist":     lambda items: _kw_filter(items, ("druidic", "mistletoe", "yew", "totem", "natural")),
+    "tongues":        lambda items: _kw_filter(items, ("sending stone", "message", "speaking", "whisper")),
+    "lamplighter":    lambda items: _kw_filter(items, ("oil", "torch", "lantern", "candle", "tinderbox", "lamp")),
+    "pathfinder":     lambda items: _kw_filter(items, ("rope", "crowbar", "grapple", "piton", "spike", "climber")),
+    "cellarer":       lambda items: _kw_filter(items, ("ration", "waterskin", "mess kit", "trail", "wineskin")),
+    "trapper":        lambda items: _kw_filter(items, ("caltrop", "trap", "snare", "hunter's trap")),
+    "costume-master": lambda items: _kw_filter(items, ("costume", "disguise", "perfume", "fine clothes", "noble")),
+}
+
+
+def refresh_archetype_inscription(data: dict, authored: dict) -> list[tuple]:
+    """One slice per character whose math archetype is set.
+
+    `authored` is expected to carry an `inventory_by_id` field — the
+    orchestrator wiring places it there before calling this builder.
+    """
+    inv_by_id = authored.get("inventory_by_id", {})
+    auth_by_id = {a["id"]: a for a in authored.get("characters", [])}
+    out: list[tuple] = []
+    for member in data["party"].get("members", []):
+        cid = member.get("id")
+        if cid == "gm":
+            continue
+        rec = inv_by_id.get(cid)
+        if not rec or not rec.get("archetype"):
+            continue
+        arc_slug = rec["archetype"]
+        all_items = (
+            rec.get("rack", []) + rec.get("spotlight", []) + rec.get("manifest", [])
+        )
+        matcher = _ARCHETYPE_ITEMS.get(arc_slug, lambda items: items)
+        slice_items = [
+            {
+                "name": it.get("name"),
+                "count": it.get("count", 1),
+                "weight": it.get("weight"),
+                "description": it.get("description", ""),
+            }
+            for it in matcher(all_items)
+        ]
+        existing = auth_by_id.get(cid, {}).get("archetype_badge")
+        out.append((cid, {
+            "character": {
+                "id": cid,
+                "name": member.get("name"),
+                "race": member.get("race"),
+                "class": member.get("class"),
+                "background": member.get("background"),
+                "epithet": auth_by_id.get(cid, {}).get("epithet", ""),
+            },
+            "archetype": {
+                "slug": arc_slug,
+                "label": _ARCHETYPE_LABELS.get(arc_slug, arc_slug.upper()),
+                "metric": arc_slug,
+                "score": rec.get("total_weight", 0),
+                "runner_up_score": 0,
+                "lead": 0,
+            },
+            "items": slice_items,
+            "existing": existing,
+        }))
+    return out
