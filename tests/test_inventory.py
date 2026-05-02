@@ -407,6 +407,9 @@ def test_assign_archetypes_unawarded_when_top_score_zero():
 
 
 def test_build_bundle_classifies_totals_and_assigns():
+    # Three characters so that cellarer is the largest-lead win for grieg:
+    # vex (0 lb) takes featherfoot, anton (100 lb ladder) takes pack-mule,
+    # leaving grieg with cellarer as the largest of his remaining leads.
     parsed = {
         "grieg": {"items": [
             {"id": "wh", "name": "Warhammer", "category": "Weapon",
@@ -415,9 +418,18 @@ def test_build_bundle_classifies_totals_and_assigns():
              "category": "Adventuring Gear - Camping & Travel",
              "weight": 2, "count": 9, "rarity": "common", "icon": "", "description": ""},
         ]},
+        "vex": {"items": []},
+        "anton": {"items": [
+            {"id": "ladder", "name": "Ladder",
+             "category": "Adventuring Gear - Utility & Equipment",
+             "weight": 100, "count": 1, "rarity": "common", "icon": "", "description": ""},
+        ]},
     }
-    party = {"members": [{"id": "grieg", "name": "Grieg",
-                          "abilities": {"str": 17}}]}
+    party = {"members": [
+        {"id": "grieg", "name": "Grieg", "abilities": {"str": 17}},
+        {"id": "vex", "name": "Vex", "abilities": {"str": 17}},
+        {"id": "anton", "name": "Anton", "abilities": {"str": 17}},
+    ]}
 
     bundle = inventory._build_bundle(parsed, party)
 
