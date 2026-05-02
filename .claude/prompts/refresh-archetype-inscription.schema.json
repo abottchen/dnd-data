@@ -1,0 +1,24 @@
+{
+  "type": "object",
+  "required": ["decision", "fields", "reason"],
+  "additionalProperties": false,
+  "properties": {
+    "decision": {
+      "type": "string",
+      "enum": ["no_change", "rewrite"]
+    },
+    "fields": {
+      "type": ["object", "null"],
+      "required": ["inscription"],
+      "additionalProperties": false,
+      "properties": {
+        "inscription": {
+          "type": "string",
+          "minLength": 8,
+          "maxLength": 200
+        }
+      }
+    },
+    "reason": {"type": "string"}
+  }
+}
