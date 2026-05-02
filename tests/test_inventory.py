@@ -230,3 +230,78 @@ def test_tongues_substring_match():
         {"name": "Sword", "count": 1},
     ]
     assert inventory.score_tongues(items, member={}) == 2
+
+
+def test_lamplighter_sums_light_items():
+    items = [
+        {"name": "Oil (x10)", "count": 10},
+        {"name": "Torch", "count": 5},
+        {"name": "Lantern", "count": 1},
+        {"name": "Sword", "count": 1},
+    ]
+    assert inventory.score_lamplighter(items, member={}) == 16
+
+
+def test_pathfinder_sums_explore_items():
+    items = [
+        {"name": "Rope (50 ft)", "count": 1},
+        {"name": "Crowbar", "count": 1},
+        {"name": "Iron Spike", "count": 8},
+        {"name": "Sword", "count": 1},
+    ]
+    assert inventory.score_pathfinder(items, member={}) == 10
+
+
+def test_apothecary_counts_consumables():
+    items = [
+        {"category": "Consumable", "count": 2},
+        {"category": "Consumable", "count": 1},
+        {"category": "Weapon", "count": 1},
+    ]
+    assert inventory.score_apothecary(items, member={}) == 3
+
+
+def test_cellarer_sums_food_items():
+    items = [
+        {"name": "Rations (x9)", "count": 9},
+        {"name": "Waterskin", "count": 1},
+        {"name": "Wineskin", "count": 1},
+        {"name": "Sword", "count": 1},
+    ]
+    assert inventory.score_cellarer(items, member={}) == 11
+
+
+def test_trapper_sums_traps():
+    items = [
+        {"name": "Caltrops (x20)", "count": 20},
+        {"name": "Hunting Trap", "count": 1},
+        {"name": "Sword", "count": 1},
+    ]
+    assert inventory.score_trapper(items, member={}) == 21
+
+
+def test_costume_master_sums_persona_items():
+    items = [
+        {"name": "Costume (x3)", "count": 3},
+        {"name": "Perfume", "count": 1},
+        {"name": "Fine Clothes", "count": 1},
+        {"name": "Sword", "count": 1},
+    ]
+    assert inventory.score_costume_master(items, member={}) == 5
+
+
+def test_quartermaster_counts_distinct_ids():
+    items = [
+        {"id": "a", "count": 1},
+        {"id": "b", "count": 5},
+        {"id": "c", "count": 1},
+    ]
+    assert inventory.score_quartermaster(items, member={}) == 3
+
+
+def test_featherfoot_is_carry_ratio_inverted():
+    member = {"abilities": {"str": 6}}  # capacity 90
+    items = [{"weight": 9, "count": 1}]   # 9 lb → 10% utilization
+    # Score is inverted utilization (so higher = more decisively unburdened).
+    # 10% utilization → score 90.0
+    assert inventory.score_featherfoot(items, member) == pytest.approx(90.0)

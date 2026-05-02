@@ -194,3 +194,52 @@ def score_naturalist(items: list[dict], member: dict) -> int:
 
 def score_tongues(items: list[dict], member: dict) -> int:
     return _sum_count_where(items, lambda it: _matches_any(it, _TONGUES_KW))
+
+
+_LAMPLIGHTER_KW = ("oil", "torch", "lantern", "candle", "tinderbox", "lamp")
+_PATHFINDER_KW = ("rope", "crowbar", "grapple", "piton", "spike", "climber")
+_CELLARER_KW = ("ration", "waterskin", "mess kit", "trail", "wineskin")
+_TRAPPER_KW = ("caltrop", "trap", "snare", "hunter's trap")
+_COSTUME_KW = ("costume", "disguise", "perfume", "fine clothes", "noble")
+
+
+def score_lamplighter(items: list[dict], member: dict) -> int:
+    return _sum_count_where(items, lambda it: _matches_any(it, _LAMPLIGHTER_KW))
+
+
+def score_pathfinder(items: list[dict], member: dict) -> int:
+    return _sum_count_where(items, lambda it: _matches_any(it, _PATHFINDER_KW))
+
+
+def score_apothecary(items: list[dict], member: dict) -> int:
+    return _sum_count_where(items, lambda it: it.get("category") == "Consumable")
+
+
+def score_cellarer(items: list[dict], member: dict) -> int:
+    return _sum_count_where(items, lambda it: _matches_any(it, _CELLARER_KW))
+
+
+def score_trapper(items: list[dict], member: dict) -> int:
+    return _sum_count_where(items, lambda it: _matches_any(it, _TRAPPER_KW))
+
+
+def score_costume_master(items: list[dict], member: dict) -> int:
+    return _sum_count_where(items, lambda it: _matches_any(it, _COSTUME_KW))
+
+
+def score_quartermaster(items: list[dict], member: dict) -> int:
+    return len({it["id"] for it in items})
+
+
+def score_featherfoot(items: list[dict], member: dict) -> float:
+    """Inverted carry-ratio utilization. Higher = more decisively unburdened.
+
+    Score = 100 - utilization%, where utilization = total / capacity * 100.
+    A character with no capacity (STR 0) is unscorable — return 0.
+    """
+    cap = _carrying_capacity(member)
+    if cap <= 0:
+        return 0.0
+    weight = _total_weight(items)
+    util_pct = weight / cap * 100
+    return 100.0 - util_pct
