@@ -78,5 +78,93 @@
     "method": "Eldritch Blast",
     "verse": "A bandit briefly lit by arcane fire",
     "annotation": "Eldritch Blast &middot; the patron's small attention, spent"
+  },
+  {
+    "character": "grieg",
+    "date": "2026-05-03",
+    "creature": "Zombie",
+    "method": "Heavy Crossbow",
+    "verse": "Two shambling dead put down in the streets outside the walls",
+    "annotation": "Heavy Crossbow &middot; two bolts, two stilled frames, by the alarm-light"
+  },
+  {
+    "character": "grieg",
+    "date": "2026-05-03",
+    "creature": "Zombie",
+    "method": "Warhammer",
+    "verse": "Dead flesh met iron in Malar's Throat and stayed down",
+    "annotation": "Warhammer &middot; close work, twice over, amid the temple's raised alarm"
+  },
+  {
+    "character": "vex",
+    "date": "2026-05-03",
+    "creature": "Zombie",
+    "method": "Longbow",
+    "verse": "A zombie unraveled at range, arrow in the ruin of its chest",
+    "annotation": "Longbow &middot; the dead do not outrun a drawn shaft"
+  },
+  {
+    "character": "vex",
+    "date": "2026-05-03",
+    "creature": "Skeleton",
+    "method": "Breath Weapon (Fire)",
+    "verse": "Bone met fire and lost; a skeleton unmade in the flame",
+    "annotation": "Breath Weapon (Fire) &middot; the flame came from within, not from a torch"
+  },
+  {
+    "character": "vex",
+    "date": "2026-05-03",
+    "creature": "Skeleton",
+    "method": "Scimitar",
+    "verse": "Two skeletons scattered, their borrowed motion cut short",
+    "annotation": "Scimitar &middot; the blade found the joints and the joints gave"
+  },
+  {
+    "character": "urida",
+    "date": "2026-05-03",
+    "creature": "Zombie",
+    "method": "Magic Missile",
+    "verse": "Three zombies taken apart by light that does not miss",
+    "annotation": "Magic Missile &middot; unerring and cold, one dart per dead thing"
+  },
+  {
+    "character": "urida",
+    "date": "2026-05-03",
+    "creature": "Skeleton",
+    "method": "Fire Bolt",
+    "verse": "Two skeletons lit and stilled in the heat of Malar's Throat",
+    "annotation": "Fire Bolt &middot; dry bone catches fast; ash is the end of all walking"
+  },
+  {
+    "character": "urida",
+    "date": "2026-05-03",
+    "creature": "Ghoul",
+    "method": "Toll the Dead",
+    "verse": "A ghoul ended by the sound of its own knell",
+    "annotation": "Toll the Dead &middot; the bell rang for it, and the ghoul had no answer"
+  },
+  {
+    "character": "chumble",
+    "date": "2026-05-03",
+    "creature": "Zombie",
+    "method": "Eldritch Blast",
+    "verse": "Two zombies unmade by force that carries no name",
+    "annotation": "Eldritch Blast &middot; the dead were still new enough to shatter"
+  },
+  {
+    "character": "chumble",
+    "date": "2026-05-03",
+    "creature": "Skeleton",
+    "method": "Eldritch Blast",
+    "verse": "A skeleton struck and scattered across the Throat's stones",
+    "annotation": "Eldritch Blast &middot; bone and void met in the dark — bone lost"
+  },
+  {
+    "character": "lilac",
+    "date": "2026-05-03",
+    "creature": "Skeleton",
+    "method": "Longbow",
+    "verse": "Two skeletons loosed from service by arrows they never heard",
+    "annotation": "Longbow &middot; the arc was short; the end was not"
   }
 ]

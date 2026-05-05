@@ -6,25 +6,37 @@
     "constellation_epithet": "his rolls yet unwritten",
     "distinction_title": "Sharpest Tongue",
     "distinction_subtitle": "the only kill drawn with words alone",
-    "distinction_detail": "<b>1</b> kill &middot; Vicious Mockery"
+    "distinction_detail": "<b>1</b> kill &middot; Vicious Mockery",
+    "archetype_badge": {
+      "archetype": "featherfoot",
+      "inscription": "Whatever he carried, he's dealt it away — the halfling bard who walks the road with nothing but a tongue that won't stay quiet."
+    }
   },
   {
     "id": "grieg",
     "epithet": "of the Wulven, sworn to the hunt",
     "reliquary_header": "Fallen by his hand",
-    "constellation_epithet": "the ready hand",
-    "distinction_title": "Cleanest Hand",
-    "distinction_subtitle": "whose kills left no blood on the deck",
-    "distinction_detail": "<b>2</b> kills &middot; shoved overboard"
+    "constellation_epithet": "six twenties struck",
+    "distinction_title": "Crown of Twenties",
+    "distinction_subtitle": "no other hand has thrown so many",
+    "distinction_detail": "<b>6</b> crits &middot; most of the company",
+    "archetype_badge": {
+      "archetype": "pack-mule",
+      "inscription": "The hunting trap alone tips twenty-five pounds; above it ride scale mail and a heavy crossbow, and the wulven still finds room for caltrops, rope, and a block-and-tackle besides."
+    }
   },
   {
     "id": "vex",
     "epithet": "of the Gold Dragonborn, born to breath and blade",
     "reliquary_header": "Fallen by his steel",
-    "constellation_epithet": "blade in every fight",
-    "distinction_title": "Widest Blade",
-    "distinction_subtitle": "who fells with every length of steel",
-    "distinction_detail": "<b>3</b> kills &middot; two weapons"
+    "constellation_epithet": "blade and breath both",
+    "distinction_title": "Many-Handed",
+    "distinction_subtitle": "who fells by every means he carries",
+    "distinction_detail": "<b>4</b> means &middot; scimitar, shortsword, longbow, breath",
+    "archetype_badge": {
+      "archetype": "cellarer",
+      "inscription": "Nobody assigned her the rations — she just packed ten days' worth, and the waterskin too, already full before the others finished gearing up."
+    }
   },
   {
     "id": "urida",
@@ -33,24 +45,36 @@
     "constellation_epithet": "the heaviest lift",
     "distinction_title": "Most Souls Gathered",
     "distinction_subtitle": "the heaviest lift the company has known",
-    "distinction_detail": "<b>325</b> XP &middot; 36% of the company"
+    "distinction_detail": "<b>775</b> XP &middot; 39% of the company",
+    "archetype_badge": {
+      "archetype": "quartermaster",
+      "inscription": "Brought the rain catcher before the first cloud, and two jars of bug grease before the first swamp — the gnome who packed for the trip everyone else forgot to imagine."
+    }
   },
   {
     "id": "chumble",
     "epithet": "of the Dhakaani, bound by pact to a shadow unseen",
     "reliquary_header": "Fallen by his pact-light",
-    "constellation_epithet": "many rolls, one kill",
+    "constellation_epithet": "highest of the cup",
     "distinction_title": "Steadiest Hand",
     "distinction_subtitle": "whose dice keep the highest company",
-    "distinction_detail": "avg <b>14.7</b> &middot; σ 4.9"
+    "distinction_detail": "avg <b>13.2</b> &middot; σ 5.7",
+    "archetype_badge": {
+      "archetype": "lamplighter",
+      "inscription": "Fifteen flasks of oil and a lamp that hasn't gone dark yet — a goblin who walked out of Dhakaan carrying enough light to argue with the night."
+    }
   },
   {
     "id": "lilac",
     "epithet": "of the Tabaxi, mist-pawed and green-eyed in the hunter's hour",
     "reliquary_header": "The hunt unbegun",
-    "constellation_epithet": "her dice still in the cup",
-    "distinction_title": "Unblooded",
-    "distinction_subtitle": "the only blade yet to draw",
-    "distinction_detail": "<b>0</b> kills &middot; the newest of the company"
+    "constellation_epithet": "no die yet slipped",
+    "distinction_title": "Surefoot",
+    "distinction_subtitle": "alone among rollers without a fumble",
+    "distinction_detail": "<b>0</b> fumbles &middot; 16 d20s thrown",
+    "archetype_badge": {
+      "archetype": "naturalist",
+      "inscription": "One carved sprig of mistletoe, ribbon-tied and kept close — the whole of the primal green, if you know how to ask, flows through that small stem."
+    }
   }
 ]

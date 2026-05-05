@@ -66,7 +66,12 @@
   },
   {
     "name": "Wakanga",
-    "epithet": "one of seven merchant princes of Port Nyanzaru, commended by Corwin above the rest and sought out on Volo's word",
+    "epithet": "one of Port Nyanzaru's seven merchant princes, who gave Urida a journal pointing to a magical object in the jungle and asked her to retrieve it",
+    "allegiance": "with"
+  },
+  {
+    "name": "Musharib",
+    "epithet": "a guide in Jobal's employ, unimpressed by the company's means and motives, who will take them to Hrakhamar at his asking price",
     "allegiance": "with"
   }
 ]
