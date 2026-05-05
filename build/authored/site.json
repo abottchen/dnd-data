@@ -3,7 +3,7 @@
   "page_subtitle": "A ledger of those who walk &middot; and those they have laid down",
   "intro_epithet": "Five travellers and a storyteller, bound to a doomed road",
   "footnote": "The names above are the names given &middot; the ones who fell were given no names",
-  "refreshed_through_session": 6,
+  "refreshed_through_session": 7,
   "road_ahead": {
     "known": [
       {
@@ -40,7 +40,7 @@
       }
     ],
     "was_known": [],
-    "direction": "Port Nyanzaru is at their feet, and three guides offer the jungle road. Azlund's oath is half-kept, and Chult is still shoreless on the maps they have."
+    "direction": "Musharib will walk them through the jungle to Hrakhamar, with Wakanga's journal in the pack and the map of Chult still mostly blank."
   },
   "gm": {
     "name": "The Dungeon Master",
@@ -61,6 +61,7 @@
     "Torgg",
     "Lilac Mist",
     "Volo",
-    "Wakanga"
+    "Wakanga",
+    "Musharib"
   ]
 }
