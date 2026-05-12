@@ -1,0 +1,11 @@
+{
+  "_comment": "Per-PC pronoun map keyed by site slug (the character id used in build/authored/characters.json). Consumed by the character-touching slice builders in build/slices.py so authoring prompts have an authoritative gender signal — the upstream data/party.json carries none. Values are written in the standard short form 'subject/object'; the authoring prompts derive the possessive and reflexive forms.",
+  "pronouns": {
+    "anton": "he/him",
+    "grieg": "he/him",
+    "vex": "he/him",
+    "urida": "she/her",
+    "chumble": "he/him",
+    "lilac": "she/her"
+  }
+}
