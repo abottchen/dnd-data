@@ -8,10 +8,11 @@ Static GitHub Pages site visualizing data from an ongoing D&D campaign.
   - `site/index.html` — build artifact (committed).
   - `site/styles.css` — the design system (palette, typography, components).
   - `site/images/` — character portrait tokens. Filenames match each entry's `image` field in `data/party.json` (e.g. `chumble-crudluck.png`). The GM's token is `GM.png`.
-- `data/` — ingestion directory for upstream files (gitignored contents). Holds `party.json`, `dicex-rolls-*.json`, `session-log.json`, all auto-pushed from upstream repos. Read-only from this repo's perspective; never modified here.
-  - `data/party.json` — current party snapshot, from the character-sheet repo.
-  - `data/dicex-rolls-*.json` — dice-roll snapshots, from the dice-roll repo.
-  - `data/session-log.json` — per-session narrative entries with real + in-universe dates, from the session-log repo.
+- `data/` — ingestion directory for source files (gitignored contents). Holds `party.json`, `session-log.json`, plus `dice/` and `inventory/` subdirectories. Files are dropped in manually from external sources; nothing in this repo writes to `data/`.
+  - `data/party.json` — current party snapshot (character-sheet export).
+  - `data/dice/dicex-rolls-*.json` — dice-roll snapshots (dice-roller export).
+  - `data/inventory/obr-inv-backup-*.json` — Owlbear Rodeo inventory exports.
+  - `data/session-log.json` — per-session narrative entries with real + in-universe dates.
 - `build/` — the build orchestrator. Python package that authors prose into `build/authored/*.json` (via `claude -p`) and renders `site/index.html`. Entry point: `python -m build`.
   - `build/__main__.py` — orchestrator entry point. Drives the discovery pass, append pass, refresh pass, and final render.
   - `build/render.py` — deterministic renderer. Reads `data/` + `build/authored/*.json` + `build/templates/*.html` + `build/dice-players.json`, validates all prose entries, and writes `site/index.html`. Resolves its own paths via `BUILD_DIR = Path(__file__).resolve().parent` (for templates / authored / dice-players) and `REPO_ROOT = BUILD_DIR.parent` (for `data/`, `site/`, and `.claude/ext/` lookups like the bestiary glob).

@@ -25,7 +25,8 @@ def slice_env(tmp_path, monkeypatch):
     data_dir.mkdir()
     shutil.copy(FIXTURES / "sample_party.json", data_dir / "party.json")
     shutil.copy(FIXTURES / "sample_session_log.json", data_dir / "session-log.json")
-    shutil.copy(FIXTURES / "sample_dicex_rolls.json", data_dir / "dicex-rolls-2026-04-23.json")
+    (data_dir / "dice").mkdir()
+    shutil.copy(FIXTURES / "sample_dicex_rolls.json", data_dir / "dice" / "dicex-rolls-2026-04-23.json")
 
     authored_dir = tmp_path / "authored"
     authored_dir.mkdir()

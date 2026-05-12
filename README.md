@@ -4,9 +4,9 @@ A static GitHub Pages site visualizing data from an ongoing D&D campaign.
 
 ## How it works
 
-Three upstream repos auto-push JSON snapshots into `data/` (gitignored). A deterministic Python builder reads those snapshots plus a small store of human-authored prose, validates everything, and renders `site/index.html` via Jinja2 templates. A GitHub Actions workflow uploads the committed `site/` directory to GitHub Pages.
+JSON snapshots from external sources (character sheets, dice roller, Owlbear Rodeo, session log) are dropped into `data/` (gitignored). A deterministic Python builder reads those snapshots plus a small store of human-authored prose, validates everything, and renders `site/index.html` via Jinja2 templates. A GitHub Actions workflow uploads the committed `site/` directory to GitHub Pages.
 
-When new upstream data lands, the authored prose store needs new entries (kill verses, session summaries, NPC epithets, etc.) and existing entries may need a refresh. That work runs locally as `python -m build` — see [Build architecture](#build-architecture).
+When new source data lands, the authored prose store needs new entries (kill verses, session summaries, NPC epithets, etc.) and existing entries may need a refresh. That work runs locally as `python -m build` — see [Build architecture](#build-architecture).
 
 See [`CLAUDE.md`](CLAUDE.md) for full architecture detail and validation rules.
 
@@ -14,11 +14,12 @@ See [`CLAUDE.md`](CLAUDE.md) for full architecture detail and validation rules.
 
 ```mermaid
 flowchart LR
-    subgraph up [upstream repos · auto-push to data/]
+    subgraph up [source snapshots · dropped into data/]
       direction TB
       P1[data/party.json]
-      P2[data/dicex-rolls-*.json]
+      P2[data/dice/dicex-rolls-*.json]
       P3[data/session-log.json]
+      P4[data/inventory/obr-inv-backup-*.json]
     end
     up --> O["build<br/>python -m build"]
     O --> A[build/authored/*.json]
@@ -29,7 +30,7 @@ flowchart LR
     I --> GH((GitHub Pages))
 ```
 
-The three upstream files under `data/` are gitignored — they carry real player names that must never reach `site/index.html`. `build/render.py`'s loaders scrub names at read time using the substring map in `build/dice-players.json`. Versioned git hooks under `.githooks/` reject any commit, message, or pushed change whose content matches a known full-name pattern.
+The source files under `data/` are gitignored — they carry real player names that must never reach `site/index.html`. `build/render.py`'s loaders scrub names at read time using the substring map in `build/dice-players.json`. Versioned git hooks under `.githooks/` reject any commit, message, or pushed change whose content matches a known full-name pattern.
 
 ## Build architecture
 
@@ -69,8 +70,8 @@ Each transformer's preferred model (`sonnet` or `opus`) is declared in YAML fron
   - `site/index.html` — committed build artifact.
   - `site/styles.css` — the design system.
   - `site/images/` — character portrait tokens, referenced by each entry's `image` field in `data/party.json`.
-- `data/` — ingestion directory for upstream files (contents gitignored).
-  - `data/party.json`, `data/dicex-rolls-*.json`, `data/session-log.json` — upstream data files, auto-pushed.
+- `data/` — ingestion directory for source files (contents gitignored).
+  - `data/party.json`, `data/session-log.json`, `data/dice/dicex-rolls-*.json`, `data/inventory/obr-inv-backup-*.json` — source data files, dropped in manually from external exports.
 - `build/` — the build orchestrator (Python package). Entry point: `python -m build`.
   - `build/__main__.py` — orchestrator entry point.
   - `build/render.py` — deterministic Python renderer (validates authored entries, computes derived data, renders via Jinja2).
