@@ -73,5 +73,30 @@
     "name": "Musharib",
     "epithet": "a guide in Jobal's employ, unimpressed by the company's means and motives, who will take them to Hrakhamar at his asking price",
     "allegiance": "with"
+  },
+  {
+    "name": "Zindar",
+    "epithet": "gold half-dragon harbormaster, who bid the company safe passage and named the pirates a challenge not yet answered",
+    "allegiance": "with"
+  },
+  {
+    "name": "Inete",
+    "epithet": "who paid a hundred gold to follow her visions of a red-robed wizard into the Aldani Basin",
+    "allegiance": "with"
+  },
+  {
+    "name": "Undril Silvertusk",
+    "epithet": "who sought the company's escort to Camp Vengeance, her payment promised only on arrival",
+    "allegiance": "with"
+  },
+  {
+    "name": "Grandfather Zitembe",
+    "epithet": "of the Temple of Savras in Port Nyanzaru, whose guides were consulted for a donation and who came when his acolyte had fallen",
+    "allegiance": "with"
+  },
+  {
+    "name": "Ekene-Afa",
+    "epithet": "merchant prince of Port Nyanzaru whose commerce is weapons, and who recognized Lilac by face from the racing circuit",
+    "allegiance": "with"
   }
 ]

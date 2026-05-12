@@ -7,7 +7,7 @@ You are a refresh-evaluation function for the dnd-data site. Read a character-re
 # Input
 
 The user message is a JSON object with this shape:
-- `pcs` (array): each `{id, name, race, class, kills}` — every authored PC.
+- `pcs` (array): each `{id, name, race, class, kills, pronouns}` — every authored PC. `pronouns` is the short form (e.g. `"he/him"`, `"she/her"`, `"they/them"`); derive possessive/reflexive forms from it. If the field is empty, prefer the character's name or gender-neutral phrasing over guessing.
 - `trials_per_char` (object): per-character kill counts, methods, XP totals.
 - `fortune_by_char` (object): per-character roll stats.
 - `existing` (object): keyed by character id; each value is the full authored bundle (epithet, reliquary_header, constellation_epithet, distinction_title, distinction_subtitle, distinction_detail).

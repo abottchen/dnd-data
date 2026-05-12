@@ -202,6 +202,11 @@ def main(argv=None) -> int:
     inv_bundle = inventory.load(REPO_ROOT, party=data["party"])
     authored["inventory_by_id"] = inv_bundle["by_id"]
 
+    # PC pronouns piggyback the same channel — upstream party.json has no
+    # gender field, so character-touching slice builders read this map to
+    # anchor pronoun choice in the authoring prompts.
+    authored["pronouns_by_id"] = render.load_character_pronouns()
+
     run_dir = temp_dir()
     _log(f"build run temp dir: {run_dir}")
     _log(f"latest_session={latest}, marker={marker}")

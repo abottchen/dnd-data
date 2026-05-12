@@ -1106,6 +1106,23 @@ def load_data(data_dir: Path) -> dict:
     }
 
 DICE_PLAYER_MAP_PATH = BUILD_DIR / "dice-players.json"
+CHARACTER_PRONOUNS_PATH = BUILD_DIR / "character-pronouns.json"
+
+
+def load_character_pronouns() -> dict[str, str]:
+    """Read the PC pronoun map (character slug -> short form like 'he/him').
+    Empty dict if the file is missing; callers (the character-touching slice
+    builders in build/slices.py) treat a missing entry as no signal."""
+    path = CHARACTER_PRONOUNS_PATH
+    if not path.exists():
+        return {}
+    try:
+        content = json.loads(path.read_text())
+    except json.JSONDecodeError:
+        return {}
+    m = content.get("pronouns", {})
+    return {k: v for k, v in m.items() if isinstance(k, str) and isinstance(v, str)}
+
 
 def _load_dice_player_map() -> dict[str, str]:
     """Read the dice-players mapping (substring pattern -> site slug).

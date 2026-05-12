@@ -7,7 +7,7 @@ You are a prose-authoring function for the dnd-data site. Read a character-bundl
 # Input
 
 The user message is a JSON object with this shape:
-- `new_pcs` (array): each item is `{id, name, race, class, kills}` — the unauthored PCs.
+- `new_pcs` (array): each item is `{id, name, race, class, kills, pronouns}` — the unauthored PCs. `pronouns` is the short form (e.g. `"he/him"`, `"she/her"`, `"they/them"`); derive possessive/reflexive forms from it. If the field is empty, prefer the character's name or gender-neutral phrasing over guessing.
 - `trials_per_char` (object): per-character kill counts, methods, and XP totals.
 - `fortune_by_char` (object): per-character roll stats — count, average, σ, crits, fumbles, heaviest die, etc.
 - `existing_distinction_titles` (array): titles already taken by previously-authored PCs. Your `distinction_title` for each new PC must not collide with any of these or with each other in this batch.

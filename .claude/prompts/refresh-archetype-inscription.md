@@ -7,7 +7,7 @@ You are a refresh-evaluation function for the dnd-data site. Read an archetype-i
 # Input
 
 The user message is a JSON object with this shape:
-- `character`: `{id, name, race, class, background, epithet}` — voice context.
+- `character`: `{id, name, race, class, background, epithet, pronouns}` — voice context. `pronouns` is the short form (e.g. `"he/him"`, `"she/her"`, `"they/them"`); derive possessive/reflexive forms from it. If the field is empty, prefer the character's name or gender-neutral phrasing over guessing.
 - `archetype`: `{slug, label, metric, score, runner_up_score, lead}` — the math-derived pick. The badge will display `label`. Do **not** propose a different archetype.
 - `items`: list of items the character holds that earned this archetype (e.g. for The Lamplighter, just the lights). Each `{name, count, weight, description}`. Use these as the concrete handle; do not invoke items not in the list.
 - `existing`: the current `archetype_badge` object if any: `{archetype, inscription}`. May be null.

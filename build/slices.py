@@ -182,6 +182,7 @@ def append_npcs(data: dict, authored: dict) -> list[tuple]:
 
 def append_characters(data: dict, authored: dict) -> list[tuple]:
     auth_ids = {c["id"] for c in authored["characters"]}
+    pronouns_by_id = authored.get("pronouns_by_id", {})
     new_pcs = []
     for member in data["party"]["members"]:
         if member["id"] in auth_ids:
@@ -192,6 +193,7 @@ def append_characters(data: dict, authored: dict) -> list[tuple]:
             "race": member.get("race"),
             "class": member.get("class"),
             "kills": member.get("kills", []),
+            "pronouns": pronouns_by_id.get(member["id"], ""),
         })
     if not new_pcs:
         return []
@@ -245,6 +247,7 @@ def refresh_npcs(data: dict, authored: dict) -> list[tuple]:
 
 
 def refresh_characters(data: dict, authored: dict) -> list[tuple]:
+    pronouns_by_id = authored.get("pronouns_by_id", {})
     pcs = []
     for member in data["party"]["members"]:
         if not any(c["id"] == member["id"] for c in authored["characters"]):
@@ -255,6 +258,7 @@ def refresh_characters(data: dict, authored: dict) -> list[tuple]:
             "race": member.get("race"),
             "class": member.get("class"),
             "kills": member.get("kills", []),
+            "pronouns": pronouns_by_id.get(member["id"], ""),
         })
     if not pcs:
         return []
@@ -325,6 +329,7 @@ def refresh_archetype_inscription(data: dict, authored: dict) -> list[tuple]:
     orchestrator wiring places it there before calling this builder.
     """
     inv_by_id = authored.get("inventory_by_id", {})
+    pronouns_by_id = authored.get("pronouns_by_id", {})
     auth_by_id = {a["id"]: a for a in authored.get("characters", [])}
     out: list[tuple] = []
     for member in data["party"].get("members", []):
@@ -356,6 +361,7 @@ def refresh_archetype_inscription(data: dict, authored: dict) -> list[tuple]:
                 "class": member.get("class"),
                 "background": member.get("background"),
                 "epithet": auth_by_id.get(cid, {}).get("epithet", ""),
+                "pronouns": pronouns_by_id.get(cid, ""),
             },
             "archetype": {
                 "slug": arc_slug,
