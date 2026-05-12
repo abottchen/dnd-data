@@ -1,10 +1,10 @@
 """Load and shape the upstream inventory snapshot for the renderer.
 
 Mirrors the dice-data integration: the latest obr-inv-backup-*.json under
-data/ is read, upstream player names are resolved through the existing
-build/dice-players.json substring map (so real surnames never reach the
-template), items are classified into three Pack-section zones (Rack,
-Spotlight, Manifest), totals are computed against 15×STR carrying
+data/inventory/ is read, upstream player names are resolved through the
+existing build/dice-players.json substring map (so real surnames never
+reach the template), items are classified into three Pack-section zones
+(Rack, Spotlight, Manifest), totals are computed against 15×STR carrying
 capacity, and 16 archetypes are scored to pick one badge per character.
 
 This module is render-only. The single place a model contributes is the
@@ -32,7 +32,7 @@ def load(repo_root: Path, party: Optional[dict] = None) -> dict:
     from build.paths import data_dir
 
     d = data_dir()
-    snapshot = _resolve_snapshot_path(d)
+    snapshot = _resolve_snapshot_path(d / "inventory")
     if snapshot is None:
         return {"by_id": {}, "company_strip": []}
 

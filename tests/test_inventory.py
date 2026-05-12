@@ -486,7 +486,8 @@ def test_load_full_pipeline_with_fixture(tmp_path, monkeypatch):
         Path(__file__).parent / "fixtures" / "inventory"
         / "obr-inv-backup-2026-05-02T04-21-16-825Z.json"
     )
-    (fixture_dir / src.name).write_text(src.read_text())
+    (fixture_dir / "inventory").mkdir()
+    (fixture_dir / "inventory" / src.name).write_text(src.read_text())
     (fixture_dir / "party.json").write_text(json.dumps([
         {"id": "grieg", "name": "Grieg", "abilities": {"str": 17}},
         {"id": "vex",   "name": "Vex",   "abilities": {"str": 12}},

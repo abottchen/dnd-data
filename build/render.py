@@ -1016,7 +1016,7 @@ def load_data(data_dir: Path) -> dict:
     with (data_dir / "session-log.json").open() as f:
         session_log = json.load(f)
 
-    dice_paths = sorted(data_dir.glob("dicex-rolls-*.json"))
+    dice_paths = sorted((data_dir / "dice").glob("dicex-rolls-*.json"))
     dice_rolls = [json.loads(p.read_text()) for p in dice_paths]
 
     # Build rolls_by_slug from dice files by mapping real-name players to site slugs.
