@@ -8,8 +8,8 @@
     "distinction_subtitle": "the only kill drawn with words alone",
     "distinction_detail": "<b>1</b> kill &middot; Vicious Mockery",
     "archetype_badge": {
-      "archetype": "featherfoot",
-      "inscription": "Whatever he carried, he's dealt it away — the halfling bard who walks the road with nothing but a tongue that won't stay quiet."
+      "archetype": "armorer",
+      "inscription": "Boiled leather on his halfling shoulders, a dagger on each hip — somehow the bard became the best-armored soul the party fields."
     }
   },
   {
@@ -34,8 +34,8 @@
     "distinction_subtitle": "who fells by every means he carries",
     "distinction_detail": "<b>4</b> means &middot; scimitar, shortsword, longbow, breath",
     "archetype_badge": {
-      "archetype": "cellarer",
-      "inscription": "Nobody assigned her the rations — she just packed ten days' worth, and the waterskin too, already full before the others finished gearing up."
+      "archetype": "apothecary",
+      "inscription": "Three tins of salve against the insects, one vial of perfume against the court, and a healing draught for the rest — he does not leave gaps in his preparations."
     }
   },
   {
@@ -47,8 +47,8 @@
     "distinction_subtitle": "the heaviest lift the company has known",
     "distinction_detail": "<b>775</b> XP &middot; 39% of the company",
     "archetype_badge": {
-      "archetype": "quartermaster",
-      "inscription": "Brought the rain catcher before the first cloud, and two jars of bug grease before the first swamp — the gnome who packed for the trip everyone else forgot to imagine."
+      "archetype": "scholar",
+      "inscription": "The book's margins ran out long before the parchment did — eight loose sheets trail it now, dense with whatever the weave kept insisting she hadn't finished writing."
     }
   },
   {
@@ -71,7 +71,7 @@
     "constellation_epithet": "no die yet slipped",
     "distinction_title": "Surefoot",
     "distinction_subtitle": "alone among rollers without a fumble",
-    "distinction_detail": "<b>0</b> fumbles &middot; 16 d20s thrown",
+    "distinction_detail": "<b>0</b> fumbles &middot; 23 d20s thrown",
     "archetype_badge": {
       "archetype": "naturalist",
       "inscription": "One carved sprig of mistletoe, ribbon-tied and kept close — the whole of the primal green, if you know how to ask, flows through that small stem."
