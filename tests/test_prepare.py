@@ -147,3 +147,20 @@ def test_prepare_writes_keep_marker_when_keep_temp(run_env):
 def test_prepare_no_keep_marker_by_default(run_env):
     run_dir = prepare.run(no_refresh=False, force_refresh=False, keep_temp=False)
     assert not (run_dir / ".keep").exists()
+
+
+# -- CLI dispatch ------------------------------------------------------------
+
+def test_main_prepare_subcommand_creates_run_dir(run_env, capsys):
+    from build.__main__ import main
+    rc = main(["prepare", "--no-refresh"])
+    assert rc == 0
+    captured = capsys.readouterr()
+    # main should print the run dir path so the user can pass it to the skill.
+    assert "build/.run" in captured.out or "runs/" in captured.out
+
+
+def test_main_apply_subcommand_requires_path(run_env, capsys):
+    from build.__main__ import main
+    rc = main(["apply"])
+    assert rc != 0  # parser should reject missing positional
