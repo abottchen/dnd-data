@@ -29,6 +29,16 @@ def _load_schema(run_dir: Path, entry: dict) -> dict:
     return json.loads((run_dir / entry["schema"]).read_text())
 
 
+def _load_slice(run_dir: Path, entry: dict) -> dict:
+    """Read a slice's input JSON. The /build-prose skill moves authored slices
+    from pending/ to done/ for its own re-run idempotency, so look in both."""
+    pending_path = run_dir / entry["pending"]
+    if pending_path.exists():
+        return json.loads(pending_path.read_text())
+    done_path = run_dir / "done" / f"{entry['stem']}.json"
+    return json.loads(done_path.read_text())
+
+
 def _move(src: Path, dest: Path) -> None:
     dest.parent.mkdir(parents=True, exist_ok=True)
     shutil.move(str(src), str(dest))
@@ -120,7 +130,7 @@ def apply_run(run_dir: Path, *, skip_render: bool) -> dict:
             continue
 
         # Apply.
-        slice_data = json.loads((run_dir / entry["pending"]).read_text())
+        slice_data = _load_slice(run_dir, entry)
         fn = registry.by_name(entry["transformer"]).apply_fn
         try:
             fn(authored, entry["key"], slice_data, output)

@@ -115,6 +115,36 @@ def test_apply_is_idempotent_on_rerun(staged_run):
     assert len(matching) == 1  # not duplicated by the second apply
 
 
+def test_apply_reads_slice_from_done_when_skill_moved_it(staged_run):
+    """The /build-prose skill moves authored slices from pending/ to done/.
+    apply_cli must still find the slice in that case."""
+    run_dir, authored_dir = staged_run
+    manifest = json.loads((run_dir / "manifest.json").read_text())
+    target = next(s for s in manifest["slices"] if s["transformer"] == "append-sessions")
+    slice_data = json.loads((run_dir / target["pending"]).read_text())
+
+    _write_result(run_dir, target, {
+        "fields": {
+            "title": "Moved-to-done Title",
+            "summary": "Slice was relocated by the skill.",
+            "silent_roll": []
+        },
+        "reason": "test fixture"
+    })
+
+    # Simulate the build-prose skill moving the slice after authoring.
+    done_dir = run_dir / "done"
+    done_dir.mkdir(exist_ok=True)
+    shutil.move(str(run_dir / target["pending"]),
+                str(done_dir / f"{target['stem']}.json"))
+
+    summary = apply_cli.apply_run(run_dir, skip_render=True)
+    assert target["stem"] in {a["stem"] for a in summary["applied"]}
+    sessions = json.loads((authored_dir / "sessions.json").read_text())
+    matching = [s for s in sessions if s["session"] == slice_data["session"]]
+    assert matching and matching[0]["title"] == "Moved-to-done Title"
+
+
 def test_apply_failure_in_apply_fn_rejects_slice_and_continues(staged_run):
     """A schema-valid result that the apply function refuses (e.g. unknown
     kill key) should be rejected, not abort the run."""

@@ -6,7 +6,7 @@ A static GitHub Pages site visualizing data from an ongoing D&D campaign.
 
 JSON snapshots from external sources (character sheets, dice roller, Owlbear Rodeo, session log) are dropped into `data/` (gitignored). A deterministic Python builder reads those snapshots plus a small store of human-authored prose, validates everything, and renders `site/index.html` via Jinja2 templates. A GitHub Actions workflow uploads the committed `site/` directory to GitHub Pages.
 
-When new source data lands, the authored prose store needs new entries (kill verses, session summaries, NPC epithets, etc.) and existing entries may need a refresh. That work runs locally as `python -m build` — see [Build architecture](#build-architecture).
+When new source data lands, the authored prose store needs new entries (kill verses, session summaries, NPC epithets, etc.) and existing entries may need a refresh. That work runs locally in three steps — `python -m build prepare`, the `/build-prose` skill inside a Claude Code session, and `python -m build apply` — see [Build architecture](#build-architecture).
 
 See [`CLAUDE.md`](CLAUDE.md) for full architecture detail and validation rules.
 
@@ -21,8 +21,13 @@ flowchart LR
       P3[data/session-log.json]
       P4[data/inventory/obr-inv-backup-*.json]
     end
-    up --> O["build<br/>python -m build"]
-    O --> A[build/authored/*.json]
+    up --> PR["python -m build prepare"]
+    A0[build/authored/*.json] --> PR
+    PR --> RUN["build/.run/&lt;ts&gt;/pending/*.json"]
+    RUN --> BP["/build-prose (in-session)"]
+    BP --> RES["build/.run/&lt;ts&gt;/results/*.json"]
+    RES --> AP["python -m build apply"]
+    AP --> A[build/authored/*.json]
     up --> R
     A --> R
     T[build/templates/*.html] --> R
@@ -34,33 +39,40 @@ The source files under `data/` are gitignored — they carry real player names t
 
 ## Build architecture
 
-The `build` package authors prose into `build/authored/*.json` (via `claude -p`) and then runs `build/render.py`. Each transformer is a single non-interactive `claude -p` call: a system prompt from `.claude/prompts/<name>.md`, a slice JSON delivered on stdin, and a JSON Schema-validated response. The orchestrator is deterministic Python; the model's only job is to turn one slice into one schema-conformant prose object.
+The `build` package prepares authoring slices, dispatches them to in-session sub-agents via the `/build-prose` skill, and then applies the returned prose to `build/authored/*.json` before re-rendering. Each transformer is a single slice file paired with a frozen system prompt and JSON Schema; the sub-agent's only job is to turn one slice into one schema-conformant prose object. The orchestrator itself is deterministic Python.
 
 ```mermaid
 sequenceDiagram
     autonumber
     participant U as upstream + authored
-    participant O as build (Python)
-    participant T as temp dir
-    participant C as claude -p (×N transformers)
+    participant P as python -m build prepare
+    participant RD as build/.run/&lt;ts&gt;/
+    participant BP as /build-prose (in-session)
+    participant SA as sub-agents (×N slices)
+    participant AP as python -m build apply
     participant A as authored/*.json
     participant R as render.py
 
-    O->>U: load data + authored state
-    O->>T: persist slice + prompt body (debug artifact)
-    O->>C: stdin=slice<br/>--system-prompt-file<br/>--json-schema
-    C-->>O: structured_output (schema-validated)
-    O->>A: apply prose, bump marker on full refresh success
-    O->>R: run render.py
+    P->>U: load data + authored state
+    P->>RD: write manifest.json + pending/*.json + frozen prompts
+    BP->>RD: read manifest, pending slices, prompts
+    BP->>SA: dispatch one sub-agent per slice
+    SA-->>RD: results/*.json (schema-validated by apply)
+    AP->>RD: validate each result vs frozen schema
+    AP->>A: apply prose, bump marker on full refresh success
+    AP->>R: run render.py
 ```
 
-- **Orchestrator** (`build/__main__.py`) — drives the append pass, then the refresh pass, then the render. Pure Python; makes all decisions about *what* to send to the model.
-- **Slice builders** (`build/slices.py`) — pure functions of `(data, authored)` returning `(key, slice_data)` tuples per category. Mirrors the slicing logic that lived in the retired `helpers.py`.
-- **Transformer invocation** (`build/invoke.py`) — for each slice, parses frontmatter from `.claude/prompts/<name>.md`, writes the body to a temp file, runs `claude -p` with the body file + slice on stdin + schema. Returns the validated `structured_output` dict.
-- **Apply** (`build/apply.py`) — writes returned prose into the in-memory authored store; `build/store.py` persists.
-- **Render loop** (`build/build_loop.py`) — runs `build/render.py` and reports.
+- **Entry point** (`build/__main__.py`) — `prepare` / `apply` subcommand dispatcher. A bare `python -m build` is the same as `prepare` and prints the `/build-prose` command to run next.
+- **Prepare** (`build/prepare.py`) — walks the transformer registry, parses frontmatter from `.claude/prompts/<name>.md`, builds slices, and writes `manifest.json` + `pending/*.json` + frozen prompt/schema copies under `build/.run/<timestamp>/`.
+- **Slice builders** (`build/slices.py`) — pure functions of `(data, authored)` returning `(key, slice_data)` tuples per category; key matching determines what's missing and needs authoring.
+- **Transformer registry** (`build/registry.py`) — single source of truth listing every transformer (append + refresh), its slice builder, and its schema.
+- **Apply** (`build/apply_cli.py`, `build/apply.py`) — validates each `results/*.json` against the frozen schema, applies the returned prose to the in-memory authored store, persists via `build/store.py`, bumps `site.refreshed_through_session` on full refresh-pass success, and then invokes `build/render.py`.
+- **`/build-prose` skill** (`.claude/skills/build-prose/`) — drives the slice queue inside a Claude Code session, dispatching one sub-agent per pending slice. Each sub-agent receives only the slice + frozen prompt + schema; no Claude Code tools.
 
-The model has no tools (`--disallowedTools` lists every Claude Code tool; `--permission-mode plan` doubles up). The full slice and the stripped prompt body are persisted to a per-run temp dir for inspection on failure; the user removes the temp dir manually after a clean run.
+Validation gates the render: any `MISSING` or `MALFORMED` authored entry causes `render.py` to exit 1. Fix the authored entry and re-run apply.
+
+The run directory under `build/.run/<timestamp>/` is preserved on failure for inspection (and on success with `prepare --keep-temp`); otherwise it is cleaned up automatically after a clean apply.
 
 Each transformer's preferred model (`sonnet` or `opus`) is declared in YAML frontmatter at the top of `.claude/prompts/<name>.md`. Sonnet handles per-item, short-output transformers (`append-kills`, `append-sessions`, `append-npcs`, `refresh-npcs`, `refresh-intro-epithet`); Opus handles slices that aggregate across the campaign and grow with it (`append-chapters`, `append-characters`, `refresh-chapters`, `refresh-characters`, `refresh-road-ahead`).
 
@@ -73,13 +85,15 @@ Each transformer's preferred model (`sonnet` or `opus`) is declared in YAML fron
 - `data/` — ingestion directory for source files (contents gitignored).
   - `data/party.json`, `data/session-log.json`, `data/dice/dicex-rolls-*.json`, `data/inventory/obr-inv-backup-*.json` — source data files, dropped in manually from external exports.
 - `build/` — the build orchestrator (Python package). Entry point: `python -m build`.
-  - `build/__main__.py` — orchestrator entry point.
+  - `build/__main__.py` — orchestrator entry point; `prepare` / `apply` subcommand dispatcher.
   - `build/render.py` — deterministic Python renderer (validates authored entries, computes derived data, renders via Jinja2).
-  - `build/paths.py`, `store.py`, `slices.py`, `invoke.py`, `apply.py`, `build_loop.py` — orchestrator submodules.
+  - `build/paths.py`, `store.py`, `slices.py`, `registry.py`, `prepare.py`, `apply.py`, `apply_cli.py`, `inventory.py` — orchestrator submodules.
+  - `build/.run/<timestamp>/` — per-run scratch dir (gitignored): `manifest.json`, `pending/`, frozen `prompts/`, and `results/` written by `/build-prose`.
   - `build/templates/` — Jinja2 partials for page structure.
   - `build/authored/` — JSON prose store (`kills`, `sessions`, `chapters`, `npcs`, `characters`, `site`); the only writable surface for the orchestrator.
   - `build/dice-players.json` — substring map (first-name or handle → site slug); never records full real names.
 - `.claude/prompts/` — paired prompt and schema files, one pair per transformer; each prompt declares its preferred model in YAML frontmatter.
+- `.claude/skills/build-prose/` — the `/build-prose` skill that drives the slice queue in-session.
 - `tests/` — pytest suite covering validators, key matching, computation formulas, slice builders, and bestiary lookup.
 - `requirements.txt` — Python dependencies.
 - `.github/workflows/deploy-pages.yml` — uploads `site/` to GitHub Pages on push to `main`.
@@ -99,15 +113,38 @@ ln -s /path/to/5etools-src .claude/ext/5etools-src
 
 ## Local build + rebuild
 
-```bash
-# Author any missing prose, then render site/index.html:
-.venv/bin/python -m build
+Building is a three-step flow — prepare slices, author prose in-session, apply + render:
 
-# Render only (assumes the authored store is already current):
+```bash
+# 1. Gather pending slices into build/.run/<timestamp>/
+.venv/bin/python -m build prepare
+
+# 2. Inside a Claude Code session, drive the slice queue:
+#    /build-prose build/.run/<timestamp>/
+#    (one sub-agent per slice; each writes a JSON result file)
+
+# 3. Validate results, apply to build/authored/*.json, render site/index.html:
+.venv/bin/python -m build apply build/.run/<timestamp>/
+```
+
+A bare `.venv/bin/python -m build` is equivalent to `prepare` — it prints the `/build-prose` command to run next and exits.
+
+To re-render without re-authoring (when `build/authored/*.json` is already current):
+
+```bash
 .venv/bin/python build/render.py
 ```
 
-The render aborts with `MISSING` / `MALFORMED` / `ORPHAN` errors before writing output if any authored entry is missing required fields. Fix the authored entry and re-run.
+Useful flags:
+
+- `prepare --no-refresh` — skip the discovery and refresh passes (append-only).
+- `prepare --force-refresh` — run them even when the marker is current.
+- `prepare --keep-temp` — preserve the run dir on success.
+- `apply --skip-render` — apply results but don't rebuild the site.
+
+The render aborts with `MISSING` / `MALFORMED` / `ORPHAN` errors before writing output if any authored entry is missing required fields. Fix the authored entry and re-run `apply`.
+
+To publish: pull `main`, run the three-step build, commit `site/index.html` and `build/authored/*.json`, push.
 
 ## Tests
 
