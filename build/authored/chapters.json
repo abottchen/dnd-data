@@ -4,5 +4,11 @@
     "starts_at_session": 1,
     "title": "Passage to Chult",
     "epigraph": "From the House of Healing to the jungle's edge &mdash; by oath, by storm, by ice, by augury."
+  },
+  {
+    "id": 2,
+    "starts_at_session": 9,
+    "title": "Down the Soshenstar to Fort Righteous",
+    "epigraph": "From the cooled town to the river's last hex &mdash; by canoe, by lasso, by boiled water, by ring-light."
   }
 ]

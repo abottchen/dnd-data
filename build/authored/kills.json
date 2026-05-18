@@ -166,5 +166,21 @@
     "method": "Longbow",
     "verse": "Two skeletons loosed from service by arrows they never heard",
     "annotation": "Longbow &middot; the arc was short; the end was not"
+  },
+  {
+    "character": "grieg",
+    "date": "2026-05-17",
+    "creature": "Flying Monkey",
+    "method": "Heavy Crossbow",
+    "verse": "A flying monkey fell mid-theft, still clutching stolen oil",
+    "annotation": "Heavy Crossbow &middot; bolt loosed before the creature could clear the deck"
+  },
+  {
+    "character": "chumble",
+    "date": "2026-05-17",
+    "creature": "Zombie",
+    "method": "Lasso & coup de grace",
+    "verse": "A zombie dragged from the dead's belly, lassoed into the light",
+    "annotation": "Lasso & coup de grace &middot; bound and brought low before the others stirred"
   }
 ]

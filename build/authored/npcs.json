@@ -62,7 +62,7 @@
   {
     "name": "Kessra",
     "epithet": "nearly lost overboard when the storm struck, caught at the rail by Vex with Anton bracing him",
-    "allegiance": null
+    "allegiance": "with"
   },
   {
     "name": "Wakanga",
@@ -98,5 +98,40 @@
     "name": "Ekene-Afa",
     "epithet": "merchant prince of Port Nyanzaru whose commerce is weapons, and who recognized Lilac by face from the racing circuit",
     "allegiance": "with"
+  },
+  {
+    "name": "Odele",
+    "epithet": "a name spoken in concern, warning the captain of a storm in the ship's path",
+    "allegiance": null
+  },
+  {
+    "name": "Eku",
+    "epithet": "a guide for hire, whose name appeared on the bulletin boards of Port Nyanzaru alongside Musharib and Salida",
+    "allegiance": null
+  },
+  {
+    "name": "Salida",
+    "epithet": "a jungle guide whose name appeared on the bulletin boards of Port Nyanzaru, known to work for Jobal",
+    "allegiance": null
+  },
+  {
+    "name": "Azaka Stormfang",
+    "epithet": "whose name appeared on a wanted poster outside the Thundering Lizard Inn, alongside Hew Hackinstone",
+    "allegiance": null
+  },
+  {
+    "name": "Hew Hackinstone",
+    "epithet": "a wanted face whose poster hung beside Azaka Stormfang's on the board outside the Thundering Lizard Inn",
+    "allegiance": null
+  },
+  {
+    "name": "Jobal",
+    "epithet": "merchant prince of Port Nyanzaru, who controls the jungle guides",
+    "allegiance": "with"
+  },
+  {
+    "name": "Saja N'baza",
+    "epithet": "a contact in Chult whom Artus Cimber was traveling to meet in hopes of finding his lost wife",
+    "allegiance": null
   }
 ]
