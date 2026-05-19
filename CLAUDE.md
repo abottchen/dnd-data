@@ -27,19 +27,26 @@ Static GitHub Pages site visualizing data from an ongoing D&D campaign.
 
 ## Build & deploy
 
-Building is a three-step flow:
+Building is normally a single command in a Claude Code session:
 
-1. `.venv/bin/python -m build prepare` gathers any pending slices into
-   `build/.run/<timestamp>/` (manifest, pending slices, frozen prompts).
-2. In a Claude Code session, run `/build-prose build/.run/<timestamp>/` —
-   the skill dispatches one sub-agent per pending slice, each writing a
-   JSON result file.
-3. `.venv/bin/python -m build apply build/.run/<timestamp>/` validates
-   each result against its schema, applies it to `build/authored/*.json`,
-   bumps the marker on full refresh-pass success, and runs `build/render.py`.
+- `/build-prose` — the skill runs `python -m build prepare`, dispatches
+  one sub-agent per pending slice (each writes a JSON result file), and
+  then runs `python -m build apply` to validate, persist authored prose,
+  bump the marker on full refresh-pass success, and render `site/index.html`.
 
-A bare `python -m build` is the same as `prepare`; it prints the skill
-command to run next and exits.
+If a slice fails, fix the prompt or slice and re-run `/build-prose <run-dir>`
+(the run dir path is printed by the skill) to resume — already-authored
+slices in `done/` are skipped.
+
+The two underlying CLIs can still be invoked directly when needed:
+
+- `.venv/bin/python -m build prepare` — gathers any pending slices into
+  `build/.run/<timestamp>/` (manifest, pending slices, frozen prompts).
+- `.venv/bin/python -m build apply build/.run/<timestamp>/` — validates
+  each result against its schema, applies it to `build/authored/*.json`,
+  bumps the marker on full refresh-pass success, and runs `build/render.py`.
+
+A bare `python -m build` is the same as `prepare`.
 
 Validation gates the render: any `MISSING` or `MALFORMED` authored entry
 causes `render.py` to exit 1. Fix the authored entry and re-run apply.
@@ -50,7 +57,7 @@ CLI flags:
 - `prepare --keep-temp` — preserve the run dir on success.
 - `apply --skip-render` — apply results but don't rebuild the site.
 
-To publish: pull `main`, run the three-step build, commit `site/index.html`
+To publish: pull `main`, run `/build-prose`, commit `site/index.html`
 and `build/authored/*.json`, push.
 
 Configure once: Settings → Pages → Source: **GitHub Actions**.
