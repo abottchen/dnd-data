@@ -6,7 +6,7 @@ A static GitHub Pages site visualizing data from an ongoing D&D campaign.
 
 JSON snapshots from external sources (character sheets, dice roller, Owlbear Rodeo, session log) are dropped into `data/` (gitignored). A deterministic Python builder reads those snapshots plus a small store of human-authored prose, validates everything, and renders `site/index.html` via Jinja2 templates. A GitHub Actions workflow uploads the committed `site/` directory to GitHub Pages.
 
-When new source data lands, the authored prose store needs new entries (kill verses, session summaries, NPC epithets, etc.) and existing entries may need a refresh. That work runs locally in three steps — `python -m build prepare`, the `/build-prose` skill inside a Claude Code session, and `python -m build apply` — see [Build architecture](#build-architecture).
+When new source data lands, the authored prose store needs new entries (kill verses, session summaries, NPC epithets, etc.) and existing entries may need a refresh. That work runs locally in a single command: the `/build-prose` skill inside a Claude Code session, which drives prepare → in-session authoring → apply end-to-end. See [Build architecture](#build-architecture).
 
 See [`CLAUDE.md`](CLAUDE.md) for full architecture detail and validation rules.
 
@@ -113,21 +113,22 @@ ln -s /path/to/5etools-src .claude/ext/5etools-src
 
 ## Local build + rebuild
 
-Building is a three-step flow — prepare slices, author prose in-session, apply + render:
+Inside a Claude Code session, the whole build is one command:
 
-```bash
-# 1. Gather pending slices into build/.run/<timestamp>/
-.venv/bin/python -m build prepare
-
-# 2. Inside a Claude Code session, drive the slice queue:
-#    /build-prose build/.run/<timestamp>/
-#    (one sub-agent per slice; each writes a JSON result file)
-
-# 3. Validate results, apply to build/authored/*.json, render site/index.html:
-.venv/bin/python -m build apply build/.run/<timestamp>/
+```
+/build-prose
 ```
 
-A bare `.venv/bin/python -m build` is equivalent to `prepare` — it prints the `/build-prose` command to run next and exits.
+The skill runs `python -m build prepare`, dispatches one sub-agent per pending slice to author prose, then runs `python -m build apply` to validate, persist, and render. If a slice fails, fix the prompt or slice and re-run `/build-prose <run-dir>` (the run dir path is printed by the skill) to resume — already-authored slices are skipped.
+
+The two underlying CLIs can still be invoked directly when needed:
+
+```bash
+.venv/bin/python -m build prepare               # gather pending slices into build/.run/<timestamp>/
+.venv/bin/python -m build apply build/.run/<timestamp>/   # validate, apply, render
+```
+
+A bare `.venv/bin/python -m build` is equivalent to `prepare`.
 
 To re-render without re-authoring (when `build/authored/*.json` is already current):
 
@@ -144,7 +145,7 @@ Useful flags:
 
 The render aborts with `MISSING` / `MALFORMED` / `ORPHAN` errors before writing output if any authored entry is missing required fields. Fix the authored entry and re-run `apply`.
 
-To publish: pull `main`, run the three-step build, commit `site/index.html` and `build/authored/*.json`, push.
+To publish: pull `main`, run `/build-prose`, commit `site/index.html` and `build/authored/*.json`, push.
 
 ## Tests
 
