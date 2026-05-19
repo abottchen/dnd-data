@@ -3,7 +3,7 @@
   "page_subtitle": "A ledger of those who walk &middot; and those they have laid down",
   "intro_epithet": "Five travellers and a storyteller, bound to a doomed road",
   "footnote": "The names above are the names given &middot; the ones who fell were given no names",
-  "refreshed_through_session": 8,
+  "refreshed_through_session": 9,
   "road_ahead": {
     "known": [
       {
@@ -40,7 +40,7 @@
       }
     ],
     "was_known": [],
-    "direction": "Musharib will walk them through the jungle to Hrakhamar, with Wakanga's journal in the pack and the map of Chult still mostly blank."
+    "direction": "One hex from Fort Righteous, the company means to read what felled the Gauntlet's outpost before pressing on toward Hrakhamar."
   },
   "gm": {
     "name": "The Dungeon Master",
@@ -67,6 +67,13 @@
     "Inete",
     "Zindar",
     "Undril Silvertusk",
-    "Ekene-Afa"
+    "Ekene-Afa",
+    "Odele",
+    "Eku",
+    "Salida",
+    "Azaka Stormfang",
+    "Hew Hackinstone",
+    "Jobal",
+    "Saja N'baza"
   ]
 }

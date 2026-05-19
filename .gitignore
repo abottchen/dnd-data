@@ -21,6 +21,9 @@ __pycache__/
 .venv
 .venv/
 
+# Build run staging dirs
+build/.run/
+
 # Editor swap/temp files
 *.swp
 *.swo
