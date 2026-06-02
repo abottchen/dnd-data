@@ -182,5 +182,53 @@
     "method": "Lasso & coup de grace",
     "verse": "A zombie dragged from the dead's belly, lassoed into the light",
     "annotation": "Lasso & coup de grace &middot; bound and brought low before the others stirred"
+  },
+  {
+    "character": "grieg",
+    "date": "2026-05-31",
+    "creature": "Goblin Warrior",
+    "method": "Warhammer",
+    "verse": "A goblin felled at the edge of the shrine road",
+    "annotation": "Warhammer &middot; iron weight, no ceremony"
+  },
+  {
+    "character": "grieg",
+    "date": "2026-05-31",
+    "creature": "Goblin Warrior",
+    "method": "Trident (Yokka pulled a minion into the blow)",
+    "verse": "A minion pushed forward to catch what was meant for another",
+    "annotation": "Trident &middot; the boss chose who would take the crit"
+  },
+  {
+    "character": "vex",
+    "date": "2026-05-31",
+    "creature": "Goblin Warrior",
+    "method": "Breath Weapon",
+    "verse": "A goblin undone by what came from no blade",
+    "annotation": "Breath Weapon &middot; exhaled, and the matter was settled"
+  },
+  {
+    "character": "chumble",
+    "date": "2026-05-31",
+    "creature": "Goblin Warrior",
+    "method": "Eldritch Blast",
+    "verse": "A goblin unmade by a force it could not name",
+    "annotation": "Eldritch Blast &middot; the dark between one heartbeat and none"
+  },
+  {
+    "character": "chumble",
+    "date": "2026-05-31",
+    "creature": "Goblin Warrior",
+    "method": "Wickles (familiar attack)",
+    "verse": "A goblin brought low by something small and swift",
+    "annotation": "Familiar &middot; Wickles, quiet and unhesitating"
+  },
+  {
+    "character": "lilac",
+    "date": "2026-05-31",
+    "creature": "Goblin Warrior",
+    "method": "Longbow",
+    "verse": "Two goblins stilled before the ambush could hold",
+    "annotation": "Longbow &middot; drawn twice, answered twice"
   }
 ]
