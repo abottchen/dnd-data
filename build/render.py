@@ -581,6 +581,132 @@ def compute_other_dice(events: list) -> list[dict]:
         })
     return rows
 
+
+# Ascent chart viewBox + plot margins (mirrors the other-dice geometry style:
+# coordinates are computed here; the template emits static SVG).
+_ASCENT_W, _ASCENT_H = 1000, 440
+_ASCENT_ML, _ASCENT_MR, _ASCENT_MT, _ASCENT_MB = 60, 128, 26, 52
+
+
+def compute_ascent(xp_log: Optional[dict]) -> Optional[dict]:
+    """Cumulative-XP climb for the Company tab. Returns None when there are no
+    XP entries (template renders an empty state). Geometry is server-side so
+    the chart matches the established other-dice/patron-die pattern."""
+    entries = (xp_log or {}).get("entries", [])
+    if not entries:
+        return None
+
+    # Chronological; stable sort preserves the GM's intra-day authoring order
+    # (so a closing "rounding error" event stays last within its session).
+    ev = sorted(entries, key=lambda e: e.get("date", ""))
+
+    nodes = [{"label": "Where it began", "type": None, "gain": 0, "total": 0,
+              "date": "", "source": "Level 1 · the road begins", "session_id": ""}]
+    running = 0
+    for e in ev:
+        running += int(e.get("perPc", 0))
+        nodes.append({
+            "label": e.get("title", ""),
+            "type": e.get("type"),
+            "gain": int(e.get("perPc", 0)),
+            "total": running,
+            "date": _short_date(e["date"]) if e.get("date") else "",
+            "source": e.get("source", ""),
+            "session_id": e.get("sessionId", ""),
+        })
+
+    total = running
+    level = _level_for_xp(total)
+    nxt = _next_threshold(level)
+    ymax = nxt if nxt else max(total, 1)
+    to_next = (nxt - total) if nxt else 0
+
+    plot_w = _ASCENT_W - _ASCENT_ML - _ASCENT_MR
+    plot_h = _ASCENT_H - _ASCENT_MT - _ASCENT_MB
+    n_seg = len(nodes) - 1
+
+    def fx(i):
+        return round(_ASCENT_ML + plot_w * (i / n_seg if n_seg else 0), 2)
+
+    def fy(v):
+        return round(_ASCENT_MT + plot_h * (1 - v / ymax), 2)
+
+    ybase = fy(0)
+
+    # node coordinates + level-up crossings
+    prev = 0
+    for i, nd in enumerate(nodes):
+        nd["i"] = i
+        nd["cx"] = fx(i)
+        nd["cy"] = fy(nd["total"])
+        up = None
+        for l in range(2, 21):
+            if prev < LEVEL_XP[l] <= nd["total"]:
+                up = _to_roman(l)
+        nd["up"] = up
+        nd["r"] = 6.5 if up else (3.5 if i == 0 else 5)
+        prev = nd["total"]
+
+    # threshold lines visible within (0, ymax]
+    thresholds = []
+    for l in range(2, 21):
+        v = LEVEL_XP[l]
+        if v > ymax:
+            break
+        thresholds.append({"v": v, "lvl": _to_roman(l), "y": fy(v), "top": v == ymax})
+
+    # session date ticks: group consecutive nodes sharing a sessionId
+    groups: list[dict] = []
+    for nd in nodes[1:]:
+        sid = nd["session_id"]
+        if groups and groups[-1]["sid"] == sid:
+            groups[-1]["xs"].append(nd["cx"])
+            groups[-1]["date"] = nd["date"]
+        else:
+            groups.append({"sid": sid, "xs": [nd["cx"]], "date": nd["date"]})
+    ticks = [{
+        "x": round(sum(g["xs"]) / len(g["xs"]), 2),
+        "x0": g["xs"][0], "x1": g["xs"][-1],
+        "label": g["date"], "multi": len(g["xs"]) > 1,
+    } for g in groups]
+
+    # path strings
+    line_d = "M " + " L ".join(f"{nd['cx']} {nd['cy']}" for nd in nodes)
+    area_d = (f"M {nodes[0]['cx']} {ybase} "
+              + " ".join(f"L {nd['cx']} {nd['cy']}" for nd in nodes)
+              + f" L {nodes[-1]['cx']} {ybase} Z")
+
+    # by-type breakdown for the source bar (descending)
+    by_type: dict[str, int] = {}
+    for e in ev:
+        t = e.get("type") or "other"
+        by_type[t] = by_type.get(t, 0) + int(e.get("perPc", 0))
+    sources = [{
+        "type": t, "label": t.capitalize(), "xp": x,
+        "pct": round(x / total * 100) if total else 0,
+    } for t, x in sorted(by_type.items(), key=lambda kv: -kv[1])]
+
+    richest = max(ev, key=lambda e: int(e.get("perPc", 0)))
+
+    return {
+        "view_w": _ASCENT_W, "view_h": _ASCENT_H,
+        "plot_left": _ASCENT_ML, "plot_right": round(_ASCENT_ML + plot_w, 2),
+        "ybase": ybase, "ymax": ymax,
+        "nodes": nodes, "thresholds": thresholds, "ticks": ticks,
+        "line_d": line_d, "area_d": area_d,
+        "proj_y": fy(total),
+        "road_x": round(_ASCENT_ML + plot_w * 0.52, 2),
+        "road_y": fy((total + ymax) / 2),
+        "last_cx": nodes[-1]["cx"], "last_cy": nodes[-1]["cy"],
+        "sources": sources,
+        "total": total, "level": _to_roman(level), "level_num": level,
+        "to_next": to_next, "next_threshold": nxt,
+        "deeds": len(ev), "sessions": len({e.get("sessionId") for e in ev}),
+        "richest_xp": int(richest.get("perPc", 0)),
+        "richest_title": richest.get("title", ""),
+    }
+
+
 SKILL_DISPLAY = {
     "acrobatics": "Acrobatics",
     "animalHandling": "Animal Handling",
