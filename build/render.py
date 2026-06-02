@@ -1083,6 +1083,29 @@ def validate_all(data: dict, authored: dict, images_dir: Path) -> list[Validatio
     errors.extend(validate_dice_player_mapping(data.get("unmapped_players", [])))
     return errors
 
+# D&D 5e (2024) cumulative XP per level — identical to 2014 at all tiers.
+LEVEL_XP = {
+    1: 0, 2: 300, 3: 900, 4: 2700, 5: 6500, 6: 14000, 7: 23000,
+    8: 34000, 9: 48000, 10: 64000, 11: 85000, 12: 100000, 13: 120000,
+    14: 140000, 15: 165000, 16: 195000, 17: 225000, 18: 265000,
+    19: 305000, 20: 355000,
+}
+
+
+def _level_for_xp(total: int) -> int:
+    """Highest level whose threshold is <= total."""
+    lvl = 1
+    for l in range(1, 21):
+        if total >= LEVEL_XP[l]:
+            lvl = l
+    return lvl
+
+
+def _next_threshold(level: int) -> Optional[int]:
+    """XP needed for the next level, or None at level 20."""
+    return LEVEL_XP.get(level + 1)
+
+
 _ROMAN_PAIRS = [(1000,"M"),(900,"CM"),(500,"D"),(400,"CD"),(100,"C"),(90,"XC"),
                 (50,"L"),(40,"XL"),(10,"X"),(9,"IX"),(5,"V"),(4,"IV"),(1,"I")]
 
