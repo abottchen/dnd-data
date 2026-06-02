@@ -621,6 +621,110 @@ def compute_best_skill(member: dict) -> dict | None:
         "mod": best.get("mod", 0),
     }
 
+# ── Ability radar geometry ──────────────────────────────────────────
+# Fixed 240x240 viewBox. Score-based scale: RADAR_FLOOR (center) -> RADAR_CEIL
+# (outer ring), one grid ring per RADAR_STEP points. Scores below the floor
+# clamp to the center. All coordinates are pre-rounded so the template lays
+# them out directly and the client script only animates/links — never recomputes.
+RADAR_KEYS = ("str", "dex", "con", "int", "wis", "cha")
+RADAR_LABELS = ("STR", "DEX", "CON", "INT", "WIS", "CHA")
+RADAR_FLOOR = 8
+RADAR_CEIL = 20
+RADAR_STEP = 2
+RADAR_TICKS = (10, 14, 18)
+RADAR_CX = 120.0
+RADAR_CY = 120.0
+RADAR_R = 76.0        # outer-ring radius
+RADAR_HIT_R = 112.0   # pie-slice hit radius (beyond the outer ring, inside the viewBox)
+RADAR_LABEL_R = 93.0  # label radius (RADAR_R + 17)
+
+def _radar_angle(i: int) -> float:
+    """Angle of axis i, with STR (i=0) pointing straight up."""
+    return -math.pi / 2 + (i / 6) * 2 * math.pi
+
+def _radar_radius(score: float) -> float:
+    """Map an ability score to a pixel radius, clamping to [RADAR_FLOOR, RADAR_CEIL]."""
+    clamped = max(RADAR_FLOOR, min(RADAR_CEIL, score))
+    return (clamped - RADAR_FLOOR) / (RADAR_CEIL - RADAR_FLOOR) * RADAR_R
+
+def _radar_point(angle: float, radius: float) -> tuple[float, float]:
+    return (RADAR_CX + math.cos(angle) * radius, RADAR_CY + math.sin(angle) * radius)
+
+def _radar_xy(p: tuple[float, float]) -> str:
+    return f"{p[0]:.1f},{p[1]:.1f}"
+
+def compute_radar(member: dict) -> dict:
+    """Geometry for a character's six-axis ability-score radar.
+
+    Returns pre-rounded coordinates for: concentric grid `rings` (point-string
+    each), `axes` far-endpoint tips `{x2, y2}` (SVG lines originate at cx, cy),
+    `ticks`, the filled `shape` (point-string), vertex
+    `dots` (with proficient-save flag), `labels`, and invisible pie-slice
+    `sectors` (60-degree hover hit zones tiling the disc). See module constants
+    for the scale."""
+    abilities = member.get("abilities", {})
+    saves = member.get("savingThrows", {})
+
+    rings = []
+    for rv in range(RADAR_FLOOR + RADAR_STEP, RADAR_CEIL + 1, RADAR_STEP):
+        rr = _radar_radius(rv)
+        rings.append(" ".join(_radar_xy(_radar_point(_radar_angle(i), rr)) for i in range(6)))
+
+    axes = []
+    for i in range(6):
+        p = _radar_point(_radar_angle(i), RADAR_R)
+        axes.append({"x2": round(p[0], 1), "y2": round(p[1], 1)})
+
+    ticks = []
+    for tv in RADAR_TICKS:
+        y = RADAR_CY - _radar_radius(tv)
+        # +4 nudges right of the axis; +3 drops to the text baseline
+        ticks.append({"x": round(RADAR_CX + 4, 1), "y": round(y + 3, 1), "text": str(tv)})
+
+    shape_pts, dots = [], []
+    for i, key in enumerate(RADAR_KEYS):
+        score = abilities.get(key, RADAR_FLOOR)
+        p = _radar_point(_radar_angle(i), _radar_radius(score))
+        shape_pts.append(_radar_xy(p))
+        dots.append({
+            "i": i, "key": key,
+            "x": round(p[0], 1), "y": round(p[1], 1),
+            "prof": bool(saves.get(key, {}).get("prof")),
+        })
+    shape = " ".join(shape_pts)
+
+    labels = []
+    for i, lab in enumerate(RADAR_LABELS):
+        a = _radar_angle(i)
+        p = _radar_point(a, RADAR_LABEL_R)
+        cos_a, sin_a = math.cos(a), math.sin(a)
+        anchor = "middle"
+        if cos_a > 0.4:
+            anchor = "start"
+        elif cos_a < -0.4:
+            anchor = "end"
+        dy = 4.0
+        if sin_a > 0.5:
+            dy = 11.0
+        elif sin_a < -0.5:
+            dy = -3.0
+        labels.append({"i": i, "text": lab, "anchor": anchor,
+                       "x": round(p[0], 1), "y": round(p[1] + dy, 1)})
+
+    sectors = []
+    for i, key in enumerate(RADAR_KEYS):
+        a = _radar_angle(i)
+        p0 = _radar_point(a - math.pi / 6, RADAR_HIT_R)
+        p1 = _radar_point(a + math.pi / 6, RADAR_HIT_R)
+        d = (f"M{RADAR_CX:.0f} {RADAR_CY:.0f} "
+             f"L{p0[0]:.1f} {p0[1]:.1f} "
+             f"A{RADAR_HIT_R:.0f} {RADAR_HIT_R:.0f} 0 0 1 {p1[0]:.1f} {p1[1]:.1f} Z")
+        sectors.append({"i": i, "key": key, "d": d})
+
+    return {"rings": rings, "axes": axes, "ticks": ticks,
+            "shape": shape, "dots": dots, "labels": labels, "sectors": sectors}
+
+
 def compute_constellation(party: dict, fortune_by_char: dict, trials: dict) -> dict:
     """Position each (non-GM) character by (xp, total rolls). Excludes GM.
 
@@ -1204,6 +1308,8 @@ def compute_all(data: dict, authored: dict) -> dict:
     distinctions = compute_distinctions(party, authored["characters"])
     patron = compute_patron_die(fortune_by_char, party)
     best_skill_by_id = {m["id"]: compute_best_skill(m) for m in party.get("members", [])}
+    radar_by_id = {m["id"]: compute_radar(m)
+                   for m in party.get("members", []) if m["id"] != "gm"}
 
     char_auth_by_id = {a["id"]: a for a in authored["characters"]}
 
@@ -1248,6 +1354,7 @@ def compute_all(data: dict, authored: dict) -> dict:
         "distinctions": distinctions,
         "patron_die": patron,
         "best_skill_by_id": best_skill_by_id,
+        "radar_by_id": radar_by_id,
         "npcs_by_allegiance": _split_npcs(authored["npcs"]),
         "inventory_by_id": inventory_bundle["by_id"],
         "company_strip": inventory_bundle["company_strip"],

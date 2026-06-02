@@ -1,0 +1,23 @@
+      {%- set r = radar_by_id[member.id] %}
+      <svg class="ability-radar" viewBox="0 0 240 240" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+        {%- for pts in r.rings %}
+        <polygon class="ar-grid{% if loop.last %} ar-grid-outer{% endif %}" points="{{ pts }}"></polygon>
+        {%- endfor %}
+        {#- axis lines originate at the radar center (RADAR_CX, RADAR_CY = 120,120 — matches the viewBox) #}
+        {%- for ax in r.axes %}
+        <line class="ar-axis" data-i="{{ loop.index0 }}" x1="120" y1="120" x2="{{ ax.x2 }}" y2="{{ ax.y2 }}"></line>
+        {%- endfor %}
+        {%- for t in r.ticks %}
+        <text class="ar-tick" x="{{ t.x }}" y="{{ t.y }}">{{ t.text }}</text>
+        {%- endfor %}
+        <polygon class="ar-shape" points="{{ r.shape }}"></polygon>
+        {%- for d in r.dots %}
+        <circle class="ar-dot{% if d.prof %} ar-dot-prof{% endif %}" data-i="{{ d.i }}" data-key="{{ d.key }}" cx="{{ d.x }}" cy="{{ d.y }}" r="{{ 4 if d.prof else 3 }}"></circle>
+        {%- endfor %}
+        {%- for lbl in r.labels %}
+        <text class="ar-label" data-i="{{ lbl.i }}" x="{{ lbl.x }}" y="{{ lbl.y }}" text-anchor="{{ lbl.anchor }}">{{ lbl.text }}</text>
+        {%- endfor %}
+        {%- for s in r.sectors %}
+        <path class="ar-sector" data-i="{{ s.i }}" data-key="{{ s.key }}" d="{{ s.d }}"></path>
+        {%- endfor %}
+      </svg>

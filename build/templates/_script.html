@@ -475,3 +475,95 @@
         el.addEventListener('mouseleave', () => { tip.classList.remove('visible'); });
       });
     })();
+
+    // --- Ability radar: draw-on reveal + linked pie-slice hover ---
+    (function () {
+      const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const CX = 120, CY = 120, DUR = 700;
+
+      function parsePoints(str) {
+        return str.trim().split(/\s+/).map(p => {
+          const xy = p.split(',');
+          return [parseFloat(xy[0]), parseFloat(xy[1])];
+        });
+      }
+      function setShape(svg, pts) {
+        const poly = svg.querySelector('.ar-shape');
+        const dots = svg.querySelectorAll('.ar-dot');
+        poly.setAttribute('points', pts.map(p => p[0].toFixed(1) + ',' + p[1].toFixed(1)).join(' '));
+        for (let i = 0; i < dots.length && i < pts.length; i++) {
+          dots[i].setAttribute('cx', pts[i][0].toFixed(1));
+          dots[i].setAttribute('cy', pts[i][1].toFixed(1));
+        }
+      }
+      function targetFor(svg) {
+        if (!svg._radarTarget) svg._radarTarget = parsePoints(svg.querySelector('.ar-shape').getAttribute('points'));
+        return svg._radarTarget;
+      }
+      function reveal(svg) {
+        const target = targetFor(svg);
+        if (reduce) { setShape(svg, target); return; }
+        const token = {};
+        svg._radarToken = token;
+        let t0 = null;
+        function step(now) {
+          if (svg._radarToken !== token) return;  // superseded by a newer reveal
+          if (t0 === null) t0 = now;
+          const t = Math.min(1, (now - t0) / DUR);
+          const e = 1 - Math.pow(1 - t, 3);
+          setShape(svg, target.map(p => [CX + (p[0] - CX) * e, CY + (p[1] - CY) * e]));
+          if (t < 1) requestAnimationFrame(step);
+        }
+        requestAnimationFrame(step);
+      }
+
+      function wireHover(panel) {
+        const svg = panel.querySelector('.ability-radar');
+        if (!svg) return;
+        function setHot(i, on) {
+          ['.ar-axis', '.ar-label', '.ar-dot', '.ar-sector'].forEach(sel => {
+            const el = svg.querySelector(sel + '[data-i="' + i + '"]');
+            if (el) el.classList.toggle('hot', on);
+          });
+          const card = panel.querySelector('.stat-card[data-i="' + i + '"]');
+          if (card) card.classList.toggle('hot', on);
+        }
+        svg.querySelectorAll('.ar-sector').forEach(sec => {
+          const i = sec.getAttribute('data-i');
+          sec.addEventListener('mouseenter', () => setHot(i, true));
+          sec.addEventListener('mouseleave', () => setHot(i, false));
+        });
+        panel.querySelectorAll('.stat-card').forEach(card => {
+          const i = card.getAttribute('data-i');
+          card.addEventListener('mouseenter', () => setHot(i, true));
+          card.addEventListener('mouseleave', () => setHot(i, false));
+        });
+      }
+
+      const panels = document.querySelectorAll('.character');
+      panels.forEach(p => {
+        const svg = p.querySelector('.ability-radar');
+        if (svg) targetFor(svg);   // cache the real target before any reveal collapses it
+        wireHover(p);              // wireHover early-returns when the panel has no radar
+      });
+
+      // Replay the draw-on whenever a panel becomes active (every tab switch).
+      const obs = new MutationObserver(muts => {
+        muts.forEach(m => {
+          const p = m.target;
+          if (p.classList.contains('active')) {
+            const svg = p.querySelector('.ability-radar');
+            if (svg) reveal(svg);
+          }
+        });
+      });
+      panels.forEach(p => obs.observe(p, { attributes: true, attributeFilter: ['class'] }));
+
+      // Reveal whichever panel is already active at load (e.g. a deep-linked hash).
+      panels.forEach(p => {
+        if (p.classList.contains('active')) {
+          const svg = p.querySelector('.ability-radar');
+          if (svg) reveal(svg);
+        }
+      });
+    })();
