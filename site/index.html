@@ -1165,13 +1165,53 @@
         <a href="#anton-pack">Pack</a>
       </nav>
 
-            <section class="abilities">
-        <div class="stat-card"><div class="stat-label">Strength</div><div class="stat-val">9</div><div class="stat-mod">&minus;1</div><div class="stat-save"><span class="save-mark"></span>Save &minus;1</div></div>
-        <div class="stat-card"><div class="stat-label">Dexterity</div><div class="stat-val">14</div><div class="stat-mod">+2</div><div class="stat-save proficient"><span class="save-mark"></span>Save +4</div></div>
-        <div class="stat-card"><div class="stat-label">Constitution</div><div class="stat-val">12</div><div class="stat-mod">+1</div><div class="stat-save"><span class="save-mark"></span>Save +1</div></div>
-        <div class="stat-card"><div class="stat-label">Intelligence</div><div class="stat-val">15</div><div class="stat-mod">+2</div><div class="stat-save"><span class="save-mark"></span>Save +2</div></div>
-        <div class="stat-card"><div class="stat-label">Wisdom</div><div class="stat-val">10</div><div class="stat-mod">+0</div><div class="stat-save"><span class="save-mark"></span>Save +0</div></div>
-        <div class="stat-card"><div class="stat-label">Charisma</div><div class="stat-val">17</div><div class="stat-mod">+3</div><div class="stat-save proficient"><span class="save-mark"></span>Save +5</div></div>
+            <section class="abilities-layout">
+        
+      <svg class="ability-radar" viewBox="0 0 240 240" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+        <polygon class="ar-grid" points="120.0,107.3 131.0,113.7 131.0,126.3 120.0,132.7 109.0,126.3 109.0,113.7"></polygon>
+        <polygon class="ar-grid" points="120.0,94.7 141.9,107.3 141.9,132.7 120.0,145.3 98.1,132.7 98.1,107.3"></polygon>
+        <polygon class="ar-grid" points="120.0,82.0 152.9,101.0 152.9,139.0 120.0,158.0 87.1,139.0 87.1,101.0"></polygon>
+        <polygon class="ar-grid" points="120.0,69.3 163.9,94.7 163.9,145.3 120.0,170.7 76.1,145.3 76.1,94.7"></polygon>
+        <polygon class="ar-grid" points="120.0,56.7 174.8,88.3 174.8,151.7 120.0,183.3 65.2,151.7 65.2,88.3"></polygon>
+        <polygon class="ar-grid ar-grid-outer" points="120.0,44.0 185.8,82.0 185.8,158.0 120.0,196.0 54.2,158.0 54.2,82.0"></polygon>
+        <line class="ar-axis" data-i="0" x1="120" y1="120" x2="120.0" y2="44.0"></line>
+        <line class="ar-axis" data-i="1" x1="120" y1="120" x2="185.8" y2="82.0"></line>
+        <line class="ar-axis" data-i="2" x1="120" y1="120" x2="185.8" y2="158.0"></line>
+        <line class="ar-axis" data-i="3" x1="120" y1="120" x2="120.0" y2="196.0"></line>
+        <line class="ar-axis" data-i="4" x1="120" y1="120" x2="54.2" y2="158.0"></line>
+        <line class="ar-axis" data-i="5" x1="120" y1="120" x2="54.2" y2="82.0"></line>
+        <text class="ar-tick" x="124.0" y="110.3">10</text>
+        <text class="ar-tick" x="124.0" y="85.0">14</text>
+        <text class="ar-tick" x="124.0" y="59.7">18</text>
+        <polygon class="ar-shape" points="120.0,113.7 152.9,101.0 141.9,132.7 120.0,164.3 109.0,126.3 70.6,91.5"></polygon>
+        <circle class="ar-dot" data-i="0" data-key="str" cx="120.0" cy="113.7" r="3"></circle>
+        <circle class="ar-dot ar-dot-prof" data-i="1" data-key="dex" cx="152.9" cy="101.0" r="4"></circle>
+        <circle class="ar-dot" data-i="2" data-key="con" cx="141.9" cy="132.7" r="3"></circle>
+        <circle class="ar-dot" data-i="3" data-key="int" cx="120.0" cy="164.3" r="3"></circle>
+        <circle class="ar-dot" data-i="4" data-key="wis" cx="109.0" cy="126.3" r="3"></circle>
+        <circle class="ar-dot ar-dot-prof" data-i="5" data-key="cha" cx="70.6" cy="91.5" r="4"></circle>
+        <text class="ar-label" data-i="0" x="120.0" y="24.0" text-anchor="middle">STR</text>
+        <text class="ar-label" data-i="1" x="200.5" y="77.5" text-anchor="start">DEX</text>
+        <text class="ar-label" data-i="2" x="200.5" y="170.5" text-anchor="start">CON</text>
+        <text class="ar-label" data-i="3" x="120.0" y="224.0" text-anchor="middle">INT</text>
+        <text class="ar-label" data-i="4" x="39.5" y="177.5" text-anchor="end">WIS</text>
+        <text class="ar-label" data-i="5" x="39.5" y="70.5" text-anchor="end">CHA</text>
+        <path class="ar-sector" data-i="0" data-key="str" d="M120 120 L64.0 23.0 A112 112 0 0 1 176.0 23.0 Z"></path>
+        <path class="ar-sector" data-i="1" data-key="dex" d="M120 120 L176.0 23.0 A112 112 0 0 1 232.0 120.0 Z"></path>
+        <path class="ar-sector" data-i="2" data-key="con" d="M120 120 L232.0 120.0 A112 112 0 0 1 176.0 217.0 Z"></path>
+        <path class="ar-sector" data-i="3" data-key="int" d="M120 120 L176.0 217.0 A112 112 0 0 1 64.0 217.0 Z"></path>
+        <path class="ar-sector" data-i="4" data-key="wis" d="M120 120 L64.0 217.0 A112 112 0 0 1 8.0 120.0 Z"></path>
+        <path class="ar-sector" data-i="5" data-key="cha" d="M120 120 L8.0 120.0 A112 112 0 0 1 64.0 23.0 Z"></path>
+      </svg>
+
+        <div class="abilities">
+        <div class="stat-card" data-i="0" data-key="str"><div class="stat-label">Strength</div><div class="stat-val">9</div><div class="stat-mod">&minus;1</div><div class="stat-save"><span class="save-mark"></span>Save &minus;1</div></div>
+        <div class="stat-card" data-i="1" data-key="dex"><div class="stat-label">Dexterity</div><div class="stat-val">14</div><div class="stat-mod">+2</div><div class="stat-save proficient"><span class="save-mark"></span>Save +4</div></div>
+        <div class="stat-card" data-i="2" data-key="con"><div class="stat-label">Constitution</div><div class="stat-val">12</div><div class="stat-mod">+1</div><div class="stat-save"><span class="save-mark"></span>Save +1</div></div>
+        <div class="stat-card" data-i="3" data-key="int"><div class="stat-label">Intelligence</div><div class="stat-val">15</div><div class="stat-mod">+2</div><div class="stat-save"><span class="save-mark"></span>Save +2</div></div>
+        <div class="stat-card" data-i="4" data-key="wis"><div class="stat-label">Wisdom</div><div class="stat-val">10</div><div class="stat-mod">+0</div><div class="stat-save"><span class="save-mark"></span>Save +0</div></div>
+        <div class="stat-card" data-i="5" data-key="cha"><div class="stat-label">Charisma</div><div class="stat-val">17</div><div class="stat-mod">+3</div><div class="stat-save proficient"><span class="save-mark"></span>Save +5</div></div>
+        </div>
       </section>
 
             <section class="proficiencies">
@@ -1314,13 +1354,53 @@
         <a href="#grieg-pack">Pack</a>
       </nav>
 
-            <section class="abilities">
-        <div class="stat-card"><div class="stat-label">Strength</div><div class="stat-val">17</div><div class="stat-mod">+3</div><div class="stat-save proficient"><span class="save-mark"></span>Save +5</div></div>
-        <div class="stat-card"><div class="stat-label">Dexterity</div><div class="stat-val">15</div><div class="stat-mod">+2</div><div class="stat-save"><span class="save-mark"></span>Save +2</div></div>
-        <div class="stat-card"><div class="stat-label">Constitution</div><div class="stat-val">13</div><div class="stat-mod">+1</div><div class="stat-save proficient"><span class="save-mark"></span>Save +3</div></div>
-        <div class="stat-card"><div class="stat-label">Intelligence</div><div class="stat-val">12</div><div class="stat-mod">+1</div><div class="stat-save"><span class="save-mark"></span>Save +1</div></div>
-        <div class="stat-card"><div class="stat-label">Wisdom</div><div class="stat-val">8</div><div class="stat-mod">&minus;1</div><div class="stat-save"><span class="save-mark"></span>Save &minus;1</div></div>
-        <div class="stat-card"><div class="stat-label">Charisma</div><div class="stat-val">10</div><div class="stat-mod">+0</div><div class="stat-save"><span class="save-mark"></span>Save +0</div></div>
+            <section class="abilities-layout">
+        
+      <svg class="ability-radar" viewBox="0 0 240 240" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+        <polygon class="ar-grid" points="120.0,107.3 131.0,113.7 131.0,126.3 120.0,132.7 109.0,126.3 109.0,113.7"></polygon>
+        <polygon class="ar-grid" points="120.0,94.7 141.9,107.3 141.9,132.7 120.0,145.3 98.1,132.7 98.1,107.3"></polygon>
+        <polygon class="ar-grid" points="120.0,82.0 152.9,101.0 152.9,139.0 120.0,158.0 87.1,139.0 87.1,101.0"></polygon>
+        <polygon class="ar-grid" points="120.0,69.3 163.9,94.7 163.9,145.3 120.0,170.7 76.1,145.3 76.1,94.7"></polygon>
+        <polygon class="ar-grid" points="120.0,56.7 174.8,88.3 174.8,151.7 120.0,183.3 65.2,151.7 65.2,88.3"></polygon>
+        <polygon class="ar-grid ar-grid-outer" points="120.0,44.0 185.8,82.0 185.8,158.0 120.0,196.0 54.2,158.0 54.2,82.0"></polygon>
+        <line class="ar-axis" data-i="0" x1="120" y1="120" x2="120.0" y2="44.0"></line>
+        <line class="ar-axis" data-i="1" x1="120" y1="120" x2="185.8" y2="82.0"></line>
+        <line class="ar-axis" data-i="2" x1="120" y1="120" x2="185.8" y2="158.0"></line>
+        <line class="ar-axis" data-i="3" x1="120" y1="120" x2="120.0" y2="196.0"></line>
+        <line class="ar-axis" data-i="4" x1="120" y1="120" x2="54.2" y2="158.0"></line>
+        <line class="ar-axis" data-i="5" x1="120" y1="120" x2="54.2" y2="82.0"></line>
+        <text class="ar-tick" x="124.0" y="110.3">10</text>
+        <text class="ar-tick" x="124.0" y="85.0">14</text>
+        <text class="ar-tick" x="124.0" y="59.7">18</text>
+        <polygon class="ar-shape" points="120.0,63.0 158.4,97.8 147.4,135.8 120.0,145.3 120.0,120.0 109.0,113.7"></polygon>
+        <circle class="ar-dot ar-dot-prof" data-i="0" data-key="str" cx="120.0" cy="63.0" r="4"></circle>
+        <circle class="ar-dot" data-i="1" data-key="dex" cx="158.4" cy="97.8" r="3"></circle>
+        <circle class="ar-dot ar-dot-prof" data-i="2" data-key="con" cx="147.4" cy="135.8" r="4"></circle>
+        <circle class="ar-dot" data-i="3" data-key="int" cx="120.0" cy="145.3" r="3"></circle>
+        <circle class="ar-dot" data-i="4" data-key="wis" cx="120.0" cy="120.0" r="3"></circle>
+        <circle class="ar-dot" data-i="5" data-key="cha" cx="109.0" cy="113.7" r="3"></circle>
+        <text class="ar-label" data-i="0" x="120.0" y="24.0" text-anchor="middle">STR</text>
+        <text class="ar-label" data-i="1" x="200.5" y="77.5" text-anchor="start">DEX</text>
+        <text class="ar-label" data-i="2" x="200.5" y="170.5" text-anchor="start">CON</text>
+        <text class="ar-label" data-i="3" x="120.0" y="224.0" text-anchor="middle">INT</text>
+        <text class="ar-label" data-i="4" x="39.5" y="177.5" text-anchor="end">WIS</text>
+        <text class="ar-label" data-i="5" x="39.5" y="70.5" text-anchor="end">CHA</text>
+        <path class="ar-sector" data-i="0" data-key="str" d="M120 120 L64.0 23.0 A112 112 0 0 1 176.0 23.0 Z"></path>
+        <path class="ar-sector" data-i="1" data-key="dex" d="M120 120 L176.0 23.0 A112 112 0 0 1 232.0 120.0 Z"></path>
+        <path class="ar-sector" data-i="2" data-key="con" d="M120 120 L232.0 120.0 A112 112 0 0 1 176.0 217.0 Z"></path>
+        <path class="ar-sector" data-i="3" data-key="int" d="M120 120 L176.0 217.0 A112 112 0 0 1 64.0 217.0 Z"></path>
+        <path class="ar-sector" data-i="4" data-key="wis" d="M120 120 L64.0 217.0 A112 112 0 0 1 8.0 120.0 Z"></path>
+        <path class="ar-sector" data-i="5" data-key="cha" d="M120 120 L8.0 120.0 A112 112 0 0 1 64.0 23.0 Z"></path>
+      </svg>
+
+        <div class="abilities">
+        <div class="stat-card" data-i="0" data-key="str"><div class="stat-label">Strength</div><div class="stat-val">17</div><div class="stat-mod">+3</div><div class="stat-save proficient"><span class="save-mark"></span>Save +5</div></div>
+        <div class="stat-card" data-i="1" data-key="dex"><div class="stat-label">Dexterity</div><div class="stat-val">15</div><div class="stat-mod">+2</div><div class="stat-save"><span class="save-mark"></span>Save +2</div></div>
+        <div class="stat-card" data-i="2" data-key="con"><div class="stat-label">Constitution</div><div class="stat-val">13</div><div class="stat-mod">+1</div><div class="stat-save proficient"><span class="save-mark"></span>Save +3</div></div>
+        <div class="stat-card" data-i="3" data-key="int"><div class="stat-label">Intelligence</div><div class="stat-val">12</div><div class="stat-mod">+1</div><div class="stat-save"><span class="save-mark"></span>Save +1</div></div>
+        <div class="stat-card" data-i="4" data-key="wis"><div class="stat-label">Wisdom</div><div class="stat-val">8</div><div class="stat-mod">&minus;1</div><div class="stat-save"><span class="save-mark"></span>Save &minus;1</div></div>
+        <div class="stat-card" data-i="5" data-key="cha"><div class="stat-label">Charisma</div><div class="stat-val">10</div><div class="stat-mod">+0</div><div class="stat-save"><span class="save-mark"></span>Save +0</div></div>
+        </div>
       </section>
 
             <section class="proficiencies">
@@ -1917,13 +1997,53 @@
         <a href="#vex-pack">Pack</a>
       </nav>
 
-            <section class="abilities">
-        <div class="stat-card"><div class="stat-label">Strength</div><div class="stat-val">12</div><div class="stat-mod">+1</div><div class="stat-save proficient"><span class="save-mark"></span>Save +3</div></div>
-        <div class="stat-card"><div class="stat-label">Dexterity</div><div class="stat-val">15</div><div class="stat-mod">+2</div><div class="stat-save"><span class="save-mark"></span>Save +2</div></div>
-        <div class="stat-card"><div class="stat-label">Constitution</div><div class="stat-val">14</div><div class="stat-mod">+2</div><div class="stat-save proficient"><span class="save-mark"></span>Save +4</div></div>
-        <div class="stat-card"><div class="stat-label">Intelligence</div><div class="stat-val">9</div><div class="stat-mod">&minus;1</div><div class="stat-save"><span class="save-mark"></span>Save &minus;1</div></div>
-        <div class="stat-card"><div class="stat-label">Wisdom</div><div class="stat-val">8</div><div class="stat-mod">&minus;1</div><div class="stat-save"><span class="save-mark"></span>Save &minus;1</div></div>
-        <div class="stat-card"><div class="stat-label">Charisma</div><div class="stat-val">13</div><div class="stat-mod">+1</div><div class="stat-save"><span class="save-mark"></span>Save +1</div></div>
+            <section class="abilities-layout">
+        
+      <svg class="ability-radar" viewBox="0 0 240 240" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+        <polygon class="ar-grid" points="120.0,107.3 131.0,113.7 131.0,126.3 120.0,132.7 109.0,126.3 109.0,113.7"></polygon>
+        <polygon class="ar-grid" points="120.0,94.7 141.9,107.3 141.9,132.7 120.0,145.3 98.1,132.7 98.1,107.3"></polygon>
+        <polygon class="ar-grid" points="120.0,82.0 152.9,101.0 152.9,139.0 120.0,158.0 87.1,139.0 87.1,101.0"></polygon>
+        <polygon class="ar-grid" points="120.0,69.3 163.9,94.7 163.9,145.3 120.0,170.7 76.1,145.3 76.1,94.7"></polygon>
+        <polygon class="ar-grid" points="120.0,56.7 174.8,88.3 174.8,151.7 120.0,183.3 65.2,151.7 65.2,88.3"></polygon>
+        <polygon class="ar-grid ar-grid-outer" points="120.0,44.0 185.8,82.0 185.8,158.0 120.0,196.0 54.2,158.0 54.2,82.0"></polygon>
+        <line class="ar-axis" data-i="0" x1="120" y1="120" x2="120.0" y2="44.0"></line>
+        <line class="ar-axis" data-i="1" x1="120" y1="120" x2="185.8" y2="82.0"></line>
+        <line class="ar-axis" data-i="2" x1="120" y1="120" x2="185.8" y2="158.0"></line>
+        <line class="ar-axis" data-i="3" x1="120" y1="120" x2="120.0" y2="196.0"></line>
+        <line class="ar-axis" data-i="4" x1="120" y1="120" x2="54.2" y2="158.0"></line>
+        <line class="ar-axis" data-i="5" x1="120" y1="120" x2="54.2" y2="82.0"></line>
+        <text class="ar-tick" x="124.0" y="110.3">10</text>
+        <text class="ar-tick" x="124.0" y="85.0">14</text>
+        <text class="ar-tick" x="124.0" y="59.7">18</text>
+        <polygon class="ar-shape" points="120.0,94.7 158.4,97.8 152.9,139.0 120.0,126.3 120.0,120.0 92.6,104.2"></polygon>
+        <circle class="ar-dot ar-dot-prof" data-i="0" data-key="str" cx="120.0" cy="94.7" r="4"></circle>
+        <circle class="ar-dot" data-i="1" data-key="dex" cx="158.4" cy="97.8" r="3"></circle>
+        <circle class="ar-dot ar-dot-prof" data-i="2" data-key="con" cx="152.9" cy="139.0" r="4"></circle>
+        <circle class="ar-dot" data-i="3" data-key="int" cx="120.0" cy="126.3" r="3"></circle>
+        <circle class="ar-dot" data-i="4" data-key="wis" cx="120.0" cy="120.0" r="3"></circle>
+        <circle class="ar-dot" data-i="5" data-key="cha" cx="92.6" cy="104.2" r="3"></circle>
+        <text class="ar-label" data-i="0" x="120.0" y="24.0" text-anchor="middle">STR</text>
+        <text class="ar-label" data-i="1" x="200.5" y="77.5" text-anchor="start">DEX</text>
+        <text class="ar-label" data-i="2" x="200.5" y="170.5" text-anchor="start">CON</text>
+        <text class="ar-label" data-i="3" x="120.0" y="224.0" text-anchor="middle">INT</text>
+        <text class="ar-label" data-i="4" x="39.5" y="177.5" text-anchor="end">WIS</text>
+        <text class="ar-label" data-i="5" x="39.5" y="70.5" text-anchor="end">CHA</text>
+        <path class="ar-sector" data-i="0" data-key="str" d="M120 120 L64.0 23.0 A112 112 0 0 1 176.0 23.0 Z"></path>
+        <path class="ar-sector" data-i="1" data-key="dex" d="M120 120 L176.0 23.0 A112 112 0 0 1 232.0 120.0 Z"></path>
+        <path class="ar-sector" data-i="2" data-key="con" d="M120 120 L232.0 120.0 A112 112 0 0 1 176.0 217.0 Z"></path>
+        <path class="ar-sector" data-i="3" data-key="int" d="M120 120 L176.0 217.0 A112 112 0 0 1 64.0 217.0 Z"></path>
+        <path class="ar-sector" data-i="4" data-key="wis" d="M120 120 L64.0 217.0 A112 112 0 0 1 8.0 120.0 Z"></path>
+        <path class="ar-sector" data-i="5" data-key="cha" d="M120 120 L8.0 120.0 A112 112 0 0 1 64.0 23.0 Z"></path>
+      </svg>
+
+        <div class="abilities">
+        <div class="stat-card" data-i="0" data-key="str"><div class="stat-label">Strength</div><div class="stat-val">12</div><div class="stat-mod">+1</div><div class="stat-save proficient"><span class="save-mark"></span>Save +3</div></div>
+        <div class="stat-card" data-i="1" data-key="dex"><div class="stat-label">Dexterity</div><div class="stat-val">15</div><div class="stat-mod">+2</div><div class="stat-save"><span class="save-mark"></span>Save +2</div></div>
+        <div class="stat-card" data-i="2" data-key="con"><div class="stat-label">Constitution</div><div class="stat-val">14</div><div class="stat-mod">+2</div><div class="stat-save proficient"><span class="save-mark"></span>Save +4</div></div>
+        <div class="stat-card" data-i="3" data-key="int"><div class="stat-label">Intelligence</div><div class="stat-val">9</div><div class="stat-mod">&minus;1</div><div class="stat-save"><span class="save-mark"></span>Save &minus;1</div></div>
+        <div class="stat-card" data-i="4" data-key="wis"><div class="stat-label">Wisdom</div><div class="stat-val">8</div><div class="stat-mod">&minus;1</div><div class="stat-save"><span class="save-mark"></span>Save &minus;1</div></div>
+        <div class="stat-card" data-i="5" data-key="cha"><div class="stat-label">Charisma</div><div class="stat-val">13</div><div class="stat-mod">+1</div><div class="stat-save"><span class="save-mark"></span>Save +1</div></div>
+        </div>
       </section>
 
             <section class="proficiencies">
@@ -2419,13 +2539,53 @@
         <a href="#urida-pack">Pack</a>
       </nav>
 
-            <section class="abilities">
-        <div class="stat-card"><div class="stat-label">Strength</div><div class="stat-val">6</div><div class="stat-mod">&minus;2</div><div class="stat-save"><span class="save-mark"></span>Save &minus;2</div></div>
-        <div class="stat-card"><div class="stat-label">Dexterity</div><div class="stat-val">12</div><div class="stat-mod">+1</div><div class="stat-save"><span class="save-mark"></span>Save +1</div></div>
-        <div class="stat-card"><div class="stat-label">Constitution</div><div class="stat-val">10</div><div class="stat-mod">+0</div><div class="stat-save"><span class="save-mark"></span>Save +0</div></div>
-        <div class="stat-card"><div class="stat-label">Intelligence</div><div class="stat-val">17</div><div class="stat-mod">+3</div><div class="stat-save proficient"><span class="save-mark"></span>Save +5</div></div>
-        <div class="stat-card"><div class="stat-label">Wisdom</div><div class="stat-val">14</div><div class="stat-mod">+2</div><div class="stat-save proficient"><span class="save-mark"></span>Save +4</div></div>
-        <div class="stat-card"><div class="stat-label">Charisma</div><div class="stat-val">11</div><div class="stat-mod">+0</div><div class="stat-save"><span class="save-mark"></span>Save +0</div></div>
+            <section class="abilities-layout">
+        
+      <svg class="ability-radar" viewBox="0 0 240 240" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+        <polygon class="ar-grid" points="120.0,107.3 131.0,113.7 131.0,126.3 120.0,132.7 109.0,126.3 109.0,113.7"></polygon>
+        <polygon class="ar-grid" points="120.0,94.7 141.9,107.3 141.9,132.7 120.0,145.3 98.1,132.7 98.1,107.3"></polygon>
+        <polygon class="ar-grid" points="120.0,82.0 152.9,101.0 152.9,139.0 120.0,158.0 87.1,139.0 87.1,101.0"></polygon>
+        <polygon class="ar-grid" points="120.0,69.3 163.9,94.7 163.9,145.3 120.0,170.7 76.1,145.3 76.1,94.7"></polygon>
+        <polygon class="ar-grid" points="120.0,56.7 174.8,88.3 174.8,151.7 120.0,183.3 65.2,151.7 65.2,88.3"></polygon>
+        <polygon class="ar-grid ar-grid-outer" points="120.0,44.0 185.8,82.0 185.8,158.0 120.0,196.0 54.2,158.0 54.2,82.0"></polygon>
+        <line class="ar-axis" data-i="0" x1="120" y1="120" x2="120.0" y2="44.0"></line>
+        <line class="ar-axis" data-i="1" x1="120" y1="120" x2="185.8" y2="82.0"></line>
+        <line class="ar-axis" data-i="2" x1="120" y1="120" x2="185.8" y2="158.0"></line>
+        <line class="ar-axis" data-i="3" x1="120" y1="120" x2="120.0" y2="196.0"></line>
+        <line class="ar-axis" data-i="4" x1="120" y1="120" x2="54.2" y2="158.0"></line>
+        <line class="ar-axis" data-i="5" x1="120" y1="120" x2="54.2" y2="82.0"></line>
+        <text class="ar-tick" x="124.0" y="110.3">10</text>
+        <text class="ar-tick" x="124.0" y="85.0">14</text>
+        <text class="ar-tick" x="124.0" y="59.7">18</text>
+        <polygon class="ar-shape" points="120.0,120.0 141.9,107.3 131.0,126.3 120.0,177.0 87.1,139.0 103.5,110.5"></polygon>
+        <circle class="ar-dot" data-i="0" data-key="str" cx="120.0" cy="120.0" r="3"></circle>
+        <circle class="ar-dot" data-i="1" data-key="dex" cx="141.9" cy="107.3" r="3"></circle>
+        <circle class="ar-dot" data-i="2" data-key="con" cx="131.0" cy="126.3" r="3"></circle>
+        <circle class="ar-dot ar-dot-prof" data-i="3" data-key="int" cx="120.0" cy="177.0" r="4"></circle>
+        <circle class="ar-dot ar-dot-prof" data-i="4" data-key="wis" cx="87.1" cy="139.0" r="4"></circle>
+        <circle class="ar-dot" data-i="5" data-key="cha" cx="103.5" cy="110.5" r="3"></circle>
+        <text class="ar-label" data-i="0" x="120.0" y="24.0" text-anchor="middle">STR</text>
+        <text class="ar-label" data-i="1" x="200.5" y="77.5" text-anchor="start">DEX</text>
+        <text class="ar-label" data-i="2" x="200.5" y="170.5" text-anchor="start">CON</text>
+        <text class="ar-label" data-i="3" x="120.0" y="224.0" text-anchor="middle">INT</text>
+        <text class="ar-label" data-i="4" x="39.5" y="177.5" text-anchor="end">WIS</text>
+        <text class="ar-label" data-i="5" x="39.5" y="70.5" text-anchor="end">CHA</text>
+        <path class="ar-sector" data-i="0" data-key="str" d="M120 120 L64.0 23.0 A112 112 0 0 1 176.0 23.0 Z"></path>
+        <path class="ar-sector" data-i="1" data-key="dex" d="M120 120 L176.0 23.0 A112 112 0 0 1 232.0 120.0 Z"></path>
+        <path class="ar-sector" data-i="2" data-key="con" d="M120 120 L232.0 120.0 A112 112 0 0 1 176.0 217.0 Z"></path>
+        <path class="ar-sector" data-i="3" data-key="int" d="M120 120 L176.0 217.0 A112 112 0 0 1 64.0 217.0 Z"></path>
+        <path class="ar-sector" data-i="4" data-key="wis" d="M120 120 L64.0 217.0 A112 112 0 0 1 8.0 120.0 Z"></path>
+        <path class="ar-sector" data-i="5" data-key="cha" d="M120 120 L8.0 120.0 A112 112 0 0 1 64.0 23.0 Z"></path>
+      </svg>
+
+        <div class="abilities">
+        <div class="stat-card" data-i="0" data-key="str"><div class="stat-label">Strength</div><div class="stat-val">6</div><div class="stat-mod">&minus;2</div><div class="stat-save"><span class="save-mark"></span>Save &minus;2</div></div>
+        <div class="stat-card" data-i="1" data-key="dex"><div class="stat-label">Dexterity</div><div class="stat-val">12</div><div class="stat-mod">+1</div><div class="stat-save"><span class="save-mark"></span>Save +1</div></div>
+        <div class="stat-card" data-i="2" data-key="con"><div class="stat-label">Constitution</div><div class="stat-val">10</div><div class="stat-mod">+0</div><div class="stat-save"><span class="save-mark"></span>Save +0</div></div>
+        <div class="stat-card" data-i="3" data-key="int"><div class="stat-label">Intelligence</div><div class="stat-val">17</div><div class="stat-mod">+3</div><div class="stat-save proficient"><span class="save-mark"></span>Save +5</div></div>
+        <div class="stat-card" data-i="4" data-key="wis"><div class="stat-label">Wisdom</div><div class="stat-val">14</div><div class="stat-mod">+2</div><div class="stat-save proficient"><span class="save-mark"></span>Save +4</div></div>
+        <div class="stat-card" data-i="5" data-key="cha"><div class="stat-label">Charisma</div><div class="stat-val">11</div><div class="stat-mod">+0</div><div class="stat-save"><span class="save-mark"></span>Save +0</div></div>
+        </div>
       </section>
 
             <section class="proficiencies">
@@ -2826,13 +2986,53 @@
         <a href="#chumble-pack">Pack</a>
       </nav>
 
-            <section class="abilities">
-        <div class="stat-card"><div class="stat-label">Strength</div><div class="stat-val">11</div><div class="stat-mod">+0</div><div class="stat-save"><span class="save-mark"></span>Save +0</div></div>
-        <div class="stat-card"><div class="stat-label">Dexterity</div><div class="stat-val">16</div><div class="stat-mod">+3</div><div class="stat-save"><span class="save-mark"></span>Save +3</div></div>
-        <div class="stat-card"><div class="stat-label">Constitution</div><div class="stat-val">15</div><div class="stat-mod">+2</div><div class="stat-save"><span class="save-mark"></span>Save +2</div></div>
-        <div class="stat-card"><div class="stat-label">Intelligence</div><div class="stat-val">13</div><div class="stat-mod">+1</div><div class="stat-save"><span class="save-mark"></span>Save +1</div></div>
-        <div class="stat-card"><div class="stat-label">Wisdom</div><div class="stat-val">13</div><div class="stat-mod">+1</div><div class="stat-save proficient"><span class="save-mark"></span>Save +3</div></div>
-        <div class="stat-card"><div class="stat-label">Charisma</div><div class="stat-val">18</div><div class="stat-mod">+4</div><div class="stat-save proficient"><span class="save-mark"></span>Save +6</div></div>
+            <section class="abilities-layout">
+        
+      <svg class="ability-radar" viewBox="0 0 240 240" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+        <polygon class="ar-grid" points="120.0,107.3 131.0,113.7 131.0,126.3 120.0,132.7 109.0,126.3 109.0,113.7"></polygon>
+        <polygon class="ar-grid" points="120.0,94.7 141.9,107.3 141.9,132.7 120.0,145.3 98.1,132.7 98.1,107.3"></polygon>
+        <polygon class="ar-grid" points="120.0,82.0 152.9,101.0 152.9,139.0 120.0,158.0 87.1,139.0 87.1,101.0"></polygon>
+        <polygon class="ar-grid" points="120.0,69.3 163.9,94.7 163.9,145.3 120.0,170.7 76.1,145.3 76.1,94.7"></polygon>
+        <polygon class="ar-grid" points="120.0,56.7 174.8,88.3 174.8,151.7 120.0,183.3 65.2,151.7 65.2,88.3"></polygon>
+        <polygon class="ar-grid ar-grid-outer" points="120.0,44.0 185.8,82.0 185.8,158.0 120.0,196.0 54.2,158.0 54.2,82.0"></polygon>
+        <line class="ar-axis" data-i="0" x1="120" y1="120" x2="120.0" y2="44.0"></line>
+        <line class="ar-axis" data-i="1" x1="120" y1="120" x2="185.8" y2="82.0"></line>
+        <line class="ar-axis" data-i="2" x1="120" y1="120" x2="185.8" y2="158.0"></line>
+        <line class="ar-axis" data-i="3" x1="120" y1="120" x2="120.0" y2="196.0"></line>
+        <line class="ar-axis" data-i="4" x1="120" y1="120" x2="54.2" y2="158.0"></line>
+        <line class="ar-axis" data-i="5" x1="120" y1="120" x2="54.2" y2="82.0"></line>
+        <text class="ar-tick" x="124.0" y="110.3">10</text>
+        <text class="ar-tick" x="124.0" y="85.0">14</text>
+        <text class="ar-tick" x="124.0" y="59.7">18</text>
+        <polygon class="ar-shape" points="120.0,101.0 163.9,94.7 158.4,142.2 120.0,151.7 92.6,135.8 65.2,88.3"></polygon>
+        <circle class="ar-dot" data-i="0" data-key="str" cx="120.0" cy="101.0" r="3"></circle>
+        <circle class="ar-dot" data-i="1" data-key="dex" cx="163.9" cy="94.7" r="3"></circle>
+        <circle class="ar-dot" data-i="2" data-key="con" cx="158.4" cy="142.2" r="3"></circle>
+        <circle class="ar-dot" data-i="3" data-key="int" cx="120.0" cy="151.7" r="3"></circle>
+        <circle class="ar-dot ar-dot-prof" data-i="4" data-key="wis" cx="92.6" cy="135.8" r="4"></circle>
+        <circle class="ar-dot ar-dot-prof" data-i="5" data-key="cha" cx="65.2" cy="88.3" r="4"></circle>
+        <text class="ar-label" data-i="0" x="120.0" y="24.0" text-anchor="middle">STR</text>
+        <text class="ar-label" data-i="1" x="200.5" y="77.5" text-anchor="start">DEX</text>
+        <text class="ar-label" data-i="2" x="200.5" y="170.5" text-anchor="start">CON</text>
+        <text class="ar-label" data-i="3" x="120.0" y="224.0" text-anchor="middle">INT</text>
+        <text class="ar-label" data-i="4" x="39.5" y="177.5" text-anchor="end">WIS</text>
+        <text class="ar-label" data-i="5" x="39.5" y="70.5" text-anchor="end">CHA</text>
+        <path class="ar-sector" data-i="0" data-key="str" d="M120 120 L64.0 23.0 A112 112 0 0 1 176.0 23.0 Z"></path>
+        <path class="ar-sector" data-i="1" data-key="dex" d="M120 120 L176.0 23.0 A112 112 0 0 1 232.0 120.0 Z"></path>
+        <path class="ar-sector" data-i="2" data-key="con" d="M120 120 L232.0 120.0 A112 112 0 0 1 176.0 217.0 Z"></path>
+        <path class="ar-sector" data-i="3" data-key="int" d="M120 120 L176.0 217.0 A112 112 0 0 1 64.0 217.0 Z"></path>
+        <path class="ar-sector" data-i="4" data-key="wis" d="M120 120 L64.0 217.0 A112 112 0 0 1 8.0 120.0 Z"></path>
+        <path class="ar-sector" data-i="5" data-key="cha" d="M120 120 L8.0 120.0 A112 112 0 0 1 64.0 23.0 Z"></path>
+      </svg>
+
+        <div class="abilities">
+        <div class="stat-card" data-i="0" data-key="str"><div class="stat-label">Strength</div><div class="stat-val">11</div><div class="stat-mod">+0</div><div class="stat-save"><span class="save-mark"></span>Save +0</div></div>
+        <div class="stat-card" data-i="1" data-key="dex"><div class="stat-label">Dexterity</div><div class="stat-val">16</div><div class="stat-mod">+3</div><div class="stat-save"><span class="save-mark"></span>Save +3</div></div>
+        <div class="stat-card" data-i="2" data-key="con"><div class="stat-label">Constitution</div><div class="stat-val">15</div><div class="stat-mod">+2</div><div class="stat-save"><span class="save-mark"></span>Save +2</div></div>
+        <div class="stat-card" data-i="3" data-key="int"><div class="stat-label">Intelligence</div><div class="stat-val">13</div><div class="stat-mod">+1</div><div class="stat-save"><span class="save-mark"></span>Save +1</div></div>
+        <div class="stat-card" data-i="4" data-key="wis"><div class="stat-label">Wisdom</div><div class="stat-val">13</div><div class="stat-mod">+1</div><div class="stat-save proficient"><span class="save-mark"></span>Save +3</div></div>
+        <div class="stat-card" data-i="5" data-key="cha"><div class="stat-label">Charisma</div><div class="stat-val">18</div><div class="stat-mod">+4</div><div class="stat-save proficient"><span class="save-mark"></span>Save +6</div></div>
+        </div>
       </section>
 
             <section class="proficiencies">
@@ -3388,13 +3588,53 @@
         <a href="#lilac-pack">Pack</a>
       </nav>
 
-            <section class="abilities">
-        <div class="stat-card"><div class="stat-label">Strength</div><div class="stat-val">8</div><div class="stat-mod">&minus;1</div><div class="stat-save proficient"><span class="save-mark"></span>Save +1</div></div>
-        <div class="stat-card"><div class="stat-label">Dexterity</div><div class="stat-val">16</div><div class="stat-mod">+3</div><div class="stat-save proficient"><span class="save-mark"></span>Save +5</div></div>
-        <div class="stat-card"><div class="stat-label">Constitution</div><div class="stat-val">14</div><div class="stat-mod">+2</div><div class="stat-save"><span class="save-mark"></span>Save +2</div></div>
-        <div class="stat-card"><div class="stat-label">Intelligence</div><div class="stat-val">10</div><div class="stat-mod">+0</div><div class="stat-save"><span class="save-mark"></span>Save +0</div></div>
-        <div class="stat-card"><div class="stat-label">Wisdom</div><div class="stat-val">16</div><div class="stat-mod">+3</div><div class="stat-save"><span class="save-mark"></span>Save +3</div></div>
-        <div class="stat-card"><div class="stat-label">Charisma</div><div class="stat-val">10</div><div class="stat-mod">+0</div><div class="stat-save"><span class="save-mark"></span>Save +0</div></div>
+            <section class="abilities-layout">
+        
+      <svg class="ability-radar" viewBox="0 0 240 240" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+        <polygon class="ar-grid" points="120.0,107.3 131.0,113.7 131.0,126.3 120.0,132.7 109.0,126.3 109.0,113.7"></polygon>
+        <polygon class="ar-grid" points="120.0,94.7 141.9,107.3 141.9,132.7 120.0,145.3 98.1,132.7 98.1,107.3"></polygon>
+        <polygon class="ar-grid" points="120.0,82.0 152.9,101.0 152.9,139.0 120.0,158.0 87.1,139.0 87.1,101.0"></polygon>
+        <polygon class="ar-grid" points="120.0,69.3 163.9,94.7 163.9,145.3 120.0,170.7 76.1,145.3 76.1,94.7"></polygon>
+        <polygon class="ar-grid" points="120.0,56.7 174.8,88.3 174.8,151.7 120.0,183.3 65.2,151.7 65.2,88.3"></polygon>
+        <polygon class="ar-grid ar-grid-outer" points="120.0,44.0 185.8,82.0 185.8,158.0 120.0,196.0 54.2,158.0 54.2,82.0"></polygon>
+        <line class="ar-axis" data-i="0" x1="120" y1="120" x2="120.0" y2="44.0"></line>
+        <line class="ar-axis" data-i="1" x1="120" y1="120" x2="185.8" y2="82.0"></line>
+        <line class="ar-axis" data-i="2" x1="120" y1="120" x2="185.8" y2="158.0"></line>
+        <line class="ar-axis" data-i="3" x1="120" y1="120" x2="120.0" y2="196.0"></line>
+        <line class="ar-axis" data-i="4" x1="120" y1="120" x2="54.2" y2="158.0"></line>
+        <line class="ar-axis" data-i="5" x1="120" y1="120" x2="54.2" y2="82.0"></line>
+        <text class="ar-tick" x="124.0" y="110.3">10</text>
+        <text class="ar-tick" x="124.0" y="85.0">14</text>
+        <text class="ar-tick" x="124.0" y="59.7">18</text>
+        <polygon class="ar-shape" points="120.0,120.0 163.9,94.7 152.9,139.0 120.0,132.7 76.1,145.3 109.0,113.7"></polygon>
+        <circle class="ar-dot ar-dot-prof" data-i="0" data-key="str" cx="120.0" cy="120.0" r="4"></circle>
+        <circle class="ar-dot ar-dot-prof" data-i="1" data-key="dex" cx="163.9" cy="94.7" r="4"></circle>
+        <circle class="ar-dot" data-i="2" data-key="con" cx="152.9" cy="139.0" r="3"></circle>
+        <circle class="ar-dot" data-i="3" data-key="int" cx="120.0" cy="132.7" r="3"></circle>
+        <circle class="ar-dot" data-i="4" data-key="wis" cx="76.1" cy="145.3" r="3"></circle>
+        <circle class="ar-dot" data-i="5" data-key="cha" cx="109.0" cy="113.7" r="3"></circle>
+        <text class="ar-label" data-i="0" x="120.0" y="24.0" text-anchor="middle">STR</text>
+        <text class="ar-label" data-i="1" x="200.5" y="77.5" text-anchor="start">DEX</text>
+        <text class="ar-label" data-i="2" x="200.5" y="170.5" text-anchor="start">CON</text>
+        <text class="ar-label" data-i="3" x="120.0" y="224.0" text-anchor="middle">INT</text>
+        <text class="ar-label" data-i="4" x="39.5" y="177.5" text-anchor="end">WIS</text>
+        <text class="ar-label" data-i="5" x="39.5" y="70.5" text-anchor="end">CHA</text>
+        <path class="ar-sector" data-i="0" data-key="str" d="M120 120 L64.0 23.0 A112 112 0 0 1 176.0 23.0 Z"></path>
+        <path class="ar-sector" data-i="1" data-key="dex" d="M120 120 L176.0 23.0 A112 112 0 0 1 232.0 120.0 Z"></path>
+        <path class="ar-sector" data-i="2" data-key="con" d="M120 120 L232.0 120.0 A112 112 0 0 1 176.0 217.0 Z"></path>
+        <path class="ar-sector" data-i="3" data-key="int" d="M120 120 L176.0 217.0 A112 112 0 0 1 64.0 217.0 Z"></path>
+        <path class="ar-sector" data-i="4" data-key="wis" d="M120 120 L64.0 217.0 A112 112 0 0 1 8.0 120.0 Z"></path>
+        <path class="ar-sector" data-i="5" data-key="cha" d="M120 120 L8.0 120.0 A112 112 0 0 1 64.0 23.0 Z"></path>
+      </svg>
+
+        <div class="abilities">
+        <div class="stat-card" data-i="0" data-key="str"><div class="stat-label">Strength</div><div class="stat-val">8</div><div class="stat-mod">&minus;1</div><div class="stat-save proficient"><span class="save-mark"></span>Save +1</div></div>
+        <div class="stat-card" data-i="1" data-key="dex"><div class="stat-label">Dexterity</div><div class="stat-val">16</div><div class="stat-mod">+3</div><div class="stat-save proficient"><span class="save-mark"></span>Save +5</div></div>
+        <div class="stat-card" data-i="2" data-key="con"><div class="stat-label">Constitution</div><div class="stat-val">14</div><div class="stat-mod">+2</div><div class="stat-save"><span class="save-mark"></span>Save +2</div></div>
+        <div class="stat-card" data-i="3" data-key="int"><div class="stat-label">Intelligence</div><div class="stat-val">10</div><div class="stat-mod">+0</div><div class="stat-save"><span class="save-mark"></span>Save +0</div></div>
+        <div class="stat-card" data-i="4" data-key="wis"><div class="stat-label">Wisdom</div><div class="stat-val">16</div><div class="stat-mod">+3</div><div class="stat-save"><span class="save-mark"></span>Save +3</div></div>
+        <div class="stat-card" data-i="5" data-key="cha"><div class="stat-label">Charisma</div><div class="stat-val">10</div><div class="stat-mod">+0</div><div class="stat-save"><span class="save-mark"></span>Save +0</div></div>
+        </div>
       </section>
 
             <section class="proficiencies">
@@ -4435,6 +4675,98 @@
           _packShowTip(tip, el, '<div class="tip-ctx">' + text + '</div>', true);
         });
         el.addEventListener('mouseleave', () => { tip.classList.remove('visible'); });
+      });
+    })();
+
+    // --- Ability radar: draw-on reveal + linked pie-slice hover ---
+    (function () {
+      const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const CX = 120, CY = 120, DUR = 700;
+
+      function parsePoints(str) {
+        return str.trim().split(/\s+/).map(p => {
+          const xy = p.split(',');
+          return [parseFloat(xy[0]), parseFloat(xy[1])];
+        });
+      }
+      function setShape(svg, pts) {
+        const poly = svg.querySelector('.ar-shape');
+        const dots = svg.querySelectorAll('.ar-dot');
+        poly.setAttribute('points', pts.map(p => p[0].toFixed(1) + ',' + p[1].toFixed(1)).join(' '));
+        for (let i = 0; i < dots.length && i < pts.length; i++) {
+          dots[i].setAttribute('cx', pts[i][0].toFixed(1));
+          dots[i].setAttribute('cy', pts[i][1].toFixed(1));
+        }
+      }
+      function targetFor(svg) {
+        if (!svg._radarTarget) svg._radarTarget = parsePoints(svg.querySelector('.ar-shape').getAttribute('points'));
+        return svg._radarTarget;
+      }
+      function reveal(svg) {
+        const target = targetFor(svg);
+        if (reduce) { setShape(svg, target); return; }
+        const token = {};
+        svg._radarToken = token;
+        let t0 = null;
+        function step(now) {
+          if (svg._radarToken !== token) return;  // superseded by a newer reveal
+          if (t0 === null) t0 = now;
+          const t = Math.min(1, (now - t0) / DUR);
+          const e = 1 - Math.pow(1 - t, 3);
+          setShape(svg, target.map(p => [CX + (p[0] - CX) * e, CY + (p[1] - CY) * e]));
+          if (t < 1) requestAnimationFrame(step);
+        }
+        requestAnimationFrame(step);
+      }
+
+      function wireHover(panel) {
+        const svg = panel.querySelector('.ability-radar');
+        if (!svg) return;
+        function setHot(i, on) {
+          ['.ar-axis', '.ar-label', '.ar-dot', '.ar-sector'].forEach(sel => {
+            const el = svg.querySelector(sel + '[data-i="' + i + '"]');
+            if (el) el.classList.toggle('hot', on);
+          });
+          const card = panel.querySelector('.stat-card[data-i="' + i + '"]');
+          if (card) card.classList.toggle('hot', on);
+        }
+        svg.querySelectorAll('.ar-sector').forEach(sec => {
+          const i = sec.getAttribute('data-i');
+          sec.addEventListener('mouseenter', () => setHot(i, true));
+          sec.addEventListener('mouseleave', () => setHot(i, false));
+        });
+        panel.querySelectorAll('.stat-card').forEach(card => {
+          const i = card.getAttribute('data-i');
+          card.addEventListener('mouseenter', () => setHot(i, true));
+          card.addEventListener('mouseleave', () => setHot(i, false));
+        });
+      }
+
+      const panels = document.querySelectorAll('.character');
+      panels.forEach(p => {
+        const svg = p.querySelector('.ability-radar');
+        if (svg) targetFor(svg);   // cache the real target before any reveal collapses it
+        wireHover(p);              // wireHover early-returns when the panel has no radar
+      });
+
+      // Replay the draw-on whenever a panel becomes active (every tab switch).
+      const obs = new MutationObserver(muts => {
+        muts.forEach(m => {
+          const p = m.target;
+          if (p.classList.contains('active')) {
+            const svg = p.querySelector('.ability-radar');
+            if (svg) reveal(svg);
+          }
+        });
+      });
+      panels.forEach(p => obs.observe(p, { attributes: true, attributeFilter: ['class'] }));
+
+      // Reveal whichever panel is already active at load (e.g. a deep-linked hash).
+      panels.forEach(p => {
+        if (p.classList.contains('active')) {
+          const svg = p.querySelector('.ability-radar');
+          if (svg) reveal(svg);
+        }
       });
     })();
 
