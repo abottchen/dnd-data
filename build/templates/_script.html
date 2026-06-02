@@ -658,7 +658,7 @@
         });
       });
 
-      svg.parentNode.querySelectorAll('.whence-seg').forEach(function (s) {
+      (svg.closest('section') || document).querySelectorAll('.whence-seg').forEach(function (s) {
         s.addEventListener('mouseenter', function () {
           clearTimeout(hideTimer);
           var html = '<div class="tip-val">' + s.getAttribute('data-xp') + '</div>';
