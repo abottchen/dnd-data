@@ -323,6 +323,28 @@ def refresh_intro_epithet(data: dict, authored: dict) -> list[tuple]:
     })]
 
 
+def refresh_ascent_read(data: dict, authored: dict) -> list[tuple]:
+    """One slice carrying the new sessions, the current XP-by-type composition,
+    and the existing one-line 'character read' for the prompt to weigh."""
+    marker = authored["site"].get("refreshed_through_session", 0)
+    new_sessions = [
+        e for i, e in enumerate(data["session_log"]["entries"], start=1) if i > marker
+    ]
+    by_type: dict[str, int] = defaultdict(int)
+    for e in (data.get("xp_log") or {}).get("entries", []):
+        by_type[e.get("type") or "other"] += int(e.get("perPc", 0))
+    total = sum(by_type.values())
+    composition = [
+        {"type": t, "xp": x, "pct": round(x / total * 100) if total else 0}
+        for t, x in sorted(by_type.items(), key=lambda kv: -kv[1])
+    ]
+    return [("all", {
+        "new_sessions": new_sessions,
+        "composition": composition,
+        "existing": authored["site"].get("ascent_read", ""),
+    })]
+
+
 def refresh_known_npcs(data: dict, authored: dict) -> list[tuple]:
     """Discover NPC names from session text and append them to the canonical
     `site.known_npcs` list. Runs in the discovery pass before append-npcs so
