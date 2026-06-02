@@ -47,6 +47,8 @@ ALL: tuple[Transformer, ...] = (
                 slices.refresh_road_ahead, apply.apply_refresh_road_ahead),
     Transformer("refresh-intro-epithet", "refresh",
                 slices.refresh_intro_epithet, apply.apply_refresh_intro_epithet),
+    Transformer("refresh-ascent-read", "refresh",
+                slices.refresh_ascent_read, apply.apply_refresh_ascent_read),
     Transformer("refresh-archetype-inscription", "refresh",
                 slices.refresh_archetype_inscription,
                 apply.apply_refresh_archetype_inscription),
