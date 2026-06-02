@@ -367,6 +367,12 @@ def test_radar_radius_increases_with_score():
                                             "int": 8, "wis": 8, "cha": 8}))["dots"][0]["y"]
     assert top_y(20) < top_y(14) < top_y(8)   # smaller y = farther up = bigger radius
     assert top_y(20) == 44.0                  # outer ring: 120 - 76
+    assert top_y(22) == top_y(20)   # scores above the ceiling clamp to the outer ring
+
+def test_radar_missing_abilities_defaults_to_center():
+    r = compute_radar({"abilities": {}, "savingThrows": {}})
+    for dot in r["dots"]:
+        assert dot["x"] == 120.0 and dot["y"] == 120.0
 
 def test_radar_marks_proficient_saves():
     r = compute_radar(_radar_member({"str": 10, "dex": 10, "con": 10,

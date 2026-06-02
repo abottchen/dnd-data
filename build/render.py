@@ -643,6 +643,7 @@ def _radar_angle(i: int) -> float:
     return -math.pi / 2 + (i / 6) * 2 * math.pi
 
 def _radar_radius(score: float) -> float:
+    """Map an ability score to a pixel radius, clamping to [RADAR_FLOOR, RADAR_CEIL]."""
     clamped = max(RADAR_FLOOR, min(RADAR_CEIL, score))
     return (clamped - RADAR_FLOOR) / (RADAR_CEIL - RADAR_FLOOR) * RADAR_R
 
@@ -656,7 +657,8 @@ def compute_radar(member: dict) -> dict:
     """Geometry for a character's six-axis ability-score radar.
 
     Returns pre-rounded coordinates for: concentric grid `rings` (point-string
-    each), `axes` endpoints, `ticks`, the filled `shape` (point-string), vertex
+    each), `axes` far-endpoint tips `{x2, y2}` (SVG lines originate at cx, cy),
+    `ticks`, the filled `shape` (point-string), vertex
     `dots` (with proficient-save flag), `labels`, and invisible pie-slice
     `sectors` (60-degree hover hit zones tiling the disc). See module constants
     for the scale."""
@@ -676,6 +678,7 @@ def compute_radar(member: dict) -> dict:
     ticks = []
     for tv in RADAR_TICKS:
         y = RADAR_CY - _radar_radius(tv)
+        # +4 nudges right of the axis; +3 drops to the text baseline
         ticks.append({"x": round(RADAR_CX + 4, 1), "y": round(y + 3, 1), "text": str(tv)})
 
     shape_pts, dots = [], []
