@@ -13,19 +13,6 @@
     }
   },
   {
-    "id": "grieg",
-    "epithet": "of the Wulven, sworn to the hunt",
-    "reliquary_header": "Fallen by his hand",
-    "constellation_epithet": "eleven twenties struck",
-    "distinction_title": "Crown of Twenties",
-    "distinction_subtitle": "no other hand has thrown so many",
-    "distinction_detail": "<b>11</b> crits &middot; most of the company",
-    "archetype_badge": {
-      "archetype": "pack-mule",
-      "inscription": "The hunting trap alone tips twenty-five pounds; above it ride scale mail and a heavy crossbow, and the wulven still finds room for caltrops, rope, and a block-and-tackle besides."
-    }
-  },
-  {
     "id": "vex",
     "epithet": "of the Gold Dragonborn, born to breath and blade",
     "reliquary_header": "Fallen by his steel",
@@ -75,6 +62,19 @@
     "archetype_badge": {
       "archetype": "naturalist",
       "inscription": "One carved sprig of mistletoe, ribbon-tied and kept close — the whole of the primal green, if you know how to ask, flows through that small stem."
+    }
+  },
+  {
+    "id": "grieg",
+    "epithet": "of the Wulven, who answers the dead with bolt and hammer",
+    "reliquary_header": "Felled by his hand",
+    "constellation_epithet": "ten crowns, one stumble",
+    "distinction_title": "The Tally of Crits",
+    "distinction_subtitle": "Ten natural twenties against a single fumble — fortune's favored hand.",
+    "distinction_detail": "<b>10</b> crits &middot; one fumble in eighty kept d20s",
+    "archetype_badge": {
+      "archetype": "pack-mule",
+      "inscription": "The hunting trap alone tips twenty-five pounds; above it ride scale mail and a heavy crossbow, and the wulven still finds room for caltrops, rope, and a block-and-tackle besides."
     }
   }
 ]

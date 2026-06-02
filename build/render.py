@@ -1026,6 +1026,15 @@ def load_data(data_dir: Path) -> dict:
     dice_player_map = _load_dice_player_map()
     unmapped_players: set[str] = set()
     rolls_by_slug: dict[str, list[dict]] = {}
+    # Successive dicex exports are not guaranteed disjoint — a later export can
+    # restate rolls already present in an earlier one (e.g. the 2026-04-27 dump
+    # re-includes the 2026-04-20/21 rolls). Concatenating blindly double-counts
+    # those rolls, inflating every fortune stat (crit/fumble counts, totals,
+    # avg/sd) and adding phantom dots to the d20 plots. A roll's timestamp is its
+    # stable identity across exports, so we drop any event whose timestamp we've
+    # already taken for that slug. Events with a blank timestamp are never
+    # deduped (we can't prove identity) — they pass through untouched.
+    seen_ts_by_slug: dict[str, set[str]] = {}
     for f in dice_rolls:
         if not isinstance(f, dict) or "players" not in f:
             continue
@@ -1037,10 +1046,15 @@ def load_data(data_dir: Path) -> dict:
             if slug is None:
                 unmapped_players.add(upstream_name)
                 continue
+            seen_ts = seen_ts_by_slug.setdefault(slug, set())
             for ev in pdata.get("rolls", []):
                 ev2 = dict(ev)
                 ev2["rolls"] = ev2.pop("dice", [])
                 ts = ev2.get("timestamp", "")
+                if ts:
+                    if ts in seen_ts:
+                        continue
+                    seen_ts.add(ts)
                 ev2["date"] = ts[:10] if ts else ""
                 rolls_by_slug.setdefault(slug, []).append(ev2)
 
@@ -1316,7 +1330,10 @@ def main() -> int:
     authored = load_authored(BUILD_DIR)
     party_count = len(data['party']) if isinstance(data['party'], list) else len(data['party'].get('members', []))
     session_count = len(data['session_log'].get('entries', []))
-    dice_count = sum(len(r) for r in data['dice_rolls'])
+    # Count actual dice events fed to the page (post-dedup, per-slug), not the
+    # parsed-file dicts in data['dice_rolls'] — len() on those returns each
+    # file's top-level key count, not an event tally.
+    dice_count = sum(len(events) for events in data['rolls_by_slug'].values())
     print(f"render.py: loaded {party_count} party members, "
           f"{dice_count} dice events, "
           f"{session_count} session entries")
