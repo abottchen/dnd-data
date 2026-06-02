@@ -1308,6 +1308,8 @@ def compute_all(data: dict, authored: dict) -> dict:
     distinctions = compute_distinctions(party, authored["characters"])
     patron = compute_patron_die(fortune_by_char, party)
     best_skill_by_id = {m["id"]: compute_best_skill(m) for m in party.get("members", [])}
+    radar_by_id = {m["id"]: compute_radar(m)
+                   for m in party.get("members", []) if m["id"] != "gm"}
 
     char_auth_by_id = {a["id"]: a for a in authored["characters"]}
 
@@ -1352,6 +1354,7 @@ def compute_all(data: dict, authored: dict) -> dict:
         "distinctions": distinctions,
         "patron_die": patron,
         "best_skill_by_id": best_skill_by_id,
+        "radar_by_id": radar_by_id,
         "npcs_by_allegiance": _split_npcs(authored["npcs"]),
         "inventory_by_id": inventory_bundle["by_id"],
         "company_strip": inventory_bundle["company_strip"],
