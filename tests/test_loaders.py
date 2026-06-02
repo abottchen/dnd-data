@@ -94,3 +94,22 @@ def test_load_data_scrubs_realname_ids_and_drops_player_field(tmp_path: Path):
 
     assert [m["id"] for m in members] == ["grieg", "urida", "anton"]
     assert all("player" not in m for m in members)
+
+
+def test_load_data_loads_xp_log_when_present(tmp_path: Path):
+    (tmp_path / "party.json").write_text('{"members": []}')
+    (tmp_path / "session-log.json").write_text('{"entries": []}')
+    (tmp_path / "dice").mkdir()
+    (tmp_path / "xp-log.json").write_text(
+        '{"entries": [{"id": "a", "date": "2026-04-19", "sessionId": "s1", '
+        '"title": "T", "type": "combat", "perPc": 50}]}')
+    data = load_data(tmp_path)
+    assert data["xp_log"]["entries"][0]["perPc"] == 50
+
+
+def test_load_data_tolerates_missing_xp_log(tmp_path: Path):
+    (tmp_path / "party.json").write_text('{"members": []}')
+    (tmp_path / "session-log.json").write_text('{"entries": []}')
+    (tmp_path / "dice").mkdir()
+    data = load_data(tmp_path)          # no xp-log.json on disk
+    assert data["xp_log"] == {"entries": []}

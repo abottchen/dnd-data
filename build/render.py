@@ -1269,6 +1269,11 @@ def load_data(data_dir: Path) -> dict:
     with (data_dir / "session-log.json").open() as f:
         session_log = json.load(f)
 
+    # XP log (optional — gitignored, dropped in by the GM after each session).
+    # Cold-start safe: a fresh clone with no xp-log.json still renders.
+    xp_path = data_dir / "xp-log.json"
+    xp_log = json.loads(xp_path.read_text()) if xp_path.exists() else {"entries": []}
+
     dice_paths = sorted((data_dir / "dice").glob("dicex-rolls-*.json"))
     dice_rolls = [json.loads(p.read_text()) for p in dice_paths]
 
@@ -1370,6 +1375,7 @@ def load_data(data_dir: Path) -> dict:
         "rolls_by_slug": rolls_by_slug,
         "unmapped_players": sorted(unmapped_players),
         "session_log": session_log,
+        "xp_log": xp_log,
     }
 
 DICE_PLAYER_MAP_PATH = BUILD_DIR / "dice-players.json"
@@ -1459,6 +1465,7 @@ def compute_all(data: dict, authored: dict) -> dict:
     best_skill_by_id = {m["id"]: compute_best_skill(m) for m in party.get("members", [])}
     radar_by_id = {m["id"]: compute_radar(m)
                    for m in party.get("members", []) if m["id"] != "gm"}
+    ascent = compute_ascent(data.get("xp_log"))
 
     char_auth_by_id = {a["id"]: a for a in authored["characters"]}
 
@@ -1502,6 +1509,7 @@ def compute_all(data: dict, authored: dict) -> dict:
         "ledger": ledger,
         "distinctions": distinctions,
         "patron_die": patron,
+        "ascent": ascent,
         "best_skill_by_id": best_skill_by_id,
         "radar_by_id": radar_by_id,
         "npcs_by_allegiance": _split_npcs(authored["npcs"]),
