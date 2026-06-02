@@ -24,12 +24,17 @@
     </div>
     <div class="ledger-cell">
       <div class="ledger-eyebrow">To Ascension</div>
+      {%- if ascent.next_threshold %}
       <div class="ledger-val">{{ "{:,}".format(ascent.to_next) }}</div>
       <div class="ledger-sub seal">Level {{ (ascent.level_num + 1) | roman }} at <b>{{ "{:,}".format(ascent.next_threshold) }}</b></div>
+      {%- else %}
+      <div class="ledger-val">&mdash;</div>
+      <div class="ledger-sub seal">Level <b>{{ ascent.level_num | roman }}</b> &middot; the summit</div>
+      {%- endif %}
     </div>
   </div>
 
-  {{ m.sub_head("The Climb to " ~ (ascent.level_num + 1) | roman) }}
+  {{ m.sub_head(("The Climb to " ~ (ascent.level_num + 1) | roman) if ascent.next_threshold else "The Long Climb") }}
   <div class="ascent">
     <svg class="ascent-chart" viewBox="0 0 {{ ascent.view_w }} {{ ascent.view_h }}" role="img"
          aria-label="Cumulative party experience climbing toward the next level">
@@ -56,10 +61,12 @@
       <path class="ascent-area" d="{{ ascent.area_d }}"/>
       <path class="ascent-line" d="{{ ascent.line_d }}"/>
       <path class="ascent-projection" d="M {{ ascent.last_cx }} {{ ascent.proj_y }} L {{ ascent.plot_right }} {{ ascent.proj_y }}"/>
+      {%- if ascent.next_threshold %}
       <text class="ascent-roadtext" x="{{ ascent.road_x }}" y="{{ ascent.road_y }}">
         <tspan class="big" x="{{ ascent.road_x }}" dy="0">{{ "{:,}".format(ascent.to_next) }} XP</tspan>
         <tspan x="{{ ascent.road_x }}" dy="18">the road to Level {{ (ascent.level_num + 1) | roman }}</tspan>
       </text>
+      {%- endif %}
 
       <line class="ascent-guide" x1="0" y1="0" x2="0" y2="0"/>
 

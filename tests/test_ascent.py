@@ -74,3 +74,17 @@ def test_compute_ascent_geometry_well_formed():
     # session ticks: one per distinct session (4), the s4 group is multi
     assert len(a["ticks"]) == 4
     assert a["ticks"][-1]["multi"] is True
+
+
+def test_compute_ascent_at_max_level_has_no_next_threshold():
+    # A party at level 20 (>= 355,000 XP) has no next threshold; the template
+    # must guard on this (next_threshold None, to_next 0) and not crash.
+    log = {"entries": [
+        {"id": "x", "date": "2026-04-19", "sessionId": "s1",
+         "title": "Apotheosis", "type": "milestone", "perPc": 355000},
+    ]}
+    a = render.compute_ascent(log)
+    assert a["level_num"] == 20
+    assert a["next_threshold"] is None
+    assert a["to_next"] == 0
+    assert a["ymax"] == a["total"]  # ceiling falls back to the current total
