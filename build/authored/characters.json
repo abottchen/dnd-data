@@ -13,19 +13,6 @@
     }
   },
   {
-    "id": "grieg",
-    "epithet": "of the Wulven, sworn to the hunt",
-    "reliquary_header": "Fallen by his hand",
-    "constellation_epithet": "eleven twenties struck",
-    "distinction_title": "Crown of Twenties",
-    "distinction_subtitle": "no other hand has thrown so many",
-    "distinction_detail": "<b>11</b> crits &middot; most of the company",
-    "archetype_badge": {
-      "archetype": "pack-mule",
-      "inscription": "The hunting trap alone tips twenty-five pounds; above it ride scale mail and a heavy crossbow, and the wulven still finds room for caltrops, rope, and a block-and-tackle besides."
-    }
-  },
-  {
     "id": "vex",
     "epithet": "of the Gold Dragonborn, born to breath and blade",
     "reliquary_header": "Fallen by his steel",
@@ -65,13 +52,26 @@
     }
   },
   {
+    "id": "grieg",
+    "epithet": "of the Wulven, who answers the question with a crossbow and the doubt with the rail",
+    "reliquary_header": "Fed to the sea and the bolt",
+    "constellation_epithet": "ten crit successes, one crit fail",
+    "distinction_title": "Most Favored by the Twenty",
+    "distinction_subtitle": "No other hand turns up the twenty so often.",
+    "distinction_detail": "<b>10</b> crit successes &middot; <b>1</b> crit fail across 80 kept d20s",
+    "archetype_badge": {
+      "archetype": "pack-mule",
+      "inscription": "The hunting trap alone tips twenty-five pounds; above it ride scale mail and a heavy crossbow, and the wulven still finds room for caltrops, rope, and a block-and-tackle besides."
+    }
+  },
+  {
     "id": "lilac",
-    "epithet": "of the Tabaxi, mist-pawed and green-eyed in the hunter's hour",
-    "reliquary_header": "The hunt unbegun",
-    "constellation_epithet": "no die yet slipped",
-    "distinction_title": "Surefoot",
-    "distinction_subtitle": "alone among rollers without a fumble",
-    "distinction_detail": "<b>0</b> fumbles &middot; 49 d20s thrown",
+    "epithet": "of the Tabaxi, who lets the bowstring do all her speaking",
+    "reliquary_header": "Taken at the longbow's reach",
+    "constellation_epithet": "every kill the same string",
+    "distinction_title": "One String, One Answer",
+    "distinction_subtitle": "Every felling she owns came off the same drawn bow.",
+    "distinction_detail": "<b>4</b> kills &middot; all by Longbow",
     "archetype_badge": {
       "archetype": "naturalist",
       "inscription": "One carved sprig of mistletoe, ribbon-tied and kept close — the whole of the primal green, if you know how to ask, flows through that small stem."

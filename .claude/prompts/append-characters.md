@@ -29,6 +29,10 @@ For each PC in `new_pcs`, produce one entry keyed by `id`:
 - Do not manufacture flavor the data does not support.
 - If a PC has no kills yet, the constellation_epithet may say so plainly ("his rolls yet unwritten") rather than inventing combat narrative.
 
+# Dice terminology (critical)
+
+When naming natural 20s or natural 1s on a d20 (the `crits` and `fumbles` stats), use the real D&D terms **"crit success(es)"** and **"crit fail(s)"**. Never coin synonyms like "crown", "fumble", "stumble", "twenty struck", or similar — they read as nonsense in a D&D context. Creative framing around those facts is welcome; the labels themselves must be the real terms. (`fumbles` in the input data is just the field name for the crit-fail count — it is not a word to use in prose.)
+
 # Voice samples (style anchor — do not reproduce verbatim)
 
 Constellation epithets — what the PC's dice say. No combat narrative. Six words or fewer:

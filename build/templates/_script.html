@@ -117,7 +117,7 @@
           html += '<div class="tip-ctx">' + rolls + ' rolls cast &middot; ' + keptD20s + ' on the twenty</div>';
           if (keptD20s > 0) {
             html += '<div class="tip-ctx">avg ' + avg.toFixed(1) + ' &middot; &sigma; ' + sd.toFixed(1) +
-                    ' &middot; ' + crits + '&times; crit &middot; ' + fumbles + '&times; fumble</div>';
+                    ' &middot; ' + crits + '&times; crit success &middot; ' + fumbles + '&times; crit fail</div>';
           }
           tip.innerHTML = html;
           const r = portrait.getBoundingClientRect();

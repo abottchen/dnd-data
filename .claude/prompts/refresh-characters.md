@@ -18,6 +18,7 @@ If the existing prose is still consistent with the data and still good prose by 
 - A fact has shifted (new kills/rolls invalidate or recolor the existing line).
 - A stronger angle exists that the original missed.
 - The line has gone stale.
+- The existing line names a natural 20 or natural 1 with a coined synonym ("crown", "fumble", "stumble", etc.) — see Dice terminology below. Treat that as stale and rewrite it with the real term.
 
 The bias is heavily toward `no_change`. Cosmetic tweaks are not a reason to rewrite.
 
@@ -39,6 +40,10 @@ The bias is heavily toward `no_change`. Cosmetic tweaks are not a reason to rewr
 
 - Distinctions must be derivable from `trials_per_char` / `fortune_by_char`.
 - Do not invent stats or flavor the data does not support.
+
+# Dice terminology (critical)
+
+When naming natural 20s or natural 1s on a d20 (the `crits` and `fumbles` stats), use the real D&D terms **"crit success(es)"** and **"crit fail(s)"**. Never coin synonyms like "crown", "fumble", "stumble", "twenty struck", or similar — they read as nonsense in a D&D context. Creative framing around those facts is welcome; the labels themselves must be the real terms. (`fumbles` in the input data is just the field name for the crit-fail count — it is not a word to use in prose.)
 
 # Voice (only if rewriting)
 
