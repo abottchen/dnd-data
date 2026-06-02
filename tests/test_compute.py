@@ -2,7 +2,8 @@ from build.render import (xp_for_cr, compute_trials, compute_sessions_chart, com
                    compute_d20_histogram, compute_other_dice, compute_best_skill,
                    compute_intro_meta, compute_constellation,
                    _compute_party_top_xp, _compute_header_eyebrow,
-                   _creature_token_url, _name_to_token_name)
+                   _creature_token_url, _name_to_token_name,
+                   compute_radar)
 
 def test_xp_for_cr_handles_fractions():
     assert xp_for_cr("1/8") == 25
@@ -323,6 +324,65 @@ def test_constellation_links_ordered_by_xp_ascending():
     assert (first["x2"], first["y2"]) == (
         star_by_id["vex"]["left_pct"] * 10, star_by_id["vex"]["top_pct"] * 10,
     )
+
+
+# ── compute_radar ──────────────────────────────────────────────────────
+
+def _radar_member(scores, prof=()):
+    return {
+        "abilities": {k: scores[k] for k in ("str", "dex", "con", "int", "wis", "cha")},
+        "savingThrows": {k: {"mod": 0, "prof": k in prof}
+                         for k in ("str", "dex", "con", "int", "wis", "cha")},
+    }
+
+def test_radar_returns_six_of_each_element():
+    r = compute_radar(_radar_member({"str": 12, "dex": 12, "con": 12,
+                                     "int": 12, "wis": 12, "cha": 12}))
+    assert len(r["axes"]) == 6
+    assert len(r["dots"]) == 6
+    assert len(r["labels"]) == 6
+    assert len(r["sectors"]) == 6
+    assert len(r["rings"]) == 6           # rings at 10,12,14,16,18,20
+    assert len(r["shape"].split(" ")) == 6
+
+def test_radar_top_axis_vertex_uses_score_scale():
+    # STR is index 0 = straight up. score 14 -> radius (14-8)/12*76 = 38 -> y = 120-38 = 82.
+    r = compute_radar(_radar_member({"str": 14, "dex": 8, "con": 8,
+                                     "int": 8, "wis": 8, "cha": 8}))
+    assert r["dots"][0] == {"i": 0, "key": "str", "x": 120.0, "y": 82.0, "prof": False}
+    assert r["shape"].split(" ")[0] == "120.0,82.0"
+
+def test_radar_clamps_low_scores_to_center():
+    # score 6 (below floor 8) clamps to center (120,120).
+    r = compute_radar(_radar_member({"str": 6, "dex": 8, "con": 8,
+                                     "int": 8, "wis": 8, "cha": 8}))
+    assert r["dots"][0]["x"] == 120.0 and r["dots"][0]["y"] == 120.0
+    # score 8 (floor) also sits at center.
+    assert r["dots"][1]["x"] == 120.0 and r["dots"][1]["y"] == 120.0
+
+def test_radar_radius_increases_with_score():
+    # Distance from center grows monotonically: 8 (center) < 14 < 20 (outer ring).
+    def top_y(score):
+        return compute_radar(_radar_member({"str": score, "dex": 8, "con": 8,
+                                            "int": 8, "wis": 8, "cha": 8}))["dots"][0]["y"]
+    assert top_y(20) < top_y(14) < top_y(8)   # smaller y = farther up = bigger radius
+    assert top_y(20) == 44.0                  # outer ring: 120 - 76
+
+def test_radar_marks_proficient_saves():
+    r = compute_radar(_radar_member({"str": 10, "dex": 10, "con": 10,
+                                     "int": 10, "wis": 10, "cha": 10},
+                                    prof=("dex", "cha")))
+    by_key = {d["key"]: d["prof"] for d in r["dots"]}
+    assert by_key == {"str": False, "dex": True, "con": False,
+                      "int": False, "wis": False, "cha": True}
+
+def test_radar_sector_path_is_a_closed_wedge():
+    r = compute_radar(_radar_member({"str": 12, "dex": 12, "con": 12,
+                                     "int": 12, "wis": 12, "cha": 12}))
+    d = r["sectors"][0]["d"]
+    assert d.startswith("M120 120 L")   # wedge starts at center
+    assert " A112 112 " in d            # arc at the hit radius
+    assert d.endswith("Z")              # closed
 
 
 def test_constellation_links_tiebreak_by_id_when_xp_equal():
