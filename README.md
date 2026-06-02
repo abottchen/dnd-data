@@ -46,7 +46,7 @@ sequenceDiagram
     autonumber
     participant U as upstream + authored
     participant P as python -m build prepare
-    participant RD as build/.run/&lt;ts&gt;/
+    participant RD as build/.run/<ts>/
     participant BP as /build-prose (in-session)
     participant SA as sub-agents (×N slices)
     participant AP as python -m build apply
