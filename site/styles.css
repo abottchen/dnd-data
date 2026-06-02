@@ -5,6 +5,7 @@
   --ink:        #14110E;
   --ink-soft:   #1c1814;
   --ink-deep:   #0c0a08;
+  --ink-warm:   #241d15;
   --brass:      #B8894A;
   --brass-hi:   #d6a460;
   --brass-dim:  #7a5a2d;
@@ -257,9 +258,9 @@ main > article > section:first-of-type,
 }
 
 /* Abilities and proficiencies sit tight under the character header — no big gap */
-main > article > section.abilities,
+main > article > section.abilities-layout,
 main > article > section.proficiencies,
-.character > section.abilities,
+.character > section.abilities-layout,
 .character > section.proficiencies {
   padding-top: 0;
   margin-bottom: 24px;
@@ -468,17 +469,19 @@ main > article > section.proficiencies,
    ───────────────────────────────────────────────────────────────── */
 .abilities {
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 1px;
   background: var(--rule);
   border: 1px solid var(--rule-strong);
-  margin-bottom: 36px;
+  flex: 1;
+  margin-bottom: 0;
 }
 
 .stat-card {
   background: var(--ink-soft);
   padding: 22px 18px 18px;
   text-align: center;
+  transition: background 0.2s, box-shadow 0.2s;
 }
 
 .stat-card .stat-label {
@@ -536,6 +539,47 @@ main > article > section.proficiencies,
 
 .stat-card .stat-save.proficient .save-mark {
   opacity: 1;
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   Ability radar (per character) + Layout B
+   ───────────────────────────────────────────────────────────────── */
+.abilities-layout {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+}
+
+.ability-radar {
+  flex: 0 0 250px;
+  width: 250px;
+  height: 250px;
+  display: block;
+}
+.ability-radar .ar-grid       { stroke: var(--rule); fill: none; stroke-width: 0.75; }
+.ability-radar .ar-grid-outer { stroke: var(--rule-strong); }
+.ability-radar .ar-axis       { stroke: var(--rule); stroke-width: 0.75; opacity: 0.6; transition: stroke 0.2s, opacity 0.2s, stroke-width 0.2s; }
+.ability-radar .ar-axis.hot   { stroke: var(--brass-hi); opacity: 1; stroke-width: 1.4; }
+.ability-radar .ar-shape      { fill: rgba(184,137,74,0.17); stroke: var(--brass-hi); stroke-width: 1.7; stroke-linejoin: round; filter: drop-shadow(0 0 7px rgba(184,137,74,0.5)); }
+.ability-radar .ar-dot        { fill: var(--brass-hi); transition: r 0.15s; }
+.ability-radar .ar-dot-prof   { fill: var(--seal); }
+.ability-radar .ar-dot.hot    { r: 6; }
+.ability-radar .ar-label      { fill: var(--paper); font-family: 'IBM Plex Sans', sans-serif; font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; transition: fill 0.2s; }
+.ability-radar .ar-label.hot  { fill: var(--brass-hi); }
+.ability-radar .ar-tick       { fill: var(--paper-dim); font-family: 'IBM Plex Sans', sans-serif; font-size: 8px; opacity: 0.7; }
+.ability-radar .ar-sector     { fill: transparent; cursor: pointer; transition: fill 0.18s ease; }
+.ability-radar .ar-sector.hot { fill: rgba(184,137,74,0.10); }
+
+.stat-card.hot {
+  background: var(--ink-warm);
+  box-shadow: inset 0 0 0 1px var(--brass);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ability-radar .ar-axis,
+  .ability-radar .ar-dot,
+  .ability-radar .ar-label,
+  .ability-radar .ar-sector { transition: none; }
 }
 
 /* ─────────────────────────────────────────────────────────────────
