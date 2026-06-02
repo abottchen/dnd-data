@@ -1486,6 +1486,11 @@ def compute_all(data: dict, authored: dict) -> dict:
     site = dict(authored["site"])
     site["intro_meta"] = compute_intro_meta(session_log)
     site["header_eyebrow"] = _compute_header_eyebrow(chronicle, ledger)
+    site.setdefault(
+        "ascent_read",
+        "Blade and book in equal measure — the company earns its name as "
+        "readily by riddle and road as at the edge of a sword.",
+    )
 
     party_top_xp = _compute_party_top_xp(party, trials, n=3)
 
