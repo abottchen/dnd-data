@@ -360,9 +360,37 @@ Add the layout wrapper, the radar element styles, and the card `.hot` highlight;
 **IMPORTANT:** Do **not** modify the existing `.stat-card .stat-save.proficient` rules — proficient saves on the *cards* stay brass. Seal-red is used only on the radar's proficient vertices (`.ar-dot-prof`).
 
 **Files:**
-- Modify: `site/styles.css` — edit the `.abilities` rule (lines 469–476); append a new block after the `.stat-card .stat-save.proficient .save-mark` rule (ends line 539).
+- Modify: `site/styles.css` — update the tight-spacing selectors (lines 260–266); edit the `.abilities` rule (lines 469–476); append a new block after the `.stat-card .stat-save.proficient .save-mark` rule (ends line 539).
 
-- [ ] **Step 1: Change `.abilities` to a 3-column block**
+- [ ] **Step 1: Re-point the tight-spacing selectors at the new wrapper**
+
+Task 4 renamed the section's outer element from `section.abilities` to `section.abilities-layout`, which orphaned the existing tight-spacing rule. Update it so the wrapper keeps `padding-top: 0; margin-bottom: 24px` (otherwise it falls back to the generic `.character > section` rule's 96px bottom margin). Replace lines 260–266:
+
+```css
+/* Abilities and proficiencies sit tight under the character header — no big gap */
+main > article > section.abilities,
+main > article > section.proficiencies,
+.character > section.abilities,
+.character > section.proficiencies {
+  padding-top: 0;
+  margin-bottom: 24px;
+}
+```
+
+with (only the two `.abilities` selectors change to `.abilities-layout`):
+
+```css
+/* Abilities and proficiencies sit tight under the character header — no big gap */
+main > article > section.abilities-layout,
+main > article > section.proficiencies,
+.character > section.abilities-layout,
+.character > section.proficiencies {
+  padding-top: 0;
+  margin-bottom: 24px;
+}
+```
+
+- [ ] **Step 2: Change `.abilities` to a 3-column block**
 
 Replace the existing rule at lines 469–476:
 
@@ -391,9 +419,9 @@ with:
 }
 ```
 
-- [ ] **Step 2: Append the layout + radar + hover styles**
+- [ ] **Step 3: Append the layout + radar + hover styles**
 
-Immediately **after** line 539 (the closing `}` of `.stat-card .stat-save.proficient .save-mark`), insert:
+Immediately **after** line 539 (the closing `}` of `.stat-card .stat-save.proficient .save-mark`), insert. Note `.abilities-layout` deliberately carries **no** `margin-bottom` — the section's bottom spacing is owned by the tight-spacing rule updated in Step 1, and the inner `.abilities` card grid is set to `margin-bottom: 0` in Step 2, so the gap is not double-counted:
 
 ```css
 
@@ -404,7 +432,6 @@ Immediately **after** line 539 (the closing `}` of `.stat-card .stat-save.profic
   display: flex;
   align-items: center;
   gap: 28px;
-  margin-bottom: 36px;
 }
 
 .ability-radar {
@@ -441,7 +468,7 @@ Immediately **after** line 539 (the closing `}` of `.stat-card .stat-save.profic
 }
 ```
 
-- [ ] **Step 3: Commit**
+- [ ] **Step 4: Commit**
 
 ```bash
 git add site/styles.css
