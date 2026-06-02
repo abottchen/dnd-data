@@ -2062,6 +2062,96 @@ main > article > section.proficiencies,
 }
 
 /* ─────────────────────────────────────────────────────────────────
+   The Company — illuminated index rail (sticky margin rubric)
+
+   The Company panel runs nine sections deep; the rail gives it a
+   persistent table of contents in the left margin, lit to the reader's
+   place via scroll-spy (see _script.html). Only #company becomes a grid
+   — every other panel keeps the plain block layout.
+   ───────────────────────────────────────────────────────────────── */
+#company.active {
+  display: grid;
+  grid-template-columns: [rail] 184px [body] minmax(0, 1fr);
+  column-gap: 48px;
+  align-items: start;
+}
+
+/* The document flow rides the body column; the rail alone holds the margin. */
+#company > .company-strip,
+#company > section {
+  grid-column: body;
+  min-width: 0;
+}
+
+.company-index {
+  grid-column: rail;
+  align-self: start;
+  position: sticky;
+  top: 32px;
+  padding-right: 20px;
+  border-right: 1px solid var(--rule);
+}
+
+.company-index-head {
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 600;
+  font-size: 20px;
+  letter-spacing: 0.5px;
+  color: var(--brass);
+  padding-bottom: 12px;
+  margin-bottom: 4px;
+  border-bottom: 1px solid var(--rule);
+}
+
+.company-index-list { list-style: none; }
+.company-index-list li { margin: 0; }
+
+.company-index a {
+  display: grid;
+  grid-template-columns: 22px 1fr;
+  column-gap: 10px;
+  align-items: baseline;
+  padding: 7px 0 7px 11px;
+  margin-left: -12px;                 /* let the lit marker sit in the gutter */
+  border-left: 2px solid transparent;
+  text-decoration: none;
+  transition: border-color 0.18s ease, background 0.18s ease;
+}
+
+.ci-num {
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-align: right;
+  color: var(--brass-dim);
+  transition: color 0.18s ease;
+}
+
+.ci-name {
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 10px;
+  letter-spacing: 1.4px;
+  line-height: 1.4;
+  text-transform: uppercase;
+  color: var(--paper-dim);
+  transition: color 0.18s ease;
+}
+
+.company-index a:hover .ci-name,
+.company-index a:focus-visible .ci-name { color: var(--paper); }
+.company-index a:hover .ci-num,
+.company-index a:focus-visible .ci-num { color: var(--brass); }
+
+/* Lit: the section currently under the reader's eye */
+.company-index a.is-current {
+  border-left-color: var(--brass);
+  background: linear-gradient(90deg, rgba(184, 137, 74, 0.12), transparent 88%);
+}
+.company-index a.is-current .ci-num  { color: var(--brass-hi); }
+.company-index a.is-current .ci-name { color: var(--paper); }
+
+/* ─────────────────────────────────────────────────────────────────
    Character TOC (sticky nav, only when reliquary > 15 entries)
    ───────────────────────────────────────────────────────────────── */
 .character-toc {
@@ -2103,6 +2193,7 @@ main > article > section.proficiencies,
 @media (prefers-reduced-motion: no-preference) {
   .page-header,
   .tabs,
+  main > article.character.active > nav.company-index,
   main > article.character.active > section,
   main > article.character.active > header {
     opacity: 0;
@@ -2111,6 +2202,7 @@ main > article > section.proficiencies,
 
   .page-header { animation-delay: 0.05s; }
   .tabs { animation-delay: 0.18s; }
+  main > article.character.active > nav.company-index { animation-delay: 0.28s; }
   main > article.character.active > header { animation-delay: 0.30s; }
   main > article.character.active > section:nth-of-type(1) { animation-delay: 0.40s; }
   main > article.character.active > section:nth-of-type(2) { animation-delay: 0.50s; }

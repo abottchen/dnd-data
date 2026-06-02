@@ -83,6 +83,66 @@
 
   <main>
     <article class="character" id="company">
+
+  <nav class="company-index" aria-label="The Company — index of sections">
+    <div class="company-index-head">The Company</div>
+    <ol class="company-index-list">
+      <li>
+        <a href="#co-reckoning" data-spy="co-reckoning">
+          <span class="ci-num">I</span>
+          <span class="ci-name">The Company's Ledger</span>
+        </a>
+      </li>
+      <li>
+        <a href="#co-stars" data-spy="co-stars">
+          <span class="ci-num">II</span>
+          <span class="ci-name">The Constellation</span>
+        </a>
+      </li>
+      <li>
+        <a href="#co-tally" data-spy="co-tally">
+          <span class="ci-num">III</span>
+          <span class="ci-name">The Bestiary</span>
+        </a>
+      </li>
+      <li>
+        <a href="#co-calendar" data-spy="co-calendar">
+          <span class="ci-num">IV</span>
+          <span class="ci-name">The Chronicle</span>
+        </a>
+      </li>
+      <li>
+        <a href="#co-horizon" data-spy="co-horizon">
+          <span class="ci-num">V</span>
+          <span class="ci-name">The Road Ahead</span>
+        </a>
+      </li>
+      <li>
+        <a href="#co-crowns" data-spy="co-crowns">
+          <span class="ci-num">VI</span>
+          <span class="ci-name">Distinctions</span>
+        </a>
+      </li>
+      <li>
+        <a href="#co-fates" data-spy="co-fates">
+          <span class="ci-num">VII</span>
+          <span class="ci-name">The Patron Die</span>
+        </a>
+      </li>
+      <li>
+        <a href="#co-margins" data-spy="co-margins">
+          <span class="ci-num">VIII</span>
+          <span class="ci-name">The Silent Roll</span>
+        </a>
+      </li>
+      <li>
+        <a href="#co-climb" data-spy="co-climb">
+          <span class="ci-num">IX</span>
+          <span class="ci-name">The Ascent</span>
+        </a>
+      </li>
+    </ol>
+  </nav>
   <div class="company-strip">
     <div class="company-strip-title">Burden of Carry</div>
     <div class="company-strip-bars">
@@ -189,7 +249,7 @@
     </div>
   </div>
 
-  <section class="company-section company-ledger">
+  <section class="company-section company-ledger" id="co-reckoning">
     <div class="section-head">
   <div class="section-eyebrow"><span class="roman">I</span>The Reckoning</div>
   <h2 class="section-title">The Company's Ledger</h2>
@@ -220,7 +280,7 @@
     </div>
   </section>
 
-  <section class="company-section">
+  <section class="company-section" id="co-stars">
     <div class="section-head">
   <div class="section-eyebrow"><span class="roman">II</span>The Stars</div>
   <h2 class="section-title">The Constellation</h2>
@@ -346,7 +406,7 @@
     </div>
   </section>
 
-  <section class="company-section">
+  <section class="company-section" id="co-tally">
     <div class="section-head">
   <div class="section-eyebrow"><span class="roman">III</span>The Tally</div>
   <h2 class="section-title">The Bestiary</h2>
@@ -422,7 +482,7 @@
     </div>
   </section>
 
-  <section class="company-section">
+  <section class="company-section" id="co-calendar">
     <div class="section-head">
   <div class="section-eyebrow"><span class="roman">IV</span>The Calendar</div>
   <h2 class="section-title">The Chronicle</h2>
@@ -906,7 +966,7 @@
 
   </section>
 
-  <section class="company-section">
+  <section class="company-section" id="co-horizon">
     <div class="section-head">
   <div class="section-eyebrow"><span class="roman">V</span>The Horizon</div>
   <h2 class="section-title">The Road Ahead</h2>
@@ -934,7 +994,7 @@
     </div>
   </section>
 
-  <section class="company-section">
+  <section class="company-section" id="co-crowns">
     <div class="section-head">
   <div class="section-eyebrow"><span class="roman">VI</span>The Crowns</div>
   <h2 class="section-title">Distinctions</h2>
@@ -993,7 +1053,7 @@
     </div>
   </section>
 
-  <section class="company-section">
+  <section class="company-section" id="co-fates">
     <div class="section-head">
   <div class="section-eyebrow"><span class="roman">VII</span>The Fates</div>
   <h2 class="section-title">The Patron Die</h2>
@@ -1113,7 +1173,7 @@
     </div>
   </section>
 
-  <section class="company-section silent-roll">
+  <section class="company-section silent-roll" id="co-margins">
     <div class="section-head">
   <div class="section-eyebrow"><span class="roman">VIII</span>The Quiet Margins</div>
   <h2 class="section-title">The Silent Roll</h2>
@@ -1143,7 +1203,7 @@
   </section>
 
   
-<section class="company-section">
+<section class="company-section" id="co-climb">
   <div class="section-head">
   <div class="section-eyebrow"><span class="roman">IX</span>The Long Climb</div>
   <h2 class="section-title">The Ascent</h2>
@@ -4789,6 +4849,60 @@
           }
         });
       });
+    })();
+
+    // --- The Company: index-rail scroll-spy + smooth descent ---
+    // Lights the rail entry for the section under the reader's eye and
+    // intercepts rail clicks so they scroll WITHOUT writing location.hash
+    // (the hash drives the tab router — see the top IIFE).
+    (function () {
+      const rail = document.querySelector('.company-index');
+      if (!rail) return;
+
+      const links = new Map();
+      rail.querySelectorAll('a[data-spy]').forEach(a => {
+        const id = a.getAttribute('data-spy');
+        links.set(id, a);
+        a.addEventListener('click', (e) => {
+          const target = document.getElementById(id);
+          if (!target) return;
+          e.preventDefault();
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+      });
+
+      const sections = [...links.keys()]
+        .map(id => document.getElementById(id))
+        .filter(Boolean);
+      if (!sections.length) return;
+
+      let current = null;
+      const setCurrent = (id) => {
+        if (id === current) return;
+        const prev = links.get(current);
+        if (prev) prev.classList.remove('is-current');
+        current = id;
+        const next = links.get(id);
+        if (next) next.classList.add('is-current');
+      };
+
+      // A thin trigger band ~22% down the viewport; whichever section overlaps
+      // it (topmost, in document order) is the reader's current section. When
+      // nothing overlaps — a gap between sections, or the panel is hidden — we
+      // hold the last lit entry rather than flicker.
+      const visible = new Set();
+      const obs = new IntersectionObserver((entries) => {
+        entries.forEach(en => {
+          if (en.isIntersecting) visible.add(en.target);
+          else visible.delete(en.target);
+        });
+        if (!visible.size) return;
+        const best = sections.find(s => visible.has(s));
+        if (best) setCurrent(best.id);
+      }, { rootMargin: '-22% 0px -72% 0px', threshold: 0 });
+
+      sections.forEach(s => obs.observe(s));
+      setCurrent(sections[0].id);   // light the first entry before any scroll
     })();
 
     // --- Pack icons: rotate non-square art onto the square host's diagonal ---

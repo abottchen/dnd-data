@@ -1,5 +1,33 @@
 {% from "_macros.html" import section_head -%}
+{#- The illuminated index rail (§ rubric → section id). Keep in step with the
+    section_head calls below and the id="…" on each <section>; the trailing
+    entry (co-climb) targets the section rendered by _ascent.html. -#}
+{%- set company_index = [
+      ("co-reckoning", "I",    "The Company's Ledger"),
+      ("co-stars",     "II",   "The Constellation"),
+      ("co-tally",     "III",  "The Bestiary"),
+      ("co-calendar",  "IV",   "The Chronicle"),
+      ("co-horizon",   "V",    "The Road Ahead"),
+      ("co-crowns",    "VI",   "Distinctions"),
+      ("co-fates",     "VII",  "The Patron Die"),
+      ("co-margins",   "VIII", "The Silent Roll"),
+      ("co-climb",     "IX",   "The Ascent"),
+    ] -%}
 <article class="character" id="company">
+
+  <nav class="company-index" aria-label="The Company — index of sections">
+    <div class="company-index-head">The Company</div>
+    <ol class="company-index-list">
+      {%- for id, num, title in company_index %}
+      <li>
+        <a href="#{{ id }}" data-spy="{{ id }}">
+          <span class="ci-num">{{ num }}</span>
+          <span class="ci-name">{{ title }}</span>
+        </a>
+      </li>
+      {%- endfor %}
+    </ol>
+  </nav>
 
   {%- if company_strip %}
   <div class="company-strip">
@@ -36,7 +64,7 @@
   </div>
   {%- endif %}
 
-  <section class="company-section company-ledger">
+  <section class="company-section company-ledger" id="co-reckoning">
     {{ section_head("I", "The Reckoning", "The Company's Ledger", site.intro_epithet) }}
     <div class="ledger-grid lead">
       <div class="ledger-cell">
@@ -62,7 +90,7 @@
     </div>
   </section>
 
-  <section class="company-section">
+  <section class="company-section" id="co-stars">
     {{ section_head("II", "The Stars", "The Constellation", "Each star a player. Brighter stars walk the road more often, distant stars carry the heavier load.", "rule") }}
     <div class="constellation">
       <div class="constellation-plot">
@@ -116,7 +144,7 @@
     </div>
   </section>
 
-  <section class="company-section">
+  <section class="company-section" id="co-tally">
     {{ section_head("III", "The Tally", "The Bestiary", "Of every kind that fell, and the count of each.", "trefoil") }}
     <div class="bestiary-grid">
       {%- for group in bestiary %}
@@ -140,12 +168,12 @@
     </div>
   </section>
 
-  <section class="company-section">
+  <section class="company-section" id="co-calendar">
     {{ section_head("IV", "The Calendar", "The Chronicle", "Each session set down by hand, with date and hour, and what was done.") }}
     {% include "_chronicle.html" %}
   </section>
 
-  <section class="company-section">
+  <section class="company-section" id="co-horizon">
     {{ section_head("V", "The Horizon", "The Road Ahead", "What is known, and where they turn.", "rule") }}
     <div class="road-ahead">
       <div class="road-ahead-block">
@@ -168,7 +196,7 @@
     </div>
   </section>
 
-  <section class="company-section">
+  <section class="company-section" id="co-crowns">
     {{ section_head("VI", "The Crowns", "Distinctions", "Each carries some honour the others do not.", "trefoil") }}
     <div class="distinctions">
       {%- for d in distinctions %}
@@ -185,7 +213,7 @@
     </div>
   </section>
 
-  <section class="company-section">
+  <section class="company-section" id="co-fates">
     {{ section_head("VII", "The Fates", "The Patron Die", "Of the rolls cast upon the twenty, here is how the die fell.") }}
     <div class="patron-die">
       <div class="patron-die-chart">
@@ -209,7 +237,7 @@
     </div>
   </section>
 
-  <section class="company-section silent-roll">
+  <section class="company-section silent-roll" id="co-margins">
     {{ section_head("VIII", "The Quiet Margins", "The Silent Roll", "Sessions where no blade was lifted.", "rule") }}
     <ul class="silent-roll-list">
       {%- for ch in chronicle.chapters %}
