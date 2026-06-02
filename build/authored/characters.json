@@ -16,10 +16,10 @@
     "id": "grieg",
     "epithet": "of the Wulven, sworn to the hunt",
     "reliquary_header": "Fallen by his hand",
-    "constellation_epithet": "seven twenties struck",
+    "constellation_epithet": "eleven twenties struck",
     "distinction_title": "Crown of Twenties",
     "distinction_subtitle": "no other hand has thrown so many",
-    "distinction_detail": "<b>7</b> crits &middot; most of the company",
+    "distinction_detail": "<b>11</b> crits &middot; most of the company",
     "archetype_badge": {
       "archetype": "pack-mule",
       "inscription": "The hunting trap alone tips twenty-five pounds; above it ride scale mail and a heavy crossbow, and the wulven still finds room for caltrops, rope, and a block-and-tackle besides."
@@ -34,8 +34,8 @@
     "distinction_subtitle": "who fells by every means he carries",
     "distinction_detail": "<b>4</b> means &middot; scimitar, shortsword, longbow, breath",
     "archetype_badge": {
-      "archetype": "apothecary",
-      "inscription": "Three tins of salve against the insects, one vial of perfume against the court, and a healing draught for the rest — he does not leave gaps in his preparations."
+      "archetype": "cellarer",
+      "inscription": "Ten days of rations and a full waterskin — the noble dragonborn ensures no one marches hungry, even when the road offers nothing."
     }
   },
   {
@@ -47,18 +47,18 @@
     "distinction_subtitle": "the heaviest lift the company has known",
     "distinction_detail": "<b>775</b> XP &middot; 38% of the company",
     "archetype_badge": {
-      "archetype": "scholar",
-      "inscription": "The book's margins ran out long before the parchment did — eight loose sheets trail it now, dense with whatever the weave kept insisting she hadn't finished writing."
+      "archetype": "featherfoot",
+      "inscription": "Travels lighter than any gnome has a right to — staff, two daggers, and a rain catcher folded tight, the whole kit barely whispering when she moves."
     }
   },
   {
     "id": "chumble",
     "epithet": "of the Dhakaani, bound by pact to a shadow unseen",
     "reliquary_header": "Fallen by his pact-light",
-    "constellation_epithet": "highest of the cup",
-    "distinction_title": "Steadiest Hand",
-    "distinction_subtitle": "whose dice keep the highest company",
-    "distinction_detail": "avg <b>12.1</b> &middot; σ 5.9",
+    "constellation_epithet": "the pact-light's tally",
+    "distinction_title": "Pact-Light Lord",
+    "distinction_subtitle": "who fells by the blast and little else",
+    "distinction_detail": "<b>4</b> kills &middot; Eldritch Blast",
     "archetype_badge": {
       "archetype": "lamplighter",
       "inscription": "Fifteen flasks of oil and a lamp that hasn't gone dark yet — a goblin who walked out of Dhakaan carrying enough light to argue with the night."
@@ -71,7 +71,7 @@
     "constellation_epithet": "no die yet slipped",
     "distinction_title": "Surefoot",
     "distinction_subtitle": "alone among rollers without a fumble",
-    "distinction_detail": "<b>0</b> fumbles &middot; 35 d20s thrown",
+    "distinction_detail": "<b>0</b> fumbles &middot; 49 d20s thrown",
     "archetype_badge": {
       "archetype": "naturalist",
       "inscription": "One carved sprig of mistletoe, ribbon-tied and kept close — the whole of the primal green, if you know how to ask, flows through that small stem."
