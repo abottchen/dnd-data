@@ -120,20 +120,48 @@ def test_refresh_characters_emits_one_bundle_slice(slice_env):
     assert "existing" in body
 
 
-def test_refresh_npcs_with_authored_npc(slice_env):
-    """Add 'Azlund' to authored npcs; refresh-npcs should emit a slice for it
-    with the full mention history."""
+def _authored_with_azlund(slice_env):
+    """Author a single NPC (Azlund) and reload. Azlund is mentioned only in
+    fixture session 1; session 2 names no NPC."""
     npcs_path = slice_env["authored_dir"] / "npcs.json"
     npcs_path.write_text(json.dumps([
         {"name": "Azlund", "allegiance": "with",
          "epithet": "the merchant who brokers what others would not"}
     ]))
-    authored = store.load_authored()
+    return store.load_authored()
+
+
+def test_refresh_npcs_emits_for_npc_named_in_new_session(slice_env):
+    """An NPC named in a session past the marker is re-evaluated, and its slice
+    carries the full mention history plus the existing epithet/allegiance."""
+    authored = _authored_with_azlund(slice_env)
+    # Marker 0 makes session 1 (where Azlund appears) a "new" session.
+    authored["site"] = {**authored["site"], "refreshed_through_session": 0}
     out = slices.refresh_npcs(slice_env["data"], authored)
     by_key = dict(out)
     assert "Azlund" in by_key
     assert any("Azlund" in m["line"] for m in by_key["Azlund"]["mentions"])
     assert by_key["Azlund"]["existing"]["allegiance"] == "with"
+
+
+def test_refresh_npcs_skips_npc_only_in_already_refreshed_sessions(slice_env):
+    """Azlund is named only in session 1; with the marker at 1 he falls entirely
+    in already-refreshed sessions, so no slice is emitted (his epithet cannot
+    have changed). This is the wasteful full-roster fan-out we now prune."""
+    authored = _authored_with_azlund(slice_env)
+    authored["site"] = {**authored["site"], "refreshed_through_session": 1}
+    out = slices.refresh_npcs(slice_env["data"], authored)
+    assert dict(out) == {}
+
+
+def test_refresh_npcs_force_refresh_reevaluates_whole_roster(slice_env):
+    """--force-refresh (the `force_refresh` side channel) lifts the marker gate
+    so an NPC named only in old sessions is still re-evaluated."""
+    authored = _authored_with_azlund(slice_env)
+    authored["site"] = {**authored["site"], "refreshed_through_session": 1}
+    authored["force_refresh"] = True
+    out = slices.refresh_npcs(slice_env["data"], authored)
+    assert "Azlund" in dict(out)
 
 
 def test_refresh_road_ahead_emits_singleton(slice_env):
