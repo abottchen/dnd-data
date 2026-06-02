@@ -75,6 +75,40 @@ def test_parse_inventories_skips_unresolved_name():
     assert set(parsed.keys()) == {"vex"}
 
 
+def test_parse_inventories_scrubs_parenthetical_player_tag():
+    """Anton's upstream entry is named 'Anton(<player>)' — character name plus
+    a real player tag in parens. The character-name key resolves the slug; the
+    parenthetical real name is discarded with the rest of the upstream `name`
+    field and must never reach the output."""
+    raw = {
+        "inventories": {
+            "uuid-1": {
+                "name": "Anton(Redacted)",
+                "items": [{"id": "a", "count": 1, "name": "Rope"}],
+            },
+        },
+    }
+    mapping = {"Anton": "anton"}
+
+    parsed = inventory._parse_inventories(raw, mapping)
+
+    assert set(parsed.keys()) == {"anton"}
+    assert "Redacted" not in str(parsed)  # parenthetical player tag scrubbed
+
+
+def test_production_map_resolves_anton_character_name():
+    """Regression: the live dice-players map must resolve Anton's upstream
+    inventory name to the 'anton' slug. Upstream names him by character name
+    with a player handle in parens ('Anton(<player>)'); the map keys on the
+    character name 'Anton' so the substring match works and the real player
+    name is never recorded in the committed config."""
+    from build.render import _load_dice_player_map, _resolve_dice_player
+
+    mapping = _load_dice_player_map()
+
+    assert _resolve_dice_player("Anton(Redacted)", mapping) == "anton"
+
+
 def _item(name, category, rarity="common", weight=1, count=1):
     return {
         "id": name.lower().replace(" ", "-"),
