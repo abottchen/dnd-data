@@ -133,5 +133,30 @@
     "name": "Saja N'baza",
     "epithet": "a contact in Chult whom Artus Cimber was traveling to meet in hopes of finding his lost wife",
     "allegiance": null
+  },
+  {
+    "name": "Jessamine",
+    "epithet": "one of the seven merchant princes of Port Nyanzaru, suspected by Grandfather Zitembe of dealing in underhanded affairs",
+    "allegiance": null
+  },
+  {
+    "name": "Kwayothe",
+    "epithet": "merchant prince of Port Nyanzaru, whose trade runs in tej and insect repellant",
+    "allegiance": null
+  },
+  {
+    "name": "Ifan Talro'a",
+    "epithet": "merchant prince of Port Nyanzaru who controls the sale of animals",
+    "allegiance": null
+  },
+  {
+    "name": "Zhanthi",
+    "epithet": "one of Port Nyanzaru's merchant princes, dealer in gems and jewelry",
+    "allegiance": null
+  },
+  {
+    "name": "Yokka",
+    "epithet": "goblin boss of Camp Righteous who surrendered after her last minion fell, then bartered information for her freedom",
+    "allegiance": "with"
   }
 ]

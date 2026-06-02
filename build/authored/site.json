@@ -3,7 +3,7 @@
   "page_subtitle": "A ledger of those who walk &middot; and those they have laid down",
   "intro_epithet": "Five travellers and a storyteller, bound to a doomed road",
   "footnote": "The names above are the names given &middot; the ones who fell were given no names",
-  "refreshed_through_session": 9,
+  "refreshed_through_session": 10,
   "road_ahead": {
     "known": [
       {
@@ -40,7 +40,7 @@
       }
     ],
     "was_known": [],
-    "direction": "One hex from Fort Righteous, the company means to read what felled the Gauntlet's outpost before pressing on toward Hrakhamar."
+    "direction": "The outpost read and the trapped shrine emptied, the company faces a fork: press on to Fort Vengeance, or turn north on Yokka's word of the eviler tribe and the undead massing across the river."
   },
   "gm": {
     "name": "The Dungeon Master",
@@ -74,6 +74,11 @@
     "Azaka Stormfang",
     "Hew Hackinstone",
     "Jobal",
-    "Saja N'baza"
+    "Saja N'baza",
+    "Jessamine",
+    "Kwayothe",
+    "Ifan Talro'a",
+    "Zhanthi",
+    "Yokka"
   ]
 }
