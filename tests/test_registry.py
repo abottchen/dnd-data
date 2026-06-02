@@ -12,6 +12,7 @@ def test_registry_lists_every_transformer():
         "refresh-chapters", "refresh-npcs", "refresh-characters",
         "refresh-road-ahead", "refresh-intro-epithet",
         "refresh-archetype-inscription",
+        "refresh-ascent-read",
     }
 
 

@@ -581,6 +581,132 @@ def compute_other_dice(events: list) -> list[dict]:
         })
     return rows
 
+
+# Ascent chart viewBox + plot margins (mirrors the other-dice geometry style:
+# coordinates are computed here; the template emits static SVG).
+_ASCENT_W, _ASCENT_H = 1000, 440
+_ASCENT_ML, _ASCENT_MR, _ASCENT_MT, _ASCENT_MB = 60, 128, 26, 52
+
+
+def compute_ascent(xp_log: Optional[dict]) -> Optional[dict]:
+    """Cumulative-XP climb for the Company tab. Returns None when there are no
+    XP entries (template renders an empty state). Geometry is server-side so
+    the chart matches the established other-dice/patron-die pattern."""
+    entries = (xp_log or {}).get("entries", [])
+    if not entries:
+        return None
+
+    # Chronological; stable sort preserves the GM's intra-day authoring order
+    # (so a closing "rounding error" event stays last within its session).
+    ev = sorted(entries, key=lambda e: e.get("date", ""))
+
+    nodes = [{"label": "Where it began", "type": None, "gain": 0, "total": 0,
+              "date": "", "source": "Level 1 · the road begins", "session_id": ""}]
+    running = 0
+    for e in ev:
+        running += int(e.get("perPc", 0))
+        nodes.append({
+            "label": e.get("title", ""),
+            "type": e.get("type"),
+            "gain": int(e.get("perPc", 0)),
+            "total": running,
+            "date": _short_date(e["date"]) if e.get("date") else "",
+            "source": e.get("source", ""),
+            "session_id": e.get("sessionId", ""),
+        })
+
+    total = running
+    level = _level_for_xp(total)
+    nxt = _next_threshold(level)
+    ymax = nxt if nxt else max(total, 1)
+    to_next = (nxt - total) if nxt else 0
+
+    plot_w = _ASCENT_W - _ASCENT_ML - _ASCENT_MR
+    plot_h = _ASCENT_H - _ASCENT_MT - _ASCENT_MB
+    n_seg = len(nodes) - 1
+
+    def fx(i):
+        return round(_ASCENT_ML + plot_w * (i / n_seg if n_seg else 0), 2)
+
+    def fy(v):
+        return round(_ASCENT_MT + plot_h * (1 - v / ymax), 2)
+
+    ybase = fy(0)
+
+    # node coordinates + level-up crossings
+    prev = 0
+    for i, nd in enumerate(nodes):
+        nd["i"] = i
+        nd["cx"] = fx(i)
+        nd["cy"] = fy(nd["total"])
+        up = None
+        for l in range(2, 21):
+            if prev < LEVEL_XP[l] <= nd["total"]:
+                up = _to_roman(l)
+        nd["up"] = up
+        nd["r"] = 6.5 if up else (3.5 if i == 0 else 5)
+        prev = nd["total"]
+
+    # threshold lines visible within (0, ymax]
+    thresholds = []
+    for l in range(2, 21):
+        v = LEVEL_XP[l]
+        if v > ymax:
+            break
+        thresholds.append({"v": v, "lvl": _to_roman(l), "y": fy(v), "top": v == ymax})
+
+    # session date ticks: group consecutive nodes sharing a sessionId
+    groups: list[dict] = []
+    for nd in nodes[1:]:
+        sid = nd["session_id"]
+        if groups and groups[-1]["sid"] == sid:
+            groups[-1]["xs"].append(nd["cx"])
+            groups[-1]["date"] = nd["date"]
+        else:
+            groups.append({"sid": sid, "xs": [nd["cx"]], "date": nd["date"]})
+    ticks = [{
+        "x": round(sum(g["xs"]) / len(g["xs"]), 2),
+        "x0": g["xs"][0], "x1": g["xs"][-1],
+        "label": g["date"], "multi": len(g["xs"]) > 1,
+    } for g in groups]
+
+    # path strings
+    line_d = "M " + " L ".join(f"{nd['cx']} {nd['cy']}" for nd in nodes)
+    area_d = (f"M {nodes[0]['cx']} {ybase} "
+              + " ".join(f"L {nd['cx']} {nd['cy']}" for nd in nodes)
+              + f" L {nodes[-1]['cx']} {ybase} Z")
+
+    # by-type breakdown for the source bar (descending)
+    by_type: dict[str, int] = {}
+    for e in ev:
+        t = e.get("type") or "other"
+        by_type[t] = by_type.get(t, 0) + int(e.get("perPc", 0))
+    sources = [{
+        "type": t, "label": t.capitalize(), "xp": x,
+        "pct": round(x / total * 100) if total else 0,
+    } for t, x in sorted(by_type.items(), key=lambda kv: -kv[1])]
+
+    richest = max(ev, key=lambda e: int(e.get("perPc", 0)))
+
+    return {
+        "view_w": _ASCENT_W, "view_h": _ASCENT_H,
+        "plot_left": _ASCENT_ML, "plot_right": round(_ASCENT_ML + plot_w, 2),
+        "ybase": ybase, "ymax": ymax,
+        "nodes": nodes, "thresholds": thresholds, "ticks": ticks,
+        "line_d": line_d, "area_d": area_d,
+        "proj_y": fy(total),
+        "road_x": round(_ASCENT_ML + plot_w * 0.52, 2),
+        "road_y": fy((total + ymax) / 2),
+        "last_cx": nodes[-1]["cx"], "last_cy": nodes[-1]["cy"],
+        "sources": sources,
+        "total": total, "level": _to_roman(level), "level_num": level,
+        "to_next": to_next, "next_threshold": nxt,
+        "deeds": len(ev), "sessions": len({e.get("sessionId") for e in ev}),
+        "richest_xp": int(richest.get("perPc", 0)),
+        "richest_title": richest.get("title", ""),
+    }
+
+
 SKILL_DISPLAY = {
     "acrobatics": "Acrobatics",
     "animalHandling": "Animal Handling",
@@ -1083,6 +1209,29 @@ def validate_all(data: dict, authored: dict, images_dir: Path) -> list[Validatio
     errors.extend(validate_dice_player_mapping(data.get("unmapped_players", [])))
     return errors
 
+# D&D 5e (2024) cumulative XP per level — identical to 2014 at all tiers.
+LEVEL_XP = {
+    1: 0, 2: 300, 3: 900, 4: 2700, 5: 6500, 6: 14000, 7: 23000,
+    8: 34000, 9: 48000, 10: 64000, 11: 85000, 12: 100000, 13: 120000,
+    14: 140000, 15: 165000, 16: 195000, 17: 225000, 18: 265000,
+    19: 305000, 20: 355000,
+}
+
+
+def _level_for_xp(total: int) -> int:
+    """Highest level whose threshold is <= total."""
+    lvl = 1
+    for l in range(1, 21):
+        if total >= LEVEL_XP[l]:
+            lvl = l
+    return lvl
+
+
+def _next_threshold(level: int) -> Optional[int]:
+    """XP needed for the next level, or None at level 20."""
+    return LEVEL_XP.get(level + 1)
+
+
 _ROMAN_PAIRS = [(1000,"M"),(900,"CM"),(500,"D"),(400,"CD"),(100,"C"),(90,"XC"),
                 (50,"L"),(40,"XL"),(10,"X"),(9,"IX"),(5,"V"),(4,"IV"),(1,"I")]
 
@@ -1119,6 +1268,11 @@ def load_data(data_dir: Path) -> dict:
         party = json.load(f)
     with (data_dir / "session-log.json").open() as f:
         session_log = json.load(f)
+
+    # XP log (optional — gitignored, dropped in by the GM after each session).
+    # Cold-start safe: a fresh clone with no xp-log.json still renders.
+    xp_path = data_dir / "xp-log.json"
+    xp_log = json.loads(xp_path.read_text()) if xp_path.exists() else {"entries": []}
 
     dice_paths = sorted((data_dir / "dice").glob("dicex-rolls-*.json"))
     dice_rolls = [json.loads(p.read_text()) for p in dice_paths]
@@ -1221,6 +1375,7 @@ def load_data(data_dir: Path) -> dict:
         "rolls_by_slug": rolls_by_slug,
         "unmapped_players": sorted(unmapped_players),
         "session_log": session_log,
+        "xp_log": xp_log,
     }
 
 DICE_PLAYER_MAP_PATH = BUILD_DIR / "dice-players.json"
@@ -1310,6 +1465,7 @@ def compute_all(data: dict, authored: dict) -> dict:
     best_skill_by_id = {m["id"]: compute_best_skill(m) for m in party.get("members", [])}
     radar_by_id = {m["id"]: compute_radar(m)
                    for m in party.get("members", []) if m["id"] != "gm"}
+    ascent = compute_ascent(data.get("xp_log"))
 
     char_auth_by_id = {a["id"]: a for a in authored["characters"]}
 
@@ -1330,6 +1486,11 @@ def compute_all(data: dict, authored: dict) -> dict:
     site = dict(authored["site"])
     site["intro_meta"] = compute_intro_meta(session_log)
     site["header_eyebrow"] = _compute_header_eyebrow(chronicle, ledger)
+    site.setdefault(
+        "ascent_read",
+        "Blade and book in equal measure — the company earns its name as "
+        "readily by riddle and road as at the edge of a sword.",
+    )
 
     party_top_xp = _compute_party_top_xp(party, trials, n=3)
 
@@ -1353,6 +1514,7 @@ def compute_all(data: dict, authored: dict) -> dict:
         "ledger": ledger,
         "distinctions": distinctions,
         "patron_die": patron,
+        "ascent": ascent,
         "best_skill_by_id": best_skill_by_id,
         "radar_by_id": radar_by_id,
         "npcs_by_allegiance": _split_npcs(authored["npcs"]),

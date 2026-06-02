@@ -232,3 +232,30 @@ def test_append_builders_tolerate_empty_authored(slice_env, builder_name, tmp_pa
     builder = getattr(slices, builder_name)
     out = builder(slice_env["data"], authored)
     assert isinstance(out, list)
+
+
+def test_refresh_ascent_read_gates_on_marker(slice_env, tmp_path, monkeypatch):
+    data = slice_env["data"]
+    authored = slice_env["authored"]
+    # attach an xp log + a composition so the builder has something to summarize
+    data["xp_log"] = {"entries": [
+        {"id": "a", "date": "2026-04-19", "sessionId": "s1", "title": "T",
+         "type": "combat", "perPc": 100},
+    ]}
+    authored["site"]["ascent_read"] = "existing read"
+
+    # marker current → no new sessions → still emits one "all" slice carrying
+    # new_sessions=[] (refresh transformers always emit; the prompt decides)
+    authored["site"]["refreshed_through_session"] = 999
+    out = slices.refresh_ascent_read(data, authored)
+    assert len(out) == 1
+    key, payload = out[0]
+    assert key == "all"
+    assert payload["existing"] == "existing read"
+    assert payload["new_sessions"] == []
+    assert payload["composition"][0]["type"] == "combat"
+
+    # marker behind → new sessions surface
+    authored["site"]["refreshed_through_session"] = 0
+    _, payload2 = slices.refresh_ascent_read(data, authored)[0]
+    assert len(payload2["new_sessions"]) == len(data["session_log"]["entries"])

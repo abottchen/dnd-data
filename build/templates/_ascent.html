@@ -1,0 +1,104 @@
+{% import "_macros.html" as m %}
+<section class="company-section">
+  {{ m.section_head("IX", "The Long Climb", "The Ascent",
+     "Every blow struck, every riddle unknotted, every horizon crossed — set down in the long account of experience.") }}
+  {%- if not ascent %}
+  <p class="fortune-empty">No experience yet recorded for the company.</p>
+  {%- else %}
+
+  <div class="ledger-grid lead">
+    <div class="ledger-cell">
+      <div class="ledger-eyebrow">XP Earned</div>
+      <div class="ledger-val">{{ "{:,}".format(ascent.total) }}</div>
+      <div class="ledger-sub">Level <b>{{ ascent.level }}</b> attained</div>
+    </div>
+    <div class="ledger-cell">
+      <div class="ledger-eyebrow">Richest Haul</div>
+      <div class="ledger-val">{{ ascent.richest_xp }}</div>
+      <div class="ledger-sub">{{ ascent.richest_title }}</div>
+    </div>
+    <div class="ledger-cell">
+      <div class="ledger-eyebrow">Deeds Recorded</div>
+      <div class="ledger-val">{{ ascent.deeds }}</div>
+      <div class="ledger-sub">across <b>{{ ascent.sessions }}</b> sessions</div>
+    </div>
+    <div class="ledger-cell">
+      <div class="ledger-eyebrow">To Ascension</div>
+      {%- if ascent.next_threshold %}
+      <div class="ledger-val">{{ "{:,}".format(ascent.to_next) }}</div>
+      <div class="ledger-sub seal">Level {{ (ascent.level_num + 1) | roman }} at <b>{{ "{:,}".format(ascent.next_threshold) }}</b></div>
+      {%- else %}
+      <div class="ledger-val">&mdash;</div>
+      <div class="ledger-sub seal">Level <b>{{ ascent.level_num | roman }}</b> &middot; the summit</div>
+      {%- endif %}
+    </div>
+  </div>
+
+  {{ m.sub_head(("The Climb to " ~ (ascent.level_num + 1) | roman) if ascent.next_threshold else "The Long Climb") }}
+  <div class="ascent">
+    <svg class="ascent-chart" viewBox="0 0 {{ ascent.view_w }} {{ ascent.view_h }}" role="img"
+         aria-label="Cumulative party experience climbing toward the next level">
+      <defs>
+        <linearGradient id="ascentFill" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="rgba(184,137,74,0.34)"/>
+          <stop offset="100%" stop-color="rgba(184,137,74,0.02)"/>
+        </linearGradient>
+      </defs>
+
+      {%- for t in ascent.thresholds %}
+      <line class="ascent-threshold{% if t.top %} top{% endif %}" x1="{{ ascent.plot_left }}" y1="{{ t.y }}" x2="{{ ascent.plot_right }}" y2="{{ t.y }}"/>
+      <text class="ascent-lvl-tag" x="{{ ascent.plot_right + 16 }}" y="{{ t.y - 2 }}">Lv {{ t.lvl }}</text>
+      <text class="ascent-lvl-xp" x="{{ ascent.plot_right + 16 }}" y="{{ t.y + 11 }}">{{ "{:,}".format(t.v) }} XP</text>
+      {%- endfor %}
+
+      <line class="ascent-axis" x1="{{ ascent.plot_left }}" y1="{{ ascent.ybase }}" x2="{{ ascent.plot_right }}" y2="{{ ascent.ybase }}"/>
+
+      {%- for tk in ascent.ticks %}
+      <text class="ascent-tick" x="{{ tk.x }}" y="{{ ascent.ybase + 30 }}">{{ tk.label }}</text>
+      {%- if tk.multi %}<line class="ascent-session-bracket" x1="{{ tk.x0 }}" y1="{{ ascent.ybase + 12 }}" x2="{{ tk.x1 }}" y2="{{ ascent.ybase + 12 }}"/>{% endif %}
+      {%- endfor %}
+
+      <path class="ascent-area" d="{{ ascent.area_d }}"/>
+      <path class="ascent-line" d="{{ ascent.line_d }}"/>
+      <path class="ascent-projection" d="M {{ ascent.last_cx }} {{ ascent.proj_y }} L {{ ascent.plot_right }} {{ ascent.proj_y }}"/>
+      {%- if ascent.next_threshold %}
+      <text class="ascent-roadtext" x="{{ ascent.road_x }}" y="{{ ascent.road_y }}">
+        <tspan class="big" x="{{ ascent.road_x }}" dy="0">{{ "{:,}".format(ascent.to_next) }} XP</tspan>
+        <tspan x="{{ ascent.road_x }}" dy="18">the road to Level {{ (ascent.level_num + 1) | roman }}</tspan>
+      </text>
+      {%- endif %}
+
+      <line class="ascent-guide" x1="0" y1="0" x2="0" y2="0"/>
+
+      {%- for n in ascent.nodes %}
+      <circle class="ascent-node t-{{ n.type or 'none' }}{% if n.up %} up halo{% endif %}" cx="{{ n.cx }}" cy="{{ n.cy }}" r="{{ n.r }}" style="animation-delay:{{ '%.2f'|format(0.7 + n.i * 0.13) }}s"/>
+      {%- if n.up %}<text class="ascent-uptag" x="{{ n.cx }}" y="{{ n.cy - 16 }}" style="animation-delay:{{ '%.2f'|format(1.0 + n.i * 0.13) }}s">Lv {{ n.up }}</text>{% endif %}
+      <circle class="ascent-hit" cx="{{ n.cx }}" cy="{{ n.cy }}" r="18"
+              data-i="{{ n.i }}" data-cx="{{ n.cx }}" data-cy="{{ n.cy }}" data-ybase="{{ ascent.ybase }}"
+              data-gain="{{ n.gain }}" data-total="{{ n.total }}" data-type="{{ n.type or '' }}"
+              data-date="{{ n.date }}" data-label="{{ n.label }}" data-note="{{ n.source }}"/>
+      {%- endfor %}
+
+      <circle class="ascent-pulse" cx="{{ ascent.last_cx }}" cy="{{ ascent.last_cy }}" r="7"/>
+    </svg>
+  </div>
+
+  {{ m.sub_head("By What Deeds") }}
+  <div class="whence">
+    <div class="whence-bar">
+      {%- for s in ascent.sources %}
+      <div class="whence-seg t-{{ s.type }}" style="--w:{{ s.pct }}%; animation-delay:{{ '%.2f'|format(0.3 + loop.index0 * 0.1) }}s"
+           data-label="{{ s.label }}" data-xp="{{ s.xp }}" data-pct="{{ s.pct }}">
+        <span class="seg-pct">{% if s.pct >= 4 %}{{ s.pct }}%{% endif %}</span>
+      </div>
+      {%- endfor %}
+    </div>
+    <div class="whence-legend">
+      {%- for s in ascent.sources %}
+      <span class="item"><span class="swatch t-{{ s.type }}"></span>{{ s.label }}</span>
+      {%- endfor %}
+    </div>
+    <p class="whence-read">{{ site.ascent_read }}</p>
+  </div>
+  {%- endif %}
+</section>

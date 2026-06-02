@@ -1,0 +1,10 @@
+{
+  "entries": [
+    { "id": "a", "date": "2026-04-19", "sessionId": "s1", "title": "Reached Port Nyanzaru", "type": "milestone", "source": "Survived the voyage", "perPc": 300 },
+    { "id": "b", "date": "2026-04-26", "sessionId": "s2", "title": "Winning the Dinosaur Race", "type": "roleplay", "source": "A triumph of nerve", "perPc": 90 },
+    { "id": "c", "date": "2026-05-03", "sessionId": "s3", "title": "Temple of Tymora defense", "type": "combat", "source": "Skeletons and zombies", "perPc": 220 },
+    { "id": "d", "date": "2026-05-31", "sessionId": "s4", "title": "Discovered Fort Righteous", "type": "discovery", "source": "A ruin in the green", "perPc": 75 },
+    { "id": "e", "date": "2026-05-31", "sessionId": "s4", "title": "Fort Righteous puzzle", "type": "quest", "source": "The alchemy jug", "perPc": 90 },
+    { "id": "f", "date": "2026-05-31", "sessionId": "s4", "title": "First puzzle in Chult", "type": "milestone", "source": "A rounding error", "perPc": 125 }
+  ]
+}

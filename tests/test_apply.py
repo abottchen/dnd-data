@@ -232,3 +232,20 @@ def test_refresh_known_npcs_rewrite_preserves_order():
     apply.apply_refresh_known_npcs(authored, key="all",
                                    slice_data={}, output=output)
     assert authored["site"]["known_npcs"] == ["A", "B", "C"]
+
+
+# -- apply_refresh_ascent_read -----------------------------------------------
+
+def test_apply_refresh_ascent_read_rewrite():
+    authored = {"site": {"ascent_read": "old"}}
+    apply.apply_refresh_ascent_read(
+        authored, "all", {}, {"decision": "rewrite",
+                              "fields": {"ascent_read": "new line"}, "reason": "x"})
+    assert authored["site"]["ascent_read"] == "new line"
+
+
+def test_apply_refresh_ascent_read_no_change():
+    authored = {"site": {"ascent_read": "old"}}
+    apply.apply_refresh_ascent_read(
+        authored, "all", {}, {"decision": "no_change", "fields": None, "reason": "x"})
+    assert authored["site"]["ascent_read"] == "old"

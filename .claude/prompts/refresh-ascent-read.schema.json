@@ -1,0 +1,20 @@
+{
+  "type": "object",
+  "required": ["decision", "fields", "reason"],
+  "additionalProperties": false,
+  "properties": {
+    "decision": {
+      "type": "string",
+      "enum": ["no_change", "rewrite"]
+    },
+    "fields": {
+      "type": ["object", "null"],
+      "required": ["ascent_read"],
+      "additionalProperties": false,
+      "properties": {
+        "ascent_read": {"type": "string"}
+      }
+    },
+    "reason": {"type": "string"}
+  }
+}
