@@ -230,6 +230,26 @@ def refresh_chapters(data: dict, authored: dict) -> list[tuple]:
 
 
 def refresh_npcs(data: dict, authored: dict) -> list[tuple]:
+    """One slice per authored NPC named in a session newer than the marker.
+
+    An NPC's epithet is a pure function of its mention set, so an NPC whose
+    mentions all fall in already-refreshed sessions would re-author to an
+    identical epithet — re-dispatching it is wasted work. We gate emission on
+    the marker the same way refresh_road_ahead / refresh_intro_epithet gate
+    their evidence. Each emitted slice still carries the NPC's *full* mention
+    history for context; only the decision to emit is marker-scoped.
+
+    Under --force-refresh (signalled via the `force_refresh` side channel) the
+    gate is lifted and the whole roster is re-evaluated.
+    """
+    marker = authored["site"].get("refreshed_through_session", 0)
+    force = authored.get("force_refresh", False)
+    new_session_ids = None if force else {
+        entry.get("session")
+        for i, entry in enumerate(data["session_log"]["entries"], start=1)
+        if i > marker
+    }
+
     out = []
     for npc in authored["npcs"]:
         name = npc["name"]
@@ -238,6 +258,10 @@ def refresh_npcs(data: dict, authored: dict) -> list[tuple]:
             if not mentions(name, entry.get("text", "")):
                 continue
             all_mentions.append({"session": entry.get("session"), "line": entry.get("text", "")})
+        if new_session_ids is not None and not any(
+            m["session"] in new_session_ids for m in all_mentions
+        ):
+            continue
         out.append((name, {
             "name": name,
             "mentions": all_mentions,

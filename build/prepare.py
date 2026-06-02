@@ -56,6 +56,10 @@ def run(*, no_refresh: bool, force_refresh: bool, keep_temp: bool) -> Path:
     inv_bundle = inventory.load(REPO_ROOT, party=data["party"])
     authored["inventory_by_id"] = inv_bundle["by_id"]
     authored["pronouns_by_id"] = render.load_character_pronouns()
+    # Side channel for marker-aware refresh builders (e.g. refresh_npcs): under
+    # --force-refresh they must re-evaluate the whole roster, not just entities
+    # touched by sessions past the marker.
+    authored["force_refresh"] = force_refresh
 
     refresh_gate = not no_refresh and (latest > marker or force_refresh)
 
