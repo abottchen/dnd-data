@@ -435,6 +435,60 @@
       });
     })();
 
+    // --- The Company: index-rail scroll-spy + smooth descent ---
+    // Lights the rail entry for the section under the reader's eye and
+    // intercepts rail clicks so they scroll WITHOUT writing location.hash
+    // (the hash drives the tab router — see the top IIFE).
+    (function () {
+      const rail = document.querySelector('.company-index');
+      if (!rail) return;
+
+      const links = new Map();
+      rail.querySelectorAll('a[data-spy]').forEach(a => {
+        const id = a.getAttribute('data-spy');
+        links.set(id, a);
+        a.addEventListener('click', (e) => {
+          const target = document.getElementById(id);
+          if (!target) return;
+          e.preventDefault();
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+      });
+
+      const sections = [...links.keys()]
+        .map(id => document.getElementById(id))
+        .filter(Boolean);
+      if (!sections.length) return;
+
+      let current = null;
+      const setCurrent = (id) => {
+        if (id === current) return;
+        const prev = links.get(current);
+        if (prev) prev.classList.remove('is-current');
+        current = id;
+        const next = links.get(id);
+        if (next) next.classList.add('is-current');
+      };
+
+      // A thin trigger band ~22% down the viewport; whichever section overlaps
+      // it (topmost, in document order) is the reader's current section. When
+      // nothing overlaps — a gap between sections, or the panel is hidden — we
+      // hold the last lit entry rather than flicker.
+      const visible = new Set();
+      const obs = new IntersectionObserver((entries) => {
+        entries.forEach(en => {
+          if (en.isIntersecting) visible.add(en.target);
+          else visible.delete(en.target);
+        });
+        if (!visible.size) return;
+        const best = sections.find(s => visible.has(s));
+        if (best) setCurrent(best.id);
+      }, { rootMargin: '-22% 0px -72% 0px', threshold: 0 });
+
+      sections.forEach(s => obs.observe(s));
+      setCurrent(sections[0].id);   // light the first entry before any scroll
+    })();
+
     // --- Pack icons: rotate non-square art onto the square host's diagonal ---
     // Catalog icons (5e.tools weapons especially) are markedly non-square.
     // With object-fit:contain in a square cell, a 2:1 scimitar renders at
