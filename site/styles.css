@@ -576,6 +576,7 @@ main > article > section.proficiencies,
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .stat-card,
   .ability-radar .ar-axis,
   .ability-radar .ar-dot,
   .ability-radar .ar-label,
