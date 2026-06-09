@@ -1,18 +1,5 @@
 [
   {
-    "id": "anton",
-    "epithet": "of the Halflings, whose tongue cuts sharper than his blade",
-    "reliquary_header": "Fallen by his tongue",
-    "constellation_epithet": "his rolls yet unwritten",
-    "distinction_title": "Sharpest Tongue",
-    "distinction_subtitle": "the only kill drawn with words alone",
-    "distinction_detail": "<b>1</b> kill &middot; Vicious Mockery",
-    "archetype_badge": {
-      "archetype": "armorer",
-      "inscription": "Boiled leather on his halfling shoulders, a dagger on each hip — somehow the bard became the best-armored soul the party fields."
-    }
-  },
-  {
     "id": "vex",
     "epithet": "of the Gold Dragonborn, born to breath and blade",
     "reliquary_header": "Fallen by his steel",
