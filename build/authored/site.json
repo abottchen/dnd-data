@@ -3,7 +3,7 @@
   "page_subtitle": "A ledger of those who walk &middot; and those they have laid down",
   "intro_epithet": "Five travellers and a storyteller, bound to a doomed road",
   "footnote": "The names above are the names given &middot; the ones who fell were given no names",
-  "refreshed_through_session": 10,
+  "refreshed_through_session": 11,
   "road_ahead": {
     "known": [
       {
@@ -40,7 +40,7 @@
       }
     ],
     "was_known": [],
-    "direction": "The outpost read and the trapped shrine emptied, the company faces a fork: press on to Fort Vengeance, or turn north on Yokka's word of the eviler tribe and the undead massing across the river."
+    "direction": "Undril Silvertusk delivered to a Camp Vengeance gone to rot, the company returns from felling the vine-mother's zombies to find the palisade ablaze and the camp under attack."
   },
   "gm": {
     "name": "The Dungeon Master",
@@ -79,6 +79,11 @@
     "Kwayothe",
     "Ifan Talro'a",
     "Zhanthi",
-    "Yokka"
-  ]
+    "Yokka",
+    "Niles Breakbone",
+    "Ord Firebeard",
+    "Perne Salhana",
+    "Wulf Rygor"
+  ],
+  "ascent_read": "Legends forged mostly by steel, but the road and its riddles have left their mark on every hard-won mile."
 }

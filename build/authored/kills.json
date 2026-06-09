@@ -222,5 +222,37 @@
     "method": "Longbow",
     "verse": "Two goblins stilled before the ambush could hold",
     "annotation": "Longbow &middot; drawn twice, answered twice"
+  },
+  {
+    "character": "vex",
+    "date": "2026-06-07",
+    "creature": "Yellow Musk Zombie",
+    "method": "Shortsword",
+    "verse": "A soldier twice-dead, vines threading the jaw",
+    "annotation": "Shortsword &middot; the chainmail could not hold the second death at bay"
+  },
+  {
+    "character": "vex",
+    "date": "2026-06-07",
+    "creature": "Yellow Musk Zombie",
+    "method": "Breath Weapon (Fire)",
+    "verse": "Three husks that walked the jungle's edge, then burned",
+    "annotation": "Breath Weapon (Fire) &middot; fire, as the voice in Urida's mind had said"
+  },
+  {
+    "character": "urida",
+    "date": "2026-06-07",
+    "creature": "Yellow Musk Zombie",
+    "method": "Chromatic Orb",
+    "verse": "A vine-threaded guard brought low in the undergrowth",
+    "annotation": "Chromatic Orb &middot; one casting, the vine fell silent"
+  },
+  {
+    "character": "lilac",
+    "date": "2026-06-07",
+    "creature": "Yellow Musk Zombie",
+    "method": "Longbow",
+    "verse": "A dead soldier, still wearing the camp's livery",
+    "annotation": "Longbow &middot; arrow-felled before the vines could spread further"
   }
 ]

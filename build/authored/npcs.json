@@ -158,5 +158,25 @@
     "name": "Yokka",
     "epithet": "goblin boss of Camp Righteous who surrendered after her last minion fell, then bartered information for her freedom",
     "allegiance": "with"
+  },
+  {
+    "name": "Niles Breakbone",
+    "epithet": "commandant of Camp Vengeance, whose mood is foul and whose reinforcements never came",
+    "allegiance": "with"
+  },
+  {
+    "name": "Ord Firebeard",
+    "epithet": "a soldier of Camp Vengeance, who spoke plainly of the camp's long deterioration",
+    "allegiance": "with"
+  },
+  {
+    "name": "Perne Salhana",
+    "epithet": "soldier of Camp Vengeance, who spoke with Vex of a camp falling apart",
+    "allegiance": "with"
+  },
+  {
+    "name": "Wulf Rygor",
+    "epithet": "a scout at Camp Vengeance, in whose tent a strangely enchanted plant was found after his return from the field",
+    "allegiance": null
   }
 ]

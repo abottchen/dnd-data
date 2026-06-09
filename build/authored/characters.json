@@ -19,7 +19,7 @@
     "constellation_epithet": "the heaviest lift",
     "distinction_title": "Most Souls Gathered",
     "distinction_subtitle": "the heaviest lift the company has known",
-    "distinction_detail": "<b>775</b> XP &middot; 38% of the company",
+    "distinction_detail": "<b>825</b> XP &middot; 32% of the company",
     "archetype_badge": {
       "archetype": "featherfoot",
       "inscription": "Travels lighter than any gnome has a right to — staff, two daggers, and a rain catcher folded tight, the whole kit barely whispering when she moves."
@@ -32,7 +32,7 @@
     "constellation_epithet": "the pact-light's tally",
     "distinction_title": "Pact-Light Lord",
     "distinction_subtitle": "who fells by the blast and little else",
-    "distinction_detail": "<b>4</b> kills &middot; Eldritch Blast",
+    "distinction_detail": "<b>5</b> kills &middot; Eldritch Blast",
     "archetype_badge": {
       "archetype": "lamplighter",
       "inscription": "Fifteen flasks of oil and a lamp that hasn't gone dark yet — a goblin who walked out of Dhakaan carrying enough light to argue with the night."
@@ -42,10 +42,10 @@
     "id": "grieg",
     "epithet": "of the Wulven, who answers the question with a crossbow and the doubt with the rail",
     "reliquary_header": "Fed to the sea and the bolt",
-    "constellation_epithet": "ten crit successes, one crit fail",
+    "constellation_epithet": "ten crit successes told",
     "distinction_title": "Most Favored by the Twenty",
     "distinction_subtitle": "No other hand turns up the twenty so often.",
-    "distinction_detail": "<b>10</b> crit successes &middot; <b>1</b> crit fail across 80 kept d20s",
+    "distinction_detail": "<b>10</b> crit successes &middot; <b>2</b> crit fails across 85 kept d20s",
     "archetype_badge": {
       "archetype": "pack-mule",
       "inscription": "The hunting trap alone tips twenty-five pounds; above it ride scale mail and a heavy crossbow, and the wulven still finds room for caltrops, rope, and a block-and-tackle besides."
@@ -58,7 +58,7 @@
     "constellation_epithet": "every kill the same string",
     "distinction_title": "One String, One Answer",
     "distinction_subtitle": "Every felling she owns came off the same drawn bow.",
-    "distinction_detail": "<b>4</b> kills &middot; all by Longbow",
+    "distinction_detail": "<b>5</b> kills &middot; all by Longbow",
     "archetype_badge": {
       "archetype": "naturalist",
       "inscription": "One carved sprig of mistletoe, ribbon-tied and kept close — the whole of the primal green, if you know how to ask, flows through that small stem."
