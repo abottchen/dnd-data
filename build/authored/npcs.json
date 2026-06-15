@@ -56,7 +56,7 @@
   },
   {
     "name": "Lilac Mist",
-    "epithet": "tabaxi dinosaur racer of Port Nyanzaru, whose wayward triceratops first brought her to the company's attention, and who finished the track ahead of them all",
+    "epithet": "tabaxi dinosaur racer of Port Nyanzaru who won the track and joined the expedition into the jungle, where her goodberries, spellwork, and longbow have proven indispensable",
     "allegiance": "with"
   },
   {
@@ -171,12 +171,12 @@
   },
   {
     "name": "Perne Salhana",
-    "epithet": "soldier of Camp Vengeance, who spoke with Vex of a camp falling apart",
+    "epithet": "soldier of Camp Vengeance, found wounded outside the cave where the plant held sway",
     "allegiance": "with"
   },
   {
     "name": "Wulf Rygor",
-    "epithet": "a scout at Camp Vengeance, in whose tent a strangely enchanted plant was found after his return from the field",
-    "allegiance": null
+    "epithet": "a scout at Camp Vengeance whose enchanted plant led him into a cave, where he fought to the death against the party",
+    "allegiance": "against"
   }
 ]

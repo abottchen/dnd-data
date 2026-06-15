@@ -310,10 +310,36 @@ def _load_bestiary() -> dict[str, dict]:
                 by_name[key] = entry
     return by_name
 
+# Homebrew/named NPCs that run on a standard stat block. Maps the NPC's
+# display name -> the 5etools creature whose type, CR, source, and token should
+# stand in for them (e.g. the Camp Vengeance scout "Wulf Rygor" is a Scout).
+# The NPC's own name is preserved on lookup; only the mechanical fields are
+# borrowed, so the bestiary and chronicle still read "Wulf Rygor". This mirrors
+# the in-data reskin convention (e.g. recording a "yellow musk guard" kill under
+# its real "Yellow Musk Zombie" stat block) for cases where the fiction name
+# must survive on the page.
+CUSTOM_NPC_STATBLOCKS = {
+    "Wulf Rygor": "Scout",
+}
+
 @functools.lru_cache(maxsize=2048)
 def bestiary_lookup(creature: str) -> Optional[dict]:
-    """Return {name, type, cr, source, hasToken, token, token_url} for a creature, or None."""
-    return _load_bestiary().get(creature.casefold())
+    """Return {name, type, cr, source, hasToken, token, token_url} for a creature, or None.
+
+    Falls back to CUSTOM_NPC_STATBLOCKS for named NPCs that borrow a standard
+    stat block; the returned entry keeps the NPC's display name."""
+    by_name = _load_bestiary()
+    entry = by_name.get(creature.casefold())
+    if entry is not None:
+        return entry
+    statblock = CUSTOM_NPC_STATBLOCKS.get(creature)
+    if statblock:
+        base = by_name.get(statblock.casefold())
+        if base is not None:
+            aliased = dict(base)
+            aliased["name"] = creature
+            return aliased
+    return None
 
 XP_BY_CR = {
     "0": 10, "1/8": 25, "1/4": 50, "1/2": 100,

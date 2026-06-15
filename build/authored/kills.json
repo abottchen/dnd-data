@@ -254,5 +254,45 @@
     "method": "Longbow",
     "verse": "A dead soldier, still wearing the camp's livery",
     "annotation": "Longbow &middot; arrow-felled before the vines could spread further"
+  },
+  {
+    "character": "grieg",
+    "date": "2026-06-14",
+    "creature": "Guard",
+    "method": "Heavy Crossbow",
+    "verse": "A guard who held the line and held it no longer",
+    "annotation": "Heavy Crossbow &middot; the bolt found him before the camp's chaos did"
+  },
+  {
+    "character": "vex",
+    "date": "2026-06-14",
+    "creature": "Yellow Musk Zombie",
+    "method": "Shortsword",
+    "verse": "A husk of a man, fought to the last as promised",
+    "annotation": "Shortsword &middot; no mind remained to fear the blade"
+  },
+  {
+    "character": "urida",
+    "date": "2026-06-14",
+    "creature": "Guard",
+    "method": "Magic Missile",
+    "verse": "A guard swallowed by the chaos he helped set loose",
+    "annotation": "Magic Missile &middot; the force did not distinguish sides"
+  },
+  {
+    "character": "urida",
+    "date": "2026-06-14",
+    "creature": "Wulf Rygor",
+    "method": "Magic Missile",
+    "verse": "Wulf Rygor, who chose the cave and did not leave it",
+    "annotation": "Magic Missile &middot; fought to the death, as the husks had"
+  },
+  {
+    "character": "chumble",
+    "date": "2026-06-14",
+    "creature": "Yellow Musk Creeper",
+    "method": "Scorching Ray",
+    "verse": "The creeper on the ceiling, burning, releasing its hold",
+    "annotation": "Scorching Ray &middot; oil-soaked and fire-finished, the charm broke with it"
   }
 ]
