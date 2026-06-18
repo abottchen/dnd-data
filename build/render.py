@@ -14,7 +14,7 @@ import math
 import sys
 from collections import Counter
 from pathlib import Path
-from statistics import pstdev
+from statistics import pstdev, median
 from typing import Optional
 
 BUILD_DIR = Path(__file__).resolve().parent
@@ -426,6 +426,114 @@ def compute_trials(party: dict) -> dict:
         "party_xp": party_xp,
         "party_kills": party_kills,
     }
+
+def _date_to_session_index(session_log: dict) -> dict:
+    """Map each session date to its 0-based campaign position."""
+    return {e["date"]: i for i, e in enumerate(session_log.get("entries", []))}
+
+
+def compute_fact_pack(party: dict, trials: dict, fortune_by_char: dict,
+                      constellation: dict, session_log: dict) -> dict:
+    """Per non-GM PC, a flat dict of verifiable 'atoms' a distinction can rest
+    on. Reuses already-computed trials/fortune/constellation; only biggest-kill
+    XP reaches back to the bestiary (via _kill_xp)."""
+    members = [m for m in party.get("members", []) if m["id"] != "gm"]
+    date_to_idx = _date_to_session_index(session_log)
+    per_char = trials["per_char"]
+
+    star_by_id = {s["id"]: s for s in constellation.get("stars", [])}
+    xp_values = [per_char[m["id"]]["xp"] for m in members]
+    roll_values = [fortune_by_char[m["id"]]["rolls_total"] for m in members]
+    med_xp = median(xp_values) if xp_values else 0
+    med_rolls = median(roll_values) if roll_values else 0
+
+    # Party-wide extrema for rank booleans (computed once).
+    avgs = {m["id"]: fortune_by_char[m["id"]]["avg"]
+            for m in members if fortune_by_char[m["id"]]["kept_d20s_count"] >= 1}
+    sds = {m["id"]: fortune_by_char[m["id"]]["sd"]
+           for m in members if fortune_by_char[m["id"]]["kept_d20s_count"] >= 2}
+    crit_counts = {m["id"]: fortune_by_char[m["id"]]["crits"] for m in members}
+    fumble_counts = {m["id"]: fortune_by_char[m["id"]]["fumbles"] for m in members}
+    heaviest = {m["id"]: fortune_by_char[m["id"]]["heaviest"]["total"] for m in members}
+    biggest_kills = {m["id"]: max((_kill_xp(k["creature"]) for k in m.get("kills", [])), default=0)
+                     for m in members}
+
+    max_avg = max(avgs.values(), default=None)
+    min_avg = min(avgs.values(), default=None)
+    min_sd = min(sds.values(), default=None)
+    max_sd = max(sds.values(), default=None)
+    max_crits = max(crit_counts.values(), default=0)
+    max_fumbles = max(fumble_counts.values(), default=0)
+    max_heaviest = max(heaviest.values(), default=0)
+    max_biggest_kill = max(biggest_kills.values(), default=0)
+
+    fp: dict[str, dict] = {}
+    for m in members:
+        cid = m["id"]
+        kills = m.get("kills", [])
+        n = len(kills)
+        methods = [k["method"] for k in kills]
+        creatures = [k["creature"].strip().lower() for k in kills]
+        t = per_char[cid]
+
+        # Kills grouped by campaign session index.
+        by_session: Counter = Counter()
+        for k in kills:
+            idx = date_to_idx.get(k["date"])
+            if idx is not None:
+                by_session[idx] += 1
+
+        # Interior drought: max run of kill-less sessions strictly between two
+        # of this PC's kill sessions.
+        kill_idxs = sorted(by_session)
+        drought = 0
+        for a, b in zip(kill_idxs, kill_idxs[1:]):
+            drought = max(drought, b - a - 1)
+
+        f = fortune_by_char[cid]
+        crits_by_date: Counter = Counter()
+        for ev in f["events"]:
+            for d in ev.get("rolls", []):
+                if d.get("type") == "d20" and not d.get("dropped") and int(d["value"]) == 20:
+                    crits_by_date[ev.get("date")] += 1
+
+        star = star_by_id.get(cid, {"system_size": 1})
+        pres = "hi" if fortune_by_char[cid]["rolls_total"] >= med_rolls else "lo"
+        contrib = "hi" if per_char[cid]["xp"] >= med_xp else "lo"
+
+        fp[cid] = {
+            "kill_count": n,
+            "kill_pct": t["kill_pct"],
+            "xp_pct": t["xp_pct"],
+            "distinct_method_count": len(set(methods)),
+            "all_kills_one_method": n > 0 and len(set(methods)) == 1,
+            "all_distinct_creatures": n > 0 and len(set(creatures)) == n,
+            "distinct_type_count": t["kinds_count"],
+            "all_distinct_types": n > 0 and t["kinds_count"] == n,
+            "biggest_kill_xp": biggest_kills[cid],
+            "max_kills_in_one_session": max(by_session.values(), default=0),
+            "kill_session_count": len(kill_idxs),
+            "longest_drought": drought,
+            "kept_d20_avg": f["avg"],
+            "is_party_luckiest": cid in avgs and avgs[cid] == max_avg,
+            "is_party_unluckiest": cid in avgs and avgs[cid] == min_avg,
+            "sd": f["sd"],
+            "is_party_steadiest": cid in sds and sds[cid] == min_sd,
+            "is_party_swingiest": cid in sds and sds[cid] == max_sd,
+            "crits": f["crits"],
+            "is_party_most_crits": f["crits"] == max_crits and max_crits > 0,
+            "max_crits_in_one_session": max(crits_by_date.values(), default=0),
+            "fumbles": f["fumbles"],
+            "is_party_most_fumbles": f["fumbles"] == max_fumbles and max_fumbles > 0,
+            "heaviest_blow": f["heaviest"]["total"],
+            "is_party_heaviest": heaviest[cid] == max_heaviest and max_heaviest > 0,
+            "is_party_biggest_kill": biggest_kills[cid] == max_biggest_kill and max_biggest_kill > 0,
+            "system_size": star.get("system_size", 1),
+            "is_constellation_outlier": star.get("system_size", 1) == 1,
+            "quadrant": f"{pres}-presence/{contrib}-contribution",
+        }
+    return fp
+
 
 def _short_date(iso_date: str) -> str:
     """'2026-04-23' -> '23 APR 2026'."""
