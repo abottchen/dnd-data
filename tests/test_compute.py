@@ -1,6 +1,6 @@
 from build.render import (xp_for_cr, compute_trials, compute_sessions_chart, compute_fortune,
                    compute_d20_histogram, compute_other_dice, compute_best_skill,
-                   compute_intro_meta, compute_constellation,
+                   compute_intro_meta, compute_constellation, compute_fact_pack,
                    _compute_party_top_xp, _compute_header_eyebrow,
                    _creature_token_url, _name_to_token_name,
                    compute_radar)
@@ -505,3 +505,151 @@ def test_constellation_links_excludes_gm():
     result = compute_constellation(party, fortune_by_char, trials)
     assert {s["id"] for s in result["stars"]} == {"anton", "vex"}
     assert len(result["links"]) == 2  # two stars → closed loop has two segments
+
+# -- Fact pack: kill-derived atoms -------------------------------------------
+
+def _session_log(dates):
+    """Build a minimal session log: one entry per date, session ids 1..N."""
+    return {"entries": [{"session": i + 1, "date": d, "text": ""} for i, d in enumerate(dates)]}
+
+def test_fact_pack_kill_pattern_atoms():
+    party = {"members": [
+        {"id": "a", "kills": [
+            {"date": "2026-04-01", "creature": "Goblin", "method": "Longbow"},
+            {"date": "2026-04-08", "creature": "Goblin", "method": "Longbow"},
+            {"date": "2026-04-08", "creature": "Goblin", "method": "Longbow"},
+        ]},
+        {"id": "b", "kills": [
+            {"date": "2026-04-01", "creature": "Goblin", "method": "Dagger"},
+            {"date": "2026-04-15", "creature": "Bandit", "method": "Longbow"},
+        ]},
+    ]}
+    trials = compute_trials(party)
+    fortune = {"a": compute_fortune([]), "b": compute_fortune([])}
+    constellation = compute_constellation(party, fortune, trials)
+    log = _session_log(["2026-04-01", "2026-04-08", "2026-04-15"])
+    fp = compute_fact_pack(party, trials, fortune, constellation, log)
+
+    assert fp["a"]["kill_count"] == 3
+    assert fp["a"]["all_kills_one_method"] is True
+    assert fp["a"]["distinct_method_count"] == 1
+    assert fp["a"]["all_distinct_creatures"] is False     # Goblin thrice
+    assert fp["a"]["max_kills_in_one_session"] == 2        # two on 2026-04-08
+    assert fp["a"]["kill_session_count"] == 2
+
+    assert fp["b"]["all_kills_one_method"] is False        # Dagger + Longbow
+    assert fp["b"]["distinct_method_count"] == 2
+    assert fp["b"]["all_distinct_creatures"] is True       # Goblin + Bandit
+    assert fp["b"]["max_kills_in_one_session"] == 1
+
+def test_fact_pack_longest_drought_counts_interior_silent_sessions():
+    party = {"members": [
+        {"id": "a", "kills": [
+            {"date": "2026-04-01", "creature": "Goblin", "method": "Longbow"},
+            {"date": "2026-04-22", "creature": "Goblin", "method": "Longbow"},
+        ]},
+    ]}
+    trials = compute_trials(party)
+    fortune = {"a": compute_fortune([])}
+    constellation = compute_constellation(party, fortune, trials)
+    # Campaign sessions on 4 dates; PC killed only on the 1st and 4th.
+    log = _session_log(["2026-04-01", "2026-04-08", "2026-04-15", "2026-04-22"])
+    fp = compute_fact_pack(party, trials, fortune, constellation, log)
+    assert fp["a"]["longest_drought"] == 2   # two silent sessions between
+
+# -- Fact pack: roll-derived atoms -------------------------------------------
+
+def _d20_events(values, date="2026-04-01"):
+    return [{"rolls": [{"type": "d20", "value": v, "dropped": False}],
+             "total": v, "notation": "1d20", "date": date} for v in values]
+
+def test_fact_pack_roll_rank_booleans():
+    party = {"members": [
+        {"id": "a", "kills": []},
+        {"id": "b", "kills": []},
+    ]}
+    trials = compute_trials(party)
+    fortune = {
+        # a: high average, two crits, both on the same date
+        "a": compute_fortune(_d20_events([20, 20, 18, 16])),
+        # b: low average, one fumble
+        "b": compute_fortune(_d20_events([1, 5, 8, 6])),
+    }
+    constellation = compute_constellation(party, fortune, trials)
+    log = _session_log(["2026-04-01"])
+    fp = compute_fact_pack(party, trials, fortune, constellation, log)
+
+    assert fp["a"]["is_party_luckiest"] is True
+    assert fp["a"]["is_party_unluckiest"] is False
+    assert fp["a"]["crits"] == 2
+    assert fp["a"]["is_party_most_crits"] is True
+    assert fp["a"]["max_crits_in_one_session"] == 2
+    assert fp["b"]["is_party_unluckiest"] is True
+    assert fp["b"]["fumbles"] == 1
+    assert fp["b"]["is_party_most_fumbles"] is True
+
+def test_fact_pack_heaviest_blow_rank():
+    party = {"members": [{"id": "a", "kills": []}, {"id": "b", "kills": []}]}
+    trials = compute_trials(party)
+    fortune = {
+        "a": compute_fortune([{"rolls": [{"type": "d8", "value": 7}], "total": 7,
+                               "notation": "1d8", "date": "2026-04-01"}]),
+        "b": compute_fortune([{"rolls": [{"type": "d12", "value": 11}], "total": 11,
+                               "notation": "1d12", "date": "2026-04-01"}]),
+    }
+    constellation = compute_constellation(party, fortune, trials)
+    fp = compute_fact_pack(party, trials, fortune, constellation, _session_log(["2026-04-01"]))
+    assert fp["b"]["heaviest_blow"] == 11
+    assert fp["b"]["is_party_heaviest"] is True
+    assert fp["a"]["is_party_heaviest"] is False
+
+# -- Fact pack: constellation-context atoms ----------------------------------
+
+def test_fact_pack_quadrant_and_system_size():
+    party = {"members": [
+        {"id": "hi", "kills": [{"date": "2026-04-01", "creature": "Ogre", "method": "Maul"}]},
+        {"id": "lo", "kills": []},
+    ]}
+    trials = compute_trials(party)
+    fortune = {
+        "hi": compute_fortune(_d20_events([10, 11, 12, 13, 14])),  # more rolls = more presence
+        "lo": compute_fortune(_d20_events([9])),
+    }
+    constellation = compute_constellation(party, fortune, trials)
+    fp = compute_fact_pack(party, trials, fortune, constellation, _session_log(["2026-04-01"]))
+
+    # hi has more XP (a kill) and more rolls than lo.
+    assert fp["hi"]["quadrant"] == "hi-presence/hi-contribution"
+    assert fp["lo"]["quadrant"] == "lo-presence/lo-contribution"
+    # Two stars far apart → each alone in its own system.
+    assert fp["hi"]["system_size"] == 1
+    assert fp["hi"]["is_constellation_outlier"] is True
+
+def test_fact_pack_rank_booleans_flag_all_tied_holders():
+    party = {"members": [{"id": "a", "kills": []}, {"id": "b", "kills": []}]}
+    trials = compute_trials(party)
+    fortune = {
+        "a": compute_fortune(_d20_events([20, 10])),  # one crit each, equal avg
+        "b": compute_fortune(_d20_events([20, 10])),
+    }
+    constellation = compute_constellation(party, fortune, trials)
+    fp = compute_fact_pack(party, trials, fortune, constellation, _session_log(["2026-04-01"]))
+    assert fp["a"]["is_party_most_crits"] is True
+    assert fp["b"]["is_party_most_crits"] is True
+    assert fp["a"]["is_party_luckiest"] is True and fp["b"]["is_party_luckiest"] is True
+
+def test_fact_pack_exposes_raw_axis_values():
+    # The constellation epithet reasons about real positions on the two axes
+    # (rolls cast, experience earned), not the coarse hi/lo split — so the raw
+    # values must be in the pack.
+    party = {"members": [
+        {"id": "a", "kills": [{"date": "2026-04-01", "creature": "Goblin", "method": "Bow"}]},
+        {"id": "b", "kills": []},
+    ]}
+    trials = compute_trials(party)
+    fortune = {"a": compute_fortune(_d20_events([10, 12, 14])), "b": compute_fortune(_d20_events([8]))}
+    constellation = compute_constellation(party, fortune, trials)
+    fp = compute_fact_pack(party, trials, fortune, constellation, _session_log(["2026-04-01"]))
+    assert fp["a"]["rolls"] == 3 == fortune["a"]["rolls_total"]
+    assert fp["a"]["xp"] == trials["per_char"]["a"]["xp"]
+    assert fp["b"]["rolls"] == 1

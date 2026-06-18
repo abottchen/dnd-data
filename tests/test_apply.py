@@ -249,3 +249,29 @@ def test_apply_refresh_ascent_read_no_change():
     apply.apply_refresh_ascent_read(
         authored, "all", {}, {"decision": "no_change", "fields": None, "reason": "x"})
     assert authored["site"]["ascent_read"] == "old"
+
+
+# -- distinction_basis persistence -------------------------------------------
+
+def test_apply_refresh_characters_persists_basis():
+    authored = {"characters": [{"id": "a", "epithet": "x", "reliquary_header": "h",
+                "constellation_epithet": "c", "distinction_title": "old",
+                "distinction_subtitle": "s", "distinction_detail": "d"}]}
+    output = {"decision": "rewrite", "fields": {"a": {
+        "epithet": "x2", "constellation_epithet": "c2",
+        "distinction_title": "Luckiest Hand", "distinction_subtitle": "s2",
+        "distinction_detail": "<b>4.1</b> average",
+        "distinction_basis": {"kind": "mechanical", "atom": "is_party_luckiest", "value": True}}}}
+    apply.apply_refresh_characters(authored, "all", {}, output)
+    c = authored["characters"][0]
+    assert c["distinction_title"] == "Luckiest Hand"
+    assert c["distinction_basis"] == {"kind": "mechanical", "atom": "is_party_luckiest", "value": True}
+
+def test_apply_append_characters_persists_basis():
+    authored = {"characters": []}
+    output = {"fields": {"a": {
+        "epithet": "e", "reliquary_header": "r", "constellation_epithet": "c",
+        "distinction_title": "t", "distinction_subtitle": "s", "distinction_detail": "d",
+        "distinction_basis": {"kind": "narrative", "sessions": [3], "note": "n"}}}}
+    apply.apply_append_characters(authored, "all", {}, output)
+    assert authored["characters"][0]["distinction_basis"]["kind"] == "narrative"

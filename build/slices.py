@@ -16,6 +16,38 @@ from collections import defaultdict
 from . import render
 
 
+def _character_context(data: dict, authored: dict) -> tuple[dict, dict, list]:
+    """Returns (fact_pack, had_new_activity, session_text) for the character
+    authoring slices. had_new_activity[pc] is True if the PC made a kill or
+    cast a die in a session newer than the refresh marker. session_text is the
+    new sessions' narrative (for the narrative-tiebreak path)."""
+    trials = render.compute_trials(data["party"])
+    fortune = {
+        m["id"]: render.compute_fortune(data["rolls_by_slug"].get(m["id"], []))
+        for m in data["party"]["members"]
+    }
+    constellation = render.compute_constellation(data["party"], fortune, trials)
+    fact_pack = render.compute_fact_pack(
+        data["party"], trials, fortune, constellation, data["session_log"])
+
+    marker = authored["site"].get("refreshed_through_session", 0)
+    entries = data["session_log"]["entries"]
+    new_dates = {e["date"] for i, e in enumerate(entries, start=1) if i > marker}
+    session_text = [
+        {"session": e.get("session"), "date": e.get("date"), "text": e.get("text", "")}
+        for i, e in enumerate(entries, start=1) if i > marker
+    ]
+
+    had_new_activity = {}
+    for m in data["party"]["members"]:
+        cid = m["id"]
+        killed = any(k["date"] in new_dates for k in m.get("kills", []))
+        rolled = any(ev.get("date") in new_dates
+                     for ev in data["rolls_by_slug"].get(cid, []))
+        had_new_activity[cid] = bool(killed or rolled)
+    return fact_pack, had_new_activity, session_text
+
+
 def iu_date(entry: dict) -> str:
     parts = [str(entry.get(k, "")).strip() for k in ("iu_day", "iu_month", "iu_year")]
     parts = [p for p in parts if p]
@@ -198,15 +230,12 @@ def append_characters(data: dict, authored: dict) -> list[tuple]:
     if not new_pcs:
         return []
 
-    trials = render.compute_trials(data["party"])
-    fortune = {
-        m["id"]: render.compute_fortune(data["rolls_by_slug"].get(m["id"], []))
-        for m in data["party"]["members"]
-    }
+    fact_pack, had_new_activity, session_text = _character_context(data, authored)
     return [("all", {
         "new_pcs": new_pcs,
-        "trials_per_char": trials.get("per_char", {}),
-        "fortune_by_char": fortune,
+        "fact_pack": fact_pack,
+        "had_new_activity": had_new_activity,
+        "session_text": session_text,
         "existing_distinction_titles": [c["distinction_title"] for c in authored["characters"]],
     })]
 
@@ -286,16 +315,13 @@ def refresh_characters(data: dict, authored: dict) -> list[tuple]:
         })
     if not pcs:
         return []
-    trials = render.compute_trials(data["party"])
-    fortune = {
-        m["id"]: render.compute_fortune(data["rolls_by_slug"].get(m["id"], []))
-        for m in data["party"]["members"]
-    }
+    fact_pack, had_new_activity, session_text = _character_context(data, authored)
     existing = {c["id"]: c for c in authored["characters"]}
     return [("all", {
         "pcs": pcs,
-        "trials_per_char": trials.get("per_char", {}),
-        "fortune_by_char": fortune,
+        "fact_pack": fact_pack,
+        "had_new_activity": had_new_activity,
+        "session_text": session_text,
         "existing": existing,
     })]
 

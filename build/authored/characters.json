@@ -2,66 +2,91 @@
   {
     "id": "vex",
     "epithet": "of the Gold Dragonborn, born to breath and blade",
-    "reliquary_header": "Fallen by his steel",
-    "constellation_epithet": "blade and breath both",
-    "distinction_title": "Many-Handed",
-    "distinction_subtitle": "who fells by every means he carries",
-    "distinction_detail": "<b>4</b> means &middot; scimitar, shortsword, longbow, breath",
+    "reliquary_header": "Given to edge and ember",
+    "constellation_epithet": "the seasoned blade, in every fight",
+    "distinction_title": "The Level Hand",
+    "distinction_subtitle": "whose rolls wander least of all the company",
+    "distinction_detail": "<b>5.4</b> standard deviation &middot; the steadiest die at the table",
     "archetype_badge": {
       "archetype": "cellarer",
       "inscription": "Ten days of rations and a full waterskin — the noble dragonborn ensures no one marches hungry, even when the road offers nothing."
+    },
+    "distinction_basis": {
+      "kind": "mechanical",
+      "atom": "is_party_steadiest",
+      "value": true
     }
   },
   {
     "id": "urida",
     "epithet": "of the Rock Gnomes, reader of the threefold weave",
-    "reliquary_header": "Fallen by her bell",
-    "constellation_epithet": "the heaviest lift",
-    "distinction_title": "Most Souls Gathered",
-    "distinction_subtitle": "the heaviest lift the company has known",
-    "distinction_detail": "<b>950</b> XP &middot; 29% of the company",
+    "reliquary_header": "Gathered to the bell's toll",
+    "constellation_epithet": "the heaviest toll, and every bit earned",
+    "distinction_title": "The Reaping Hour",
+    "distinction_subtitle": "who once took six souls inside a single night",
+    "distinction_detail": "<b>6</b> kills in one session &middot; no greater single-day harvest told",
     "archetype_badge": {
       "archetype": "featherfoot",
       "inscription": "Travels lighter than any gnome has a right to — staff, two daggers, and a rain catcher folded tight, the whole kit barely whispering when she moves."
+    },
+    "distinction_basis": {
+      "kind": "mechanical",
+      "atom": "max_kills_in_one_session",
+      "value": 6
     }
   },
   {
     "id": "chumble",
     "epithet": "of the Dhakaani, bound by pact to a shadow unseen",
-    "reliquary_header": "Fallen by his pact-light",
-    "constellation_epithet": "the pact-light's tally",
-    "distinction_title": "Pact-Light Lord",
-    "distinction_subtitle": "who fells by the blast and little else",
-    "distinction_detail": "<b>5</b> kills &middot; Eldritch Blast",
+    "reliquary_header": "Claimed by the shadow unseen",
+    "constellation_epithet": "much weight from a quiet hand",
+    "distinction_title": "Slayer of the Greatest Foe",
+    "distinction_subtitle": "who alone has felled the heaviest thing the company has met",
+    "distinction_detail": "<b>450</b> XP &middot; the single largest kill any hand has claimed",
     "archetype_badge": {
       "archetype": "lamplighter",
       "inscription": "Fifteen flasks of oil and a lamp that hasn't gone dark yet — a goblin who walked out of Dhakaan carrying enough light to argue with the night."
+    },
+    "distinction_basis": {
+      "kind": "mechanical",
+      "atom": "is_party_biggest_kill",
+      "value": true
     }
   },
   {
     "id": "grieg",
     "epithet": "of the Wulven, who answers the question with a crossbow and the doubt with the rail",
-    "reliquary_header": "Fed to the sea and the bolt",
-    "constellation_epithet": "ten crit successes told",
-    "distinction_title": "Most Favored by the Twenty",
+    "reliquary_header": "Sent over the rail to the sea",
+    "constellation_epithet": "never far from the fray",
+    "distinction_title": "Favored of the Twenty",
     "distinction_subtitle": "No other hand turns up the twenty so often.",
-    "distinction_detail": "<b>10</b> crit successes &middot; <b>3</b> crit fails across 98 kept d20s",
+    "distinction_detail": "<b>10</b> crit successes &middot; no hand in the company turns the twenty so often",
     "archetype_badge": {
       "archetype": "pack-mule",
       "inscription": "The hunting trap alone tips twenty-five pounds; above it ride scale mail and a heavy crossbow, and the wulven still finds room for caltrops, rope, and a block-and-tackle besides."
+    },
+    "distinction_basis": {
+      "kind": "mechanical",
+      "atom": "is_party_most_crits",
+      "value": true
     }
   },
   {
     "id": "lilac",
     "epithet": "of the Tabaxi, who lets the bowstring do all her speaking",
-    "reliquary_header": "Taken at the longbow's reach",
-    "constellation_epithet": "every kill the same string",
-    "distinction_title": "One String, One Answer",
-    "distinction_subtitle": "Every felling she owns came off the same drawn bow.",
-    "distinction_detail": "<b>5</b> kills &middot; all by Longbow",
+    "reliquary_header": "Felled before they drew near",
+    "constellation_epithet": "newest of the pack, already counting kills",
+    "distinction_title": "The Burning Night",
+    "distinction_subtitle": "who turned three crit successes inside one session's span",
+    "distinction_detail": "<b>3</b> crit successes in a single session &middot; her brightest night by far",
     "archetype_badge": {
       "archetype": "naturalist",
       "inscription": "One carved sprig of mistletoe, ribbon-tied and kept close — the whole of the primal green, if you know how to ask, flows through that small stem."
+    },
+    "distinction_basis": {
+      "kind": "mechanical",
+      "atom": "max_crits_in_one_session",
+      "value": 3
     }
   }
 ]

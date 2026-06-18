@@ -86,6 +86,7 @@ def apply_append_characters(authored: dict, key, slice_data: dict, output: dict)
             "distinction_title": bundle["distinction_title"],
             "distinction_subtitle": bundle["distinction_subtitle"],
             "distinction_detail": bundle["distinction_detail"],
+            "distinction_basis": bundle["distinction_basis"],
         })
 
 
@@ -131,6 +132,7 @@ def apply_refresh_characters(authored: dict, key, slice_data: dict, output: dict
         c["distinction_title"] = bundle["distinction_title"]
         c["distinction_subtitle"] = bundle["distinction_subtitle"]
         c["distinction_detail"] = bundle["distinction_detail"]
+        c["distinction_basis"] = bundle["distinction_basis"]
 
 
 def apply_refresh_road_ahead(authored: dict, key, slice_data: dict, output: dict) -> dict:
