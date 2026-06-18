@@ -637,3 +637,19 @@ def test_fact_pack_rank_booleans_flag_all_tied_holders():
     assert fp["a"]["is_party_most_crits"] is True
     assert fp["b"]["is_party_most_crits"] is True
     assert fp["a"]["is_party_luckiest"] is True and fp["b"]["is_party_luckiest"] is True
+
+def test_fact_pack_exposes_raw_axis_values():
+    # The constellation epithet reasons about real positions on the two axes
+    # (rolls cast, experience earned), not the coarse hi/lo split — so the raw
+    # values must be in the pack.
+    party = {"members": [
+        {"id": "a", "kills": [{"date": "2026-04-01", "creature": "Goblin", "method": "Bow"}]},
+        {"id": "b", "kills": []},
+    ]}
+    trials = compute_trials(party)
+    fortune = {"a": compute_fortune(_d20_events([10, 12, 14])), "b": compute_fortune(_d20_events([8]))}
+    constellation = compute_constellation(party, fortune, trials)
+    fp = compute_fact_pack(party, trials, fortune, constellation, _session_log(["2026-04-01"]))
+    assert fp["a"]["rolls"] == 3 == fortune["a"]["rolls_total"]
+    assert fp["a"]["xp"] == trials["per_char"]["a"]["xp"]
+    assert fp["b"]["rolls"] == 1

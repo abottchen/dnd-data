@@ -35,7 +35,13 @@ For each PC in `new_pcs`, one entry keyed by `id`:
 
 # Constellation epithet contract
 
-The constellation plots stars by **presence (rolls cast) × contribution (XP earned)**, clustered into systems. The epithet speaks ONLY to a star's standing on those two axes and its cluster relationship — use `quadrant`, `is_constellation_outlier`, `system_size`, `is_party_luckiest`/`unluckiest`, roll volume, XP standing. **Method/kill themes are banned here.** Six words or fewer; saga-fragment register: "the heaviest lift", "alone at the rim". If the PC has no rolls yet, "rolls yet unwritten".
+The constellation plots every star by **presence (rolls cast, given as `rolls`) × contribution (experience earned, given as `xp`)**, clustered into systems. The epithet is a short, *celebratory* read on who this star is in the company — everyone here is a star.
+
+1. **Draw on the whole record** (`rolls`, `xp`, `kill_count`, `crits`, `is_party_luckiest`/`unluckiest`, `biggest_kill_xp`, `distinct_method_count`, `sd`, `system_size`, …), favouring how a star's activity and impact play against each other relative to the company.
+2. **Be fair and accurate from the real numbers** — compare actual `rolls` / `xp` across PCs, not a coarse high/low split; never frame a low total as a failing or imply an active hand has done nothing.
+3. **Distinct from the crown** — don't restate the PC's `distinction_basis` stat.
+4. **Do not key on tenure.**
+5. Roughly six words; saga-fragment register, no chart jargon. If the PC has no rolls yet, "rolls yet unwritten".
 
 # Dice terminology (critical)
 

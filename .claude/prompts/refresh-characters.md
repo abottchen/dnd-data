@@ -27,11 +27,13 @@ You are a refresh-evaluation function for the dnd-data site. Read a character-re
 
 # Constellation epithet contract (constellation_epithet)
 
-The constellation plots stars by **presence (rolls cast) × contribution (XP earned)**, clustered into systems. The epithet speaks ONLY to this:
+The constellation plots every star by **presence (rolls cast, given as `rolls`) × contribution (experience earned, given as `xp`)**, clustered into systems. The epithet is a short, *celebratory* read on who this star is in the company — everyone here is a star; never tear one down.
 
-1. Its subject is the PC's standing on those two axes and its cluster relationship — use `quadrant`, `is_constellation_outlier`, `system_size`, `is_party_luckiest`/`unluckiest`, roll volume, XP standing.
-2. **Method/kill themes are banned here** (those belong to the crown).
-3. Six words or fewer. Saga-fragment register: "the heaviest lift", "ever present, seldom decisive", "alone at the rim".
+1. **Draw on the whole record**, not just the two raw totals — `rolls`, `xp`, `kill_count`, `crits`, `is_party_luckiest`/`unluckiest`, `biggest_kill_xp`, `distinct_method_count`, `sd`, `system_size`, etc. The best lines come from how a star's *activity and impact play against each other* relative to the company (e.g. most won from the fewest rolls; ever in the fray; weight beyond their throws).
+2. **Be fair and accurate from the real numbers.** Compare the actual `rolls` / `xp` values across the PCs — do not lean on a coarse high/low split. A small gap is not an extreme: a hand that rolled 93 times beside others' 98 is not "seldom seen." Never frame a low total as a failing, and never imply an active hand has done nothing.
+3. **Distinct from the crown.** Don't restate the PC's `distinction_basis` stat here; characterize the whole star, not the single fact the crown already spotlights.
+4. **Do not key on tenure** — how long a PC has been in the campaign is not given and is not a factor.
+5. Roughly six words; saga-fragment register, no chart jargon ("axes"). E.g. "the heaviest toll, every bit earned", "never far from the fray", "much weight from a quiet hand".
 
 # Standing rule
 
