@@ -1,0 +1,20 @@
+{
+  "type": "object",
+  "required": ["fields", "reason"],
+  "additionalProperties": false,
+  "properties": {
+    "fields": {
+      "type": "object",
+      "required": ["sworn_creed"],
+      "additionalProperties": false,
+      "properties": {
+        "sworn_creed": {
+          "type": "string",
+          "minLength": 16,
+          "maxLength": 150
+        }
+      }
+    },
+    "reason": {"type": "string"}
+  }
+}

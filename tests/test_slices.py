@@ -100,6 +100,44 @@ def test_append_characters_emits_one_bundled_slice(slice_env):
     assert "Sharpest Tongue" in body["existing_distinction_titles"]
 
 
+# -- Sworn-path (append) coverage --------------------------------------------
+
+def _set_subclass(slice_env, cid, subclass):
+    for m in slice_env["data"]["party"]["members"]:
+        if m["id"] == cid:
+            m["subclass"] = subclass
+
+
+def test_append_sworn_emits_slice_for_subclassed_authored_pc(slice_env):
+    """anton is authored (epithet etc.) but has no sworn_creed; giving him a
+    subclass emits exactly one slice, keyed by his id, carrying the subclass
+    name and the voice context the creed is authored from."""
+    _set_subclass(slice_env, "anton", "College of Lore")
+    out = slices.append_sworn(slice_env["data"], slice_env["authored"])
+    by_key = dict(out)
+    assert set(by_key) == {"anton"}
+    body = by_key["anton"]
+    assert body["subclass"] == "College of Lore"
+    assert body["character"]["id"] == "anton"
+    assert body["character"]["epithet"]  # voice context carried
+
+
+def test_append_sworn_skips_when_creed_already_present(slice_env):
+    _set_subclass(slice_env, "anton", "College of Lore")
+    for c in slice_env["authored"]["characters"]:
+        if c["id"] == "anton":
+            c["sworn_creed"] = "already sung"
+    out = slices.append_sworn(slice_env["data"], slice_env["authored"])
+    assert out == []
+
+
+def test_append_sworn_skips_pc_without_subclass(slice_env):
+    # anton carries no subclass in the fixture; vex isn't authored yet, so it
+    # has no entry to attach a creed to. Either way: nothing to emit.
+    out = slices.append_sworn(slice_env["data"], slice_env["authored"])
+    assert out == []
+
+
 # -- Refresh-pass coverage ---------------------------------------------------
 
 def test_refresh_chapters_returns_slice_per_authored_chapter(slice_env):

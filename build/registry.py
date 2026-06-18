@@ -36,6 +36,8 @@ ALL: tuple[Transformer, ...] = (
                 slices.append_npcs, apply.apply_append_npcs),
     Transformer("append-characters", "append",
                 slices.append_characters, apply.apply_append_characters),
+    Transformer("append-sworn", "append",
+                slices.append_sworn, apply.apply_append_sworn),
 
     Transformer("refresh-chapters", "refresh",
                 slices.refresh_chapters, apply.apply_refresh_chapters),

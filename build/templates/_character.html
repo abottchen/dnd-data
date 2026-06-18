@@ -1,3 +1,4 @@
+{% from "_macros.html" import sworn_sigil -%}
     <article class="character" id="{{ member.id }}">
       <header class="character-header">
         <img class="portrait" src="images/{{ member.image }}" alt="">
@@ -9,6 +10,18 @@
           {%- if lvl < 1 %}{% set lvl = 1 %}{% endif %}
           {%- if lvl > 5 %}{% set lvl = 5 %}{% endif %}
           <div class="meta">{{ member.class }} &middot; {{ tier_labels[lvl - 1] }} Tier &middot; {{ member.background }}</div>
+          {%- if member.subclass %}
+          {%- set sigil = sworn_sigil(member.subclass) %}
+          <div class="sworn">
+            <div class="sworn-eyebrow">&#9670;&ensp;Sworn Path</div>
+            <div class="sworn-body">
+              {%- if sigil %}<span class="sworn-sigil">{{ sigil }}</span>{% endif %}
+              <span class="sworn-name">{{ member.subclass }}</span>
+              <span class="sworn-rule"></span>
+              <span class="sworn-creed">{{ characters_authored[member.id].sworn_creed | safe }}</span>
+            </div>
+          </div>
+          {%- endif %}
           {%- set inscription = archetype_inscriptions.get(member.id) %}
           {%- set pack_rec = inventory_by_id.get(member.id) %}
           {%- if pack_rec and pack_rec.archetype %}

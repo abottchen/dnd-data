@@ -102,6 +102,29 @@ def test_validate_characters_missing_constellation_epithet():
     errors = validate_characters(party, authored)
     assert any(e.field == "constellation_epithet" for e in errors)
 
+_FULL_CHAR = {
+    "epithet": "e", "reliquary_header": "r", "constellation_epithet": "c",
+    "distinction_title": "t", "distinction_subtitle": "s", "distinction_detail": "d",
+}
+
+def test_validate_characters_requires_sworn_creed_when_subclassed():
+    party = {"members": [{"id": "anton", "subclass": "College of Lore"}]}
+    authored = [{"id": "anton", **_FULL_CHAR}]  # sworn_creed missing
+    errors = validate_characters(party, authored)
+    assert any(e.field == "sworn_creed" for e in errors)
+
+def test_validate_characters_no_sworn_creed_requirement_without_subclass():
+    party = {"members": [{"id": "anton"}]}  # no subclass → no sworn path
+    authored = [{"id": "anton", **_FULL_CHAR}]
+    errors = validate_characters(party, authored)
+    assert not any(e.field == "sworn_creed" for e in errors)
+
+def test_validate_characters_passes_with_sworn_creed_when_subclassed():
+    party = {"members": [{"id": "anton", "subclass": "College of Lore"}]}
+    authored = [{"id": "anton", **_FULL_CHAR, "sworn_creed": "sworn to the song"}]
+    errors = validate_characters(party, authored)
+    assert errors == []
+
 def test_validate_site_required_keys():
     site = {"intro_epithet": "x", "refreshed_through_session": 0}
     errors = validate_site(site, latest_session=5)

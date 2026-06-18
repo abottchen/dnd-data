@@ -90,6 +90,17 @@ def apply_append_characters(authored: dict, key, slice_data: dict, output: dict)
         })
 
 
+def apply_append_sworn(authored: dict, key, slice_data: dict, output: dict) -> None:
+    """Write characters[<id>].sworn_creed. `key` is the character id, used
+    verbatim so casing drift in the echoed output can't miss the entry."""
+    fields = output["fields"]
+    for c in authored["characters"]:
+        if c["id"] == key:
+            c["sworn_creed"] = fields["sworn_creed"]
+            return
+    raise ValueError(f"character {key!r} not found in authored store")
+
+
 def apply_refresh_chapters(authored: dict, key, slice_data: dict, output: dict) -> None:
     if output["decision"] == "no_change":
         return
