@@ -247,3 +247,42 @@ from build import render as _render
 def test_validate_all_accepts_fact_pack_kwarg():
     sig = inspect.signature(_render.validate_all)
     assert "fact_pack" in sig.parameters
+
+
+import json as _json
+from pathlib import Path as _Path
+import jsonschema
+
+_PROMPTS = _Path(__file__).resolve().parent.parent / ".claude/prompts"
+
+def _append_char_schema():
+    return _json.loads((_PROMPTS / "append-characters.schema.json").read_text())
+
+def test_append_char_schema_requires_basis():
+    schema = _append_char_schema()
+    good = {"reason": "r", "fields": {"a": {
+        "epithet": "e", "reliquary_header": "r", "constellation_epithet": "c",
+        "distinction_title": "t", "distinction_subtitle": "s", "distinction_detail": "d",
+        "distinction_basis": {"kind": "mechanical", "atom": "kill_count", "value": 0}}}}
+    jsonschema.validate(good, schema)
+    bad = dict(good)
+    bad["fields"] = {"a": {k: v for k, v in good["fields"]["a"].items() if k != "distinction_basis"}}
+    with pytest.raises(jsonschema.ValidationError):
+        jsonschema.validate(bad, schema)
+
+def _refresh_char_schema():
+    return _json.loads((_PROMPTS / "refresh-characters.schema.json").read_text())
+
+def test_refresh_char_schema_requires_basis_on_rewrite():
+    schema = _refresh_char_schema()
+    good = {"decision": "rewrite", "reason": "r", "fields": {"a": {
+        "epithet": "e", "constellation_epithet": "c", "distinction_title": "t",
+        "distinction_subtitle": "s", "distinction_detail": "d",
+        "distinction_basis": {"kind": "mechanical", "atom": "is_party_luckiest", "value": True}}}}
+    jsonschema.validate(good, schema)  # must not raise
+
+    bad = {"decision": "rewrite", "reason": "r", "fields": {"a": {
+        "epithet": "e", "constellation_epithet": "c", "distinction_title": "t",
+        "distinction_subtitle": "s", "distinction_detail": "d"}}}  # no basis
+    with pytest.raises(jsonschema.ValidationError):
+        jsonschema.validate(bad, schema)
