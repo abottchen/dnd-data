@@ -1313,23 +1313,59 @@ def compute_distinctions(party: dict, characters_authored: list) -> list[dict]:
     return rows
 
 def validate_distinction_uniqueness(authored: list) -> list[ValidationError]:
-    """Distinction titles must be unique across the party."""
+    """Distinction titles AND the underlying mechanical basis atom must be
+    unique across the party — no two PCs crowned on the same fact."""
     errors: list[ValidationError] = []
-    seen: dict[str, str] = {}
+    seen_title: dict[str, str] = {}
+    seen_atom: dict[str, str] = {}
     for a in authored:
         t = a.get("distinction_title", "").strip().lower()
-        if not t:
-            continue
-        if t in seen:
-            errors.append(ValidationError(
-                KIND_MALFORMED, "characters", (a["id"],),
-                field=f"distinction_title duplicates '{seen[t]}'"
-            ))
-        else:
-            seen[t] = a["id"]
+        if t:
+            if t in seen_title:
+                errors.append(ValidationError(
+                    KIND_MALFORMED, "characters", (a["id"],),
+                    field=f"distinction_title duplicates '{seen_title[t]}'"))
+            else:
+                seen_title[t] = a["id"]
+        basis = a.get("distinction_basis") or {}
+        if basis.get("kind") == "mechanical":
+            atom = basis.get("atom")
+            if atom:
+                if atom in seen_atom:
+                    errors.append(ValidationError(
+                        KIND_MALFORMED, "characters", (a["id"],),
+                        field=f"distinction_basis atom '{atom}' duplicates '{seen_atom[atom]}'"))
+                else:
+                    seen_atom[atom] = a["id"]
     return errors
 
-def validate_all(data: dict, authored: dict, images_dir: Path) -> list[ValidationError]:
+
+def validate_distinction_basis(authored: list, fact_pack: dict) -> list[ValidationError]:
+    """A mechanical distinction_basis must match the recomputed fact pack.
+    Narrative bases record provenance only and are not fact-checked. A missing
+    basis is tolerated (pre-migration entries)."""
+    errors: list[ValidationError] = []
+    for a in authored:
+        basis = a.get("distinction_basis")
+        if not basis:
+            continue
+        if basis.get("kind") != "mechanical":
+            continue
+        atom = basis.get("atom")
+        atoms = fact_pack.get(a["id"], {})
+        if atom not in atoms:
+            errors.append(ValidationError(
+                KIND_MALFORMED, "characters", (a["id"],),
+                field=f"distinction_basis unknown atom '{atom}'"))
+            continue
+        if atoms[atom] != basis.get("value"):
+            errors.append(ValidationError(
+                KIND_MALFORMED, "characters", (a["id"],),
+                field=(f"distinction_basis '{atom}' claims {basis.get('value')!r} "
+                       f"but fact pack has {atoms[atom]!r}")))
+    return errors
+
+def validate_all(data: dict, authored: dict, images_dir: Path, fact_pack: dict | None = None) -> list[ValidationError]:
     errors: list[ValidationError] = []
     errors.extend(validate_kills(data["party"], authored["kills"]))
     errors.extend(validate_sessions(data["session_log"], authored["sessions"]))
@@ -1338,6 +1374,15 @@ def validate_all(data: dict, authored: dict, images_dir: Path) -> list[Validatio
     errors.extend(validate_npcs(npcs, authored["npcs"]))
     errors.extend(validate_characters(data["party"], authored["characters"]))
     errors.extend(validate_distinction_uniqueness(authored["characters"]))
+    if fact_pack is None:
+        trials = compute_trials(data["party"])
+        member_ids = [m["id"] for m in data["party"].get("members", [])]
+        fortune_by_char = {cid: compute_fortune(data["rolls_by_slug"].get(cid, []))
+                           for cid in member_ids}
+        constellation = compute_constellation(data["party"], fortune_by_char, trials)
+        fact_pack = compute_fact_pack(data["party"], trials, fortune_by_char,
+                                      constellation, data["session_log"])
+    errors.extend(validate_distinction_basis(authored["characters"], fact_pack))
     errors.extend(validate_site(authored["site"], len(data["session_log"].get("entries", []))))
     errors.extend(validate_portraits(data["party"], images_dir))
     errors.extend(validate_dice_player_mapping(data.get("unmapped_players", [])))

@@ -3,6 +3,7 @@ from build.render import (
     ValidationError, KIND_MISSING, KIND_MALFORMED, KIND_ORPHAN, validate_kills,
     validate_sessions, validate_chapters, validate_npcs, validate_characters, validate_site,
     validate_portraits, validate_dice_player_mapping,
+    validate_distinction_basis, validate_distinction_uniqueness,
 )
 
 def test_validation_error_format_missing():
@@ -188,3 +189,61 @@ def test_validate_dice_player_mapping_reports_unmapped():
 
 def test_validate_dice_player_mapping_passes_when_empty():
     assert validate_dice_player_mapping([]) == []
+
+
+def _fp(**atoms):
+    """A one-PC fact pack for id 'a' plus a second PC 'b'."""
+    base = {"a": {"is_party_luckiest": True, "kill_count": 5, "all_distinct_creatures": True},
+            "b": {"is_party_luckiest": True, "kill_count": 2, "all_distinct_creatures": False}}
+    base["a"].update(atoms)
+    return base
+
+def test_basis_mechanical_match_is_clean():
+    authored = [{"id": "a", "distinction_basis": {"kind": "mechanical",
+                 "atom": "is_party_luckiest", "value": True}}]
+    errs = validate_distinction_basis(authored, _fp())
+    assert errs == []
+
+def test_basis_mechanical_mismatch_is_malformed():
+    authored = [{"id": "a", "distinction_basis": {"kind": "mechanical",
+                 "atom": "kill_count", "value": 99}}]
+    errs = validate_distinction_basis(authored, _fp())
+    assert len(errs) == 1
+    assert errs[0].kind == "MALFORMED"
+
+def test_basis_unknown_atom_is_malformed():
+    authored = [{"id": "a", "distinction_basis": {"kind": "mechanical",
+                 "atom": "no_such_atom", "value": 1}}]
+    errs = validate_distinction_basis(authored, _fp())
+    assert len(errs) == 1
+    assert errs[0].kind == "MALFORMED"
+
+def test_basis_narrative_skips_factpack_check():
+    authored = [{"id": "a", "distinction_basis": {"kind": "narrative",
+                 "sessions": [12], "note": "bargained with a devil"}}]
+    errs = validate_distinction_basis(authored, _fp())
+    assert errs == []
+
+def test_basis_absent_is_tolerated():
+    """Pre-migration characters without a basis must not fail the render."""
+    authored = [{"id": "a", "distinction_title": "Foo"}]
+    errs = validate_distinction_basis(authored, _fp())
+    assert errs == []
+
+def test_uniqueness_flags_shared_basis_atom():
+    authored = [
+        {"id": "a", "distinction_title": "Luck of A",
+         "distinction_basis": {"kind": "mechanical", "atom": "is_party_luckiest", "value": True}},
+        {"id": "b", "distinction_title": "Luck of B",
+         "distinction_basis": {"kind": "mechanical", "atom": "is_party_luckiest", "value": True}},
+    ]
+    errs = validate_distinction_uniqueness(authored)
+    assert any("is_party_luckiest" in (e.field or "") for e in errs)
+
+
+import inspect
+from build import render as _render
+
+def test_validate_all_accepts_fact_pack_kwarg():
+    sig = inspect.signature(_render.validate_all)
+    assert "fact_pack" in sig.parameters

@@ -115,8 +115,7 @@ def test_refresh_characters_emits_one_bundle_slice(slice_env):
     key, body = out[0]
     assert key == "all"
     assert any(c["id"] == "anton" for c in body["pcs"])
-    assert "trials_per_char" in body
-    assert "fortune_by_char" in body
+    assert "fact_pack" in body
     assert "existing" in body
 
 
@@ -232,6 +231,32 @@ def test_append_builders_tolerate_empty_authored(slice_env, builder_name, tmp_pa
     builder = getattr(slices, builder_name)
     out = builder(slice_env["data"], authored)
     assert isinstance(out, list)
+
+
+def test_refresh_characters_slice_carries_fact_pack_and_activity(slice_env):
+    out = slices.refresh_characters(slice_env["data"], slice_env["authored"])
+    assert len(out) == 1
+    key, payload = out[0]
+    assert key == "all"
+    assert "fact_pack" in payload
+    assert "had_new_activity" in payload
+    assert "session_text" in payload
+    # Every authored PC appears in the fact pack and the activity map.
+    pc_ids = {p["id"] for p in payload["pcs"]}
+    assert pc_ids and set(payload["fact_pack"]) >= pc_ids
+    assert set(payload["had_new_activity"]) >= pc_ids
+    # had_new_activity values are booleans.
+    assert all(isinstance(v, bool) for v in payload["had_new_activity"].values())
+
+def test_append_characters_slice_carries_fact_pack(slice_env):
+    # Drop one authored character so append re-emits it.
+    authored = slice_env["authored"]
+    dropped = authored["characters"].pop()
+    out = slices.append_characters(slice_env["data"], authored)
+    assert len(out) == 1
+    _, payload = out[0]
+    assert "fact_pack" in payload
+    assert dropped["id"] in payload["fact_pack"]
 
 
 def test_refresh_ascent_read_gates_on_marker(slice_env, tmp_path, monkeypatch):
