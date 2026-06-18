@@ -15,7 +15,8 @@
       "kind": "mechanical",
       "atom": "is_party_steadiest",
       "value": true
-    }
+    },
+    "sworn_creed": "sworn to the banner — her voice the line that holds when blades alone cannot"
   },
   {
     "id": "urida",
@@ -33,7 +34,8 @@
       "kind": "mechanical",
       "atom": "max_kills_in_one_session",
       "value": 6
-    }
+    },
+    "sworn_creed": "force shaped at the source — the blast bends, and those beside her stand unburned"
   },
   {
     "id": "chumble",
@@ -51,7 +53,8 @@
       "kind": "mechanical",
       "atom": "is_party_biggest_kill",
       "value": true
-    }
+    },
+    "sworn_creed": "bound in fire to a name struck in the dark — and the bargain still runs"
   },
   {
     "id": "grieg",
@@ -69,7 +72,8 @@
       "kind": "mechanical",
       "atom": "is_party_most_crits",
       "value": true
-    }
+    },
+    "sworn_creed": "the other self walks the dark road — he sends the echo where the bolt cannot follow"
   },
   {
     "id": "lilac",
@@ -87,6 +91,7 @@
       "kind": "mechanical",
       "atom": "max_crits_in_one_session",
       "value": 3
-    }
+    },
+    "sworn_creed": "the courts left their mark on her — glamour and dread in equal measure"
   }
 ]

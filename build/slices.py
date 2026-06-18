@@ -212,6 +212,45 @@ def append_npcs(data: dict, authored: dict) -> list[tuple]:
     return out
 
 
+def append_sworn(data: dict, authored: dict) -> list[tuple]:
+    """One slice per already-authored PC who carries a subclass but has no
+    `sworn_creed` yet — keyed by character id.
+
+    The creed is a one-line in-voice gloss on the character's subclass (their
+    "sworn path"). The subclass is static character-sheet data, so this is an
+    append (author once when missing), not a refresh: a PC who already has a
+    creed is skipped, and a brand-new PC is picked up only after
+    append-characters has seeded its entry. Each slice carries the subclass
+    name plus the same voice context the epithet/distinction prose draws on.
+    """
+    pronouns_by_id = authored.get("pronouns_by_id", {})
+    member_by_id = {m["id"]: m for m in data["party"]["members"]}
+    out = []
+    for c in authored["characters"]:
+        cid = c["id"]
+        member = member_by_id.get(cid)
+        if member is None:
+            continue
+        subclass = (member.get("subclass") or "").strip()
+        if not subclass:
+            continue
+        if (c.get("sworn_creed") or "").strip():
+            continue
+        out.append((cid, {
+            "subclass": subclass,
+            "character": {
+                "id": cid,
+                "name": member.get("name"),
+                "race": member.get("race"),
+                "class": member.get("class"),
+                "background": member.get("background"),
+                "epithet": c.get("epithet", ""),
+                "pronouns": pronouns_by_id.get(cid, ""),
+            },
+        }))
+    return out
+
+
 def append_characters(data: dict, authored: dict) -> list[tuple]:
     auth_ids = {c["id"] for c in authored["characters"]}
     pronouns_by_id = authored.get("pronouns_by_id", {})

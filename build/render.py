@@ -167,13 +167,20 @@ def validate_npcs(npcs_in_log: list, authored: list) -> list[ValidationError]:
 def validate_characters(party: dict, authored: list) -> list[ValidationError]:
     errors: list[ValidationError] = []
     expected = {m["id"] for m in party.get("members", [])}
+    subclass_by_id = {m["id"]: (m.get("subclass") or "").strip()
+                      for m in party.get("members", [])}
     by_id = {a["id"]: a for a in authored}
     for cid in expected:
         a = by_id.get(cid)
         if a is None:
             errors.append(ValidationError(KIND_MISSING, "characters", (cid,)))
             continue
-        for f in REQUIRED_CHAR_FIELDS:
+        required = REQUIRED_CHAR_FIELDS
+        # The sworn-path creed is required only where there is a sworn path to
+        # gloss — i.e. the member carries a subclass on their sheet.
+        if subclass_by_id.get(cid):
+            required = required + ("sworn_creed",)
+        for f in required:
             if _missing_or_blank(a, f):
                 errors.append(ValidationError(KIND_MALFORMED, "characters", (cid,), field=f))
     for cid in by_id:
