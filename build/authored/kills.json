@@ -302,5 +302,93 @@
     "method": "Longbow",
     "verse": "A yellow musk zombie put down in the cave's dark",
     "annotation": "Longbow &middot; one arrow found it before it could close"
+  },
+  {
+    "character": "grieg",
+    "date": "2026-06-21",
+    "creature": "Swarm of Infesting Insects",
+    "method": "Warhammer",
+    "verse": "A swarm scattered, the buzzing gone quiet in the river mud",
+    "annotation": "Warhammer &middot; iron through living cloud, the last one crushed flat"
+  },
+  {
+    "character": "grieg",
+    "date": "2026-06-21",
+    "creature": "Tribal Warrior",
+    "method": "Warhammer",
+    "verse": "A cannibal brought down before the bones were cold",
+    "annotation": "Warhammer &middot; one blow among the blue-marked dead"
+  },
+  {
+    "character": "vex",
+    "date": "2026-06-21",
+    "creature": "Crocodile",
+    "method": "Shortsword",
+    "verse": "A crocodile that found the river no refuge",
+    "annotation": "Shortsword &middot; steel where the scales gave way"
+  },
+  {
+    "character": "vex",
+    "date": "2026-06-21",
+    "creature": "Tribal Warrior",
+    "method": "Breath Weapon (Fire)",
+    "verse": "Another gone to the same fire, no pause between them",
+    "annotation": "Breath Weapon (Fire) &middot; two marks, one breath, no reprieve"
+  },
+  {
+    "character": "urida",
+    "date": "2026-06-21",
+    "creature": "Crocodile",
+    "method": "Shatter",
+    "verse": "A second crocodile unmade the same way",
+    "annotation": "Shatter &middot; the spell did not tire between them"
+  },
+  {
+    "character": "urida",
+    "date": "2026-06-21",
+    "creature": "Tribal Warrior",
+    "method": "Magic Missile",
+    "verse": "A cannibal struck before he could close the distance",
+    "annotation": "Magic Missile &middot; three darts, no miss, no quarter"
+  },
+  {
+    "character": "urida",
+    "date": "2026-06-21",
+    "creature": "Tribal Warrior",
+    "method": "Shatter",
+    "verse": "One more cannibal silenced in the tangle of the jungle floor",
+    "annotation": "Shatter &middot; the last of several, the spell still patient"
+  },
+  {
+    "character": "chumble",
+    "date": "2026-06-21",
+    "creature": "Crocodile",
+    "method": "Burning Hands",
+    "verse": "A crocodile met flame where it expected water",
+    "annotation": "Burning Hands &middot; the river did not save it"
+  },
+  {
+    "character": "chumble",
+    "date": "2026-06-21",
+    "creature": "Tribal Warrior",
+    "method": "Eldritch Blast",
+    "verse": "A blue-marked cannibal taken apart at the seam",
+    "annotation": "Eldritch Blast &middot; force through flesh, cleanly ended"
+  },
+  {
+    "character": "lilac",
+    "date": "2026-06-21",
+    "creature": "Crocodile",
+    "method": "Longbow",
+    "verse": "A crocodile felled from the shore where it could not reach",
+    "annotation": "Longbow &middot; one arrow from dry ground, that was enough"
+  },
+  {
+    "character": "lilac",
+    "date": "2026-06-21",
+    "creature": "Tribal Warrior",
+    "method": "Longbow",
+    "verse": "A cannibal gone still at the edge of the Soshenstar",
+    "annotation": "Longbow &middot; the arrow crossed the water it would not"
   }
 ]

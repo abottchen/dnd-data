@@ -4,17 +4,17 @@
     "epithet": "of the Gold Dragonborn, born to breath and blade",
     "reliquary_header": "Given to edge and ember",
     "constellation_epithet": "the seasoned blade, in every fight",
-    "distinction_title": "The Level Hand",
-    "distinction_subtitle": "whose rolls wander least of all the company",
-    "distinction_detail": "<b>5.4</b> standard deviation &middot; the steadiest die at the table",
+    "distinction_title": "The Brightest Salvo",
+    "distinction_subtitle": "whose single night turned five crit successes",
+    "distinction_detail": "<b>5</b> crit successes in one session &middot; the brightest single night the table has seen",
     "archetype_badge": {
       "archetype": "cellarer",
       "inscription": "Ten days of rations and a full waterskin — the noble dragonborn ensures no one marches hungry, even when the road offers nothing."
     },
     "distinction_basis": {
       "kind": "mechanical",
-      "atom": "is_party_steadiest",
-      "value": true
+      "atom": "max_crits_in_one_session",
+      "value": 5
     },
     "sworn_creed": "sworn to the banner — her voice the line that holds when blades alone cannot"
   },
@@ -43,11 +43,11 @@
     "reliquary_header": "Claimed by the shadow unseen",
     "constellation_epithet": "much weight from a quiet hand",
     "distinction_title": "Slayer of the Greatest Foe",
-    "distinction_subtitle": "who alone has felled the heaviest thing the company has met",
-    "distinction_detail": "<b>450</b> XP &middot; the single largest kill any hand has claimed",
+    "distinction_subtitle": "whose Scorching Ray felled the heaviest thing the company has met",
+    "distinction_detail": "<b>450</b> XP &middot; among the heaviest single kills any hand has claimed",
     "archetype_badge": {
-      "archetype": "lamplighter",
-      "inscription": "Fifteen flasks of oil and a lamp that hasn't gone dark yet — a goblin who walked out of Dhakaan carrying enough light to argue with the night."
+      "archetype": "scholar",
+      "inscription": "Two books, ten sheets of parchment, and an ink bottle that hasn't run dry — a goblin who carries the weight of Dhakaan in his satchel one page at a time."
     },
     "distinction_basis": {
       "kind": "mechanical",
@@ -63,7 +63,7 @@
     "constellation_epithet": "never far from the fray",
     "distinction_title": "Favored of the Twenty",
     "distinction_subtitle": "No other hand turns up the twenty so often.",
-    "distinction_detail": "<b>10</b> crit successes &middot; no hand in the company turns the twenty so often",
+    "distinction_detail": "<b>11</b> crit successes &middot; no hand in the company turns the twenty so often",
     "archetype_badge": {
       "archetype": "pack-mule",
       "inscription": "The hunting trap alone tips twenty-five pounds; above it ride scale mail and a heavy crossbow, and the wulven still finds room for caltrops, rope, and a block-and-tackle besides."
@@ -79,18 +79,18 @@
     "id": "lilac",
     "epithet": "of the Tabaxi, who lets the bowstring do all her speaking",
     "reliquary_header": "Felled before they drew near",
-    "constellation_epithet": "newest of the pack, already counting kills",
-    "distinction_title": "The Burning Night",
-    "distinction_subtitle": "who turned three crit successes inside one session's span",
-    "distinction_detail": "<b>3</b> crit successes in a single session &middot; her brightest night by far",
+    "constellation_epithet": "the patient bowstring, ever drawn",
+    "distinction_title": "Fortune's Favored",
+    "distinction_subtitle": "whose kept dice land highest of all the company",
+    "distinction_detail": "<b>11.4</b> kept d20 average &middot; the most-favored hand at the table",
     "archetype_badge": {
       "archetype": "naturalist",
       "inscription": "One carved sprig of mistletoe, ribbon-tied and kept close — the whole of the primal green, if you know how to ask, flows through that small stem."
     },
     "distinction_basis": {
       "kind": "mechanical",
-      "atom": "max_crits_in_one_session",
-      "value": 3
+      "atom": "is_party_luckiest",
+      "value": true
     },
     "sworn_creed": "the courts left their mark on her — glamour and dread in equal measure"
   }
