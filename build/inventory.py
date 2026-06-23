@@ -76,7 +76,17 @@ def _parse_inventories(raw: dict, mapping: dict[str, str]) -> dict[str, dict]:
         slug = _resolve_dice_player(name, mapping)
         if slug is None:
             continue
-        out[slug] = {"items": list(inv.get("items", []))}
+        items = list(inv.get("items", []))
+        # A snapshot can carry more than one inventory that resolves to the
+        # same slug (e.g. a player's real token plus a stale, empty duplicate
+        # token in the Owlbear export). Plain last-write-wins lets the empty
+        # duplicate clobber the populated inventory, zeroing the character's
+        # items. Keep whichever inventory carries more items; ties keep the
+        # first seen.
+        existing = out.get(slug)
+        if existing is not None and len(existing["items"]) >= len(items):
+            continue
+        out[slug] = {"items": items}
     return out
 
 

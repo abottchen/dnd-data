@@ -96,6 +96,29 @@ def test_parse_inventories_scrubs_parenthetical_player_tag():
     assert "Redacted" not in str(parsed)  # parenthetical player tag scrubbed
 
 
+def test_parse_inventories_empty_duplicate_does_not_clobber_populated():
+    """An Owlbear export can carry two inventories that resolve to the same
+    slug — e.g. a player's real token plus a stale, empty duplicate token.
+    Iteration order must not let the empty duplicate overwrite the populated
+    inventory (which would zero the character's items); the inventory with
+    more items wins regardless of order."""
+    populated = {"name": "ScorpioTHK",
+                 "items": [{"id": "a", "count": 1, "name": "Spellbook"}]}
+    empty = {"name": "ScorpioTHK", "items": []}
+    mapping = {"ScorpioTHK": "urida"}
+
+    # Populated first, empty second (the order that triggers last-write-wins).
+    parsed = inventory._parse_inventories(
+        {"inventories": {"u1": populated, "u2": empty}}, mapping)
+    assert set(parsed.keys()) == {"urida"}
+    assert [it["name"] for it in parsed["urida"]["items"]] == ["Spellbook"]
+
+    # Empty first, populated second — must also keep the populated one.
+    parsed = inventory._parse_inventories(
+        {"inventories": {"u1": empty, "u2": populated}}, mapping)
+    assert [it["name"] for it in parsed["urida"]["items"]] == ["Spellbook"]
+
+
 def _item(name, category, rarity="common", weight=1, count=1):
     return {
         "id": name.lower().replace(" ", "-"),
