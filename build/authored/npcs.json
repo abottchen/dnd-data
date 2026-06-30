@@ -178,5 +178,25 @@
     "name": "Wulf Rygor",
     "epithet": "a scout at Camp Vengeance whose enchanted plant led him into a cave, where he fought to the death against the party",
     "allegiance": "against"
+  },
+  {
+    "name": "Nuanwa Olerro",
+    "epithet": "priest of Mielikki who led three Emerald Enclave scouts through the jungle heat and offered the party her camp on 22 Flamerule",
+    "allegiance": "with"
+  },
+  {
+    "name": "Bakari",
+    "epithet": "scout of the Emerald Enclave under Nuanwa Olerro, who kept watch around the camp",
+    "allegiance": "with"
+  },
+  {
+    "name": "Imka",
+    "epithet": "one of Nuanwa Olerro's three Emerald Enclave scouts, trying to learn from the priest but not quite grasping it",
+    "allegiance": "with"
+  },
+  {
+    "name": "Doruk",
+    "epithet": "scout of the Emerald Enclave under Nuanwa Olerro, whose approval comes only in grunts",
+    "allegiance": "with"
   }
 ]

@@ -24,8 +24,8 @@
     "reliquary_header": "Gathered to the bell's toll",
     "constellation_epithet": "the heaviest toll, and every bit earned",
     "distinction_title": "The Reaping Hour",
-    "distinction_subtitle": "who once took six souls inside a single night",
-    "distinction_detail": "<b>6</b> kills in one session &middot; no greater single-day harvest told",
+    "distinction_subtitle": "who once took twelve souls inside a single night",
+    "distinction_detail": "<b>12</b> kills in one session &middot; no greater single-day harvest told",
     "archetype_badge": {
       "archetype": "featherfoot",
       "inscription": "Travels lighter than any gnome has a right to — staff, two daggers, and a rain catcher folded tight, the whole kit barely whispering when she moves."
@@ -33,7 +33,7 @@
     "distinction_basis": {
       "kind": "mechanical",
       "atom": "max_kills_in_one_session",
-      "value": 6
+      "value": 12
     },
     "sworn_creed": "force shaped at the source — the blast bends, and those beside her stand unburned"
   },
@@ -63,7 +63,7 @@
     "constellation_epithet": "never far from the fray",
     "distinction_title": "Favored of the Twenty",
     "distinction_subtitle": "No other hand turns up the twenty so often.",
-    "distinction_detail": "<b>11</b> crit successes &middot; no hand in the company turns the twenty so often",
+    "distinction_detail": "<b>12</b> crit successes &middot; no hand in the company turns the twenty so often",
     "archetype_badge": {
       "archetype": "pack-mule",
       "inscription": "The hunting trap alone tips twenty-five pounds; above it ride scale mail and a heavy crossbow, and the wulven still finds room for caltrops, rope, and a block-and-tackle besides."
@@ -79,17 +79,17 @@
     "id": "lilac",
     "epithet": "of the Tabaxi, who lets the bowstring do all her speaking",
     "reliquary_header": "Felled before they drew near",
-    "constellation_epithet": "the patient bowstring, ever drawn",
-    "distinction_title": "Fortune's Favored",
-    "distinction_subtitle": "whose kept dice land highest of all the company",
-    "distinction_detail": "<b>11.4</b> kept d20 average &middot; the most-favored hand at the table",
+    "constellation_epithet": "ever at the hunt, the soft-pawed shot",
+    "distinction_title": "The Steady Hand",
+    "distinction_subtitle": "whose dice swing the least of any hand at the table",
+    "distinction_detail": "<b>5.7</b> roll spread &middot; the steadiest dice the company casts",
     "archetype_badge": {
       "archetype": "naturalist",
       "inscription": "One carved sprig of mistletoe, ribbon-tied and kept close — the whole of the primal green, if you know how to ask, flows through that small stem."
     },
     "distinction_basis": {
       "kind": "mechanical",
-      "atom": "is_party_luckiest",
+      "atom": "is_party_steadiest",
       "value": true
     },
     "sworn_creed": "the courts left their mark on her — glamour and dread in equal measure"
