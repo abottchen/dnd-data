@@ -327,6 +327,18 @@ def _load_bestiary() -> dict[str, dict]:
 # must survive on the page.
 CUSTOM_NPC_STATBLOCKS = {
     "Wulf Rygor": "Scout",
+    "Queen Grabstab": "Goblin Boss",
+}
+
+# Explicit pip-icon overrides for named NPCs. Maps display name -> an image URL
+# (e.g. adventure art). Used only for the kill pip, where it takes precedence
+# over any stat-block token. An entry here does NOT by itself enter the creature
+# into the "Kinds Slain" tally or grant CR/XP — that requires a real bestiary
+# name or a CUSTOM_NPC_STATBLOCKS entry. Queen Grabstab has both: she borrows the
+# Goblin Boss stat block (above) for the bestiary/XP, but keeps her own portrait
+# on the pip via this table.
+CUSTOM_CREATURE_TOKENS = {
+    "Queen Grabstab": "https://5e.tools/img/adventure/ToA/048-0322.webp",
 }
 
 @functools.lru_cache(maxsize=2048)
@@ -567,7 +579,7 @@ def compute_sessions_chart(party: dict) -> dict:
             bucket[k["date"]].append({
                 "creature": k["creature"],
                 "method": k["method"],
-                "token_url": info.get("token_url"),
+                "token_url": CUSTOM_CREATURE_TOKENS.get(k["creature"]) or info.get("token_url"),
             })
         per_char_per_date[cid] = bucket
 
@@ -1245,7 +1257,7 @@ def compute_chronicle(session_log: dict, sessions_authored: list, chapters_autho
                 "method": k["method"],
                 "date": k["date"],
                 "date_label": _short_date(k["date"]),
-                "token_url": info.get("token_url"),
+                "token_url": CUSTOM_CREATURE_TOKENS.get(k["creature"]) or info.get("token_url"),
             })
 
     chapters = []
