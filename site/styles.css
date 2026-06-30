@@ -1605,8 +1605,9 @@ main > article > section.proficiencies,
 
 .chronicle-chapter-meta {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 28px;
+  gap: 16px 28px;
   margin-top: 22px;
   font-family: 'IBM Plex Sans', sans-serif;
   font-size: 10px;
@@ -1620,9 +1621,15 @@ main > article > section.proficiencies,
 .chronicle-chapter-meta .seal { color: var(--seal); }
 .chronicle-chapter-meta .seal b { color: var(--seal); }
 
+/* The frieze of the fallen: the chapter's whole toll, pulled onto its own
+   full-width row beneath the meta caption so it wraps into a band of seals
+   instead of running off the page. */
 .chronicle-chapter-tally {
+  flex-basis: 100%;
+  min-width: 0;
   display: flex;
-  gap: 4px;
+  flex-wrap: wrap;
+  gap: 5px;
   align-items: center;
 }
 
@@ -1634,6 +1641,20 @@ main > article > section.proficiencies,
   object-fit: cover;
   box-shadow: 0 0 0 1px var(--brass-dim);
   cursor: help;
+  position: relative;
+  z-index: 0;
+  transform-origin: center;
+  transition: transform 0.18s cubic-bezier(0.2, 0.7, 0.2, 1.5),
+              box-shadow 0.18s ease;
+}
+
+/* The loupe: lift a seal to inspect it. Image pips only — an empty
+   placeholder ring has nothing to magnify. */
+img.chronicle-session-pip:hover,
+img.chronicle-session-pip:focus-visible {
+  transform: scale(2.7);
+  z-index: 6;
+  box-shadow: 0 0 0 1.5px var(--brass-hi), 0 8px 22px rgba(0, 0, 0, 0.6);
 }
 
 .chronicle-session-pip.pip-placeholder {
@@ -1641,6 +1662,10 @@ main > article > section.proficiencies,
   border: 1px solid var(--brass-dim);
   box-sizing: border-box;
   box-shadow: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chronicle-session-pip { transition: none; }
 }
 
 .chronicle-session {

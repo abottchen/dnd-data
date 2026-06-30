@@ -390,5 +390,69 @@
     "method": "Longbow",
     "verse": "A cannibal gone still at the edge of the Soshenstar",
     "annotation": "Longbow &middot; the arrow crossed the water it would not"
+  },
+  {
+    "character": "grieg",
+    "date": "2026-06-28",
+    "creature": "Goblin Warrior",
+    "method": "Trident",
+    "verse": "A goblin laid down at the Yellyark's edge",
+    "annotation": "Trident &middot; the camp's outer line thinned by one"
+  },
+  {
+    "character": "grieg",
+    "date": "2026-06-28",
+    "creature": "Goblin Warrior",
+    "method": "Warhammer",
+    "verse": "A second goblin given to the ground",
+    "annotation": "Warhammer &middot; Grieg moved through the camp without slowing"
+  },
+  {
+    "character": "vex",
+    "date": "2026-06-28",
+    "creature": "Goblin Warrior",
+    "method": "Breath Weapon (Fire)",
+    "verse": "Goblins lost inside the hut Vex set alight",
+    "annotation": "Breath Weapon (Fire) &middot; the walls held the fire long enough"
+  },
+  {
+    "character": "urida",
+    "date": "2026-06-28",
+    "creature": "Goblin Warrior",
+    "method": "Toll the Dead",
+    "verse": "A goblin reached by the sound of its own end",
+    "annotation": "Toll the Dead &middot; the knell rang twice amid the ruin"
+  },
+  {
+    "character": "urida",
+    "date": "2026-06-28",
+    "creature": "Goblin Warrior",
+    "method": "Shatter",
+    "verse": "Goblins broken in the hut the fire had cleared",
+    "annotation": "Shatter &middot; the sound reached what the flame had left standing"
+  },
+  {
+    "character": "chumble",
+    "date": "2026-06-28",
+    "creature": "Goblin Warrior",
+    "method": "Eldritch Blast",
+    "verse": "A goblin claimed once the alarm had sounded",
+    "annotation": "Eldritch Blast &middot; one bolt loosed into the scramble"
+  },
+  {
+    "character": "lilac",
+    "date": "2026-06-28",
+    "creature": "Goblin Warrior",
+    "method": "Longbow",
+    "verse": "Two goblins brought down from the boughs above camp",
+    "annotation": "Longbow &middot; she had chosen her height before the alarm rose"
+  },
+  {
+    "character": "lilac",
+    "date": "2026-06-28",
+    "creature": "Queen Grabstab",
+    "method": "Longbow",
+    "verse": "Queen Grabstab fell, but the net carried her away",
+    "annotation": "Longbow &middot; the queen was dead before the vine was cut"
   }
 ]
