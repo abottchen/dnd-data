@@ -20,8 +20,8 @@
           </div>
           <div class="trial">
             <div class="trial-label">Average d20</div>
-            <div class="trial-val">{{ "%.1f" | format(f.avg) }}</div>
-            <div class="trial-sub">σ {{ "%.1f" | format(f.sd) }}</div>
+            <div class="trial-val"><span class="gloss" data-gloss="average" data-value="{{ "%.1f" | format(f.avg) }}">{{ "%.1f" | format(f.avg) }}</span></div>
+            <div class="trial-sub"><span class="gloss" data-gloss="spread" data-value="{{ "%.1f" | format(f.sd) }}">σ {{ "%.1f" | format(f.sd) }}</span></div>
           </div>
           <div class="trial">
             <div class="trial-label">Crit Successes</div>
@@ -57,7 +57,7 @@
             <li class="dt-row">
               <span class="dt-label">{% if row.die in DICE_WITH_GLYPHS %}<svg width="22" height="22" aria-hidden="true"><use href="#{{ row.die }}"/></svg>{% endif %}{{ row.die }}<span class="dt-count"> &times; {{ row.count }}</span></span>
               <svg class="dt-chart" viewBox="0 0 360 60"><line class="avg-line" x1="16" y1="30" x2="360" y2="30"/>{% if row.dots | length > 1 %}<polyline class="roll-line" points="{% for d in row.dots %}{{ d.x }},{{ d.y }} {% endfor %}"/>{% endif %}{% for d in row.dots %}<circle class="roll-dot" data-date="{{ d.date }}" cx="{{ d.x }}" cy="{{ d.y }}" r="{% if row.dots | length == 1 %}3{% else %}2.5{% endif %}"/>{% endfor %}</svg>
-              <span class="dt-stat">avg <b>{{ "%.1f" | format(row.avg) }}</b> &middot; best <b>{{ row.best }}</b></span>
+              <span class="dt-stat">avg <b>{{ "%.1f" | format(row.avg) }}</b> &middot; maxed <b>&times;{{ row.maxed }}</b></span>
             </li>
             {%- endfor %}
           </ul>

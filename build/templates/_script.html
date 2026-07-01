@@ -116,7 +116,7 @@
           html += '<div class="tip-ctx">' + xp + ' earned &middot; ' + kills + ' fallen</div>';
           html += '<div class="tip-ctx">' + rolls + ' rolls cast &middot; ' + keptD20s + ' on the twenty</div>';
           if (keptD20s > 0) {
-            html += '<div class="tip-ctx">avg ' + avg.toFixed(1) + ' &middot; &sigma; ' + sd.toFixed(1) +
+            html += '<div class="tip-ctx">avg ' + avg.toFixed(1) + ' &middot; spread &sigma; ' + sd.toFixed(1) +
                     ' &middot; ' + crits + '&times; crit success &middot; ' + fumbles + '&times; crit fail</div>';
           }
           tip.innerHTML = html;
@@ -727,5 +727,110 @@
         s.addEventListener('mouseleave', function () {
           hideTimer = setTimeout(function () { tip.classList.remove('visible'); }, 80);
         });
+      });
+    })();
+
+    // --- Glossary terms: plain-English gloss for statistical shorthand ---------
+    // Any element with [data-gloss] gets a dotted underline + help cursor and,
+    // on hover / keyboard focus / tap, reveals a prose definition drawn from the
+    // GLOSS map below. Touch has no hover, so a tap toggles it (and a tap
+    // elsewhere or Escape dismisses it); the timestamp guard stops the trailing
+    // click that follows focus/hover from immediately closing what just opened.
+    (function () {
+      // A fair d20 isn't just a flat 1–20: its natural mean is 10.5 and its
+      // natural scatter (σ) is about 5.8. What a lay reader wants is how far
+      // this adventurer sits from those marks, so each gloss states the
+      // baseline, the deviation, and what it means in plain words. Bodies are
+      // functions of the trigger's data-value, so the numbers stay per-player.
+      const FAIR_AVG = 10.5, FAIR_SD = 5.8;
+      const vsFair = (v, base) => {
+        const d = v - base;
+        if (Math.abs(d) < 0.05) return 'right on the mark';
+        return (d > 0 ? '+' : '−') + Math.abs(d).toFixed(1) + (d > 0 ? ' above' : ' below');
+      };
+      const GLOSS = {
+        average: {
+          term: 'Average d20',
+          body: (v) => {
+            const d = v - FAIR_AVG;
+            const read = d >= 1 ? 'running genuinely lucky'
+                       : d >= 0.2 ? 'running a little lucky'
+                       : d > -0.2 ? 'as fair as it gets'
+                       : d > -1 ? 'running a little unlucky'
+                       : 'genuinely snakebit';
+            return 'The average of every d20 this adventurer has kept. A perfectly fair die averages 10.5, so anything above that is lucky and anything below is cursed. This ' +
+                   v.toFixed(1) + ' sits ' + vsFair(v, FAIR_AVG) + ', ' + read + '.';
+          }
+        },
+        spread: {
+          term: 'Spread (σ)',
+          body: (v) => {
+            const d = v - FAIR_SD;
+            const read = d >= 1 ? 'notably streaky'
+                       : d >= 0.2 ? 'a shade streakier than usual'
+                       : d > -0.2 ? 'about typical for a d20'
+                       : d > -1 ? 'a shade steadier than usual'
+                       : 'unusually steady';
+            const gap = Math.abs(d) < 0.05 ? 'on the mark' : (d > 0 ? '+' : '−') + Math.abs(d).toFixed(1);
+            return 'How scattered the rolls are around that average. A fair d20 naturally spreads by about 5.8, so this ' +
+                   v.toFixed(1) + ' (' + gap + ') is ' + read + '. Higher numbers come from clusters of 1s and 20s. Lower numbers come from rolls that keep to the middle.';
+          }
+        }
+      };
+      const triggers = document.querySelectorAll('[data-gloss]');
+      if (!triggers.length) return;
+
+      const tip = document.createElement('div');
+      tip.className = 'dice-tooltip tip-gloss';
+      document.body.appendChild(tip);
+      let hideTimer, openEl = null, shownAt = 0;
+
+      const place = (anchor) => {
+        const margin = 8;
+        const half = tip.offsetWidth / 2;
+        const r = anchor.getBoundingClientRect();
+        let cx = r.left + r.width / 2;
+        cx = Math.max(half + margin, Math.min(window.innerWidth - half - margin, cx));
+        tip.style.left = cx + 'px';
+        tip.style.top = r.top + 'px';
+      };
+      const show = (anchor, term, body) => {
+        clearTimeout(hideTimer);
+        tip.innerHTML = '<div class="tip-term">' + term + '</div>' +
+                        '<div class="tip-def">' + body + '</div>';
+        tip.classList.add('visible');
+        place(anchor);                 // measure after content lands, so width is real
+        openEl = anchor;
+        shownAt = Date.now();
+      };
+      const close = () => { tip.classList.remove('visible'); openEl = null; };
+      const hide = () => { hideTimer = setTimeout(close, 80); };
+
+      triggers.forEach(el => {
+        const def = GLOSS[el.getAttribute('data-gloss')];
+        if (!def) return;
+        const value = parseFloat(el.dataset.value);
+        const body = typeof def.body === 'function' ? def.body(value) : def.body;
+        el.setAttribute('tabindex', '0');
+        el.setAttribute('role', 'button');
+        el.setAttribute('aria-label', def.term + '. ' + body);
+        el.addEventListener('mouseenter', () => show(el, def.term, body));
+        el.addEventListener('mouseleave', hide);
+        el.addEventListener('focus', () => show(el, def.term, body));
+        el.addEventListener('blur', hide);
+        el.addEventListener('click', (e) => {
+          e.preventDefault();
+          // Only a deliberate second interaction (not the click that trails a
+          // hover/focus show) collapses it.
+          if (openEl === el && Date.now() - shownAt > 250) { clearTimeout(hideTimer); close(); }
+          else show(el, def.term, body);
+        });
+        el.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape') { clearTimeout(hideTimer); close(); el.blur(); }
+        });
+      });
+
+      document.addEventListener('click', (e) => {
+        if (openEl && !openEl.contains(e.target)) { clearTimeout(hideTimer); close(); }
       });
     })();

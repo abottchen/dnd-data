@@ -692,7 +692,7 @@ def compute_patron_die(fortune_by_char: dict, party: dict) -> list[dict]:
     return compute_d20_histogram(physicals, party_max=party_max)
 
 def compute_other_dice(events: list) -> list[dict]:
-    """Per-die-type rows: d4..d12+, with dot positions and avg/best."""
+    """Per-die-type rows: d4..d12+, with dot positions, avg, and maxed count."""
     by_die: dict[str, list[dict]] = {}
     for ev in events:
         date = ev.get("date", "")
@@ -730,7 +730,10 @@ def compute_other_dice(events: list) -> list[dict]:
             "die": die_type,
             "count": N,
             "avg": round(sum(values) / N, 1),
-            "best": max(values),
+            # Times the die landed on its ceiling. Once ceilings saturate this
+            # trends up for everyone, but it still separates the die you cast
+            # constantly from the one you've only maxed once.
+            "maxed": sum(1 for v in values if v == face),
             "dots": [{"x": x, "y": y, "value": v, "date": e["date"]}
                      for x, y, v, e in zip(xs, ys, values, entries)],
         })
