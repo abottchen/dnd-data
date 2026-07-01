@@ -90,6 +90,29 @@ def test_other_dice_omits_units_d10_paired_with_d100():
     assert d10_rows[0]["count"] == 1
     assert d10_rows[0]["dots"][0]["value"] == 7
 
+def test_other_dice_counts_maxed_ceiling_hits():
+    events = [
+        {"rolls": [{"type": "d6", "value": 6}], "total": 6, "notation": "1d6", "date": "2026-04-01"},
+        {"rolls": [{"type": "d6", "value": 6}], "total": 6, "notation": "1d6", "date": "2026-04-02"},
+        {"rolls": [{"type": "d6", "value": 3}], "total": 3, "notation": "1d6", "date": "2026-04-03"},
+        {"rolls": [{"type": "d6", "value": 1}], "total": 1, "notation": "1d6", "date": "2026-04-04"},
+    ]
+    row = next(r for r in compute_other_dice(events) if r["die"] == "d6")
+    assert row["count"] == 4
+    assert row["maxed"] == 2
+    assert "best" not in row
+
+
+def test_other_dice_maxed_honors_d10_zero_as_ten():
+    # This dice system stores a d10 "10" as value 0; that is the ceiling.
+    events = [
+        {"rolls": [{"type": "d10", "value": 0}], "total": 10, "notation": "1d10", "date": "2026-04-01"},
+        {"rolls": [{"type": "d10", "value": 4}], "total": 4, "notation": "1d10", "date": "2026-04-02"},
+    ]
+    row = next(r for r in compute_other_dice(events) if r["die"] == "d10")
+    assert row["maxed"] == 1
+
+
 def test_best_skill_picks_highest_mod():
     member = {"skills": {
         "perception": {"mod": 2, "prof": "none"},

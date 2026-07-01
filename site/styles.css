@@ -2504,6 +2504,50 @@ img.chronicle-session-pip:focus-visible {
   line-height: 1.4;
 }
 
+/* Glossary: a term of art (σ, etc.) that whispers its plain meaning on hover,
+   focus, or tap. The trigger is a quiet dotted underline; the popover reuses
+   the shared dice-tooltip but wraps prose instead of a nowrap stat line. */
+.gloss {
+  text-decoration: underline dotted;
+  text-decoration-color: var(--brass-dim);
+  text-underline-offset: 3px;
+  cursor: help;
+  /* σ must stay lowercase — an uppercasing ancestor (.trial-sub) would turn it
+     into Σ, the summation sign, which reads as a different quantity entirely. */
+  text-transform: none;
+}
+.gloss:focus-visible {
+  outline: 1px solid var(--brass);
+  outline-offset: 3px;
+}
+/* Under the big serif average, a 3px offset crowds the digits — scale it. */
+.trial-val .gloss { text-underline-offset: 0.12em; }
+.dice-tooltip.tip-gloss {
+  white-space: normal;
+  max-width: min(280px, calc(100vw - 24px));
+  text-align: left;
+  padding: 14px 18px;
+}
+.dice-tooltip.tip-gloss .tip-term {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 21px;
+  font-weight: 600;
+  line-height: 1.1;
+  color: var(--brass);
+}
+.dice-tooltip.tip-gloss .tip-def {
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 12.5px;
+  line-height: 1.55;
+  letter-spacing: 0.1px;
+  text-transform: none;
+  color: var(--paper);
+  margin-top: 7px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .dice-tooltip { transition: none; }
+}
+
 /* --- Archetype badge ------------------------------------- */
 .archetype {
   display: inline-block;
