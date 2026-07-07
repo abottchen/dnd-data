@@ -84,6 +84,8 @@ def apply_run(run_dir: Path, *, skip_render: bool) -> dict:
       - applied: list of {transformer, key, stem}
       - rejected: list of {transformer, key, stem, reason}
       - pending: list of {transformer, key, stem} (no result file yet)
+      - graduated: list of names that moved road_ahead known → was_known
+        this run (empty unless a refresh-road-ahead slice was applied)
       - marker_old, marker_new
       - render_ok: bool | None (None when skip_render)
     """
@@ -95,6 +97,7 @@ def apply_run(run_dir: Path, *, skip_render: bool) -> dict:
     applied: list = []
     rejected: list = []
     pending: list = []
+    graduated: list = []
     refresh_total = sum(1 for s in manifest["slices"] if s["pass"] == "refresh")
     refresh_applied = 0
 
@@ -133,12 +136,14 @@ def apply_run(run_dir: Path, *, skip_render: bool) -> dict:
         fn = registry.by_name(entry["transformer"]).apply_fn
         trial = copy.deepcopy(authored)
         try:
-            fn(trial, entry["key"], slice_data, output)
+            ret = fn(trial, entry["key"], slice_data, output)
         except (ValueError, KeyError) as e:
             _record_rejection(rejected, rejected_dir, entry, result_path,
                               f"apply failed: {e}")
             continue
         authored = trial
+        if isinstance(ret, dict):
+            graduated.extend(ret.get("graduated", []))
 
         applied.append({"transformer": entry["transformer"],
                         "key": entry["key"], "stem": entry["stem"]})
@@ -172,6 +177,7 @@ def apply_run(run_dir: Path, *, skip_render: bool) -> dict:
         "applied": applied,
         "rejected": rejected,
         "pending": pending,
+        "graduated": graduated,
         "marker_old": marker_old,
         "marker_new": marker_new,
         "render_ok": render_ok,

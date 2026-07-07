@@ -37,6 +37,33 @@ def staged_run(tmp_path, monkeypatch):
     return run_dir, authored_dir
 
 
+@pytest.fixture
+def staged_refresh_run(tmp_path, monkeypatch):
+    """Like staged_run, but with the refresh pass forced on so refresh slices
+    (e.g. refresh-road-ahead) exist in the manifest."""
+    data_dir = tmp_path / "data"
+    data_dir.mkdir()
+    shutil.copy(FIXTURES / "sample_party.json", data_dir / "party.json")
+    shutil.copy(FIXTURES / "sample_session_log.json", data_dir / "session-log.json")
+    (data_dir / "dice").mkdir()
+    shutil.copy(FIXTURES / "sample_dicex_rolls.json",
+                data_dir / "dice" / "dicex-rolls-2026-04-23.json")
+
+    authored_dir = tmp_path / "authored"
+    authored_dir.mkdir()
+    for f in (FIXTURES / "sample_authored").iterdir():
+        shutil.copy(f, authored_dir / f.name)
+
+    run_root = tmp_path / "runs"
+    run_root.mkdir()
+    monkeypatch.setenv("BUILD_DATA_DIR", str(data_dir))
+    monkeypatch.setenv("BUILD_AUTHORED_DIR", str(authored_dir))
+    monkeypatch.setenv("BUILD_RUN_ROOT", str(run_root))
+
+    run_dir = prepare.run(no_refresh=False, force_refresh=True, keep_temp=False)
+    return run_dir, authored_dir
+
+
 def _write_result(run_dir: Path, entry: dict, payload: dict) -> None:
     """Helper: write the JSON result for one manifest entry."""
     (run_dir / entry["result"]).write_text(json.dumps(payload, indent=2))
@@ -210,3 +237,19 @@ def test_failed_apply_leaves_no_partial_mutation(staged_run):
     assert any(a["stem"] == sessions_entry["stem"] for a in summary["applied"])
     after = json.loads((authored_dir / "kills.json").read_text())
     assert after == before  # no partial append persisted
+
+
+def test_apply_surfaces_road_ahead_graduations(staged_refresh_run):
+    run_dir, authored_dir = staged_refresh_run
+    manifest = json.loads((run_dir / "manifest.json").read_text())
+    entry = next(s for s in manifest["slices"]
+                 if s["transformer"] == "refresh-road-ahead")
+    _write_result(run_dir, entry, {
+        "decision": "rewrite",
+        "fields": {"known": [], "was_known":
+                   [{"name": "Azlund's offer", "gloss": "answered"}],
+                   "direction": "north"},
+        "reason": "test",
+    })
+    summary = apply_cli.apply_run(run_dir, skip_render=True)
+    assert summary["graduated"] == ["Azlund's offer"]
