@@ -5464,6 +5464,41 @@
 
   
   <script>
+    // Shared tooltip singleton. One element, ONE hide timer — per-widget
+    // timers let widget A's pending hide dismiss the tooltip widget B just
+    // showed when the pointer moves quickly between widgets.
+    const Tip = (() => {
+      const HIDE_DELAY_MS = 80;
+      const el = document.createElement('div');
+      el.className = 'dice-tooltip';
+      document.body.appendChild(el);
+      let hideTimer;
+      const esc = (s) => String(s ?? '').replace(/[&<>"']/g, c => (
+        {'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[c]));
+      function show(anchor, html, opts) {
+        opts = opts || {};
+        clearTimeout(hideTimer);
+        el.className = 'dice-tooltip'
+          + (opts.wide ? ' tip-wide' : '')
+          + (opts.gloss ? ' tip-gloss' : '');
+        el.innerHTML = html;
+        el.classList.add('visible');
+        // Clamp horizontally so long content never runs off-viewport.
+        const margin = 8;
+        const half = el.offsetWidth / 2;
+        const r = anchor.getBoundingClientRect();
+        let cx = r.left + r.width / 2;
+        cx = Math.max(half + margin, Math.min(window.innerWidth - half - margin, cx));
+        el.style.left = cx + 'px';
+        el.style.top = r.top + 'px';
+      }
+      function hide() {
+        hideTimer = setTimeout(() => el.classList.remove('visible'), HIDE_DELAY_MS);
+      }
+      function cancelHide() { clearTimeout(hideTimer); }
+      return { show, hide, cancelHide, esc, el };
+    })();
+
     (function () {
       const tabs = document.querySelectorAll('.tab');
       const panels = document.querySelectorAll('.character');
@@ -5488,35 +5523,20 @@
     (function () {
       // Chronicle pip tooltips: creature + killer + method + date. Falls back to a
       // placeholder span when the 5e.tools token URL fails to load.
-      let tip = document.querySelector('.dice-tooltip');
-      if (!tip) {
-        tip = document.createElement('div');
-        tip.className = 'dice-tooltip';
-        document.body.appendChild(tip);
-      }
-      let hideTimer;
-
       const attach = (el) => {
         const show = () => {
-          clearTimeout(hideTimer);
           const creature = el.getAttribute('data-creature') || '';
           const killer = el.getAttribute('data-killer-name') || '';
           const method = el.getAttribute('data-method') || '';
           const date = el.getAttribute('data-date') || '';
-          let html = '<div class="tip-val tip-val-text">' + creature + '</div>';
-          if (killer) html += '<div class="tip-ctx">felled by ' + killer + '</div>';
+          let html = '<div class="tip-val tip-val-text">' + Tip.esc(creature) + '</div>';
+          if (killer) html += '<div class="tip-ctx">felled by ' + Tip.esc(killer) + '</div>';
           if (method || date) {
-            html += '<div class="tip-ctx">' + method + (method && date ? ' &middot; ' : '') + date + '</div>';
+            html += '<div class="tip-ctx">' + Tip.esc(method) + (method && date ? ' &middot; ' : '') + Tip.esc(date) + '</div>';
           }
-          tip.innerHTML = html;
-          const r = el.getBoundingClientRect();
-          tip.style.left = (r.left + r.width / 2) + 'px';
-          tip.style.top = r.top + 'px';
-          tip.classList.add('visible');
+          Tip.show(el, html);
         };
-        const hide = () => {
-          hideTimer = setTimeout(() => tip.classList.remove('visible'), 80);
-        };
+        const hide = () => Tip.hide();
         el.addEventListener('mouseenter', show);
         el.addEventListener('mouseleave', hide);
       };
@@ -5553,14 +5573,6 @@
     (function () {
       // Constellation portrait tooltips: exact axis values + dice/kill stats that
       // can't be read off the chart at a glance.
-      let tip = document.querySelector('.dice-tooltip');
-      if (!tip) {
-        tip = document.createElement('div');
-        tip.className = 'dice-tooltip';
-        document.body.appendChild(tip);
-      }
-      let hideTimer;
-
       document.querySelectorAll('.constellation-star').forEach(star => {
         const portrait = star.querySelector('.portrait');
         if (!portrait) return;
@@ -5576,24 +5588,17 @@
         const fumbles = parseInt(star.getAttribute('data-fumbles'), 10) || 0;
 
         const show = () => {
-          clearTimeout(hideTimer);
-          let html = '<div class="tip-val tip-val-text">' + name + '</div>';
-          if (epithet) html += '<div class="tip-ctx">' + epithet + '</div>';
+          let html = '<div class="tip-val tip-val-text">' + Tip.esc(name) + '</div>';
+          if (epithet) html += '<div class="tip-ctx">' + Tip.esc(epithet) + '</div>';
           html += '<div class="tip-ctx">' + xp + ' earned &middot; ' + kills + ' fallen</div>';
           html += '<div class="tip-ctx">' + rolls + ' rolls cast &middot; ' + keptD20s + ' on the twenty</div>';
           if (keptD20s > 0) {
             html += '<div class="tip-ctx">avg ' + avg.toFixed(1) + ' &middot; spread &sigma; ' + sd.toFixed(1) +
                     ' &middot; ' + crits + '&times; crit success &middot; ' + fumbles + '&times; crit fail</div>';
           }
-          tip.innerHTML = html;
-          const r = portrait.getBoundingClientRect();
-          tip.style.left = (r.left + r.width / 2) + 'px';
-          tip.style.top = r.top + 'px';
-          tip.classList.add('visible');
+          Tip.show(portrait, html);
         };
-        const hide = () => {
-          hideTimer = setTimeout(() => tip.classList.remove('visible'), 80);
-        };
+        const hide = () => Tip.hide();
         portrait.addEventListener('mouseenter', show);
         portrait.addEventListener('mouseleave', hide);
       });
@@ -5601,14 +5606,6 @@
 
     (function () {
       // Sessions Chart ("Across the Ages") tooltips: read kills from each bar's data-kills attribute.
-      let sessionTip = document.querySelector('.dice-tooltip');
-      if (!sessionTip) {
-        sessionTip = document.createElement('div');
-        sessionTip.className = 'dice-tooltip';
-        document.body.appendChild(sessionTip);
-      }
-      let sessionHideTimer;
-
       document.querySelectorAll('.session-bar').forEach(bar => {
         const labelEl = bar.querySelector('.bar-label');
         if (!labelEl) return;
@@ -5622,31 +5619,23 @@
         const barEl = bar.querySelector('.bar');
 
         const show = () => {
-          clearTimeout(sessionHideTimer);
           const count = kills.length;
           let html = '<div class="tip-val">' + count + '</div>';
-          html += '<div class="tip-ctx">' + (count === 0 ? 'No blade drawn' : (count === 1 ? '1 fallen' : count + ' fallen')) + ' &middot; ' + date + '</div>';
+          html += '<div class="tip-ctx">' + (count === 0 ? 'No blade drawn' : (count === 1 ? '1 fallen' : count + ' fallen')) + ' &middot; ' + Tip.esc(date) + '</div>';
           if (count > 0) {
             html += '<ul class="tip-list">';
             kills.forEach(k => {
               const tok = k.token_url
-                ? '<img class="tip-token" src="' + k.token_url + '" alt="" loading="lazy">'
+                ? '<img class="tip-token" src="' + Tip.esc(k.token_url) + '" alt="" loading="lazy">'
                 : '<span class="tip-token pip-placeholder" aria-hidden="true"></span>';
-              html += '<li>' + tok + '<span class="creature">' + k.creature + '</span>' +
-                      ' <span class="method">' + k.method + '</span></li>';
+              html += '<li>' + tok + '<span class="creature">' + Tip.esc(k.creature) + '</span>' +
+                      ' <span class="method">' + Tip.esc(k.method) + '</span></li>';
             });
             html += '</ul>';
           }
-          sessionTip.innerHTML = html;
-          const anchor = barEl || bar;
-          const r = anchor.getBoundingClientRect();
-          sessionTip.style.left = (r.left + r.width / 2) + 'px';
-          sessionTip.style.top = r.top + 'px';
-          sessionTip.classList.add('visible');
+          Tip.show(barEl || bar, html);
         };
-        const hide = () => {
-          sessionHideTimer = setTimeout(() => sessionTip.classList.remove('visible'), 80);
-        };
+        const hide = () => Tip.hide();
         bar.addEventListener('mouseenter', show);
         bar.addEventListener('mouseleave', hide);
       });
@@ -5655,14 +5644,6 @@
     (function () {
       // Twenty Faces histogram tooltips: face, count, % of casts, and (when sample size warrants) deviation from the fair share.
       const DEVIATION_MIN_TOTAL = 40;
-      let tip = document.querySelector('.dice-tooltip');
-      if (!tip) {
-        tip = document.createElement('div');
-        tip.className = 'dice-tooltip';
-        document.body.appendChild(tip);
-      }
-      let hideTimer;
-
       document.querySelectorAll('.dice-hist, .patron-die-chart').forEach(hist => {
         const cols = Array.from(hist.querySelectorAll('.dice-col'));
         const total = cols.reduce((s, c) => s + (parseInt(c.dataset.count, 10) || 0), 0);
@@ -5680,7 +5661,6 @@
           const matchingLabel = labelByVal[col.dataset.val];
 
           const show = () => {
-            clearTimeout(hideTimer);
             let html = '<div class="tip-val">' + count + '</div>';
             html += '<div class="tip-ctx">Face ' + value + ' &middot; ' + pct + '% of casts</div>';
             if (showDeviation) {
@@ -5695,15 +5675,11 @@
               }
               html += '<div class="tip-ctx">' + line + '</div>';
             }
-            tip.innerHTML = html;
-            const r = col.getBoundingClientRect();
-            tip.style.left = (r.left + r.width / 2) + 'px';
-            tip.style.top = r.top + 'px';
-            tip.classList.add('visible');
+            Tip.show(col, html);
             if (matchingLabel) matchingLabel.classList.add('active');
           };
           const hide = () => {
-            hideTimer = setTimeout(() => tip.classList.remove('visible'), 80);
+            Tip.hide();
             if (matchingLabel) matchingLabel.classList.remove('active');
           };
           col.addEventListener('mouseenter', show);
@@ -5713,11 +5689,6 @@
     })();
 
     (function () {
-      const tip = document.createElement('div');
-      tip.className = 'dice-tooltip';
-      document.body.appendChild(tip);
-      let hideTimer;
-
       const SVG_NS = 'http://www.w3.org/2000/svg';
       const CHART_LEFT = 0, CHART_RIGHT = 360, CHART_HEIGHT = 60;
 
@@ -5753,19 +5724,15 @@
           svg.appendChild(hit);
 
           const show = () => {
-            clearTimeout(hideTimer);
             dot.classList.add('active');
-            tip.innerHTML =
+            const html =
               '<div class="tip-val">' + value + '</div>' +
-              (date ? '<div class="tip-ctx">' + date + '</div>' : '');
-            const r = dot.getBoundingClientRect();
-            tip.style.left = (r.left + r.width / 2) + 'px';
-            tip.style.top = r.top + 'px';
-            tip.classList.add('visible');
+              (date ? '<div class="tip-ctx">' + Tip.esc(date) + '</div>' : '');
+            Tip.show(dot, html);
           };
           const hide = () => {
             dot.classList.remove('active');
-            hideTimer = setTimeout(() => tip.classList.remove('visible'), 80);
+            Tip.hide();
           };
 
           hit.addEventListener('mouseenter', show);
@@ -5776,75 +5743,42 @@
       });
     })();
 
-    // Shared tooltip helper for Pack zones, company strip, and archetype badge.
-    // Toggles the .tip-wide variant (so descriptions wrap with a max-width) and
-    // clamps the horizontal position so the tooltip never extends past the
-    // viewport edge — the previous nowrap version clipped at the window margin
-    // when item descriptions ran long.
-    function _packShowTip(tip, anchor, html, wide) {
-      tip.innerHTML = html;
-      tip.classList.toggle('tip-wide', !!wide);
-      tip.classList.add('visible');
-      const tipWidth = tip.offsetWidth;
-      const halfWidth = tipWidth / 2;
-      const margin = 8;
-      const r = anchor.getBoundingClientRect();
-      let cx = r.left + r.width / 2;
-      cx = Math.max(halfWidth + margin,
-                    Math.min(window.innerWidth - halfWidth - margin, cx));
-      tip.style.left = cx + 'px';
-      tip.style.top = r.top + 'px';
-    }
-
-    function _packGetTip() {
-      let tip = document.querySelector('.dice-tooltip');
-      if (!tip) {
-        tip = document.createElement('div');
-        tip.className = 'dice-tooltip';
-        document.body.appendChild(tip);
-      }
-      return tip;
-    }
-
     // --- Pack: Rack item tooltips ---
     (function () {
-      const tip = _packGetTip();
       document.querySelectorAll('.rack-item').forEach(el => {
         el.addEventListener('mouseenter', () => {
           const name = el.getAttribute('data-name') || '';
           const count = el.getAttribute('data-count') || '';
           const weight = el.getAttribute('data-weight') || '';
           const desc = el.getAttribute('data-description') || '';
-          let html = '<div class="tip-val tip-val-text">' + name + '</div>';
-          html += '<div class="tip-ctx">' + (count !== '1' ? '&times;' + count + ' &middot; ' : '') +
-                  weight + ' lb</div>';
-          if (desc) html += '<div class="tip-ctx">' + desc + '</div>';
-          _packShowTip(tip, el, html, !!desc);
+          let html = '<div class="tip-val tip-val-text">' + Tip.esc(name) + '</div>';
+          html += '<div class="tip-ctx">' + (count !== '1' ? '&times;' + Tip.esc(count) + ' &middot; ' : '') +
+                  Tip.esc(weight) + ' lb</div>';
+          if (desc) html += '<div class="tip-ctx">' + Tip.esc(desc) + '</div>';
+          Tip.show(el, html, { wide: !!desc });
         });
-        el.addEventListener('mouseleave', () => { tip.classList.remove('visible'); });
+        el.addEventListener('mouseleave', () => Tip.hide());
       });
     })();
 
     // --- Pack: Spotlight card tooltips ---
     (function () {
-      const tip = _packGetTip();
       document.querySelectorAll('.spotlight-card').forEach(el => {
         el.addEventListener('mouseenter', () => {
           const name = el.getAttribute('data-name') || '';
           const rarity = el.getAttribute('data-rarity') || '';
           const desc = el.getAttribute('data-description') || '';
-          let html = '<div class="tip-val tip-val-text">' + name + '</div>';
-          if (rarity) html += '<div class="tip-ctx">' + rarity + '</div>';
-          if (desc) html += '<div class="tip-ctx">' + desc + '</div>';
-          _packShowTip(tip, el, html, !!desc);
+          let html = '<div class="tip-val tip-val-text">' + Tip.esc(name) + '</div>';
+          if (rarity) html += '<div class="tip-ctx">' + Tip.esc(rarity) + '</div>';
+          if (desc) html += '<div class="tip-ctx">' + Tip.esc(desc) + '</div>';
+          Tip.show(el, html, { wide: !!desc });
         });
-        el.addEventListener('mouseleave', () => { tip.classList.remove('visible'); });
+        el.addEventListener('mouseleave', () => Tip.hide());
       });
     })();
 
     // --- Pack: Manifest chip tooltips ---
     (function () {
-      const tip = _packGetTip();
       document.querySelectorAll('.manifest-chip').forEach(el => {
         el.addEventListener('mouseenter', () => {
           const name = el.getAttribute('data-name') || '';
@@ -5853,20 +5787,19 @@
           const cat = el.getAttribute('data-category') || '';
           const desc = el.getAttribute('data-description') || '';
           const total = (parseFloat(weight) * parseInt(count, 10)) || 0;
-          let html = '<div class="tip-val tip-val-text">' + name + '</div>';
-          html += '<div class="tip-ctx">' + (count !== '1' ? '&times;' + count + ' &middot; ' : '') +
-                  weight + ' lb each &middot; ' + total + ' lb total</div>';
-          if (cat) html += '<div class="tip-ctx">' + cat + '</div>';
-          if (desc) html += '<div class="tip-ctx">' + desc + '</div>';
-          _packShowTip(tip, el, html, !!desc);
+          let html = '<div class="tip-val tip-val-text">' + Tip.esc(name) + '</div>';
+          html += '<div class="tip-ctx">' + (count !== '1' ? '&times;' + Tip.esc(count) + ' &middot; ' : '') +
+                  Tip.esc(weight) + ' lb each &middot; ' + total + ' lb total</div>';
+          if (cat) html += '<div class="tip-ctx">' + Tip.esc(cat) + '</div>';
+          if (desc) html += '<div class="tip-ctx">' + Tip.esc(desc) + '</div>';
+          Tip.show(el, html, { wide: !!desc });
         });
-        el.addEventListener('mouseleave', () => { tip.classList.remove('visible'); });
+        el.addEventListener('mouseleave', () => Tip.hide());
       });
     })();
 
     // --- Company strip bar tooltips ---
     (function () {
-      const tip = _packGetTip();
       document.querySelectorAll('.company-strip-bar').forEach(el => {
         el.addEventListener('mouseenter', () => {
           const name = el.getAttribute('data-shortname') || '';
@@ -5876,17 +5809,17 @@
           const spot = el.getAttribute('data-spotlight') || '0';
           const man = el.getAttribute('data-manifest') || '0';
           const pct = cap > 0 ? Math.round(w / cap * 100) : 0;
-          let html = '<div class="tip-val tip-val-text">' + name + '</div>';
+          let html = '<div class="tip-val tip-val-text">' + Tip.esc(name) + '</div>';
           if (cap > 0) {
-            html += '<div class="tip-ctx">Rack ' + rack + ' &middot; Spotlight ' + spot +
-                    ' &middot; Manifest ' + man + ' = ' + w + ' lb</div>';
+            html += '<div class="tip-ctx">Rack ' + Tip.esc(rack) + ' &middot; Spotlight ' + Tip.esc(spot) +
+                    ' &middot; Manifest ' + Tip.esc(man) + ' = ' + w + ' lb</div>';
             html += '<div class="tip-ctx">' + pct + '% of capacity</div>';
           } else {
             html += '<div class="tip-ctx">Awaiting manifest</div>';
           }
-          _packShowTip(tip, el, html, false);
+          Tip.show(el, html, { wide: false });
         });
-        el.addEventListener('mouseleave', () => { tip.classList.remove('visible'); });
+        el.addEventListener('mouseleave', () => Tip.hide());
         el.addEventListener('click', () => {
           const slug = el.getAttribute('data-slug');
           if (slug) {
@@ -5981,14 +5914,13 @@
 
     // --- Archetype badge tooltips ---
     (function () {
-      const tip = _packGetTip();
       document.querySelectorAll('.archetype').forEach(el => {
         el.addEventListener('mouseenter', () => {
           const text = el.getAttribute('data-inscription') || '';
           if (!text) return;
-          _packShowTip(tip, el, '<div class="tip-ctx">' + text + '</div>', true);
+          Tip.show(el, '<div class="tip-ctx">' + Tip.esc(text) + '</div>', { wide: true });
         });
-        el.addEventListener('mouseleave', () => { tip.classList.remove('visible'); });
+        el.addEventListener('mouseleave', () => Tip.hide());
       });
     })();
 
@@ -6086,19 +6018,19 @@
 
     // ── The Ascent (XP) — tooltips, hover highlight, load animation ──────────
     (function () {
-      var svg = document.querySelector('.ascent-chart');
+      const svg = document.querySelector('.ascent-chart');
       if (!svg) return;
-      var REDUCED = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      var CAP = { combat: 'Combat', milestone: 'Milestone', quest: 'Quest', discovery: 'Discovery', roleplay: 'Roleplay' };
+      const REDUCED = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const CAP = { combat: 'Combat', milestone: 'Milestone', quest: 'Quest', discovery: 'Discovery', roleplay: 'Roleplay' };
 
-      var line = svg.querySelector('.ascent-line');
-      var area = svg.querySelector('.ascent-area');
-      var proj = svg.querySelector('.ascent-projection');
-      var road = svg.querySelector('.ascent-roadtext');
-      var guide = svg.querySelector('.ascent-guide');
-      var pulse = svg.querySelector('.ascent-pulse');
-      var nodes = svg.querySelectorAll('.ascent-node');
-      var uptags = svg.querySelectorAll('.ascent-uptag');
+      const line = svg.querySelector('.ascent-line');
+      const area = svg.querySelector('.ascent-area');
+      const proj = svg.querySelector('.ascent-projection');
+      const road = svg.querySelector('.ascent-roadtext');
+      const guide = svg.querySelector('.ascent-guide');
+      const pulse = svg.querySelector('.ascent-pulse');
+      const nodes = svg.querySelectorAll('.ascent-node');
+      const uptags = svg.querySelectorAll('.ascent-uptag');
 
       // Load animation
       if (REDUCED) {
@@ -6109,7 +6041,7 @@
         uptags.forEach(function (t) { t.style.opacity = 1; });
       } else {
         if (line) {
-          var len = line.getTotalLength();
+          const len = line.getTotalLength();
           line.style.strokeDasharray = len;
           line.style.strokeDashoffset = len;
           line.getBoundingClientRect();
@@ -6125,39 +6057,27 @@
       }
 
       // map node index -> visible node for hover highlight
-      var visByI = {};
+      const visByI = {};
       nodes.forEach(function (n, idx) { visByI[idx] = n; });
 
-      var tip = document.querySelector('.dice-tooltip') || (function () {
-        var t = document.createElement('div'); t.className = 'dice-tooltip';
-        document.body.appendChild(t); return t;
-      })();
-      var hideTimer;
-
       svg.querySelectorAll('.ascent-hit').forEach(function (h) {
-        var i = h.getAttribute('data-i');
+        const i = h.getAttribute('data-i');
         h.addEventListener('mouseenter', function () {
-          clearTimeout(hideTimer);
-          var gain = +h.getAttribute('data-gain');
-          var total = (+h.getAttribute('data-total')).toLocaleString();
-          var type = h.getAttribute('data-type');
-          var date = h.getAttribute('data-date');
-          var label = h.getAttribute('data-label');
-          var note = h.getAttribute('data-note');
-          var html = '<div class="tip-val">' + (gain > 0 ? '+' + gain : '&mdash;') + '</div>';
-          html += '<div class="tip-ctx" style="color:var(--paper);font-size:13px;text-transform:none;font-family:\'Cormorant Garamond\',serif;">' + label + '</div>';
-          var meta = [];
-          if (type) meta.push(CAP[type] || type);
-          if (date) meta.push(date);
+          const gain = +h.getAttribute('data-gain');
+          const total = (+h.getAttribute('data-total')).toLocaleString();
+          const type = h.getAttribute('data-type');
+          const date = h.getAttribute('data-date');
+          const label = h.getAttribute('data-label');
+          const note = h.getAttribute('data-note');
+          let html = '<div class="tip-val">' + (gain > 0 ? '+' + gain : '&mdash;') + '</div>';
+          html += '<div class="tip-ctx tip-title">' + Tip.esc(label) + '</div>';
+          const meta = [];
+          if (type) meta.push(Tip.esc(CAP[type] || type));
+          if (date) meta.push(Tip.esc(date));
           if (meta.length) html += '<div class="tip-ctx">' + meta.join(' &middot; ') + '</div>';
-          if (note) html += '<div class="tip-ctx" style="text-transform:none;font-style:italic;font-family:\'EB Garamond\',serif;font-size:13px;max-width:260px;white-space:normal;margin-top:8px;">' + note + '</div>';
-          if (gain > 0) html += '<div class="tip-ctx" style="margin-top:8px;padding-top:8px;border-top:1px solid var(--rule);">Running total &middot; ' + total + ' XP</div>';
-          tip.className = 'dice-tooltip tip-wide';
-          tip.innerHTML = html;
-          var r = h.getBoundingClientRect();
-          tip.style.left = (r.left + r.width / 2) + 'px';
-          tip.style.top = r.top + 'px';
-          tip.classList.add('visible');
+          if (note) html += '<div class="tip-ctx tip-note">' + Tip.esc(note) + '</div>';
+          if (gain > 0) html += '<div class="tip-ctx tip-total">Running total &middot; ' + total + ' XP</div>';
+          Tip.show(h, html, { wide: true });
           if (visByI[i]) visByI[i].classList.add('active');
           if (guide) {
             guide.setAttribute('x1', h.getAttribute('data-cx'));
@@ -6168,7 +6088,7 @@
           }
         });
         h.addEventListener('mouseleave', function () {
-          hideTimer = setTimeout(function () { tip.classList.remove('visible'); }, 80);
+          Tip.hide();
           if (visByI[i]) visByI[i].classList.remove('active');
           if (guide) guide.classList.remove('on');
         });
@@ -6176,19 +6096,11 @@
 
       (svg.closest('section') || document).querySelectorAll('.whence-seg').forEach(function (s) {
         s.addEventListener('mouseenter', function () {
-          clearTimeout(hideTimer);
-          var html = '<div class="tip-val">' + s.getAttribute('data-xp') + '</div>';
-          html += '<div class="tip-ctx">' + s.getAttribute('data-label') + ' &middot; ' + s.getAttribute('data-pct') + '% of all XP</div>';
-          tip.className = 'dice-tooltip tip-wide';
-          tip.innerHTML = html;
-          var r = s.getBoundingClientRect();
-          tip.style.left = (r.left + r.width / 2) + 'px';
-          tip.style.top = r.top + 'px';
-          tip.classList.add('visible');
+          let html = '<div class="tip-val">' + Tip.esc(s.getAttribute('data-xp')) + '</div>';
+          html += '<div class="tip-ctx">' + Tip.esc(s.getAttribute('data-label')) + ' &middot; ' + Tip.esc(s.getAttribute('data-pct')) + '% of all XP</div>';
+          Tip.show(s, html, { wide: true });
         });
-        s.addEventListener('mouseleave', function () {
-          hideTimer = setTimeout(function () { tip.classList.remove('visible'); }, 80);
-        });
+        s.addEventListener('mouseleave', function () { Tip.hide(); });
       });
     })();
 
@@ -6242,31 +6154,17 @@
       const triggers = document.querySelectorAll('[data-gloss]');
       if (!triggers.length) return;
 
-      const tip = document.createElement('div');
-      tip.className = 'dice-tooltip tip-gloss';
-      document.body.appendChild(tip);
-      let hideTimer, openEl = null, shownAt = 0;
+      let openEl = null, shownAt = 0;
 
-      const place = (anchor) => {
-        const margin = 8;
-        const half = tip.offsetWidth / 2;
-        const r = anchor.getBoundingClientRect();
-        let cx = r.left + r.width / 2;
-        cx = Math.max(half + margin, Math.min(window.innerWidth - half - margin, cx));
-        tip.style.left = cx + 'px';
-        tip.style.top = r.top + 'px';
-      };
       const show = (anchor, term, body) => {
-        clearTimeout(hideTimer);
-        tip.innerHTML = '<div class="tip-term">' + term + '</div>' +
-                        '<div class="tip-def">' + body + '</div>';
-        tip.classList.add('visible');
-        place(anchor);                 // measure after content lands, so width is real
+        const html = '<div class="tip-term">' + term + '</div>' +
+                     '<div class="tip-def">' + body + '</div>';
+        Tip.show(anchor, html, { gloss: true });
         openEl = anchor;
         shownAt = Date.now();
       };
-      const close = () => { tip.classList.remove('visible'); openEl = null; };
-      const hide = () => { hideTimer = setTimeout(close, 80); };
+      const close = () => { Tip.el.classList.remove('visible'); openEl = null; };
+      const hide = () => Tip.hide();
 
       triggers.forEach(el => {
         const def = GLOSS[el.getAttribute('data-gloss')];
@@ -6284,16 +6182,16 @@
           e.preventDefault();
           // Only a deliberate second interaction (not the click that trails a
           // hover/focus show) collapses it.
-          if (openEl === el && Date.now() - shownAt > 250) { clearTimeout(hideTimer); close(); }
+          if (openEl === el && Date.now() - shownAt > 250) { Tip.cancelHide(); close(); }
           else show(el, def.term, body);
         });
         el.addEventListener('keydown', (e) => {
-          if (e.key === 'Escape') { clearTimeout(hideTimer); close(); el.blur(); }
+          if (e.key === 'Escape') { Tip.cancelHide(); close(); el.blur(); }
         });
       });
 
       document.addEventListener('click', (e) => {
-        if (openEl && !openEl.contains(e.target)) { clearTimeout(hideTimer); close(); }
+        if (openEl && !openEl.contains(e.target)) { Tip.cancelHide(); close(); }
       });
     })();
 
