@@ -1569,6 +1569,19 @@ def load_data(data_dir: Path) -> dict:
         if _has_chapter_marker(text):
             ne["chapter_marker"] = True
         normalized_entries.append(ne)
+
+    # The refresh marker (site.refreshed_through_session) and every marker
+    # gate in build/slices.py treat entry position as session id. That is
+    # only sound while entry i IS session i — fail loudly if the log ever
+    # gains an out-of-order / inserted entry so the assumption is revisited
+    # deliberately instead of silently mis-scoping every refresh pass.
+    for i, ne in enumerate(normalized_entries, start=1):
+        if ne.get("session") != i:
+            raise ValueError(
+                f"session ordinal mismatch: entry {i} carries session "
+                f"{ne.get('session')!r}; the refresh marker requires entry i == session i"
+            )
+
     session_log = dict(session_log)
     session_log["entries"] = normalized_entries
 

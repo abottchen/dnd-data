@@ -40,6 +40,23 @@ def slice_env(tmp_path, monkeypatch):
     return {"data": data, "authored": authored, "authored_dir": authored_dir}
 
 
+# -- _new_entries helper coverage ---------------------------------------------
+
+def test_new_entries_respects_marker(slice_env):
+    data, authored = slice_env["data"], slice_env["authored"]
+    authored["site"]["refreshed_through_session"] = 1
+    new = slices._new_entries(data, authored)
+    assert [e["session"] for e in new] == [
+        e["session"] for e in data["session_log"]["entries"][1:]
+    ]
+
+
+def test_new_entries_empty_when_marker_current(slice_env):
+    data, authored = slice_env["data"], slice_env["authored"]
+    authored["site"]["refreshed_through_session"] = len(data["session_log"]["entries"])
+    assert slices._new_entries(data, authored) == []
+
+
 # -- Append-pass coverage ----------------------------------------------------
 
 def test_append_kills_emits_slice_per_session_with_new_kills(slice_env):

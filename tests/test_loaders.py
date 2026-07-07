@@ -1,6 +1,8 @@
 import json
 from pathlib import Path
 
+import pytest
+
 from build import render
 from build.render import load_data
 
@@ -113,3 +115,16 @@ def test_load_data_tolerates_missing_xp_log(tmp_path: Path):
     (tmp_path / "dice").mkdir()
     data = load_data(tmp_path)          # no xp-log.json on disk
     assert data["xp_log"] == {"entries": []}
+
+
+def test_load_data_rejects_out_of_order_session_ordinals(tmp_path):
+    """The refresh marker is a positional count; entry i must be session i."""
+    (tmp_path / "party.json").write_text("[]")
+    (tmp_path / "dice").mkdir()
+    log = {"entries": [
+        {"day": "1", "realDate": "04/19/2026", "text": ""},
+        {"day": "3", "realDate": "04/23/2026", "text": ""},   # gap: entry 2 is session 3
+    ]}
+    (tmp_path / "session-log.json").write_text(json.dumps(log))
+    with pytest.raises(ValueError, match="session ordinal"):
+        render.load_data(tmp_path)

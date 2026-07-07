@@ -30,12 +30,11 @@ def _character_context(data: dict, authored: dict) -> tuple[dict, dict, list]:
     fact_pack = render.compute_fact_pack(
         data["party"], trials, fortune, constellation, data["session_log"])
 
-    marker = authored["site"].get("refreshed_through_session", 0)
-    entries = data["session_log"]["entries"]
-    new_dates = {e["date"] for i, e in enumerate(entries, start=1) if i > marker}
+    new = _new_entries(data, authored)
+    new_dates = {e["date"] for e in new}
     session_text = [
         {"session": e.get("session"), "date": e.get("date"), "text": e.get("text", "")}
-        for i, e in enumerate(entries, start=1) if i > marker
+        for e in new
     ]
 
     had_new_activity = {}
@@ -93,6 +92,17 @@ def session_index(sid: int, session_log: dict) -> int | None:
         if e.get("session") == sid:
             return i
     return None
+
+
+def _new_entries(data: dict, authored: dict) -> list[dict]:
+    """Session-log entries newer than the refresh marker, in log order.
+
+    The marker is a positional count (entry i == session i; load_data
+    enforces this), so 'newer' is simply position > marker.
+    """
+    marker = authored["site"].get("refreshed_through_session", 0)
+    entries = data["session_log"]["entries"]
+    return list(entries[marker:])
 
 
 def chapter_session_ids(chapter_id: int, chapters: list, session_log: dict) -> list[int]:
@@ -310,12 +320,9 @@ def refresh_npcs(data: dict, authored: dict) -> list[tuple]:
     Under --force-refresh (signalled via the `force_refresh` side channel) the
     gate is lifted and the whole roster is re-evaluated.
     """
-    marker = authored["site"].get("refreshed_through_session", 0)
     force = authored.get("force_refresh", False)
     new_session_ids = None if force else {
-        entry.get("session")
-        for i, entry in enumerate(data["session_log"]["entries"], start=1)
-        if i > marker
+        e.get("session") for e in _new_entries(data, authored)
     }
 
     out = []
@@ -366,10 +373,7 @@ def refresh_characters(data: dict, authored: dict) -> list[tuple]:
 
 
 def refresh_road_ahead(data: dict, authored: dict) -> list[tuple]:
-    marker = authored["site"].get("refreshed_through_session", 0)
-    new_sessions = [
-        e for i, e in enumerate(data["session_log"]["entries"], start=1) if i > marker
-    ]
+    new_sessions = _new_entries(data, authored)
     return [("all", {
         "new_sessions": new_sessions,
         "existing": authored["site"]["road_ahead"],
@@ -377,10 +381,7 @@ def refresh_road_ahead(data: dict, authored: dict) -> list[tuple]:
 
 
 def refresh_intro_epithet(data: dict, authored: dict) -> list[tuple]:
-    marker = authored["site"].get("refreshed_through_session", 0)
-    new_sessions = [
-        e for i, e in enumerate(data["session_log"]["entries"], start=1) if i > marker
-    ]
+    new_sessions = _new_entries(data, authored)
     return [("all", {
         "new_sessions": new_sessions,
         "road_ahead_known": authored["site"]["road_ahead"]["known"],
@@ -391,10 +392,7 @@ def refresh_intro_epithet(data: dict, authored: dict) -> list[tuple]:
 def refresh_ascent_read(data: dict, authored: dict) -> list[tuple]:
     """One slice carrying the new sessions, the current XP-by-type composition,
     and the existing one-line 'character read' for the prompt to weigh."""
-    marker = authored["site"].get("refreshed_through_session", 0)
-    new_sessions = [
-        e for i, e in enumerate(data["session_log"]["entries"], start=1) if i > marker
-    ]
+    new_sessions = _new_entries(data, authored)
     by_type: dict[str, int] = defaultdict(int)
     for e in (data.get("xp_log") or {}).get("entries", []):
         by_type[e.get("type") or "other"] += int(e.get("perPc", 0))
