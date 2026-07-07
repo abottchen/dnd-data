@@ -40,5 +40,11 @@
       }
     },
     "reason": {"type": "string"}
-  }
+  },
+  "allOf": [
+    {
+      "if": {"properties": {"decision": {"const": "rewrite"}}},
+      "then": {"properties": {"fields": {"type": "object"}}}
+    }
+  ]
 }
