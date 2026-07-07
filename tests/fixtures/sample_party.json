@@ -6,11 +6,66 @@
       "image": "anton-truebranch.png",
       "race": "Halfling",
       "class": "Bard",
+      "background": "Guild Artisan",
+      "level": 3,
+      "ac": 15,
+      "hp": {
+        "max": 24
+      },
+      "speed": 25,
+      "abilities": {
+        "str": 10,
+        "dex": 14,
+        "con": 12,
+        "int": 8,
+        "wis": 10,
+        "cha": 16
+      },
+      "savingThrows": {
+        "str": {
+          "mod": 0,
+          "prof": false
+        },
+        "dex": {
+          "mod": 2,
+          "prof": false
+        },
+        "con": {
+          "mod": 1,
+          "prof": false
+        },
+        "int": {
+          "mod": -1,
+          "prof": false
+        },
+        "wis": {
+          "mod": 2,
+          "prof": true
+        },
+        "cha": {
+          "mod": 5,
+          "prof": true
+        }
+      },
       "kills": [
-        {"date": "2026-04-19", "creature": "Goblin", "method": "Vicious Mockery"},
-        {"date": "2026-04-23", "creature": "Bandit", "method": "Vicious Mockery"}
+        {
+          "date": "2026-04-19",
+          "creature": "Goblin",
+          "method": "Vicious Mockery"
+        },
+        {
+          "date": "2026-04-23",
+          "creature": "Bandit",
+          "method": "Vicious Mockery"
+        }
       ],
-      "skills": {"Persuasion": {"mod": 5}}
+      "skills": {
+        "Persuasion": {
+          "mod": 5,
+          "prof": "full"
+        }
+      },
+      "subclass": null
     },
     {
       "id": "vex",
@@ -18,10 +73,61 @@
       "image": "vex-stormcaller.png",
       "race": "Tiefling",
       "class": "Fighter",
+      "background": "Soldier",
+      "level": 3,
+      "ac": 16,
+      "hp": {
+        "max": 28
+      },
+      "speed": 30,
+      "abilities": {
+        "str": 16,
+        "dex": 12,
+        "con": 14,
+        "int": 8,
+        "wis": 10,
+        "cha": 8
+      },
+      "savingThrows": {
+        "str": {
+          "mod": 5,
+          "prof": true
+        },
+        "dex": {
+          "mod": 1,
+          "prof": false
+        },
+        "con": {
+          "mod": 4,
+          "prof": true
+        },
+        "int": {
+          "mod": -1,
+          "prof": false
+        },
+        "wis": {
+          "mod": 0,
+          "prof": false
+        },
+        "cha": {
+          "mod": -1,
+          "prof": false
+        }
+      },
       "kills": [
-        {"date": "2026-04-19", "creature": "Goblin", "method": "Longsword"}
+        {
+          "date": "2026-04-19",
+          "creature": "Goblin",
+          "method": "Longsword"
+        }
       ],
-      "skills": {"Athletics": {"mod": 4}}
+      "skills": {
+        "Athletics": {
+          "mod": 4,
+          "prof": "full"
+        }
+      },
+      "subclass": null
     }
   ]
 }
