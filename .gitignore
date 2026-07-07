@@ -18,7 +18,6 @@ data/*
 __pycache__/
 .pytest_cache/
 *.pyc
-.venv
 .venv/
 
 # Build run staging dirs
