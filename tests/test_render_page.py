@@ -35,7 +35,7 @@ def _forbidden_names_regex() -> str:
 
 def _render_html(staged_env) -> str:
     """Load staged fixture data + authored store, run compute_all, and render
-    the page, returning the HTML text.
+    the page, returning the rendered HTML text and the authored store.
 
     The `vex` party member is deliberately left out of
     tests/fixtures/sample_authored/characters.json — test_slices.py relies on

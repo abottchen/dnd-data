@@ -186,9 +186,7 @@ def render_page(context: dict, templates_dir: Path, out_path: Path) -> None:
         autoescape=True,
         keep_trailing_newline=True,
     )
-    env.filters["short_date"] = _short_date
     env.filters["roman"] = _to_roman
-    env.filters["cr_label"] = compute_cr_label
     env.filters["ability_mod"] = lambda score: (score - 10) // 2
     template = env.get_template("base.html")
     html = template.render(**context)
