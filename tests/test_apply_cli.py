@@ -169,3 +169,44 @@ def test_apply_failure_in_apply_fn_rejects_slice_and_continues(staged_run):
     rejected_dir = run_dir / "results" / "rejected"
     assert (rejected_dir / f"{target['stem']}.json").exists()
     assert (rejected_dir / f"{target['stem']}.error.json").exists()
+
+
+def test_failed_apply_leaves_no_partial_mutation(staged_run):
+    """append-kills applies per-entry in a loop; a bad key mid-batch must not
+    leave earlier entries appended when the slice is recorded rejected."""
+    run_dir, authored_dir = staged_run
+    manifest = json.loads((run_dir / "manifest.json").read_text())
+    entry = next(s for s in manifest["slices"]
+                 if s["transformer"] == "append-kills")
+    slice_data = json.loads((run_dir / entry["pending"]).read_text())
+    k = slice_data["kills"][0]
+    good_key = f"{k['character']}__{k['date']}__{k['creature']}__{k['method']}"
+    _write_result(run_dir, entry, {
+        "fields": {
+            good_key: {"verse": "A verse.", "annotation": "an annotation"},
+            "nobody__2099-01-01__Nothing__nothing": {"verse": "x", "annotation": "y"},
+        },
+        "reason": "test",
+    })
+
+    # Also write a valid result for another slice so this run has at least
+    # one successful apply — otherwise apply_run's `if applied: persist()`
+    # gate never fires and kills.json would trivially stay untouched
+    # regardless of whether the mid-loop mutation leaked, masking the bug.
+    sessions_entry = next(s for s in manifest["slices"]
+                          if s["transformer"] == "append-sessions")
+    _write_result(run_dir, sessions_entry, {
+        "fields": {
+            "title": "Unrelated Session",
+            "summary": "A session applied successfully in the same run.",
+            "silent_roll": [],
+        },
+        "reason": "test",
+    })
+
+    before = json.loads((authored_dir / "kills.json").read_text())
+    summary = apply_cli.apply_run(run_dir, skip_render=True)
+    assert any(r["stem"] == entry["stem"] for r in summary["rejected"])
+    assert any(a["stem"] == sessions_entry["stem"] for a in summary["applied"])
+    after = json.loads((authored_dir / "kills.json").read_text())
+    assert after == before  # no partial append persisted

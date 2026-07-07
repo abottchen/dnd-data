@@ -9,6 +9,7 @@ Idempotency: a result that has already been applied moves out of `results/`
 into `results/applied/`. Re-running apply on the same run dir reapplies
 nothing that was applied before.
 """
+import copy
 import json
 import shutil
 import subprocess
@@ -17,8 +18,8 @@ from pathlib import Path
 
 import jsonschema
 
-from . import inventory, registry, render, store
-from .paths import REPO_ROOT, data_dir
+from . import registry, store
+from .paths import REPO_ROOT
 
 
 def _load_manifest(run_dir: Path) -> dict:
@@ -89,11 +90,7 @@ def apply_run(run_dir: Path, *, skip_render: bool) -> dict:
     manifest = _load_manifest(run_dir)
     # Always load fresh state from disk; authored may have been edited between
     # prepare and apply (deliberate user intervention).
-    data = render.load_data(str(data_dir()))
     authored = store.load_authored()
-    inv_bundle = inventory.load(REPO_ROOT, party=data["party"])
-    authored["inventory_by_id"] = inv_bundle["by_id"]
-    authored["pronouns_by_id"] = render.load_character_pronouns()
 
     applied: list = []
     rejected: list = []
@@ -129,15 +126,19 @@ def apply_run(run_dir: Path, *, skip_render: bool) -> dict:
             _record_rejection(rejected, rejected_dir, entry, result_path, str(e))
             continue
 
-        # Apply.
+        # Apply against a scratch copy so a mid-loop failure inside an
+        # apply fn cannot leave half-applied mutations in the store that
+        # a later persist() would write to disk.
         slice_data = _load_slice(run_dir, entry)
         fn = registry.by_name(entry["transformer"]).apply_fn
+        trial = copy.deepcopy(authored)
         try:
-            fn(authored, entry["key"], slice_data, output)
+            fn(trial, entry["key"], slice_data, output)
         except (ValueError, KeyError) as e:
             _record_rejection(rejected, rejected_dir, entry, result_path,
                               f"apply failed: {e}")
             continue
+        authored = trial
 
         applied.append({"transformer": entry["transformer"],
                         "key": entry["key"], "stem": entry["stem"]})
