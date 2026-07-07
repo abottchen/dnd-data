@@ -6,60 +6,22 @@ from pathlib import Path
 import pytest
 
 from build import apply_cli, prepare, store
-from build.paths import REPO_ROOT
-
-FIXTURES = REPO_ROOT / "tests/fixtures"
 
 
 @pytest.fixture
-def staged_run(tmp_path, monkeypatch):
-    """Run prepare against the fixtures to produce a real run dir."""
-    data_dir = tmp_path / "data"
-    data_dir.mkdir()
-    shutil.copy(FIXTURES / "sample_party.json", data_dir / "party.json")
-    shutil.copy(FIXTURES / "sample_session_log.json", data_dir / "session-log.json")
-    (data_dir / "dice").mkdir()
-    shutil.copy(FIXTURES / "sample_dicex_rolls.json",
-                data_dir / "dice" / "dicex-rolls-2026-04-23.json")
-
-    authored_dir = tmp_path / "authored"
-    authored_dir.mkdir()
-    for f in (FIXTURES / "sample_authored").iterdir():
-        shutil.copy(f, authored_dir / f.name)
-
-    run_root = tmp_path / "runs"
-    run_root.mkdir()
-    monkeypatch.setenv("BUILD_DATA_DIR", str(data_dir))
-    monkeypatch.setenv("BUILD_AUTHORED_DIR", str(authored_dir))
-    monkeypatch.setenv("BUILD_RUN_ROOT", str(run_root))
-
+def staged_run(staged_env):
+    """Thin wrapper over staged_env: run prepare against the fixtures to
+    produce a real run dir. Returns (run_dir, authored_dir)."""
+    authored_dir = staged_env / "authored"
     run_dir = prepare.run(no_refresh=True, force_refresh=False, keep_temp=False)
     return run_dir, authored_dir
 
 
 @pytest.fixture
-def staged_refresh_run(tmp_path, monkeypatch):
+def staged_refresh_run(staged_env):
     """Like staged_run, but with the refresh pass forced on so refresh slices
     (e.g. refresh-road-ahead) exist in the manifest."""
-    data_dir = tmp_path / "data"
-    data_dir.mkdir()
-    shutil.copy(FIXTURES / "sample_party.json", data_dir / "party.json")
-    shutil.copy(FIXTURES / "sample_session_log.json", data_dir / "session-log.json")
-    (data_dir / "dice").mkdir()
-    shutil.copy(FIXTURES / "sample_dicex_rolls.json",
-                data_dir / "dice" / "dicex-rolls-2026-04-23.json")
-
-    authored_dir = tmp_path / "authored"
-    authored_dir.mkdir()
-    for f in (FIXTURES / "sample_authored").iterdir():
-        shutil.copy(f, authored_dir / f.name)
-
-    run_root = tmp_path / "runs"
-    run_root.mkdir()
-    monkeypatch.setenv("BUILD_DATA_DIR", str(data_dir))
-    monkeypatch.setenv("BUILD_AUTHORED_DIR", str(authored_dir))
-    monkeypatch.setenv("BUILD_RUN_ROOT", str(run_root))
-
+    authored_dir = staged_env / "authored"
     run_dir = prepare.run(no_refresh=False, force_refresh=True, keep_temp=False)
     return run_dir, authored_dir
 

@@ -271,7 +271,7 @@ def test_header_eyebrow_handles_missing_keys():
 
 # ── compute_constellation links ────────────────────────────────────────
 
-def _consteltation_inputs(*xp_pairs):
+def _constellation_inputs(*xp_pairs):
     """Build (party, fortune_by_char, trials) for compute_constellation tests."""
     members = [{"id": cid, "name": cid.title()} for cid, _ in xp_pairs]
     party = {"members": members}
@@ -285,7 +285,7 @@ def _consteltation_inputs(*xp_pairs):
 
 
 def test_constellation_links_empty_when_fewer_than_two_stars():
-    party, fortune, trials = _consteltation_inputs(("anton", 100))
+    party, fortune, trials = _constellation_inputs(("anton", 100))
     result = compute_constellation(party, fortune, trials)
     assert result["links"] == []
 
@@ -296,7 +296,7 @@ def test_constellation_links_empty_when_no_stars():
 
 
 def test_constellation_links_form_a_closed_loop():
-    party, fortune, trials = _consteltation_inputs(
+    party, fortune, trials = _constellation_inputs(
         ("anton", 100), ("vex", 200), ("urida", 300)
     )
     result = compute_constellation(party, fortune, trials)
@@ -311,7 +311,7 @@ def test_constellation_links_form_a_closed_loop():
 
 def test_constellation_links_ordered_by_xp_ascending():
     # Pass members in non-monotonic order to confirm the sort happens inside.
-    party, fortune, trials = _consteltation_inputs(
+    party, fortune, trials = _constellation_inputs(
         ("vex", 200), ("anton", 100), ("urida", 300)
     )
     result = compute_constellation(party, fortune, trials)
@@ -394,7 +394,7 @@ def test_radar_sector_path_is_a_closed_wedge():
 def test_constellation_links_tiebreak_by_id_when_xp_equal():
     # Identical xp but different rolls → each star is its own cluster, so
     # the (xp, id) tiebreak in the link sort is what matters here.
-    party, fortune, trials = _consteltation_inputs(
+    party, fortune, trials = _constellation_inputs(
         ("vex", 100), ("anton", 100), ("grieg", 100)
     )
     fortune["anton"]["rolls_total"] = 30
@@ -418,7 +418,7 @@ def test_constellation_links_tiebreak_by_id_when_xp_equal():
 # ── compute_constellation systems (collision handling) ────────────────
 
 def test_constellation_no_collision_means_no_systems():
-    party, fortune, trials = _consteltation_inputs(("anton", 100), ("vex", 200))
+    party, fortune, trials = _constellation_inputs(("anton", 100), ("vex", 200))
     result = compute_constellation(party, fortune, trials)
     assert result["systems"] == []
     for s in result["stars"]:
@@ -429,7 +429,7 @@ def test_constellation_no_collision_means_no_systems():
 
 def test_constellation_collision_creates_system():
     # Identical xp + identical rolls → both stars round to the same coord.
-    party, fortune, trials = _consteltation_inputs(("vex", 100), ("grieg", 100))
+    party, fortune, trials = _constellation_inputs(("vex", 100), ("grieg", 100))
     result = compute_constellation(party, fortune, trials)
     assert len(result["systems"]) == 1
     sys = result["systems"][0]
@@ -441,7 +441,7 @@ def test_constellation_collision_creates_system():
 
 def test_constellation_binary_orbit_offsets_are_mirrored():
     # n=2 → horizontal pair, offsets sum to zero on x and stay flat on y.
-    party, fortune, trials = _consteltation_inputs(("vex", 100), ("grieg", 100))
+    party, fortune, trials = _constellation_inputs(("vex", 100), ("grieg", 100))
     result = compute_constellation(party, fortune, trials)
     xs = sorted(s["orbit_x_px"] for s in result["stars"])
     assert xs[0] == -xs[1]
@@ -456,7 +456,7 @@ def test_constellation_clusters_near_misses():
     # grieg have nearly the same rolls — a 1-vs-2 difference rounds to
     # adjacent (top_pct = 4 vs 6), which puts the 72px portraits ~8px apart
     # on the y-axis and almost fully on top of each other.
-    party, fortune, trials = _consteltation_inputs(
+    party, fortune, trials = _constellation_inputs(
         ("vex", 100), ("grieg", 100)
     )
     fortune["vex"]["rolls_total"] = 100
@@ -468,7 +468,7 @@ def test_constellation_clusters_near_misses():
 
 def test_constellation_links_dedupe_through_clusters():
     # vex + grieg collide; anton stands alone. Two cluster nodes → two links.
-    party, fortune, trials = _consteltation_inputs(
+    party, fortune, trials = _constellation_inputs(
         ("anton", 50), ("vex", 200), ("grieg", 200)
     )
     result = compute_constellation(party, fortune, trials)

@@ -1,15 +1,10 @@
 """Tests for build/prepare.py — slice gathering and run-dir population."""
 import json
 import os
-import shutil
-from pathlib import Path
 
 import pytest
 
 from build import prepare, render
-from build.paths import REPO_ROOT
-
-FIXTURES = REPO_ROOT / "tests/fixtures"
 
 
 # -- Frontmatter parser (moved from build/invoke.py) ------------------------
@@ -51,28 +46,10 @@ def test_parse_frontmatter_malformed_line_raises():
 
 
 @pytest.fixture
-def run_env(tmp_path, monkeypatch):
-    """Stage a fixture data dir, authored dir, and isolated run root."""
-    data_dir = tmp_path / "data"
-    data_dir.mkdir()
-    shutil.copy(FIXTURES / "sample_party.json", data_dir / "party.json")
-    shutil.copy(FIXTURES / "sample_session_log.json", data_dir / "session-log.json")
-    (data_dir / "dice").mkdir()
-    shutil.copy(FIXTURES / "sample_dicex_rolls.json",
-                data_dir / "dice" / "dicex-rolls-2026-04-23.json")
-
-    authored_dir = tmp_path / "authored"
-    authored_dir.mkdir()
-    for f in (FIXTURES / "sample_authored").iterdir():
-        shutil.copy(f, authored_dir / f.name)
-
-    run_root = tmp_path / "runs"
-    run_root.mkdir()
-
-    monkeypatch.setenv("BUILD_DATA_DIR", str(data_dir))
-    monkeypatch.setenv("BUILD_AUTHORED_DIR", str(authored_dir))
-    monkeypatch.setenv("BUILD_RUN_ROOT", str(run_root))
-    return tmp_path
+def run_env(staged_env):
+    """Thin wrapper over staged_env: stage a fixture data dir, authored dir,
+    and isolated run root. Returns tmp_path."""
+    return staged_env
 
 
 def test_prepare_creates_manifest_and_pending_files(run_env):
@@ -135,8 +112,8 @@ def test_prepare_model_from_prompt_frontmatter(run_env):
     run_dir = prepare.run(no_refresh=False, force_refresh=True, keep_temp=False)
     manifest = json.loads((run_dir / "manifest.json").read_text())
     models = {s["model"] for s in manifest["slices"]}
-    # All entries should declare a model (default "sonnet" if absent).
-    assert all(m for m in models)
+    # All entries should declare a known model (default "sonnet" if absent).
+    assert models <= {"sonnet", "opus"}
 
 
 def test_prepare_writes_keep_marker_when_keep_temp(run_env):

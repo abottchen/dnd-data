@@ -128,3 +128,20 @@ def test_load_data_rejects_out_of_order_session_ordinals(tmp_path):
     (tmp_path / "session-log.json").write_text(json.dumps(log))
     with pytest.raises(ValueError, match="session ordinal"):
         render.load_data(tmp_path)
+
+
+def test_resolve_dice_player_substring_hit():
+    assert render._resolve_dice_player("Zebulon Marlowe", {"Zebulon": "vex"}) == "vex"
+
+
+def test_resolve_dice_player_longest_pattern_first():
+    mapping = {"Z": "wrong", "Zebulon": "vex"}
+    assert render._resolve_dice_player("Zebulon Marlowe", mapping) == "vex"
+
+
+def test_resolve_dice_player_no_match_returns_none():
+    assert render._resolve_dice_player("Nobody Special", {"Quinn": "vex"}) is None
+
+
+def test_resolve_dice_player_ignores_empty_pattern():
+    assert render._resolve_dice_player("Anyone", {"": "oops"}) is None
