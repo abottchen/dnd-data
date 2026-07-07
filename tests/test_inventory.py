@@ -27,7 +27,7 @@ def test_parse_inventories_drops_gm_and_resolves_names():
     raw = {
         "inventories": {
             "uuid-1": {
-                "name": "Simon Weil",
+                "name": "Simeon Weil",
                 "items": [{"id": "x", "count": 1, "name": "Sword",
                            "category": "Weapon", "weight": 3, "rarity": "common",
                            "icon": "https://example/sword.svg",
@@ -46,7 +46,7 @@ def test_parse_inventories_drops_gm_and_resolves_names():
             },
         },
     }
-    mapping = {"Simon": "grieg", "Vex": "vex", "GM": "gm"}
+    mapping = {"Simeon": "grieg", "Vex": "vex", "GM": "gm"}
 
     parsed = inventory._parse_inventories(raw, mapping)
 
