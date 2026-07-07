@@ -11,6 +11,15 @@ The user message is a JSON object with this shape:
 - `composition` (array): XP-by-type totals for the whole campaign, descending — each `{type, xp, pct}`. Types are `combat`, `milestone`, `quest`, `discovery`, `roleplay`.
 - `existing` (str): the current one-line character read shown beneath the XP source bar.
 
+# Spoiler rules (omit, do not paraphrase)
+
+`new_sessions` is raw session text that includes DM-only content the players could not know. Never let it into the character read:
+
+- `(DM Note)` prefix → omit the entire line.
+- Bracketed notes `[like this]` → DM-only; omit.
+- Future-tense planning from the DM's perspective (e.g. "will tell them…", "plans to…") → DM-only; omit.
+- Parenthesized `(notes)` — apply the test: *could the players in their seats have learned this from the in-fiction events?* If no, omit.
+
 # Standing rule (critical)
 
 This line is mostly stable. Rewrite only when the **balance of how the company earns XP has genuinely shifted** — e.g. a party that was combat-dominated has become an exploration/roleplay party, or a new mode (a big discovery or social arc) has clearly entered the mix. A few points of drift in the percentages is not a reason to rewrite.

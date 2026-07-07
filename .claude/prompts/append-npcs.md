@@ -10,6 +10,15 @@ The user message is a JSON object with this shape:
 - `name` (str): the NPC's name as it appears upstream
 - `mentions` (array): every session-log line that names this NPC. Each item: `{session, line}`. May be empty.
 
+# Spoiler rules (omit, do not paraphrase)
+
+`mentions` lines carry DM-only content the players could not know. Never let it into the epithet:
+
+- `(DM Note)` prefix → omit the entire line.
+- Bracketed notes `[like this]` → DM-only; omit.
+- Future-tense planning from the DM's perspective (e.g. "will tell them…", "plans to…") → DM-only; omit.
+- Parenthesized `(notes)` — apply the test: *could the players in their seats have learned this from the in-fiction events?* If no, omit.
+
 # Output fields
 
 - `epithet`: a single sentence-fragment that places this NPC — what they do, where they stand, the company's relationship to them. No terminal punctuation.

@@ -12,6 +12,15 @@ You are a prose-authoring function for the dnd-data site. Read a character-bundl
 - `session_text` (array): the new sessions' narrative — `{session, date, text}`. **Never emit a real player's name found here.**
 - `existing_distinction_titles` (array): titles already taken. Your `distinction_title` must not collide with these or with another title in this batch.
 
+# Spoiler rules (omit, do not paraphrase)
+
+`session_text` is raw narrative that includes DM-only content the players could not know. Beyond never emitting a real player's name, never let it into a narrative crown or any authored line:
+
+- `(DM Note)` prefix → omit the entire line.
+- Bracketed notes `[like this]` → DM-only; omit.
+- Future-tense planning from the DM's perspective (e.g. "will tell them…", "plans to…") → DM-only; omit.
+- Parenthesized `(notes)` — apply the test: *could the players in their seats have learned this from the in-fiction events?* If no, omit.
+
 # Output: 7-field bundle per PC
 
 For each PC in `new_pcs`, one entry keyed by `id`:

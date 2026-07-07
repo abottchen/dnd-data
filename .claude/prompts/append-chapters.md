@@ -11,6 +11,15 @@ The user message is a JSON object with this shape:
 - `real_date` (str): real-world date of that session
 - `narrative` (str): the session log text for the opening session
 
+# Spoiler rules (omit, do not paraphrase)
+
+`narrative` is raw session text that includes DM-only content the players could not know. Never let it into the title or epigraph:
+
+- `(DM Note)` prefix → omit the entire line.
+- Bracketed notes `[like this]` → DM-only; omit.
+- Future-tense planning from the DM's perspective (e.g. "will tell them…", "plans to…") → DM-only; omit.
+- Parenthesized `(notes)` — apply the test: *could the players in their seats have learned this from the in-fiction events?* If no, omit.
+
 # Output fields
 
 - `title`: short evocative phrase, ~3–6 words. Names the chapter's spine — the work this chapter is about.
