@@ -7,11 +7,6 @@ import pytest
 from build import inventory
 
 
-def test_module_exposes_load():
-    assert hasattr(inventory, "load")
-    assert callable(inventory.load)
-
-
 def test_resolve_snapshot_path_picks_latest(tmp_path):
     (tmp_path / "obr-inv-backup-2026-04-01T00-00-00-000Z.json").write_text("{}")
     (tmp_path / "obr-inv-backup-2026-05-02T04-21-16-825Z.json").write_text("{}")
@@ -32,7 +27,7 @@ def test_parse_inventories_drops_gm_and_resolves_names():
     raw = {
         "inventories": {
             "uuid-1": {
-                "name": "Simon Weil",
+                "name": "Simeon Weil",
                 "items": [{"id": "x", "count": 1, "name": "Sword",
                            "category": "Weapon", "weight": 3, "rarity": "common",
                            "icon": "https://example/sword.svg",
@@ -51,7 +46,7 @@ def test_parse_inventories_drops_gm_and_resolves_names():
             },
         },
     }
-    mapping = {"Simon": "grieg", "Vex": "vex", "GM": "gm"}
+    mapping = {"Simeon": "grieg", "Vex": "vex", "GM": "gm"}
 
     parsed = inventory._parse_inventories(raw, mapping)
 
@@ -259,6 +254,21 @@ def test_scholar_substring_match_on_lore_keywords():
     ]
     # spellbook + parchment + ink → 3 matches; counts summed
     assert inventory.score_scholar(items, member={}) == 12
+
+
+def test_scorers_and_archetype_match_share_keywords():
+    """A keyword added to a scorer must also drive archetype_match filtering."""
+    items = [{"id": "b1", "name": "Dusty Spellbook", "count": 1,
+              "category": "Adventuring Gear", "weight": 1, "rarity": "common",
+              "description": ""}]
+    assert inventory.score_scholar(items, {}) == 1
+    assert inventory.archetype_match("scholar", items) == items
+
+
+def test_glaive_hand_and_quartermaster_tolerate_missing_id():
+    items = [{"name": "Blade", "category": "Weapon", "count": 1}]
+    assert inventory.score_glaive_hand(items, {}) == 0
+    assert inventory.score_quartermaster(items, {}) == 0
 
 
 def test_naturalist_substring_match():
@@ -517,6 +527,17 @@ def test_company_strip_excludes_gm_member():
     assert [s["slug"] for s in strip] == ["grieg"]
 
 
+def test_company_strip_carries_pct():
+    parsed = {"vex": {"items": [{"id": "a", "name": "Rock", "count": 1,
+                                 "weight": 30, "category": "Adventuring Gear",
+                                 "rarity": "common", "description": ""}]}}
+    party = {"members": [{"id": "vex", "name": "Vex",
+                          "abilities": {"str": 10}}]}
+    bundle = inventory._build_bundle(parsed, party)
+    strip = {s["slug"]: s for s in bundle["company_strip"]}
+    assert strip["vex"]["pct"] == 20   # 30 lb of 150 capacity
+
+
 def test_load_returns_empty_bundle_when_no_snapshot(tmp_path, monkeypatch):
     monkeypatch.setenv("BUILD_DATA_DIR", str(tmp_path))
     bundle = inventory.load(tmp_path.parent)
@@ -537,6 +558,8 @@ def test_load_full_pipeline_with_fixture(tmp_path, monkeypatch):
         {"id": "vex",   "name": "Vex",   "abilities": {"str": 12}},
     ]))
     monkeypatch.setenv("BUILD_DATA_DIR", str(fixture_dir))
+    monkeypatch.setattr(inventory, "_load_dice_player_map",
+                        lambda: {"Simeon": "grieg", "Vex": "vex", "GM": "gm"})
 
     bundle = inventory.load(fixture_dir.parent)
 

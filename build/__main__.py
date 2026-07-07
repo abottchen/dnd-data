@@ -45,6 +45,9 @@ def _cmd_apply(args) -> int:
     print(f"applied: {len(summary['applied'])}", file=sys.stderr)
     print(f"rejected: {len(summary['rejected'])}", file=sys.stderr)
     print(f"pending: {len(summary['pending'])}", file=sys.stderr)
+    if summary.get("graduated"):
+        print("graduated (known → was_known): "
+              + ", ".join(summary["graduated"]), file=sys.stderr)
     if summary["marker_new"] != summary["marker_old"]:
         print(f"marker: {summary['marker_old']} → {summary['marker_new']}", file=sys.stderr)
     if summary["render_ok"] is True:
@@ -85,10 +88,7 @@ def main(argv=None) -> int:
         return _cmd_prepare(ns)
     if args.cmd == "prepare":
         return _cmd_prepare(args)
-    if args.cmd == "apply":
-        return _cmd_apply(args)
-    parser.error(f"unknown subcommand: {args.cmd}")
-    return 2
+    return _cmd_apply(args)
 
 
 if __name__ == "__main__":

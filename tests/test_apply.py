@@ -57,6 +57,34 @@ def test_append_kills_raises_on_malformed_key():
                                  slice_data=slice_data, output=output)
 
 
+def test_append_kills_rejects_existing_key():
+    authored = {"kills": [{"character": "vex", "date": "2026-04-19",
+                           "creature": "Goblin", "method": "shortbow",
+                           "verse": "v", "annotation": "a"}]}
+    slice_data = {"kills": [{"character": "vex", "date": "2026-04-19",
+                             "creature": "Goblin", "method": "shortbow"}]}
+    output = {"fields": {"vex__2026-04-19__Goblin__shortbow":
+                         {"verse": "v2", "annotation": "a2"}}}
+    with pytest.raises(ValueError, match="already authored"):
+        apply.apply_append_kills(authored, "2026-04-19", slice_data, output)
+
+
+def test_append_kills_rejects_duplicate_within_batch():
+    """Two raw keys in one output batch that normalize to the same kill
+    (model casing drift) must not both pass the guard — the second raises
+    and no duplicate row lands in authored."""
+    authored = {"kills": []}
+    slice_data = {"kills": [{"character": "vex", "date": "2026-04-19",
+                             "creature": "Goblin", "method": "shortbow"}]}
+    output = {"fields": {
+        "vex__2026-04-19__Goblin__shortbow": {"verse": "v1", "annotation": "a1"},
+        "vex__2026-04-19__goblin__SHORTBOW": {"verse": "v2", "annotation": "a2"},
+    }}
+    with pytest.raises(ValueError, match="already authored"):
+        apply.apply_append_kills(authored, "2026-04-19", slice_data, output)
+    assert len(authored["kills"]) <= 1
+
+
 # -- apply_append_npcs -------------------------------------------------------
 
 def test_append_npcs_uses_slice_key_not_model_output():
@@ -86,6 +114,22 @@ def test_append_npcs_tolerates_null_allegiance():
                             slice_data={"name": "Stranger", "mentions": []},
                             output=output)
     assert authored["npcs"][0]["allegiance"] is None
+
+
+def test_append_npcs_rejects_existing_name():
+    authored = {"npcs": [{"name": "Azlund", "epithet": "e", "allegiance": "with"}]}
+    with pytest.raises(ValueError, match="already authored"):
+        apply.apply_append_npcs(authored, "Azlund", {"name": "Azlund"},
+                                {"fields": {"epithet": "x", "allegiance": "with"}})
+
+
+def test_append_sessions_rejects_existing_session():
+    authored = {"sessions": [{"session": 2, "date": "2026-04-23",
+                              "title": "t", "summary": "s", "silent_roll": []}]}
+    slice_data = {"session": 2, "real_date": "2026-04-23"}
+    output = {"fields": {"title": "new", "summary": "new", "silent_roll": []}}
+    with pytest.raises(ValueError, match="already authored"):
+        apply.apply_append_sessions(authored, 2, slice_data, output)
 
 
 # -- apply_refresh_chapters --------------------------------------------------
@@ -121,6 +165,17 @@ def test_refresh_chapters_raises_when_chapter_not_in_authored():
     with pytest.raises(ValueError, match="chapter 99"):
         apply.apply_refresh_chapters(authored, key="99",
                                      slice_data={}, output=output)
+
+
+def test_append_chapters_rejects_existing_id_or_start():
+    authored = {"chapters": [{"id": 1, "starts_at_session": 1,
+                              "title": "t", "epigraph": "e"}]}
+    with pytest.raises(ValueError, match="already authored"):
+        apply.apply_append_chapters(authored, "1", {"starts_at_session": 9},
+                                    {"fields": {"title": "x", "epigraph": "y"}})
+    with pytest.raises(ValueError, match="already authored"):
+        apply.apply_append_chapters(authored, "2", {"starts_at_session": 1},
+                                    {"fields": {"title": "x", "epigraph": "y"}})
 
 
 # -- apply_refresh_road_ahead ------------------------------------------------
@@ -275,3 +330,13 @@ def test_apply_append_characters_persists_basis():
         "distinction_basis": {"kind": "narrative", "sessions": [3], "note": "n"}}}}
     apply.apply_append_characters(authored, "all", {}, output)
     assert authored["characters"][0]["distinction_basis"]["kind"] == "narrative"
+
+
+def test_append_characters_rejects_existing_id():
+    authored = {"characters": [{"id": "vex"}]}
+    output = {"fields": {"vex": {"epithet": "e", "reliquary_header": "r",
+                                 "constellation_epithet": "c",
+                                 "distinction_title": "t", "distinction_subtitle": "s",
+                                 "distinction_detail": "d", "distinction_basis": {}}}}
+    with pytest.raises(ValueError, match="already authored"):
+        apply.apply_append_characters(authored, "all", {}, output)

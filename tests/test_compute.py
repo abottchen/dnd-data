@@ -1,6 +1,7 @@
+from build import render
 from build.render import (xp_for_cr, compute_trials, compute_sessions_chart, compute_fortune,
                    compute_d20_histogram, compute_other_dice, compute_best_skill,
-                   compute_intro_meta, compute_constellation, compute_fact_pack,
+                   compute_constellation, compute_fact_pack,
                    _compute_party_top_xp, _compute_header_eyebrow,
                    _creature_token_url, _name_to_token_name,
                    compute_radar)
@@ -136,6 +137,13 @@ def test_best_skill_humanizes_camelcase_keys():
     }}
     assert compute_best_skill(member) == {"name": "Sleight of Hand", "mod": 4}
 
+def test_compute_best_skill_alphabetical_tiebreak_past_first_char():
+    member = {"skills": {
+        "athletics": {"mod": 3, "prof": "full"},
+        "arcana":    {"mod": 3, "prof": "full"},
+    }}
+    assert compute_best_skill(member)["name"] == "Arcana"
+
 def test_name_to_token_name_strips_diacritics_and_quotes():
     assert _name_to_token_name("Naïve") == "Naive"
     assert _name_to_token_name('Ælf "Foo" Bar') == "AElf Foo Bar"
@@ -168,37 +176,6 @@ def test_d20_histogram_emits_all_20_bars():
     bar5 = next(b for b in bars if b["value"] == 5)
     assert bar5["count"] == 0
     assert bar5["zero"] is True
-
-
-def test_compute_intro_meta_typical():
-    log = {"entries": [{"iu_month": "Kythorn", "iu_year": 1494}] * 5}
-    assert compute_intro_meta(log) == "Five Sessions &middot; Kythorn 1494 DR"
-
-def test_compute_intro_meta_singular():
-    log = {"entries": [{"iu_month": "Hammer", "iu_year": 1495}]}
-    assert compute_intro_meta(log) == "One Session &middot; Hammer 1495 DR"
-
-def test_compute_intro_meta_uses_latest_entry_month_and_year():
-    log = {"entries": [
-        {"iu_month": "Kythorn", "iu_year": 1494},
-        {"iu_month": "Kythorn", "iu_year": 1494},
-        {"iu_month": "Flamerule", "iu_year": 1494},
-    ]}
-    assert compute_intro_meta(log) == "Three Sessions &middot; Flamerule 1494 DR"
-
-def test_compute_intro_meta_word_form_through_twenty():
-    log = {"entries": [{"iu_month": "Kythorn", "iu_year": 1494}] * 20}
-    assert compute_intro_meta(log) == "Twenty Sessions &middot; Kythorn 1494 DR"
-
-def test_compute_intro_meta_digit_form_above_twenty():
-    log = {"entries": [{"iu_month": "Kythorn", "iu_year": 1494}] * 21}
-    assert compute_intro_meta(log) == "21 Sessions &middot; Kythorn 1494 DR"
-
-def test_compute_intro_meta_empty_log():
-    assert compute_intro_meta({"entries": []}) == "No Sessions Yet"
-
-def test_compute_intro_meta_missing_entries_key():
-    assert compute_intro_meta({}) == "No Sessions Yet"
 
 
 # ── _compute_party_top_xp ──────────────────────────────────────────────
@@ -294,7 +271,7 @@ def test_header_eyebrow_handles_missing_keys():
 
 # ── compute_constellation links ────────────────────────────────────────
 
-def _consteltation_inputs(*xp_pairs):
+def _constellation_inputs(*xp_pairs):
     """Build (party, fortune_by_char, trials) for compute_constellation tests."""
     members = [{"id": cid, "name": cid.title()} for cid, _ in xp_pairs]
     party = {"members": members}
@@ -308,7 +285,7 @@ def _consteltation_inputs(*xp_pairs):
 
 
 def test_constellation_links_empty_when_fewer_than_two_stars():
-    party, fortune, trials = _consteltation_inputs(("anton", 100))
+    party, fortune, trials = _constellation_inputs(("anton", 100))
     result = compute_constellation(party, fortune, trials)
     assert result["links"] == []
 
@@ -319,7 +296,7 @@ def test_constellation_links_empty_when_no_stars():
 
 
 def test_constellation_links_form_a_closed_loop():
-    party, fortune, trials = _consteltation_inputs(
+    party, fortune, trials = _constellation_inputs(
         ("anton", 100), ("vex", 200), ("urida", 300)
     )
     result = compute_constellation(party, fortune, trials)
@@ -334,7 +311,7 @@ def test_constellation_links_form_a_closed_loop():
 
 def test_constellation_links_ordered_by_xp_ascending():
     # Pass members in non-monotonic order to confirm the sort happens inside.
-    party, fortune, trials = _consteltation_inputs(
+    party, fortune, trials = _constellation_inputs(
         ("vex", 200), ("anton", 100), ("urida", 300)
     )
     result = compute_constellation(party, fortune, trials)
@@ -417,7 +394,7 @@ def test_radar_sector_path_is_a_closed_wedge():
 def test_constellation_links_tiebreak_by_id_when_xp_equal():
     # Identical xp but different rolls → each star is its own cluster, so
     # the (xp, id) tiebreak in the link sort is what matters here.
-    party, fortune, trials = _consteltation_inputs(
+    party, fortune, trials = _constellation_inputs(
         ("vex", 100), ("anton", 100), ("grieg", 100)
     )
     fortune["anton"]["rolls_total"] = 30
@@ -441,7 +418,7 @@ def test_constellation_links_tiebreak_by_id_when_xp_equal():
 # ── compute_constellation systems (collision handling) ────────────────
 
 def test_constellation_no_collision_means_no_systems():
-    party, fortune, trials = _consteltation_inputs(("anton", 100), ("vex", 200))
+    party, fortune, trials = _constellation_inputs(("anton", 100), ("vex", 200))
     result = compute_constellation(party, fortune, trials)
     assert result["systems"] == []
     for s in result["stars"]:
@@ -452,7 +429,7 @@ def test_constellation_no_collision_means_no_systems():
 
 def test_constellation_collision_creates_system():
     # Identical xp + identical rolls → both stars round to the same coord.
-    party, fortune, trials = _consteltation_inputs(("vex", 100), ("grieg", 100))
+    party, fortune, trials = _constellation_inputs(("vex", 100), ("grieg", 100))
     result = compute_constellation(party, fortune, trials)
     assert len(result["systems"]) == 1
     sys = result["systems"][0]
@@ -464,7 +441,7 @@ def test_constellation_collision_creates_system():
 
 def test_constellation_binary_orbit_offsets_are_mirrored():
     # n=2 → horizontal pair, offsets sum to zero on x and stay flat on y.
-    party, fortune, trials = _consteltation_inputs(("vex", 100), ("grieg", 100))
+    party, fortune, trials = _constellation_inputs(("vex", 100), ("grieg", 100))
     result = compute_constellation(party, fortune, trials)
     xs = sorted(s["orbit_x_px"] for s in result["stars"])
     assert xs[0] == -xs[1]
@@ -479,7 +456,7 @@ def test_constellation_clusters_near_misses():
     # grieg have nearly the same rolls — a 1-vs-2 difference rounds to
     # adjacent (top_pct = 4 vs 6), which puts the 72px portraits ~8px apart
     # on the y-axis and almost fully on top of each other.
-    party, fortune, trials = _consteltation_inputs(
+    party, fortune, trials = _constellation_inputs(
         ("vex", 100), ("grieg", 100)
     )
     fortune["vex"]["rolls_total"] = 100
@@ -491,7 +468,7 @@ def test_constellation_clusters_near_misses():
 
 def test_constellation_links_dedupe_through_clusters():
     # vex + grieg collide; anton stands alone. Two cluster nodes → two links.
-    party, fortune, trials = _consteltation_inputs(
+    party, fortune, trials = _constellation_inputs(
         ("anton", 50), ("vex", 200), ("grieg", 200)
     )
     result = compute_constellation(party, fortune, trials)
@@ -676,3 +653,18 @@ def test_fact_pack_exposes_raw_axis_values():
     assert fp["a"]["rolls"] == 3 == fortune["a"]["rolls_total"]
     assert fp["a"]["xp"] == trials["per_char"]["a"]["xp"]
     assert fp["b"]["rolls"] == 1
+
+def test_short_date_fixed_english_months():
+    assert render._short_date("2026-04-23") == "23 APR 2026"
+    assert render._short_date("2026-12-01") == "01 DEC 2026"
+
+def test_compute_reliquary_joins_authored_verse_casefolded():
+    party = {"members": [{"id": "vex", "name": "Vex", "kills": [
+        {"date": "2026-04-19", "creature": "Goblin", "method": "Shortbow"},
+    ]}]}
+    authored_kills = [{"character": "vex", "date": "2026-04-19",
+                       "creature": "goblin", "method": "shortbow",
+                       "verse": "A verse.", "annotation": "an annotation"}]
+    rows = render.compute_reliquary(party, authored_kills)
+    assert rows["vex"][0]["verse"] == "A verse."
+    assert rows["vex"][0]["date_label"] == "19 APR 2026"

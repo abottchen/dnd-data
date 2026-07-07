@@ -5,39 +5,38 @@ Each test materializes the fixture data + authored store under tmp_path and
 calls the builder directly.
 """
 import json
-import shutil
-from pathlib import Path
 
 import pytest
 
 from build import render, slices, store
 
-REPO_ROOT = Path(__file__).resolve().parent.parent
-FIXTURES = REPO_ROOT / "tests/fixtures"
-
 
 @pytest.fixture
-def slice_env(tmp_path, monkeypatch):
-    """Materialize a writable copy of fixture data + authored store under
-    tmp_path. Returns (data_dict, authored_dict). BUILD_AUTHORED_DIR is
-    monkeypatched so store.load_authored() points at the fixture copy."""
-    data_dir = tmp_path / "data"
-    data_dir.mkdir()
-    shutil.copy(FIXTURES / "sample_party.json", data_dir / "party.json")
-    shutil.copy(FIXTURES / "sample_session_log.json", data_dir / "session-log.json")
-    (data_dir / "dice").mkdir()
-    shutil.copy(FIXTURES / "sample_dicex_rolls.json", data_dir / "dice" / "dicex-rolls-2026-04-23.json")
-
-    authored_dir = tmp_path / "authored"
-    authored_dir.mkdir()
-    for f in (FIXTURES / "sample_authored").iterdir():
-        shutil.copy(f, authored_dir / f.name)
-
-    monkeypatch.setenv("BUILD_AUTHORED_DIR", str(authored_dir))
-
-    data = render.load_data(data_dir)
+def slice_env(staged_env):
+    """Thin wrapper over staged_env: load the staged data + authored store.
+    Returns {"data", "authored", "authored_dir"} for direct use by slice
+    builder tests."""
+    authored_dir = staged_env / "authored"
+    data = render.load_data(staged_env / "data")
     authored = store.load_authored()
     return {"data": data, "authored": authored, "authored_dir": authored_dir}
+
+
+# -- _new_entries helper coverage ---------------------------------------------
+
+def test_new_entries_respects_marker(slice_env):
+    data, authored = slice_env["data"], slice_env["authored"]
+    authored["site"]["refreshed_through_session"] = 1
+    new = slices._new_entries(data, authored)
+    assert [e["session"] for e in new] == [
+        e["session"] for e in data["session_log"]["entries"][1:]
+    ]
+
+
+def test_new_entries_empty_when_marker_current(slice_env):
+    data, authored = slice_env["data"], slice_env["authored"]
+    authored["site"]["refreshed_through_session"] = len(data["session_log"]["entries"])
+    assert slices._new_entries(data, authored) == []
 
 
 # -- Append-pass coverage ----------------------------------------------------
@@ -322,3 +321,16 @@ def test_refresh_ascent_read_gates_on_marker(slice_env, tmp_path, monkeypatch):
     authored["site"]["refreshed_through_session"] = 0
     _, payload2 = slices.refresh_ascent_read(data, authored)[0]
     assert len(payload2["new_sessions"]) == len(data["session_log"]["entries"])
+
+
+def test_archetype_slice_carries_no_fabricated_stats(slice_env):
+    data, authored = slice_env["data"], slice_env["authored"]
+    authored["inventory_by_id"] = {"vex": {
+        "archetype": "scholar", "total_weight": 3.0,
+        "rack": [], "spotlight": [],
+        "manifest": [{"name": "Spellbook", "count": 1, "weight": 3,
+                      "description": ""}],
+    }}
+    out = slices.refresh_archetype_inscription(data, authored)
+    (_, s), = [t for t in out if t[0] == "vex"]
+    assert set(s["archetype"]) == {"slug", "label", "score"}

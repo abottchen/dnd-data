@@ -1189,6 +1189,12 @@ main > article > section.proficiencies,
   font-variant-numeric: tabular-nums;
 }
 
+/* Ascent tooltip context lines: a serif title, an italic prose note, and a
+   ruled-off running total. Formerly inline style="" fragments on the divs. */
+.dice-tooltip .tip-title { color: var(--paper); font-size: 13px; text-transform: none; font-family: 'Cormorant Garamond', serif; }
+.dice-tooltip .tip-note { text-transform: none; font-style: italic; font-family: 'EB Garamond', serif; font-size: 13px; max-width: 260px; white-space: normal; margin-top: 8px; }
+.dice-tooltip .tip-total { margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--rule); }
+
 .dice-tooltip .tip-list {
   list-style: none;
   margin: 10px 0 0;

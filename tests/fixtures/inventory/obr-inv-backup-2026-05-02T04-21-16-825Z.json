@@ -2,7 +2,7 @@
   "exportedAt": "2026-05-02T04:21:16.825Z",
   "inventories": {
     "uuid-grieg": {
-      "name": "Simon Weil",
+      "name": "Simeon Weil",
       "items": [
         {"id": "wh", "name": "Warhammer", "category": "Weapon",
          "weight": 5, "count": 1, "rarity": "common",

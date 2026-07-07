@@ -65,7 +65,7 @@
   </header>
 
   <nav class="tabs" role="tablist">
-    <a href="#company" class="tab" data-tab="company">
+    <a href="#company" class="tab" data-tab="company" role="tab" id="tab-company" aria-controls="company">
       <span class="tab-cluster">
         {%- for member in party_top_xp %}
         <img src="images/{{ member.image }}" alt="" data-rank="{{ loop.index }}">
@@ -73,9 +73,9 @@
       </span>The Company
     </a>
     {%- for member in party.members if member.id != "gm" %}
-    <a href="#{{ member.id }}" class="tab" data-tab="{{ member.id }}"><img src="images/{{ member.image }}" alt="">{{ member.id | title }}</a>
+    <a href="#{{ member.id }}" class="tab" data-tab="{{ member.id }}" role="tab" id="tab-{{ member.id }}" aria-controls="{{ member.id }}"><img src="images/{{ member.image }}" alt="">{{ member.id | title }}</a>
     {%- endfor %}
-    <a href="#gm" class="tab" data-tab="gm"><img src="images/GM.png" alt="">GM</a>
+    <a href="#gm" class="tab" data-tab="gm" role="tab" id="tab-gm" aria-controls="gm"><img src="images/GM.png" alt="">GM</a>
   </nav>
 
   <main>
@@ -88,9 +88,9 @@
 
   <footer class="footnote">{{ site.footnote | safe }}</footer>
 
-  {# The inline <script> below owns the tab switcher and the Other Dice tooltip IIFE.
-     It generates KILLS_BY_CHAR_SESSION at runtime from the rendered .session-bar elements'
-     data attributes, so the build need not pre-emit a JS map. #}
+  {# The inline <script> below is the page's only client-side logic (tab
+     switcher + all tooltip/animation IIFEs). Removing it breaks the page
+     silently — see CLAUDE.md gotchas. #}
   <script>
 {% include "_script.html" %}
   </script>

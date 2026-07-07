@@ -17,7 +17,8 @@ import json
 from pathlib import Path
 from typing import Optional
 
-from build.render import _load_dice_player_map, _resolve_dice_player
+from .loaders import (load_dice_player_map as _load_dice_player_map,
+                      resolve_dice_player as _resolve_dice_player)
 
 
 def load(repo_root: Path, party: Optional[dict] = None) -> dict:
@@ -188,7 +189,8 @@ def score_armorer(items: list[dict], member: dict) -> float:
 
 
 def score_glaive_hand(items: list[dict], member: dict) -> int:
-    return len({it["id"] for it in items if it.get("category") == "Weapon"})
+    return len({it.get("id") for it in items
+                 if it.get("category") == "Weapon" and it.get("id")})
 
 
 def score_quiver(items: list[dict], member: dict) -> int:
@@ -202,36 +204,40 @@ def score_curio_keeper(items: list[dict], member: dict) -> int:
     return _sum_count_where(items, is_curio)
 
 
-_SCHOLAR_KW = ("book", "parchment", "ink", "scroll", "spellbook")
-_NATURALIST_KW = ("druidic", "mistletoe", "yew", "totem", "natural")
-_TONGUES_KW = ("sending stone", "message", "speaking", "whisper")
+# Per-archetype filter: which items earned the archetype. Used both by the
+# keyword scorers below and by archetype_match (so the slice builder and
+# math_inscription's fallback line see the same matched gear the scorer
+# counted) — a single shared map keeps the two from silently desyncing.
+_KEYWORDS: dict[str, tuple[str, ...]] = {
+    "scholar":        ("book", "parchment", "ink", "scroll", "spellbook"),
+    "naturalist":     ("druidic", "mistletoe", "yew", "totem", "natural"),
+    "tongues":        ("sending stone", "message", "speaking", "whisper"),
+    "lamplighter":    ("oil", "torch", "lantern", "candle", "tinderbox", "lamp"),
+    "pathfinder":     ("rope", "crowbar", "grapple", "piton", "spike", "climber"),
+    "cellarer":       ("ration", "waterskin", "mess kit", "trail", "wineskin"),
+    "trapper":        ("caltrop", "trap", "snare", "hunter's trap"),
+    "costume-master": ("costume", "disguise", "perfume", "fine clothes", "noble"),
+}
 
 
 def score_scholar(items: list[dict], member: dict) -> int:
-    return _sum_count_where(items, lambda it: _matches_any(it, _SCHOLAR_KW))
+    return _sum_count_where(items, lambda it: _matches_any(it, _KEYWORDS["scholar"]))
 
 
 def score_naturalist(items: list[dict], member: dict) -> int:
-    return _sum_count_where(items, lambda it: _matches_any(it, _NATURALIST_KW))
+    return _sum_count_where(items, lambda it: _matches_any(it, _KEYWORDS["naturalist"]))
 
 
 def score_tongues(items: list[dict], member: dict) -> int:
-    return _sum_count_where(items, lambda it: _matches_any(it, _TONGUES_KW))
-
-
-_LAMPLIGHTER_KW = ("oil", "torch", "lantern", "candle", "tinderbox", "lamp")
-_PATHFINDER_KW = ("rope", "crowbar", "grapple", "piton", "spike", "climber")
-_CELLARER_KW = ("ration", "waterskin", "mess kit", "trail", "wineskin")
-_TRAPPER_KW = ("caltrop", "trap", "snare", "hunter's trap")
-_COSTUME_KW = ("costume", "disguise", "perfume", "fine clothes", "noble")
+    return _sum_count_where(items, lambda it: _matches_any(it, _KEYWORDS["tongues"]))
 
 
 def score_lamplighter(items: list[dict], member: dict) -> int:
-    return _sum_count_where(items, lambda it: _matches_any(it, _LAMPLIGHTER_KW))
+    return _sum_count_where(items, lambda it: _matches_any(it, _KEYWORDS["lamplighter"]))
 
 
 def score_pathfinder(items: list[dict], member: dict) -> int:
-    return _sum_count_where(items, lambda it: _matches_any(it, _PATHFINDER_KW))
+    return _sum_count_where(items, lambda it: _matches_any(it, _KEYWORDS["pathfinder"]))
 
 
 def score_apothecary(items: list[dict], member: dict) -> int:
@@ -239,19 +245,19 @@ def score_apothecary(items: list[dict], member: dict) -> int:
 
 
 def score_cellarer(items: list[dict], member: dict) -> int:
-    return _sum_count_where(items, lambda it: _matches_any(it, _CELLARER_KW))
+    return _sum_count_where(items, lambda it: _matches_any(it, _KEYWORDS["cellarer"]))
 
 
 def score_trapper(items: list[dict], member: dict) -> int:
-    return _sum_count_where(items, lambda it: _matches_any(it, _TRAPPER_KW))
+    return _sum_count_where(items, lambda it: _matches_any(it, _KEYWORDS["trapper"]))
 
 
 def score_costume_master(items: list[dict], member: dict) -> int:
-    return _sum_count_where(items, lambda it: _matches_any(it, _COSTUME_KW))
+    return _sum_count_where(items, lambda it: _matches_any(it, _KEYWORDS["costume-master"]))
 
 
 def score_quartermaster(items: list[dict], member: dict) -> int:
-    return len({it["id"] for it in items})
+    return len({it.get("id") for it in items if it.get("id")})
 
 
 def score_featherfoot(items: list[dict], member: dict) -> float:
@@ -427,6 +433,7 @@ def _build_bundle(parsed: dict[str, dict], party: dict) -> dict:
                 "total_weight": 0,
                 "capacity": _carrying_capacity(member),
                 "breakdown": {"rack": 0, "spotlight": 0, "manifest": 0},
+                "pct": 0,
             })
         else:
             strip.append({
@@ -436,25 +443,10 @@ def _build_bundle(parsed: dict[str, dict], party: dict) -> dict:
                 "total_weight": rec["total_weight"],
                 "capacity": rec["capacity"],
                 "breakdown": rec["breakdown"],
+                "pct": round(rec["total_weight"] / rec["capacity"] * 100) if rec["capacity"] else 0,
             })
 
     return {"by_id": by_id, "company_strip": strip}
-
-
-# Per-archetype filter: which items earned the archetype. Used both by
-# the slice builder (so the model only sees relevant items) and by
-# math_inscription (so the fallback line names the actual matched gear
-# instead of total inventory). Mirrors the scorer logic for each archetype.
-_KEYWORDS: dict[str, tuple[str, ...]] = {
-    "scholar":        ("book", "parchment", "ink", "scroll", "spellbook"),
-    "naturalist":     ("druidic", "mistletoe", "yew", "totem", "natural"),
-    "tongues":        ("sending stone", "message", "speaking", "whisper"),
-    "lamplighter":    ("oil", "torch", "lantern", "candle", "tinderbox", "lamp"),
-    "pathfinder":     ("rope", "crowbar", "grapple", "piton", "spike", "climber"),
-    "cellarer":       ("ration", "waterskin", "mess kit", "trail", "wineskin"),
-    "trapper":        ("caltrop", "trap", "snare", "hunter's trap"),
-    "costume-master": ("costume", "disguise", "perfume", "fine clothes", "noble"),
-}
 
 
 def archetype_match(arc_slug: str, items: list[dict]) -> list[dict]:

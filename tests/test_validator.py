@@ -1,4 +1,5 @@
 import pytest
+from build import render
 from build.render import (
     ValidationError, KIND_MISSING, KIND_MALFORMED, KIND_ORPHAN, validate_kills,
     validate_sessions, validate_chapters, validate_npcs, validate_characters, validate_site,
@@ -164,9 +165,17 @@ def test_validate_site_rejects_still_present_intro_meta():
 
 def test_validate_site_passes_with_complete_singleton():
     site = {"intro_epithet": "x", "page_title": "t", "page_subtitle": "s",
-            "refreshed_through_session": 5}
+            "refreshed_through_session": 5, "footnote": "f",
+            "gm": {"name": "GM"}, "road_ahead": {"known": []}}
     errors = validate_site(site, latest_session=5)
     assert errors == []
+
+def test_validate_site_requires_footnote_gm_road_ahead():
+    site = {"intro_epithet": "x", "page_title": "t", "page_subtitle": "s",
+            "refreshed_through_session": 0}
+    errors = render.validate_site(site, latest_session=0)
+    fields = {e.field for e in errors}
+    assert {"footnote", "gm", "road_ahead"} <= fields
 
 
 # --- Portrait + dice-player-map validators ---

@@ -41,3 +41,10 @@ def test_every_pass_name_is_valid():
     valid = {"discovery", "append", "refresh"}
     for entry in registry.ALL:
         assert entry.pass_name in valid, f"{entry.name}: invalid pass_name {entry.pass_name!r}"
+
+
+def test_every_transformer_has_prompt_and_schema():
+    from build.paths import PROMPTS_DIR
+    for t in registry.ALL:
+        assert (PROMPTS_DIR / f"{t.name}.md").exists(), t.name
+        assert (PROMPTS_DIR / f"{t.name}.schema.json").exists(), t.name

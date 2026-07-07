@@ -38,3 +38,34 @@
 <svg viewBox="0 0 32 32" width="32" height="32" aria-hidden="true"><path d="M16 3 C17 12 20 15 29 16 C20 17 17 20 16 29 C15 20 12 17 3 16 C12 15 15 12 16 3 Z"/></svg>
 {%- endif -%}
 {%- endmacro %}
+
+{# Chronicle kill pips: one image (or placeholder span) per kill, tooltip data attrs attached. #}
+{% macro kill_pips(pips) -%}
+  {%- for k in pips %}
+    {%- if k.token_url %}
+            <img class="chronicle-session-pip" src="{{ k.token_url }}" alt="{{ k.creature }}"
+                 data-creature="{{ k.creature }}" data-killer-name="{{ k.killer_name }}"
+                 data-killer-image="{{ k.killer_image }}" data-method="{{ k.method }}"
+                 data-date="{{ k.date_label }}" loading="lazy">
+    {%- else %}
+            <span class="chronicle-session-pip pip-placeholder"
+                  data-creature="{{ k.creature }}" data-killer-name="{{ k.killer_name }}"
+                  data-killer-image="{{ k.killer_image }}" data-method="{{ k.method }}"
+                  data-date="{{ k.date_label }}" aria-label="{{ k.creature }}"></span>
+    {%- endif %}
+  {%- endfor %}
+{%- endmacro %}
+
+{# d20 histogram bars: count/height per value, "&middot;" placeholder for zero-count bars. #}
+{% macro d20_histogram(bars) -%}
+  {%- for bar in bars %}
+            <div class="dice-col" data-val="{{ bar.value }}" data-count="{{ bar.count }}"><div class="dice-count{% if bar.zero %} zero{% endif %}">{% if bar.zero %}&middot;{% else %}{{ bar.count }}{% endif %}</div><div class="dice-bar{% if bar.zero %} zero{% endif %}"{% if not bar.zero %} style="height:{{ bar.height_pct }}%"{% endif %}></div></div>
+  {%- endfor %}
+{%- endmacro %}
+
+{# d20 histogram labels: value ticks below the bars, "nat" class on 1 and 20. #}
+{% macro d20_labels(bars) -%}
+  {%- for bar in bars %}
+            <span class="lbl{% if bar.value == 1 or bar.value == 20 %} nat{% endif %}" data-val="{{ bar.value }}">{{ bar.value }}</span>
+  {%- endfor %}
+{%- endmacro %}
