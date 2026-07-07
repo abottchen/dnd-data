@@ -65,23 +65,23 @@
   </header>
 
   <nav class="tabs" role="tablist">
-    <a href="#company" class="tab" data-tab="company">
+    <a href="#company" class="tab" data-tab="company" role="tab" id="tab-company" aria-controls="company">
       <span class="tab-cluster">
         <img src="images/urida.png" alt="" data-rank="1">
         <img src="images/vex.png" alt="" data-rank="2">
         <img src="images/chumble-crudluck.png" alt="" data-rank="3">
       </span>The Company
     </a>
-    <a href="#grieg" class="tab" data-tab="grieg"><img src="images/grieg.png" alt="">Grieg</a>
-    <a href="#vex" class="tab" data-tab="vex"><img src="images/vex.png" alt="">Vex</a>
-    <a href="#urida" class="tab" data-tab="urida"><img src="images/urida.png" alt="">Urida</a>
-    <a href="#chumble" class="tab" data-tab="chumble"><img src="images/chumble-crudluck.png" alt="">Chumble</a>
-    <a href="#lilac" class="tab" data-tab="lilac"><img src="images/lilac-mist.png" alt="">Lilac</a>
-    <a href="#gm" class="tab" data-tab="gm"><img src="images/GM.png" alt="">GM</a>
+    <a href="#grieg" class="tab" data-tab="grieg" role="tab" id="tab-grieg" aria-controls="grieg"><img src="images/grieg.png" alt="">Grieg</a>
+    <a href="#vex" class="tab" data-tab="vex" role="tab" id="tab-vex" aria-controls="vex"><img src="images/vex.png" alt="">Vex</a>
+    <a href="#urida" class="tab" data-tab="urida" role="tab" id="tab-urida" aria-controls="urida"><img src="images/urida.png" alt="">Urida</a>
+    <a href="#chumble" class="tab" data-tab="chumble" role="tab" id="tab-chumble" aria-controls="chumble"><img src="images/chumble-crudluck.png" alt="">Chumble</a>
+    <a href="#lilac" class="tab" data-tab="lilac" role="tab" id="tab-lilac" aria-controls="lilac"><img src="images/lilac-mist.png" alt="">Lilac</a>
+    <a href="#gm" class="tab" data-tab="gm" role="tab" id="tab-gm" aria-controls="gm"><img src="images/GM.png" alt="">GM</a>
   </nav>
 
   <main>
-    <article class="character" id="company">
+    <article class="character" id="company" role="tabpanel" aria-labelledby="tab-company">
 
   <nav class="company-index" aria-label="The Company — index of sections">
     <div class="company-index-head">The Company</div>
@@ -1857,7 +1857,7 @@
 
 </article>
 
-      <article class="character" id="grieg">
+      <article class="character" id="grieg" role="tabpanel" aria-labelledby="tab-grieg">
       <header class="character-header">
         <img class="portrait" src="images/grieg.png" alt="">
         <div class="identity">
@@ -2599,7 +2599,7 @@
 
     </article>
 
-      <article class="character" id="vex">
+      <article class="character" id="vex" role="tabpanel" aria-labelledby="tab-vex">
       <header class="character-header">
         <img class="portrait" src="images/vex.png" alt="">
         <div class="identity">
@@ -3280,7 +3280,7 @@
 
     </article>
 
-      <article class="character" id="urida">
+      <article class="character" id="urida" role="tabpanel" aria-labelledby="tab-urida">
       <header class="character-header">
         <img class="portrait" src="images/urida.png" alt="">
         <div class="identity">
@@ -3939,7 +3939,7 @@
 
     </article>
 
-      <article class="character" id="chumble">
+      <article class="character" id="chumble" role="tabpanel" aria-labelledby="tab-chumble">
       <header class="character-header">
         <img class="portrait" src="images/chumble-crudluck.png" alt="">
         <div class="identity">
@@ -4633,7 +4633,7 @@
 
     </article>
 
-      <article class="character" id="lilac">
+      <article class="character" id="lilac" role="tabpanel" aria-labelledby="tab-lilac">
       <header class="character-header">
         <img class="portrait" src="images/lilac-mist.png" alt="">
         <div class="identity">
@@ -5133,7 +5133,7 @@
 
     </article>
 
-    <article class="character" id="gm">
+    <article class="character" id="gm" role="tabpanel" aria-labelledby="tab-gm">
   <header class="character-header">
     <img class="portrait" src="images/GM.png" alt="">
     <div class="identity">
@@ -5454,7 +5454,12 @@
 
       function activate(id) {
         if (!valid.has(id)) id = valid.has(landingId) ? landingId : defaultId;
-        tabs.forEach(t => t.classList.toggle('active', t.dataset.tab === id));
+        tabs.forEach(t => {
+          const active = t.dataset.tab === id;
+          t.classList.toggle('active', active);
+          t.setAttribute('aria-selected', active ? 'true' : 'false');
+          t.setAttribute('tabindex', active ? '0' : '-1');
+        });
         panels.forEach(p => p.classList.toggle('active', p.id === id));
       }
 
@@ -5463,6 +5468,26 @@
       });
 
       activate(location.hash.slice(1));
+
+      const tabList = document.querySelector('.tabs');
+      tabList.addEventListener('keydown', (e) => {
+        const order = [...tabs];
+        const i = order.indexOf(document.activeElement);
+        if (i === -1) return;
+        let j = null;
+        if (e.key === 'ArrowRight') j = (i + 1) % order.length;
+        else if (e.key === 'ArrowLeft') j = (i - 1 + order.length) % order.length;
+        else if (e.key === 'Home') j = 0;
+        else if (e.key === 'End') j = order.length - 1;
+        if (j === null) return;
+        e.preventDefault();
+        // Set the hash before focusing: navigating to a fragment whose
+        // target isn't focusable (the tabpanel <article> has no tabindex)
+        // makes the browser reset focus to the document, which would
+        // clobber the roving tabindex if it ran after .focus().
+        location.hash = order[j].dataset.tab;   // selection follows focus
+        order[j].focus();
+      });
     })();
 
     (function () {

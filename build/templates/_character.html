@@ -1,5 +1,5 @@
 {% from "_macros.html" import sworn_sigil -%}
-    <article class="character" id="{{ member.id }}">
+    <article class="character" id="{{ member.id }}" role="tabpanel" aria-labelledby="tab-{{ member.id }}">
       <header class="character-header">
         <img class="portrait" src="images/{{ member.image }}" alt="">
         <div class="identity">
