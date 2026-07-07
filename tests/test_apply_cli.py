@@ -69,6 +69,44 @@ def _write_result(run_dir: Path, entry: dict, payload: dict) -> None:
     (run_dir / entry["result"]).write_text(json.dumps(payload, indent=2))
 
 
+def _valid_payload_for(entry: dict, run_dir: Path) -> dict:
+    """Build a minimal schema-valid result payload for a manifest entry,
+    switching on its transformer. Covers the append transformers emitted by
+    the staged_run fixture (no_refresh=True keeps it to append-only)."""
+    transformer = entry["transformer"]
+    if transformer == "append-kills":
+        return {"fields": {}, "reason": "test fixture"}
+    if transformer == "append-sessions":
+        return {
+            "fields": {
+                "title": "Test Title",
+                "summary": "A short summary of this session.",
+                "silent_roll": [],
+            },
+            "reason": "test fixture",
+        }
+    if transformer == "append-chapters":
+        return {
+            "fields": {
+                "title": "Test Chapter",
+                "epigraph": "A test epigraph.",
+            },
+            "reason": "test fixture",
+        }
+    if transformer == "append-npcs":
+        return {
+            "fields": {
+                "epithet": "the Tested",
+                "allegiance": None,
+            },
+            "reason": "test fixture",
+        }
+    if transformer == "append-characters":
+        return {"fields": {}, "reason": "test fixture"}
+    raise NotImplementedError(
+        f"_valid_payload_for has no builder for transformer {transformer!r}")
+
+
 def test_apply_missing_results_reports_pending(staged_run):
     run_dir, _ = staged_run
     summary = apply_cli.apply_run(run_dir, skip_render=True)
@@ -253,3 +291,34 @@ def test_apply_surfaces_road_ahead_graduations(staged_refresh_run):
     })
     summary = apply_cli.apply_run(run_dir, skip_render=True)
     assert summary["graduated"] == ["Azlund's offer"]
+
+
+def test_fully_successful_apply_prunes_run_dir(staged_run):
+    run_dir, authored_dir = staged_run
+    manifest = json.loads((run_dir / "manifest.json").read_text())
+    for entry in manifest["slices"]:
+        _write_result(run_dir, entry, _valid_payload_for(entry, run_dir))
+    summary = apply_cli.apply_run(run_dir, skip_render=True)
+    assert not summary["rejected"] and not summary["pending"]
+    assert not run_dir.exists()
+
+
+def test_keep_marker_preserves_run_dir(staged_run):
+    run_dir, authored_dir = staged_run
+    (run_dir / ".keep").write_text("")
+    manifest = json.loads((run_dir / "manifest.json").read_text())
+    for entry in manifest["slices"]:
+        _write_result(run_dir, entry, _valid_payload_for(entry, run_dir))
+    apply_cli.apply_run(run_dir, skip_render=True)
+    assert run_dir.exists()
+
+
+def test_missing_slice_file_is_rejected_not_crash(staged_run):
+    run_dir, authored_dir = staged_run
+    manifest = json.loads((run_dir / "manifest.json").read_text())
+    entry = manifest["slices"][0]
+    _write_result(run_dir, entry, _valid_payload_for(entry, run_dir))
+    (run_dir / entry["pending"]).unlink()          # simulate manual cleanup
+    summary = apply_cli.apply_run(run_dir, skip_render=True)
+    assert any(r["stem"] == entry["stem"] and "slice file missing" in r["reason"]
+               for r in summary["rejected"])

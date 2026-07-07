@@ -132,7 +132,12 @@ def apply_run(run_dir: Path, *, skip_render: bool) -> dict:
         # Apply against a scratch copy so a mid-loop failure inside an
         # apply fn cannot leave half-applied mutations in the store that
         # a later persist() would write to disk.
-        slice_data = _load_slice(run_dir, entry)
+        try:
+            slice_data = _load_slice(run_dir, entry)
+        except FileNotFoundError:
+            _record_rejection(rejected, rejected_dir, entry, result_path,
+                              "slice file missing from pending/ and done/")
+            continue
         fn = registry.by_name(entry["transformer"]).apply_fn
         trial = copy.deepcopy(authored)
         try:
@@ -173,7 +178,7 @@ def apply_run(run_dir: Path, *, skip_render: bool) -> dict:
             # Surface to the caller; do not clean up.
             print(rr["stderr"][:2000], file=sys.stderr)
 
-    return {
+    summary = {
         "applied": applied,
         "rejected": rejected,
         "pending": pending,
@@ -182,3 +187,11 @@ def apply_run(run_dir: Path, *, skip_render: bool) -> dict:
         "marker_new": marker_new,
         "render_ok": render_ok,
     }
+
+    # A fully-successful run has nothing left to inspect: prune the run dir
+    # unless the user pinned it with --keep-temp (the .keep sentinel).
+    fully_ok = not rejected and not pending and render_ok is not False
+    if fully_ok and not (run_dir / ".keep").exists():
+        shutil.rmtree(run_dir, ignore_errors=True)
+
+    return summary
