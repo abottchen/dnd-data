@@ -17,7 +17,19 @@ def _forbidden_names_regex() -> str:
         capture_output=True, text=True, check=True)
     pattern = out.stdout.strip()
     pattern = pattern.replace("[[:space:]]", r"\s")
-    pattern = pattern.replace("[[:alpha:]]", r"[^\W\d_]")
+    # POSIX [:alpha:] has no direct Python re equivalent. A plain substring
+    # replace only covers the isolated "[[:alpha:]]" bracket; when the class
+    # is embedded alongside extra literals (e.g. "[[:alpha:]'-]"), swap the
+    # whole bracket expression for an equivalent alternation instead, so the
+    # extra literals stay unioned rather than accidentally negated.
+    def _sub_alpha_class(m: "re.Match") -> str:
+        extra = m.group(1)
+        alt = r"[^\W\d_]"
+        if extra:
+            alt += f"|[{re.escape(extra)}]"
+        return f"(?:{alt})"
+
+    pattern = re.sub(r"\[\[:alpha:\]([^\]]*)\]", _sub_alpha_class, pattern)
     return pattern
 
 

@@ -10,4 +10,9 @@
 
 # Word-boundary on each side, alternation of first names, one-or-more
 # whitespace, then a Capitalized token (the suspected last name).
-echo "\\b(Simon|Steve|Quinn|Mike|David)[[:space:]]+[A-Z][a-zA-Z'-]+\\b"
+#
+# Known limits (accepted): all-lowercase "simon weil" passes (case-insensitive
+# matching floods false positives on bare first names in prose); reversed
+# "Weil, Simon" passes; the rendered-HTML test in tests/test_render_page.py is
+# the backstop on the published artifact.
+echo "\\b(Simon|Steve|Quinn|Mike|David)[[:space:]]+[A-Z][[:alpha:]'-]+\\b"

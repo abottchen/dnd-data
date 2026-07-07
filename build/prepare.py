@@ -8,6 +8,8 @@ for each transformer. The skill `/build-prose` consumes that directory.
 import json
 import re
 import shutil
+import subprocess
+import sys
 from pathlib import Path
 
 from . import inventory, registry, render, store
@@ -19,6 +21,20 @@ _STEM_SAFE = re.compile(r"[^A-Za-z0-9_.-]+")
 
 def _stem(transformer: str, key) -> str:
     return _STEM_SAFE.sub("-", f"{transformer}__{key}")
+
+
+def _warn_if_hooks_inactive() -> None:
+    """A fresh clone has no core.hooksPath; the forbidden-name guard is off."""
+    try:
+        out = subprocess.run(
+            ["git", "-C", str(REPO_ROOT), "config", "core.hooksPath"],
+            capture_output=True, text=True)
+    except OSError:
+        return
+    if out.stdout.strip() != ".githooks":
+        print("prepare: WARNING — core.hooksPath is not '.githooks'; the "
+              "forbidden-name commit guard is inactive. Run: "
+              "git config core.hooksPath .githooks", file=sys.stderr)
 
 
 def _prompt_meta(name: str, frozen_prompts_dir: Path) -> dict:
@@ -47,6 +63,7 @@ def run(*, no_refresh: bool, force_refresh: bool, keep_temp: bool) -> Path:
 
     Returns the run-dir path. Skill `/build-prose` consumes it.
     """
+    _warn_if_hooks_inactive()
     data = render.load_data(str(data_dir()))
     authored = store.load_authored()
     latest = len(data["session_log"]["entries"])
