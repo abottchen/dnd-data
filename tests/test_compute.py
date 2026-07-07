@@ -1,3 +1,4 @@
+from build import render
 from build.render import (xp_for_cr, compute_trials, compute_sessions_chart, compute_fortune,
                    compute_d20_histogram, compute_other_dice, compute_best_skill,
                    compute_intro_meta, compute_constellation, compute_fact_pack,
@@ -683,3 +684,14 @@ def test_fact_pack_exposes_raw_axis_values():
     assert fp["a"]["rolls"] == 3 == fortune["a"]["rolls_total"]
     assert fp["a"]["xp"] == trials["per_char"]["a"]["xp"]
     assert fp["b"]["rolls"] == 1
+
+def test_compute_reliquary_joins_authored_verse_casefolded():
+    party = {"members": [{"id": "vex", "name": "Vex", "kills": [
+        {"date": "2026-04-19", "creature": "Goblin", "method": "Shortbow"},
+    ]}]}
+    authored_kills = [{"character": "vex", "date": "2026-04-19",
+                       "creature": "goblin", "method": "shortbow",
+                       "verse": "A verse.", "annotation": "an annotation"}]
+    rows = render.compute_reliquary(party, authored_kills)
+    assert rows["vex"][0]["verse"] == "A verse."
+    assert rows["vex"][0]["date_label"] == "19 APR 2026"

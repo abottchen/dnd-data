@@ -1712,10 +1712,7 @@ def compute_all(data: dict, authored: dict) -> dict:
         "party": party,
         "party_top_xp": party_top_xp,
         "characters_authored": char_auth_by_id,
-        "kills_authored_by_key": {
-            kill_key(k["character"], k["date"], k["creature"], k["method"]): k
-            for k in authored["kills"]
-        },
+        "reliquary_by_id": compute_reliquary(party, authored["kills"]),
         "trials": trials,
         "fortune": fortune_by_char,
         "sessions_chart": sessions_chart,
@@ -1781,6 +1778,31 @@ def compute_cr_label(creature: str) -> str:
         cr = cr.get("cr")
     cr = str(cr)
     return {"1/8": "&frac18;", "1/4": "&frac14;", "1/2": "&frac12;"}.get(cr, cr)
+
+def compute_reliquary(party: dict, authored_kills: list) -> dict[str, list[dict]]:
+    """Per-member, date-sorted kill rows with their authored verse joined in.
+    Joining here (via kill_key's casefold) keeps templates free of key
+    reconstruction — the template-side `| lower` rebuild diverged from
+    casefold on non-ASCII names."""
+    by_key = {
+        kill_key(k["character"], k["date"], k["creature"], k["method"]): k
+        for k in authored_kills
+    }
+    out: dict[str, list[dict]] = {}
+    for m in party.get("members", []):
+        rows = []
+        for k in sorted(m.get("kills", []), key=lambda k: k["date"]):
+            auth = by_key.get(kill_key(m["id"], k["date"], k["creature"], k["method"]), {})
+            rows.append({
+                "date": k["date"],
+                "date_label": _short_date(k["date"]),
+                "creature": k["creature"],
+                "cr_label": compute_cr_label(k["creature"]),
+                "verse": auth.get("verse", ""),
+                "annotation": auth.get("annotation", ""),
+            })
+        out[m["id"]] = rows
+    return out
 
 def render_page(context: dict, templates_dir: Path, out_path: Path) -> None:
     from jinja2 import Environment, FileSystemLoader, StrictUndefined
