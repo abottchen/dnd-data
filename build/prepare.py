@@ -52,7 +52,9 @@ def run(*, no_refresh: bool, force_refresh: bool, keep_temp: bool) -> Path:
     latest = len(data["session_log"]["entries"])
     marker = authored["site"].get("refreshed_through_session", 0)
 
-    # Inventory + pronoun side channels (mirror current __main__.py wiring).
+    # Inventory + pronoun side channels for slice builders. These ride inside
+    # the authored dict but are never persisted: store.persist writes only
+    # LIST_STEMS + site.
     inv_bundle = inventory.load(REPO_ROOT, party=data["party"])
     authored["inventory_by_id"] = inv_bundle["by_id"]
     authored["pronouns_by_id"] = render.load_character_pronouns()

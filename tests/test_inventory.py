@@ -261,6 +261,21 @@ def test_scholar_substring_match_on_lore_keywords():
     assert inventory.score_scholar(items, member={}) == 12
 
 
+def test_scorers_and_archetype_match_share_keywords():
+    """A keyword added to a scorer must also drive archetype_match filtering."""
+    items = [{"id": "b1", "name": "Dusty Spellbook", "count": 1,
+              "category": "Adventuring Gear", "weight": 1, "rarity": "common",
+              "description": ""}]
+    assert inventory.score_scholar(items, {}) == 1
+    assert inventory.archetype_match("scholar", items) == items
+
+
+def test_glaive_hand_and_quartermaster_tolerate_missing_id():
+    items = [{"name": "Blade", "category": "Weapon", "count": 1}]
+    assert inventory.score_glaive_hand(items, {}) == 0
+    assert inventory.score_quartermaster(items, {}) == 0
+
+
 def test_naturalist_substring_match():
     items = [
         {"name": "Sprig of Mistletoe (Druidic Focus)", "count": 1},

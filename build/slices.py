@@ -11,9 +11,13 @@ a few named helpers from `render` (the authoritative computation source)
 but does not factor a third common module.
 """
 import re
+import sys
 from collections import defaultdict
 
 from . import render
+from .inventory import ARCHETYPE_SLATE, archetype_match
+
+_ARCHETYPE_LABELS = {a["slug"]: a["label"] for a in ARCHETYPE_SLATE}
 
 
 def _character_context(data: dict, authored: dict) -> tuple[dict, dict, list]:
@@ -153,6 +157,8 @@ def append_kills(data: dict, authored: dict) -> list[tuple]:
         kills = new_by_date[date]
         session = sessions_by_date.get(date)
         if session is None:
+            print(f"append_kills: no session-log entry for kill date {date}; "
+                  f"skipping {len(kills)} kill(s)", file=sys.stderr)
             continue
         out.append((date, {
             "session": session.get("session"),
@@ -426,11 +432,6 @@ def refresh_known_npcs(data: dict, authored: dict) -> list[tuple]:
 
 # -- Refresh: archetype inscription ------------------------------------------
 
-from build.inventory import archetype_match, ARCHETYPE_SLATE
-
-_ARCHETYPE_LABELS = {a["slug"]: a["label"] for a in ARCHETYPE_SLATE}
-
-
 def refresh_archetype_inscription(data: dict, authored: dict) -> list[tuple]:
     """One slice per character whose math archetype is set.
 
@@ -475,10 +476,7 @@ def refresh_archetype_inscription(data: dict, authored: dict) -> list[tuple]:
             "archetype": {
                 "slug": arc_slug,
                 "label": _ARCHETYPE_LABELS.get(arc_slug, arc_slug.upper()),
-                "metric": arc_slug,
                 "score": rec.get("total_weight", 0),
-                "runner_up_score": 0,
-                "lead": 0,
             },
             "items": slice_items,
             "existing": existing,

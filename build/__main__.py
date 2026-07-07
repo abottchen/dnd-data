@@ -88,10 +88,7 @@ def main(argv=None) -> int:
         return _cmd_prepare(ns)
     if args.cmd == "prepare":
         return _cmd_prepare(args)
-    if args.cmd == "apply":
-        return _cmd_apply(args)
-    parser.error(f"unknown subcommand: {args.cmd}")
-    return 2
+    return _cmd_apply(args)
 
 
 if __name__ == "__main__":

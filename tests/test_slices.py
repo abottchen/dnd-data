@@ -339,3 +339,16 @@ def test_refresh_ascent_read_gates_on_marker(slice_env, tmp_path, monkeypatch):
     authored["site"]["refreshed_through_session"] = 0
     _, payload2 = slices.refresh_ascent_read(data, authored)[0]
     assert len(payload2["new_sessions"]) == len(data["session_log"]["entries"])
+
+
+def test_archetype_slice_carries_no_fabricated_stats(slice_env):
+    data, authored = slice_env["data"], slice_env["authored"]
+    authored["inventory_by_id"] = {"vex": {
+        "archetype": "scholar", "total_weight": 3.0,
+        "rack": [], "spotlight": [],
+        "manifest": [{"name": "Spellbook", "count": 1, "weight": 3,
+                      "description": ""}],
+    }}
+    out = slices.refresh_archetype_inscription(data, authored)
+    (_, s), = [t for t in out if t[0] == "vex"]
+    assert set(s["archetype"]) == {"slug", "label", "score"}
