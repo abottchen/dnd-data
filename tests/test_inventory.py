@@ -558,6 +558,8 @@ def test_load_full_pipeline_with_fixture(tmp_path, monkeypatch):
         {"id": "vex",   "name": "Vex",   "abilities": {"str": 12}},
     ]))
     monkeypatch.setenv("BUILD_DATA_DIR", str(fixture_dir))
+    monkeypatch.setattr(inventory, "_load_dice_player_map",
+                        lambda: {"Simeon": "grieg", "Vex": "vex", "GM": "gm"})
 
     bundle = inventory.load(fixture_dir.parent)
 
