@@ -259,11 +259,8 @@
         const label = row.querySelector('.dt-label');
         if (!label) return;
         // Read the full textContent so a leading <svg> icon (if present) doesn't
-        // shadow the die name. The first \d+ after a 'd' wins.
+        // shadow the die name.
         const dieStr = (label.textContent || '').trim();
-        const m = dieStr.match(/d(\d+)/);
-        if (!m) return;
-        const max = parseInt(m[1], 10);
         const svg = row.querySelector('.dt-chart');
         if (!svg) return;
         const dots = Array.from(svg.querySelectorAll('.roll-dot'));
@@ -271,8 +268,7 @@
         const xs = dots.map(d => parseFloat(d.getAttribute('cx')));
 
         dots.forEach((dot, idx) => {
-          const cy = parseFloat(dot.getAttribute('cy'));
-          const value = Math.round(1 + (56 - cy) / 52 * (max - 1));
+          const value = parseInt(dot.getAttribute('data-value'), 10);
           const date = dot.getAttribute('data-date') || '';
 
           // Voronoi column: boundaries at midpoints to neighbors; edges extend to chart bounds.
