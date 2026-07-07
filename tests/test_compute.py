@@ -136,6 +136,13 @@ def test_best_skill_humanizes_camelcase_keys():
     }}
     assert compute_best_skill(member) == {"name": "Sleight of Hand", "mod": 4}
 
+def test_compute_best_skill_alphabetical_tiebreak_past_first_char():
+    member = {"skills": {
+        "athletics": {"mod": 3, "prof": "full"},
+        "arcana":    {"mod": 3, "prof": "full"},
+    }}
+    assert compute_best_skill(member)["name"] == "Arcana"
+
 def test_name_to_token_name_strips_diacritics_and_quotes():
     assert _name_to_token_name("Naïve") == "Naive"
     assert _name_to_token_name('Ælf "Foo" Bar') == "AElf Foo Bar"

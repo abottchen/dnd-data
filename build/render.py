@@ -894,16 +894,13 @@ def compute_best_skill(member: dict) -> dict | None:
     skills = member.get("skills") or {}
     if not skills:
         return None
-    def sort_key(item):
-        key, info = item
-        return (info.get("mod", 0),
-                _PROF_RANK.get(info.get("prof", "none"), 0),
-                -ord(key[0]) if key else 0)
-    best_key, best = max(skills.items(), key=sort_key)
-    return {
-        "name": SKILL_DISPLAY.get(best_key, best_key),
-        "mod": best.get("mod", 0),
-    }
+    best_key, best = min(
+        skills.items(),
+        key=lambda item: (-item[1].get("mod", 0),
+                          -_PROF_RANK.get(item[1].get("prof", "none"), 0),
+                          item[0]),
+    )
+    return {"name": SKILL_DISPLAY.get(best_key, best_key), "mod": best.get("mod", 0)}
 
 # ── Ability radar geometry ──────────────────────────────────────────
 # Fixed 240x240 viewBox. Score-based scale: RADAR_FLOOR (center) -> RADAR_CEIL
