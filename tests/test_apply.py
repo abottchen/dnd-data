@@ -69,6 +69,22 @@ def test_append_kills_rejects_existing_key():
         apply.apply_append_kills(authored, "2026-04-19", slice_data, output)
 
 
+def test_append_kills_rejects_duplicate_within_batch():
+    """Two raw keys in one output batch that normalize to the same kill
+    (model casing drift) must not both pass the guard — the second raises
+    and no duplicate row lands in authored."""
+    authored = {"kills": []}
+    slice_data = {"kills": [{"character": "vex", "date": "2026-04-19",
+                             "creature": "Goblin", "method": "shortbow"}]}
+    output = {"fields": {
+        "vex__2026-04-19__Goblin__shortbow": {"verse": "v1", "annotation": "a1"},
+        "vex__2026-04-19__goblin__SHORTBOW": {"verse": "v2", "annotation": "a2"},
+    }}
+    with pytest.raises(ValueError, match="already authored"):
+        apply.apply_append_kills(authored, "2026-04-19", slice_data, output)
+    assert len(authored["kills"]) <= 1
+
+
 # -- apply_append_npcs -------------------------------------------------------
 
 def test_append_npcs_uses_slice_key_not_model_output():

@@ -46,6 +46,7 @@ def apply_append_kills(authored: dict, key, slice_data: dict, output: dict) -> N
             "verse": vals["verse"],
             "annotation": vals["annotation"],
         })
+        existing.add(normalized)
 
 
 def apply_append_sessions(authored: dict, key, slice_data: dict, output: dict) -> None:
