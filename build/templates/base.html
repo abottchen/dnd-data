@@ -88,9 +88,9 @@
 
   <footer class="footnote">{{ site.footnote | safe }}</footer>
 
-  {# The inline <script> below owns the tab switcher and the Other Dice tooltip IIFE.
-     It generates KILLS_BY_CHAR_SESSION at runtime from the rendered .session-bar elements'
-     data attributes, so the build need not pre-emit a JS map. #}
+  {# The inline <script> below is the page's only client-side logic (tab
+     switcher + all tooltip/animation IIFEs). Removing it breaks the page
+     silently — see CLAUDE.md gotchas. #}
   <script>
 {% include "_script.html" %}
   </script>

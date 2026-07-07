@@ -1,7 +1,7 @@
 {% from "_macros.html" import section_head -%}
 <article class="character" id="gm">
   {%- set gm_member = {"id": "gm"} %}
-  {%- set gm_fortune = fortune.get("gm") if "gm" in fortune else None %}
+  {%- set gm_fortune = fortune.get("gm") %}
   <header class="character-header">
     <img class="portrait" src="images/GM.png" alt="">
     <div class="identity">

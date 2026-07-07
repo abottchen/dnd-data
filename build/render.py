@@ -13,6 +13,7 @@ import json
 import math
 import sys
 from collections import Counter
+from dataclasses import dataclass
 from pathlib import Path
 from statistics import pstdev, median
 from typing import Optional
@@ -27,12 +28,12 @@ KIND_MISSING = "MISSING"
 KIND_MALFORMED = "MALFORMED"
 KIND_ORPHAN = "ORPHAN"
 
+@dataclass
 class ValidationError:
-    def __init__(self, kind: str, kind_type: str, key: tuple, field: str | None = None):
-        self.kind = kind
-        self.kind_type = kind_type
-        self.key = key
-        self.field = field
+    kind: str
+    kind_type: str
+    key: tuple
+    field: str | None = None
 
     def __str__(self) -> str:
         key_str = "(" + ", ".join(str(k) for k in self.key) + ")"
@@ -83,16 +84,10 @@ REQUIRED_CHAPTER_FIELDS = ("title", "epigraph")
 REQUIRED_NPC_FIELDS = ("epithet",)
 REQUIRED_CHAR_FIELDS = ("epithet", "reliquary_header", "constellation_epithet",
                          "distinction_title", "distinction_subtitle", "distinction_detail")
-REQUIRED_SITE_FIELDS = ("intro_epithet", "page_title", "page_subtitle")
+REQUIRED_SITE_FIELDS = ("intro_epithet", "page_title", "page_subtitle", "footnote", "gm", "road_ahead")
 
 # Reject if still present in authored/site.json after the migration to a build-computed value.
 DEAD_SITE_FIELDS = ("intro_meta",)
-
-NUMBER_WORDS = (
-    "Zero", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight",
-    "Nine", "Ten", "Eleven", "Twelve", "Thirteen", "Fourteen", "Fifteen",
-    "Sixteen", "Seventeen", "Eighteen", "Nineteen", "Twenty",
-)
 
 # Fields that are list-typed and legitimately may be empty lists (not MALFORMED).
 _LIST_EMPTY_OK = frozenset({"silent_roll"})
@@ -406,10 +401,10 @@ def compute_trials(party: dict) -> dict:
                 means = tied[0]
             else:
                 # Tiebreak by max CR among kills using that method
-                def max_cr_for_method(method):
+                def max_xp_for_method(method):
                     crs = [_kill_cr(k["creature"]) for k in kills if k["method"] == method]
                     return max((XP_BY_CR.get(c, 0) for c in crs), default=0)
-                tied.sort(key=lambda mm: (-max_cr_for_method(mm), mm.lower()))
+                tied.sort(key=lambda mm: (-max_xp_for_method(mm), mm.lower()))
                 means = tied[0]
             means_n = top_n
         else:
@@ -556,14 +551,18 @@ def compute_fact_pack(party: dict, trials: dict, fortune_by_char: dict,
     return fp
 
 
+_MONTHS_ABBR = ("JAN", "FEB", "MAR", "APR", "MAY", "JUN",
+                "JUL", "AUG", "SEP", "OCT", "NOV", "DEC")
+
 def _short_date(iso_date: str) -> str:
-    """'2026-04-23' -> '23 APR 2026'."""
+    """'2026-04-23' -> '23 APR 2026'. Fixed English table — strftime('%b')
+    is locale-dependent."""
     from datetime import date
     d = date.fromisoformat(iso_date)
-    return d.strftime("%d %b %Y").upper()
+    return f"{d.day:02d} {_MONTHS_ABBR[d.month - 1]} {d.year}"
 
 def compute_sessions_chart(party: dict) -> dict:
-    """Bars + tooltip-ready KILLS_BY_CHAR_SESSION map."""
+    """Per-character kill bars per session date, with tooltip-ready kill lists."""
     members = party.get("members", [])
 
     # Distinct sorted session dates across the party
@@ -1185,24 +1184,7 @@ def compute_bestiary(party: dict) -> list[dict]:
     groups.sort(key=lambda g: (-g["total"], g["type"].lower()))
     return groups
 
-def _count_word(n: int) -> str:
-    if 0 <= n <= 20:
-        return NUMBER_WORDS[n]
-    return str(n)
-
-def compute_intro_meta(session_log: dict) -> str:
-    """Header line under the campaign title — count + latest in-universe month/year."""
-    entries = session_log.get("entries", [])
-    n = len(entries)
-    if n == 0:
-        return "No Sessions Yet"
-    noun = "Session" if n == 1 else "Sessions"
-    latest = entries[-1]
-    iu_month = latest.get("iu_month", "Kythorn")
-    iu_year = latest.get("iu_year", "1494")
-    return f"{_count_word(n)} {noun} &middot; {iu_month} {iu_year} DR"
-
-def compute_company_ledger(party: dict, dice_files: list, session_log: dict, trials: dict, fortune_by_char: dict) -> dict:
+def compute_company_ledger(party: dict, session_log: dict, trials: dict, fortune_by_char: dict) -> dict:
     members = [m for m in party.get("members", []) if m["id"] != "gm"]
     total_xp = sum(trials["per_char"][m["id"]]["xp"] for m in members)
     total_kills = sum(trials["per_char"][m["id"]]["kill_count"] for m in members)
@@ -1672,7 +1654,7 @@ def compute_all(data: dict, authored: dict) -> dict:
     constellation = compute_constellation(party, fortune_by_char, trials)
     bestiary = compute_bestiary(party)
     chronicle = compute_chronicle(session_log, authored["sessions"], authored["chapters"], party)
-    ledger = compute_company_ledger(party, data.get("dice_rolls", []), session_log, trials, fortune_by_char)
+    ledger = compute_company_ledger(party, session_log, trials, fortune_by_char)
     distinctions = compute_distinctions(party, authored["characters"])
     patron = compute_patron_die(fortune_by_char, party)
     best_skill_by_id = {m["id"]: compute_best_skill(m) for m in party.get("members", [])}
@@ -1697,7 +1679,6 @@ def compute_all(data: dict, authored: dict) -> dict:
         inscriptions[slug] = inventory.resolve_inscription(rec, authored_badge, archetype_ranks)
 
     site = dict(authored["site"])
-    site["intro_meta"] = compute_intro_meta(session_log)
     site["header_eyebrow"] = _compute_header_eyebrow(chronicle, ledger)
     site.setdefault(
         "ascent_read",
@@ -1825,8 +1806,6 @@ def main() -> int:
                         help="Directory containing party.json etc.")
     parser.add_argument("--out", default=str(REPO_ROOT / "site" / "index.html"),
                         help="Output HTML path.")
-    parser.add_argument("--strict", action="store_true",
-                        help="Abort on any validation error (default: True).")
     args = parser.parse_args()
 
     print(f"render.py: starting (data_dir={args.data_dir})")
@@ -1855,14 +1834,15 @@ def main() -> int:
     templates_dir = BUILD_DIR / "templates"
     base_template = templates_dir / "base.html"
     if not base_template.exists():
-        print(f"render.py: no {base_template} yet; skipping render (compute only). "
-              f"Create templates first (plan tasks 18-24).")
+        print(f"render.py: no {base_template} yet; skipping render (compute only).")
         return 0
 
     try:
         context = compute_all(data, authored)
         render_page(context, templates_dir, Path(args.out))
     except Exception as e:
+        import traceback
+        traceback.print_exc()
         print(f"render.py: render failed: {type(e).__name__}: {e}", file=sys.stderr)
         return 2
     print(f"render.py: rendered {args.out}")

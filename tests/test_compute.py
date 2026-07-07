@@ -1,7 +1,7 @@
 from build import render
 from build.render import (xp_for_cr, compute_trials, compute_sessions_chart, compute_fortune,
                    compute_d20_histogram, compute_other_dice, compute_best_skill,
-                   compute_intro_meta, compute_constellation, compute_fact_pack,
+                   compute_constellation, compute_fact_pack,
                    _compute_party_top_xp, _compute_header_eyebrow,
                    _creature_token_url, _name_to_token_name,
                    compute_radar)
@@ -176,37 +176,6 @@ def test_d20_histogram_emits_all_20_bars():
     bar5 = next(b for b in bars if b["value"] == 5)
     assert bar5["count"] == 0
     assert bar5["zero"] is True
-
-
-def test_compute_intro_meta_typical():
-    log = {"entries": [{"iu_month": "Kythorn", "iu_year": 1494}] * 5}
-    assert compute_intro_meta(log) == "Five Sessions &middot; Kythorn 1494 DR"
-
-def test_compute_intro_meta_singular():
-    log = {"entries": [{"iu_month": "Hammer", "iu_year": 1495}]}
-    assert compute_intro_meta(log) == "One Session &middot; Hammer 1495 DR"
-
-def test_compute_intro_meta_uses_latest_entry_month_and_year():
-    log = {"entries": [
-        {"iu_month": "Kythorn", "iu_year": 1494},
-        {"iu_month": "Kythorn", "iu_year": 1494},
-        {"iu_month": "Flamerule", "iu_year": 1494},
-    ]}
-    assert compute_intro_meta(log) == "Three Sessions &middot; Flamerule 1494 DR"
-
-def test_compute_intro_meta_word_form_through_twenty():
-    log = {"entries": [{"iu_month": "Kythorn", "iu_year": 1494}] * 20}
-    assert compute_intro_meta(log) == "Twenty Sessions &middot; Kythorn 1494 DR"
-
-def test_compute_intro_meta_digit_form_above_twenty():
-    log = {"entries": [{"iu_month": "Kythorn", "iu_year": 1494}] * 21}
-    assert compute_intro_meta(log) == "21 Sessions &middot; Kythorn 1494 DR"
-
-def test_compute_intro_meta_empty_log():
-    assert compute_intro_meta({"entries": []}) == "No Sessions Yet"
-
-def test_compute_intro_meta_missing_entries_key():
-    assert compute_intro_meta({}) == "No Sessions Yet"
 
 
 # ── _compute_party_top_xp ──────────────────────────────────────────────
@@ -684,6 +653,10 @@ def test_fact_pack_exposes_raw_axis_values():
     assert fp["a"]["rolls"] == 3 == fortune["a"]["rolls_total"]
     assert fp["a"]["xp"] == trials["per_char"]["a"]["xp"]
     assert fp["b"]["rolls"] == 1
+
+def test_short_date_fixed_english_months():
+    assert render._short_date("2026-04-23") == "23 APR 2026"
+    assert render._short_date("2026-12-01") == "01 DEC 2026"
 
 def test_compute_reliquary_joins_authored_verse_casefolded():
     party = {"members": [{"id": "vex", "name": "Vex", "kills": [
