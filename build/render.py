@@ -1790,7 +1790,7 @@ def render_page(context: dict, templates_dir: Path, out_path: Path) -> None:
     env = Environment(
         loader=FileSystemLoader(str(templates_dir)),
         undefined=StrictUndefined,
-        autoescape=False,
+        autoescape=True,
         keep_trailing_newline=True,
     )
     env.filters["short_date"] = _short_date
