@@ -23,12 +23,18 @@ def apply_append_kills(authored: dict, key, slice_data: dict, output: dict) -> N
         render.kill_key(k["character"], k["date"], k["creature"], k["method"]): k
         for k in slice_data["kills"]
     }
+    existing = {
+        render.kill_key(a["character"], a["date"], a["creature"], a["method"])
+        for a in authored["kills"]
+    }
     for kk_str, vals in output["fields"].items():
         parts = kk_str.split("__", 3)
         if len(parts) != 4:
             raise ValueError(f"malformed kill key from model: {kk_str!r}")
         char, date, creature, method = parts
         normalized = render.kill_key(char, date, creature, method)
+        if normalized in existing:
+            raise ValueError(f"kill already authored: {kk_str!r}")
         kill = by_normalized.get(normalized)
         if kill is None:
             raise ValueError(f"kill key not in slice: {kk_str!r}")
@@ -43,6 +49,8 @@ def apply_append_kills(authored: dict, key, slice_data: dict, output: dict) -> N
 
 
 def apply_append_sessions(authored: dict, key, slice_data: dict, output: dict) -> None:
+    if any(s["session"] == slice_data["session"] for s in authored["sessions"]):
+        raise ValueError(f"session {slice_data['session']} already authored")
     fields = output["fields"]
     authored["sessions"].append({
         "session": slice_data["session"],
@@ -54,9 +62,16 @@ def apply_append_sessions(authored: dict, key, slice_data: dict, output: dict) -
 
 
 def apply_append_chapters(authored: dict, key, slice_data: dict, output: dict) -> None:
+    chapter_id = int(key)
+    if any(c["id"] == chapter_id for c in authored["chapters"]):
+        raise ValueError(f"chapter id {chapter_id} already authored")
+    if any(c["starts_at_session"] == slice_data["starts_at_session"]
+           for c in authored["chapters"]):
+        raise ValueError(
+            f"chapter starting at session {slice_data['starts_at_session']} already authored")
     fields = output["fields"]
     authored["chapters"].append({
-        "id": int(key),
+        "id": chapter_id,
         "starts_at_session": slice_data["starts_at_session"],
         "title": fields["title"],
         "epigraph": fields["epigraph"],
@@ -67,6 +82,8 @@ def apply_append_npcs(authored: dict, key, slice_data: dict, output: dict) -> No
     """`key` is the upstream-derived NPC name; we use it verbatim rather than
     trusting the model's echoed `name`, so casing/whitespace drift in the
     structured output cannot create duplicate authored entries."""
+    if any(n["name"] == key for n in authored["npcs"]):
+        raise ValueError(f"npc {key!r} already authored")
     fields = output["fields"]
     authored["npcs"].append({
         "name": key,
@@ -78,6 +95,8 @@ def apply_append_npcs(authored: dict, key, slice_data: dict, output: dict) -> No
 def apply_append_characters(authored: dict, key, slice_data: dict, output: dict) -> None:
     """One slice for the whole batch; output['fields'] is keyed by PC id."""
     for pc_id, bundle in output["fields"].items():
+        if any(c["id"] == pc_id for c in authored["characters"]):
+            raise ValueError(f"character {pc_id!r} already authored")
         authored["characters"].append({
             "id": pc_id,
             "epithet": bundle["epithet"],
