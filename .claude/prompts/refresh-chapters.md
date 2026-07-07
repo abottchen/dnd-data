@@ -12,6 +12,15 @@ The user message is a JSON object with this shape:
 - `sessions` (array): every session entry that belongs to this chapter
 - `existing` (object): `{title, epigraph}` — the current authored prose
 
+# Spoiler rules (omit, do not paraphrase)
+
+Session entries in `sessions` carry raw text that includes DM-only content the players could not know. Never let it drive a rewrite of the title or epigraph:
+
+- `(DM Note)` prefix → omit the entire line.
+- Bracketed notes `[like this]` → DM-only; omit.
+- Future-tense planning from the DM's perspective (e.g. "will tell them…", "plans to…") → DM-only; omit.
+- Parenthesized `(notes)` — apply the test: *could the players in their seats have learned this from the in-fiction events?* If no, omit.
+
 # Standing rule (critical)
 
 If the existing prose is still consistent with the data and still good prose by the voice rules, return it unchanged. Only rewrite if:

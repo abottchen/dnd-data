@@ -3,7 +3,7 @@
   "page_subtitle": "A ledger of those who walk &middot; and those they have laid down",
   "intro_epithet": "Five travellers and a storyteller, bound to a doomed road",
   "footnote": "The names above are the names given &middot; the ones who fell were given no names",
-  "refreshed_through_session": 14,
+  "refreshed_through_session": 15,
   "road_ahead": {
     "known": [
       {
@@ -40,7 +40,7 @@
       }
     ],
     "was_known": [],
-    "direction": "Queen Grabstab dead and her camp slung whole into the southeast canopy, the company turns to run down the flying Yellyark and the amulet that rode away around her neck."
+    "direction": "Yellyark found broken and empty, Grabstab's amulet in hand and Vorn the half-woken guardian shuffling at Urida's heel, the company turns back for Port Nyanzaru to resupply."
   },
   "gm": {
     "name": "The Dungeon Master",
@@ -87,7 +87,8 @@
     "Nuanwa Olerro",
     "Bakari",
     "Imka",
-    "Doruk"
+    "Doruk",
+    "Vorn"
   ],
   "ascent_read": "Legends forged mostly by steel, but the road and its riddles have left their mark on every hard-won mile."
 }

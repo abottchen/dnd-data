@@ -80,16 +80,16 @@
     "epithet": "of the Tabaxi, who lets the bowstring do all her speaking",
     "reliquary_header": "Felled before they drew near",
     "constellation_epithet": "ever at the hunt, the soft-pawed shot",
-    "distinction_title": "The Steady Hand",
-    "distinction_subtitle": "whose dice swing the least of any hand at the table",
-    "distinction_detail": "<b>5.7</b> roll spread &middot; the steadiest dice the company casts",
+    "distinction_title": "The Cat's Own Luck",
+    "distinction_subtitle": "whose kept dice fall higher than any other hand at the table",
+    "distinction_detail": "<b>11.3</b> average kept d20 &middot; the kindest dice the company casts",
     "archetype_badge": {
       "archetype": "naturalist",
       "inscription": "One carved sprig of mistletoe, ribbon-tied and kept close — the whole of the primal green, if you know how to ask, flows through that small stem."
     },
     "distinction_basis": {
       "kind": "mechanical",
-      "atom": "is_party_steadiest",
+      "atom": "is_party_luckiest",
       "value": true
     },
     "sworn_creed": "the courts left their mark on her — glamour and dread in equal measure"

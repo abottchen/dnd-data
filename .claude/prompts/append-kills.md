@@ -13,6 +13,15 @@ The user message is a JSON object with this shape:
 - `narrative` (str): the session log text — the source of truth for what actually happened
 - `kills` (array): each kill has `character`, `creature`, `method`, `date`
 
+# Spoiler rules (omit, do not paraphrase)
+
+`narrative` is raw session text that includes DM-only content the players could not know. Never let it into a verse or annotation (the `kills` and `method` fields are authoritative and always fair to use):
+
+- `(DM Note)` prefix → omit the entire line.
+- Bracketed notes `[like this]` → DM-only; omit.
+- Future-tense planning from the DM's perspective (e.g. "will tell them…", "plans to…") → DM-only; omit.
+- Parenthesized `(notes)` — apply the test: *could the players in their seats have learned this from the in-fiction events?* If no, omit.
+
 # Voice rules
 
 - Single sentence. Concrete, evocative, third person. No "you" or "I".

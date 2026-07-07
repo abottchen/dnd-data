@@ -454,5 +454,29 @@
     "method": "Longbow",
     "verse": "Queen Grabstab fell, but the net carried her away",
     "annotation": "Longbow &middot; the queen was dead before the vine was cut"
+  },
+  {
+    "character": "vex",
+    "date": "2026-07-05",
+    "creature": "Eblis",
+    "method": "Longbow",
+    "verse": "An eblis dropped from the dark before the camp fully woke",
+    "annotation": "Longbow &middot; one arrow found the raider still climbing for the trees"
+  },
+  {
+    "character": "chumble",
+    "date": "2026-07-05",
+    "creature": "Eblis",
+    "method": "Eldritch Blast",
+    "verse": "A second raider fell to the alarm it had triggered",
+    "annotation": "Eldritch Blast &middot; the same voice that raised the camp answered it"
+  },
+  {
+    "character": "lilac",
+    "date": "2026-07-05",
+    "creature": "Eblis",
+    "method": "Longbow",
+    "verse": "A third eblis went down as the survivors began to bargain",
+    "annotation": "Longbow &middot; the last shot before two begged for their lives"
   }
 ]

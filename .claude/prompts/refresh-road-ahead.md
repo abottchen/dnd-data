@@ -10,6 +10,15 @@ The user message is a JSON object with this shape:
 - `new_sessions` (array): every session that has landed since the last refresh.
 - `existing` (object): the current `road_ahead` block, with `known`, `was_known`, and `direction`. Each `known[]` and `was_known[]` entry is `{name, gloss}`. `direction` is a single sentence.
 
+# Spoiler rules (omit, do not paraphrase)
+
+`new_sessions` carries raw session text that includes DM-only content the players could not know. Never let it drive a graduation, gloss, or the `direction` line:
+
+- `(DM Note)` prefix → omit the entire line.
+- Bracketed notes `[like this]` → DM-only; omit.
+- Future-tense planning from the DM's perspective (e.g. "will tell them…", "plans to…") → DM-only; omit.
+- Parenthesized `(notes)` — apply the test: *could the players in their seats have learned this from the in-fiction events?* If no, omit.
+
 # What to evaluate
 
 For each `known[]` entry, decide whether `new_sessions` resolved or fundamentally changed that thread. If yes:

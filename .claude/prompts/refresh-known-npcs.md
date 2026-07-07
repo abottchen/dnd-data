@@ -10,6 +10,15 @@ The user message is a JSON object with this shape:
 - `sessions` (array): every session log entry to date. Each item has at minimum `{day, realDate, text}`.
 - `existing` (array of str): the current `known_npcs` list — the canonical names of every NPC the site already tracks.
 
+# Spoiler rules (omit, do not paraphrase)
+
+`sessions[*].text` is raw session text that includes DM-only content the players could not know. Never let it introduce a name to the list — a figure named only in a DM note the party has not yet met does not belong:
+
+- `(DM Note)` prefix → omit the entire line.
+- Bracketed notes `[like this]` → DM-only; omit.
+- Future-tense planning from the DM's perspective (e.g. "will tell them…", "plans to…") → DM-only; omit.
+- Parenthesized `(notes)` — apply the test: *could the players in their seats have learned this from the in-fiction events?* If no, omit.
+
 # What counts as an NPC
 
 An NPC is a **named, sentient, person-like character** the party interacts with — allies, antagonists, vendors, contacts, faction figures.
