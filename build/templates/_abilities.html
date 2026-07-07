@@ -5,7 +5,7 @@
         {%- set ability_labels = {"str": "Strength", "dex": "Dexterity", "con": "Constitution", "int": "Intelligence", "wis": "Wisdom", "cha": "Charisma"} %}
         {%- for key in ability_keys %}
           {%- set score = member.abilities[key] %}
-          {%- set mod = (score - 10) // 2 %}
+          {%- set mod = score | ability_mod %}
           {%- set mod_str = ("+" if mod >= 0 else "") ~ mod %}
           {%- set mod_display = mod_str | replace("-", "&minus;") %}
           {%- set st = member.savingThrows[key] %}

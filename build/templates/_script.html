@@ -342,7 +342,7 @@
           const rack = el.getAttribute('data-rack') || '0';
           const spot = el.getAttribute('data-spotlight') || '0';
           const man = el.getAttribute('data-manifest') || '0';
-          const pct = cap > 0 ? Math.round(w / cap * 100) : 0;
+          const pct = parseInt(el.getAttribute('data-pct'), 10) || 0;
           let html = '<div class="tip-val tip-val-text">' + Tip.esc(name) + '</div>';
           if (cap > 0) {
             html += '<div class="tip-ctx">Rack ' + Tip.esc(rack) + ' &middot; Spotlight ' + Tip.esc(spot) +

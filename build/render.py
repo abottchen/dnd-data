@@ -1712,6 +1712,8 @@ def compute_all(data: dict, authored: dict) -> dict:
         "inventory_by_id": inventory_bundle["by_id"],
         "company_strip": inventory_bundle["company_strip"],
         "archetype_inscriptions": inscriptions,
+        "skill_display": SKILL_DISPLAY,
+        "archetype_labels": {a["slug"]: a["label"] for a in inventory.ARCHETYPE_SLATE},
     }
 
 
@@ -1796,6 +1798,7 @@ def render_page(context: dict, templates_dir: Path, out_path: Path) -> None:
     env.filters["short_date"] = _short_date
     env.filters["roman"] = _to_roman
     env.filters["cr_label"] = compute_cr_label
+    env.filters["ability_mod"] = lambda score: (score - 10) // 2
     template = env.get_template("base.html")
     html = template.render(**context)
     out_path.write_text(html)

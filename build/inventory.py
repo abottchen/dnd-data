@@ -432,6 +432,7 @@ def _build_bundle(parsed: dict[str, dict], party: dict) -> dict:
                 "total_weight": 0,
                 "capacity": _carrying_capacity(member),
                 "breakdown": {"rack": 0, "spotlight": 0, "manifest": 0},
+                "pct": 0,
             })
         else:
             strip.append({
@@ -441,6 +442,7 @@ def _build_bundle(parsed: dict[str, dict], party: dict) -> dict:
                 "total_weight": rec["total_weight"],
                 "capacity": rec["capacity"],
                 "breakdown": rec["breakdown"],
+                "pct": round(rec["total_weight"] / rec["capacity"] * 100) if rec["capacity"] else 0,
             })
 
     return {"by_id": by_id, "company_strip": strip}

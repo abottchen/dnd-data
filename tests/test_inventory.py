@@ -532,6 +532,17 @@ def test_company_strip_excludes_gm_member():
     assert [s["slug"] for s in strip] == ["grieg"]
 
 
+def test_company_strip_carries_pct():
+    parsed = {"vex": {"items": [{"id": "a", "name": "Rock", "count": 1,
+                                 "weight": 30, "category": "Adventuring Gear",
+                                 "rarity": "common", "description": ""}]}}
+    party = {"members": [{"id": "vex", "name": "Vex",
+                          "abilities": {"str": 10}}]}
+    bundle = inventory._build_bundle(parsed, party)
+    strip = {s["slug"]: s for s in bundle["company_strip"]}
+    assert strip["vex"]["pct"] == 20   # 30 lb of 150 capacity
+
+
 def test_load_returns_empty_bundle_when_no_snapshot(tmp_path, monkeypatch):
     monkeypatch.setenv("BUILD_DATA_DIR", str(tmp_path))
     bundle = inventory.load(tmp_path.parent)
