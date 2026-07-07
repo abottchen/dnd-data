@@ -17,7 +17,8 @@ import json
 from pathlib import Path
 from typing import Optional
 
-from build.render import _load_dice_player_map, _resolve_dice_player
+from .loaders import (load_dice_player_map as _load_dice_player_map,
+                      resolve_dice_player as _resolve_dice_player)
 
 
 def load(repo_root: Path, party: Optional[dict] = None) -> dict:
