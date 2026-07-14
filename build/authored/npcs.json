@@ -71,7 +71,7 @@
   },
   {
     "name": "Musharib",
-    "epithet": "a guide in Jobal's employ who led them into the jungle at his asking price, got lost, fought at their side, and kept going",
+    "epithet": "a guide in Jobal's employ who led them into the jungle at his asking price, got lost more than once, fought at their side, then resigned his post and stayed behind in Port Nyanzaru",
     "allegiance": "with"
   },
   {
@@ -136,8 +136,8 @@
   },
   {
     "name": "Jessamine",
-    "epithet": "one of the seven merchant princes of Port Nyanzaru, suspected by Grandfather Zitembe of dealing in underhanded affairs",
-    "allegiance": null
+    "epithet": "one of the seven merchant princes of Port Nyanzaru, the one to talk to about poisons, whom Grandfather Zitembe suspects of underhanded dealing",
+    "allegiance": "with"
   },
   {
     "name": "Kwayothe",
@@ -203,5 +203,40 @@
     "name": "Vorn",
     "epithet": "a shield guardian bound to Urida's amulet, walking and following but stripped of every other power",
     "allegiance": "with"
+  },
+  {
+    "name": "Faroul & Gondolo",
+    "epithet": "guide service posted on the bulletin board, called terrible racers who nonetheless rode Zongo to third place",
+    "allegiance": null
+  },
+  {
+    "name": "Tiryki",
+    "epithet": "chultan dinosaur racer, son of Ekene-Afa, who rode Banana Candy against the company at the races",
+    "allegiance": null
+  },
+  {
+    "name": "The Honeyman",
+    "epithet": "left to the ants by the goblins he tried to rob, who marked their camp for the company once healed",
+    "allegiance": "with"
+  },
+  {
+    "name": "Qawasha",
+    "epithet": "druid guide of Fort Beluarian, who sent the Emerald Enclave's scouts on a mission to kill the undead",
+    "allegiance": "with"
+  },
+  {
+    "name": "Rokah",
+    "epithet": "who sought the company out by night, claiming common cause against the flaming fist and offering coin and guides for an escort to Fort Beluarian",
+    "allegiance": "with"
+  },
+  {
+    "name": "River",
+    "epithet": "a jungle guide paired with Flask, named by Rokah to lead the company through the wilds",
+    "allegiance": null
+  },
+  {
+    "name": "Flask",
+    "epithet": "one of a pair of jungle guides spoken of by Rokah, not yet met",
+    "allegiance": null
   }
 ]

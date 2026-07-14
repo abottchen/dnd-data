@@ -379,6 +379,7 @@ def compute_other_dice(events: list) -> list[dict]:
 # coordinates are computed here; the template emits static SVG).
 _ASCENT_W, _ASCENT_H = 1000, 440
 _ASCENT_ML, _ASCENT_MR, _ASCENT_MT, _ASCENT_MB = 60, 128, 26, 52
+_ASCENT_TICK_GAP = 72   # min viewBox-units between x-axis month labels
 
 
 def compute_ascent(xp_log: Optional[dict]) -> Optional[dict]:
@@ -404,6 +405,7 @@ def compute_ascent(xp_log: Optional[dict]) -> Optional[dict]:
             "gain": int(e.get("perPc", 0)),
             "total": running,
             "date": _short_date(e["date"]) if e.get("date") else "",
+            "iso": e.get("date", ""),
             "source": e.get("source", ""),
             "session_id": e.get("sessionId", ""),
         })
@@ -448,20 +450,43 @@ def compute_ascent(xp_log: Optional[dict]) -> Optional[dict]:
             break
         thresholds.append({"v": v, "lvl": _to_roman(l), "y": fy(v), "top": v == ymax})
 
-    # session date ticks: group consecutive nodes sharing a sessionId
-    groups: list[dict] = []
+    # x-axis time labels. The axis is ordinal — deeds sit at even intervals,
+    # not proportional to date — so stamping every session's full "DD MON YYYY"
+    # made the labels pile up as the log grew. Instead anchor one label per
+    # calendar month at that month's first deed, then greedily drop any that
+    # would crowd its neighbour, so the axis stays legible whether the log holds
+    # 8 deeds or 800. Exact per-deed dates still live in the hover tooltips.
+    month_anchors: list[dict] = []
+    seen_ym: set[str] = set()
     for nd in nodes[1:]:
-        sid = nd["session_id"]
-        if groups and groups[-1]["sid"] == sid:
-            groups[-1]["xs"].append(nd["cx"])
-            groups[-1]["date"] = nd["date"]
-        else:
-            groups.append({"sid": sid, "xs": [nd["cx"]], "date": nd["date"]})
-    ticks = [{
-        "x": round(sum(g["xs"]) / len(g["xs"]), 2),
-        "x0": g["xs"][0], "x1": g["xs"][-1],
-        "label": g["date"], "multi": len(g["xs"]) > 1,
-    } for g in groups]
+        ym = nd["iso"][:7]
+        if ym and ym not in seen_ym:
+            seen_ym.add(ym)
+            month_anchors.append({
+                "x": nd["cx"], "year": ym[:4],
+                "mon": _MONTHS_ABBR[int(ym[5:7]) - 1],
+            })
+
+    kept: list[dict] = []
+    for a in month_anchors:
+        if not kept or a["x"] - kept[-1]["x"] >= _ASCENT_TICK_GAP:
+            kept.append(a)
+    # Recency wins: the newest month always earns a label; if keeping it would
+    # crowd the previous survivor, drop that one rather than the newest.
+    if month_anchors and kept[-1] is not month_anchors[-1]:
+        newest = month_anchors[-1]
+        while kept and newest["x"] - kept[-1]["x"] < _ASCENT_TICK_GAP:
+            kept.pop()
+        kept.append(newest)
+
+    ticks = []
+    prev_year = None
+    for a in kept:
+        ticks.append({
+            "x": a["x"],
+            "label": a["mon"] if a["year"] == prev_year else f"{a['mon']} {a['year']}",
+        })
+        prev_year = a["year"]
 
     # path strings
     line_d = "M " + " L ".join(f"{nd['cx']} {nd['cy']}" for nd in nodes)

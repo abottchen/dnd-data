@@ -3,7 +3,7 @@
   "page_subtitle": "A ledger of those who walk &middot; and those they have laid down",
   "intro_epithet": "Five travellers and a storyteller, bound to a doomed road",
   "footnote": "The names above are the names given &middot; the ones who fell were given no names",
-  "refreshed_through_session": 15,
+  "refreshed_through_session": 16,
   "road_ahead": {
     "known": [
       {
@@ -40,7 +40,7 @@
       }
     ],
     "was_known": [],
-    "direction": "Yellyark found broken and empty, Grabstab's amulet in hand and Vorn the half-woken guardian shuffling at Urida's heel, the company turns back for Port Nyanzaru to resupply."
+    "direction": "Resupplied in Port Nyanzaru with the guardian left buried in jungle moss, the company weighs Rokah's bargain: escort him to Fort Beluarian and screen his work there, and a charter of exploration he means to steal is theirs."
   },
   "gm": {
     "name": "The Dungeon Master",
@@ -88,7 +88,14 @@
     "Bakari",
     "Imka",
     "Doruk",
-    "Vorn"
+    "Vorn",
+    "Faroul & Gondolo",
+    "Tiryki",
+    "The Honeyman",
+    "Qawasha",
+    "Rokah",
+    "River",
+    "Flask"
   ],
   "ascent_read": "Legends forged mostly by steel, but the road and its riddles have left their mark on every hard-won mile."
 }
