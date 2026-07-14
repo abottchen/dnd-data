@@ -2624,12 +2624,12 @@ img.chronicle-session-pip:focus-visible {
 .ascent-tick {
   fill: var(--paper-dim);
   font-family: 'IBM Plex Sans', sans-serif;
-  font-size: 9px;
+  font-size: 9.5px;
   letter-spacing: 1.5px;
   text-transform: uppercase;
   text-anchor: middle;
 }
-.ascent-session-bracket { stroke: var(--brass-dim); stroke-width: 1; opacity: 0.5; }
+.ascent-tickmark { stroke: var(--rule-strong); stroke-width: 1; opacity: 0.7; }
 
 .ascent-area  { fill: url(#ascentFill); opacity: 0; }
 .ascent-area.drawn { opacity: 1; transition: opacity 0.9s ease 0.4s; }

@@ -71,9 +71,13 @@ def test_compute_ascent_geometry_well_formed():
     xs = [n["cx"] for n in a["nodes"]]
     assert xs == sorted(xs)
     assert a["plot_left"] <= xs[0] and xs[-1] <= a["plot_right"]
-    # session ticks: one per distinct session (4), the s4 group is multi
-    assert len(a["ticks"]) == 4
-    assert a["ticks"][-1]["multi"] is True
+    # x-axis labels: one per distinct calendar month (Apr, May), anchored at
+    # each month's first deed; the year shows only on its first appearance.
+    assert [t["label"] for t in a["ticks"]] == ["APR 2026", "MAY"]
+    # anchored at the first deed of each month, left-to-right, inside the plot
+    assert a["ticks"][0]["x"] == a["nodes"][1]["cx"]   # 19 Apr
+    assert a["ticks"][1]["x"] == a["nodes"][3]["cx"]   #  3 May
+    assert a["ticks"][0]["x"] < a["ticks"][1]["x"]
 
 
 def test_compute_ascent_at_max_level_has_no_next_threshold():

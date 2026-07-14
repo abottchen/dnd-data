@@ -54,8 +54,8 @@
       <line class="ascent-axis" x1="{{ ascent.plot_left }}" y1="{{ ascent.ybase }}" x2="{{ ascent.plot_right }}" y2="{{ ascent.ybase }}"/>
 
       {%- for tk in ascent.ticks %}
-      <text class="ascent-tick" x="{{ tk.x }}" y="{{ ascent.ybase + 30 }}">{{ tk.label }}</text>
-      {%- if tk.multi %}<line class="ascent-session-bracket" x1="{{ tk.x0 }}" y1="{{ ascent.ybase + 12 }}" x2="{{ tk.x1 }}" y2="{{ ascent.ybase + 12 }}"/>{% endif %}
+      <line class="ascent-tickmark" x1="{{ tk.x }}" y1="{{ ascent.ybase }}" x2="{{ tk.x }}" y2="{{ ascent.ybase + 7 }}"/>
+      <text class="ascent-tick" x="{{ tk.x }}" y="{{ ascent.ybase + 23 }}">{{ tk.label }}</text>
       {%- endfor %}
 
       <path class="ascent-area" d="{{ ascent.area_d }}"/>
