@@ -221,22 +221,37 @@
   },
   {
     "name": "Qawasha",
-    "epithet": "druid guide of Fort Beluarian, who sent the Emerald Enclave's scouts on a mission to kill the undead",
+    "epithet": "druid guide of Fort Beluarian, who would not walk with them until their road led to the undead",
     "allegiance": "with"
   },
   {
     "name": "Rokah",
-    "epithet": "who sought the company out by night, claiming common cause against the flaming fist and offering coin and guides for an escort to Fort Beluarian",
+    "epithet": "whose distraction plan failed, and who slipped into the jungle rather than back to the ship",
     "allegiance": "with"
   },
   {
     "name": "River",
-    "epithet": "a jungle guide paired with Flask, named by Rokah to lead the company through the wilds",
-    "allegiance": null
+    "epithet": "paired with Flask as Rokah's own guide, who slipped back into the jungle with him rather than return to the ship",
+    "allegiance": "against"
   },
   {
     "name": "Flask",
-    "epithet": "one of a pair of jungle guides spoken of by Rokah, not yet met",
-    "allegiance": null
+    "epithet": "one of Rokah's jungle guides, who slipped back into the jungle rather than return to the ship",
+    "allegiance": "against"
+  },
+  {
+    "name": "Aremag",
+    "epithet": "a Dragon Turtle who guards the coastal waters and would not let the party pass without tribute",
+    "allegiance": "against"
+  },
+  {
+    "name": "Liara Portyr",
+    "epithet": "of the Flaming Fist at Fort Beluarian, who buys ghoul heads by the score and sent the company toward Shilku's silence",
+    "allegiance": "with"
+  },
+  {
+    "name": "Shago",
+    "epithet": "guide hired out of Fort Beluarian, five gold a day and a hundred fifty up front",
+    "allegiance": "with"
   }
 ]

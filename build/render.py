@@ -126,6 +126,14 @@ def load_data(data_dir: Path) -> dict:
             ne.setdefault("iu_day", "1")
             ne.setdefault("iu_month", "Kythorn")
             ne.setdefault("iu_year", "1494")
+        # Upstream may export `text` as a list of pre-indented bullet lines
+        # instead of one newline-joined string. Every downstream consumer
+        # (chapter-marker detection, mentions() regex, prompt narratives)
+        # expects a string, so flatten it here — the items already carry
+        # their own "- "/"  - " indentation, so a newline join reproduces
+        # the original single-string markdown structure.
+        if isinstance(ne.get("text"), list):
+            ne["text"] = "\n".join(str(line) for line in ne["text"])
         text = ne.get("text", "")
         if _has_chapter_marker(text):
             ne["chapter_marker"] = True
