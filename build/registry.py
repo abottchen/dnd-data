@@ -41,8 +41,6 @@ ALL: tuple[Transformer, ...] = (
 
     Transformer("refresh-chapters", "refresh",
                 slices.refresh_chapters, apply.apply_refresh_chapters),
-    Transformer("refresh-sessions", "refresh",
-                slices.refresh_sessions, apply.apply_refresh_sessions),
     Transformer("refresh-npcs", "refresh",
                 slices.refresh_npcs, apply.apply_refresh_npcs),
     Transformer("refresh-characters", "refresh",

@@ -127,10 +127,12 @@ def chapter_session_ids(chapter_id: int, chapters: list, session_log: dict) -> l
 
 
 # -- Session fact context ----------------------------------------------------
-# The session-prose transformers (append + refresh verify) need more than one
-# session's narrative to get details right: canonical species (roster), the
-# authoritative kill log for the session's date, and every earlier session's
-# narrative so a proper noun introduced before this session carries forward.
+# Session prose needs more than one session's narrative to get details right:
+# canonical species (roster), the authoritative kill log for the session's date,
+# and every earlier session's narrative so a proper noun introduced before this
+# session carries forward. The append-sessions slice carries all of it, and the
+# same slice is what the paired verify-sessions agent fact-checks the draft
+# against in the same build (see .claude/prompts/verify-sessions.md).
 
 def _session_roster(data: dict, authored: dict) -> list[dict]:
     """Canonical species/class for every party member, so session prose never
@@ -361,42 +363,6 @@ def refresh_chapters(data: dict, authored: dict) -> list[tuple]:
             "starts_at_session": chapter["starts_at_session"],
             "sessions": sessions_in_chapter,
             "existing": {"title": chapter["title"], "epigraph": chapter["epigraph"]},
-        }))
-    return out
-
-
-def refresh_sessions(data: dict, authored: dict) -> list[tuple]:
-    """One verify/correct slice per already-authored session.
-
-    Mirrors refresh_chapters: every authored session is re-evaluated on each
-    refresh build. The slice carries the same fact context the author had
-    (this session's narrative, the roster, the kill log for its date, and every
-    prior session's narrative) plus the existing entry, so the transformer can
-    confirm the prose (`no_change`) or return a corrected rewrite when it
-    contradicts the source. This is the fact-checking pass that catches the
-    misreads no amount of extra slice input prevents (a swapped actor, a
-    mis-stated relationship): the append author drafts in voice, this pass
-    checks the draft against the canonical facts an independent second time.
-    """
-    entries = data["session_log"]["entries"]
-    by_session = {e.get("session"): e for e in entries}
-    out = []
-    for s in authored["sessions"]:
-        sid = s["session"]
-        entry = by_session.get(sid, {})
-        out.append((sid, {
-            "session": sid,
-            "real_date": s.get("date") or entry.get("date"),
-            "iu_date": iu_date(entry),
-            "narrative": entry.get("text", ""),
-            "roster": _session_roster(data, authored),
-            "kills": _kills_on_date(data, entry.get("date")),
-            "prior_narratives": _prior_narratives(entries, sid),
-            "existing": {
-                "title": s.get("title"),
-                "summary": s.get("summary"),
-                "silent_roll": s.get("silent_roll", []),
-            },
         }))
     return out
 

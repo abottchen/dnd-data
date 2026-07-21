@@ -1,14 +1,10 @@
 {
   "type": "object",
-  "required": ["decision", "fields", "reason"],
+  "required": ["fields", "reason"],
   "additionalProperties": false,
   "properties": {
-    "decision": {
-      "type": "string",
-      "enum": ["no_change", "rewrite"]
-    },
     "fields": {
-      "type": ["object", "null"],
+      "type": "object",
       "required": ["title", "summary", "silent_roll"],
       "additionalProperties": false,
       "properties": {
@@ -21,11 +17,5 @@
       }
     },
     "reason": {"type": "string"}
-  },
-  "allOf": [
-    {
-      "if": {"properties": {"decision": {"const": "rewrite"}}},
-      "then": {"properties": {"fields": {"type": "object"}}}
-    }
-  ]
+  }
 }

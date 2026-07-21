@@ -169,30 +169,6 @@ def test_refresh_chapters_returns_slice_per_authored_chapter(slice_env):
     assert by_key["1"]["existing"]["title"]
 
 
-def test_refresh_sessions_emits_slice_per_authored_session(slice_env):
-    """The verify/correct pass re-evaluates each already-authored session,
-    carrying the existing entry plus the same fact context (narrative, roster,
-    kill log, prior narratives) the author had, so it can catch and fix
-    contradictions."""
-    out = slices.refresh_sessions(slice_env["data"], slice_env["authored"])
-    by_key = dict(out)
-    # Only session 1 is authored in the fixture.
-    assert set(by_key) == {1}
-    body = by_key[1]
-
-    # Existing entry carried for the verifier to check.
-    assert body["existing"]["title"] == "First Light"
-    assert body["existing"]["summary"]
-
-    # Same fact context as the append slice.
-    assert "Daggerford" in body["narrative"]
-    assert {r["name"] for r in body["roster"]} == {"Anton Truebranch", "Vex Stormcaller"}
-    assert {(k["character"], k["creature"]) for k in body["kills"]} == {
-        ("anton", "Goblin"), ("vex", "Goblin")}
-    # Session 1 is the first session, so nothing precedes it.
-    assert body["prior_narratives"] == []
-
-
 def test_refresh_characters_emits_one_bundle_slice(slice_env):
     out = slices.refresh_characters(slice_env["data"], slice_env["authored"])
     assert len(out) == 1

@@ -178,46 +178,6 @@ def test_append_chapters_rejects_existing_id_or_start():
                                     {"fields": {"title": "x", "epigraph": "y"}})
 
 
-# -- apply_refresh_sessions --------------------------------------------------
-
-def test_refresh_sessions_no_change_is_noop():
-    authored = {"sessions": [{"session": 1, "date": "2026-04-19", "title": "Old",
-                              "summary": "Old prose.", "silent_roll": ["kept"]}]}
-    output = {"decision": "no_change", "fields": None, "reason": "accurate"}
-    apply.apply_refresh_sessions(authored, key=1,
-                                 slice_data={"session": 1}, output=output)
-    assert authored["sessions"][0]["title"] == "Old"
-    assert authored["sessions"][0]["silent_roll"] == ["kept"]
-
-
-def test_refresh_sessions_rewrite_replaces_prose_fields_only():
-    authored = {"sessions": [{"session": 1, "date": "2026-04-19", "title": "Old",
-                              "summary": "Chumble the halfling.", "silent_roll": []}]}
-    output = {"decision": "rewrite",
-              "fields": {"title": "Corrected", "summary": "Chumble the goblin.",
-                         "silent_roll": ["a plain note"]},
-              "reason": "fixed species"}
-    apply.apply_refresh_sessions(authored, key=1,
-                                 slice_data={"session": 1}, output=output)
-    s = authored["sessions"][0]
-    assert s["title"] == "Corrected"
-    assert s["summary"] == "Chumble the goblin."
-    assert s["silent_roll"] == ["a plain note"]
-    # Identity fields (session id, date) are never touched by a rewrite.
-    assert s["session"] == 1 and s["date"] == "2026-04-19"
-
-
-def test_refresh_sessions_raises_when_session_not_in_authored():
-    authored = {"sessions": [{"session": 1, "title": "x", "summary": "y",
-                              "silent_roll": []}]}
-    output = {"decision": "rewrite",
-              "fields": {"title": "n", "summary": "m", "silent_roll": []},
-              "reason": ""}
-    with pytest.raises(ValueError, match="session 99"):
-        apply.apply_refresh_sessions(authored, key=99,
-                                     slice_data={"session": 99}, output=output)
-
-
 # -- apply_refresh_road_ahead ------------------------------------------------
 
 def test_refresh_road_ahead_no_change_returns_empty_graduations():

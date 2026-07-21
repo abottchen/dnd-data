@@ -8,7 +8,7 @@ allowed-tools:
 
 # build-prose
 
-You are the loop driver for the dnd-data build's authoring step. You own all three phases: kick off `prepare` to stage slices, dispatch a sub-agent per pending slice to write JSON results, then kick off `apply` to validate, persist authored prose, and render the site.
+You are the loop driver for the dnd-data build's authoring step. You own all phases: kick off `prepare` to stage slices, dispatch a sub-agent per pending slice to write JSON results, dispatch an independent verify sub-agent to fact-check the drafts that call for it, then kick off `apply` to validate, persist authored prose, and render the site.
 
 ## Inputs
 
@@ -53,8 +53,32 @@ A valid run directory contains `manifest.json`, `pending/`, `results/`, `done/`,
    - If the file exists and parses as JSON, move `pending/<stem>.json` to `done/<stem>.json`.
    - If not, leave the pending file in place and log the slice in `<run-dir>/failures.json` (append, not overwrite).
 6. Repeat batches until `pending/` only contains slices that have failed at least once. Do not retry inside the same skill run — the user gets to decide whether to edit the slice or prompt first.
-7. **Apply**: run `.venv/bin/python -m build apply <run-dir>` via Bash. Always run it, even when some slices failed — `apply` is safe to call with leftover pending slices (it just skips the render). Surface its stderr summary (applied / rejected / pending / marker / render) inline.
-8. End with a one-line status:
+7. **Verify pass** (independent, same-build fact-check): the manifest has a top-level `verify` map keyed by transformer name (currently just `append-sessions`). For every manifest slice whose `transformer` is a key in that map and which now has a `results/<stem>.json` file, dispatch one verify sub-agent (in the same batches-of-5 style):
+   - `subagent_type: "general-purpose"`
+   - `model`: `manifest["verify"][transformer]["model"]`.
+   - **Prompt body** (substitute the bracketed fields; the slice lives in `done/<stem>.json` once authored, else `pending/<stem>.json`):
+
+         You are the verify pass for the [transformer] transformer. Read
+         these four files only:
+
+         - verify prompt (your instructions): <run-dir>/[verify.prompt_body]
+         - verify schema: <run-dir>/[verify.schema]
+         - the session slice (source material): <run-dir>/[slice path]
+         - the draft entry under review: <run-dir>/[result]
+
+         Follow the verify prompt. It hands you the source material (the
+         slice) and the draft entry. Return the FINAL entry as a single JSON
+         object conforming to the verify schema — unchanged if the draft is
+         accurate, corrected in the same voice if it is not. Overwrite the
+         draft by writing your JSON to:
+
+         <run-dir>/[result]
+
+         Do not edit any other file. Use only Read (on the four paths above)
+         and Write (on the result path).
+   - The verified JSON replaces the draft in `results/<stem>.json`; the apply step consumes it. If a verify sub-agent returns nothing or invalid JSON, leave the existing draft result in place (apply will still validate it). Verifying is idempotent, so a second `/build-prose <run-dir>` re-verifies safely.
+8. **Apply**: run `.venv/bin/python -m build apply <run-dir>` via Bash. Always run it, even when some slices failed — `apply` is safe to call with leftover pending slices (it just skips the render). Surface its stderr summary (applied / rejected / pending / marker / render) inline.
+9. End with a one-line status:
    - All clean and render OK → `build complete`.
    - Anything rejected or still pending → name what failed and tell the user that `/build-prose <run-dir>` will resume from where it stopped after they fix the prompt or slice.
 

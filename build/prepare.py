@@ -18,6 +18,13 @@ from .paths import (PROMPTS_DIR, REPO_ROOT, authored_dir, data_dir,
 
 _STEM_SAFE = re.compile(r"[^A-Za-z0-9_.-]+")
 
+# Transformers that pair an independent verify pass with their authoring. The
+# verify agent runs at dispatch time (in the /build-prose skill), right after
+# the author writes a draft, so the entity is fact-checked in the same build it
+# is authored. The verify prompt's output conforms to the *authoring*
+# transformer's schema, so apply consumes the verified result unchanged.
+VERIFY_FOR = {"append-sessions": "verify-sessions"}
+
 
 def _stem(transformer: str, key) -> str:
     return _STEM_SAFE.sub("-", f"{transformer}__{key}")
@@ -123,6 +130,19 @@ def run(*, no_refresh: bool, force_refresh: bool, keep_temp: bool) -> Path:
                 "schema": meta["schema_rel"],
             })
 
+    # Freeze the verify prompt for any authoring transformer that emitted a
+    # slice this run and pairs a verify pass. The skill reads manifest["verify"]
+    # to dispatch the verifier after each such slice is authored.
+    verify_meta: dict = {}
+    for transformer, verify_name in VERIFY_FOR.items():
+        if transformer in prompt_cache:
+            vm = _prompt_meta(verify_name, frozen_prompts)
+            verify_meta[transformer] = {
+                "prompt_body": vm["prompt_body_rel"],
+                "schema": vm["schema_rel"],
+                "model": vm["model"],
+            }
+
     manifest = {
         "run_id": run_id,
         "marker": marker,
@@ -131,6 +151,7 @@ def run(*, no_refresh: bool, force_refresh: bool, keep_temp: bool) -> Path:
         "keep_temp": keep_temp,
         "no_refresh": no_refresh,
         "slices": slices_out,
+        "verify": verify_meta,
     }
     (rdir / "manifest.json").write_text(
         json.dumps(manifest, indent=2, ensure_ascii=False) + "\n"
