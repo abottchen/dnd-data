@@ -71,6 +71,29 @@ def test_append_sessions_emits_slice_per_unauthored_session(slice_env):
     assert body["chapter_marker"] is True
 
 
+def test_append_sessions_slice_carries_roster_kills_and_prior_narratives(slice_env):
+    """The session author needs canonical species (roster), the authoritative
+    kill log for this session's date, and every earlier session's narrative so
+    proper nouns established before this session carry forward."""
+    out = slices.append_sessions(slice_env["data"], slice_env["authored"])
+    _, body = out[0]  # session 2
+
+    # Roster: one entry per party member, carrying species/class + a pronouns key.
+    roster = {r["name"]: r for r in body["roster"]}
+    assert roster["Anton Truebranch"]["race"] == "Halfling"
+    assert roster["Vex Stormcaller"]["class"] == "Fighter"
+    assert all("pronouns" in r for r in body["roster"])
+
+    # Kill log: only this session's date (2026-04-23 → Anton's Bandit), never
+    # the whole party ledger.
+    assert {(k["character"], k["creature"]) for k in body["kills"]} == {("anton", "Bandit")}
+
+    # Prior narratives: every session before this one, and none from this
+    # session or later.
+    assert {p["session"] for p in body["prior_narratives"]} == {1}
+    assert "Daggerford" in body["prior_narratives"][0]["text"]
+
+
 def test_append_chapters_emits_slice_per_unauthored_marker(slice_env):
     out = slices.append_chapters(slice_env["data"], slice_env["authored"])
     assert len(out) == 1
@@ -144,6 +167,30 @@ def test_refresh_chapters_returns_slice_per_authored_chapter(slice_env):
     by_key = dict(out)
     assert set(by_key) == {"1"}
     assert by_key["1"]["existing"]["title"]
+
+
+def test_refresh_sessions_emits_slice_per_authored_session(slice_env):
+    """The verify/correct pass re-evaluates each already-authored session,
+    carrying the existing entry plus the same fact context (narrative, roster,
+    kill log, prior narratives) the author had, so it can catch and fix
+    contradictions."""
+    out = slices.refresh_sessions(slice_env["data"], slice_env["authored"])
+    by_key = dict(out)
+    # Only session 1 is authored in the fixture.
+    assert set(by_key) == {1}
+    body = by_key[1]
+
+    # Existing entry carried for the verifier to check.
+    assert body["existing"]["title"] == "First Light"
+    assert body["existing"]["summary"]
+
+    # Same fact context as the append slice.
+    assert "Daggerford" in body["narrative"]
+    assert {r["name"] for r in body["roster"]} == {"Anton Truebranch", "Vex Stormcaller"}
+    assert {(k["character"], k["creature"]) for k in body["kills"]} == {
+        ("anton", "Goblin"), ("vex", "Goblin")}
+    # Session 1 is the first session, so nothing precedes it.
+    assert body["prior_narratives"] == []
 
 
 def test_refresh_characters_emits_one_bundle_slice(slice_env):

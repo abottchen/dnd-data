@@ -14,8 +14,14 @@ A JSON object:
 - `session` (int): session number
 - `real_date` (str): real-world date
 - `iu_date` (str): in-universe date
-- `narrative` (str): the session log, your only source of truth for what happened
+- `narrative` (str): this session's log — your source of truth for what happened
 - `chapter_marker` (bool): whether this session opens a new chapter
+- `roster` (array): every party member, each `{name, race, class, pronouns}`. This
+  is the authority for a character's species, class, and pronouns.
+- `kills` (array): the authoritative record of who killed what this session, each
+  `{character, creature, method}`. This is the ONLY authority for kills.
+- `prior_narratives` (array): every earlier session's log, each `{session, text}`.
+  Use it to keep names of ships, places, and people consistent with what came before.
 
 # What to write
 
@@ -28,12 +34,26 @@ A JSON object:
   chronicles, and it should show. Relish the telling. Some embellishment of manner is
   welcome. Invention of fact is not.
 - `silent_roll`: zero or more short, plain sentences noting off-Chronicle beats the
-  kill ledger does not capture. Often `[]`. No flourish here, plain lines only.
+  kill log does not capture. Often `[]`. No flourish here, plain lines only.
 
-# Rules
+# Fidelity rules (these override the voice — get the facts right first)
 
-- Every fact must come from the narrative. Invent no events, names, or outcomes, and
-  change nothing that happened.
+- **Every fact comes from the source.** Invent no events, names, or outcomes, and
+  change nothing that happened. Embellish *manner*, never *fact*. Do not assign a
+  character a class, profession, gender, family relationship, or a time of day that
+  the narrative, roster, or prior narratives do not establish.
+- **Species and pronouns come from the `roster`.** Never call a character a race the
+  roster does not give them. If you name a character's kind, match the roster exactly.
+- **Kills come only from the `kills` log.** Credit exactly the character the log
+  names, and never state a body count larger than the log supports. If the narrative
+  says "the group killed twenty" but the log lists eight, the Chronicle follows the
+  log. Do not count kills the log does not record.
+- **Credit the exact actor.** When the narrative says a specific person did a thing,
+  the Chronicle names that same person. Do not merge two characters' deeds or move a
+  deed from one to another for a better sentence.
+- **Names stay consistent across sessions.** A ship, place, or person introduced in a
+  `prior_narratives` entry keeps that name. Do not rename the party's own ship after a
+  vessel merely mentioned in passing.
 - Omit spoilers, do not paraphrase them: any `(DM Note)` line, any `[bracketed]` note,
   any future-tense DM planning, and any parenthetical the players could not have
   learned from the events themselves.

@@ -126,6 +126,54 @@ def chapter_session_ids(chapter_id: int, chapters: list, session_log: dict) -> l
     return [e["session"] for e in session_log["entries"][chapter_start_idx - 1:chapter_end_idx]]
 
 
+# -- Session fact context ----------------------------------------------------
+# The session-prose transformers (append + refresh verify) need more than one
+# session's narrative to get details right: canonical species (roster), the
+# authoritative kill log for the session's date, and every earlier session's
+# narrative so a proper noun introduced before this session carries forward.
+
+def _session_roster(data: dict, authored: dict) -> list[dict]:
+    """Canonical species/class for every party member, so session prose never
+    has to guess a character's race. Pronouns ride along when the prepare-time
+    side channel supplied them (empty string otherwise)."""
+    pronouns = authored.get("pronouns_by_id", {})
+    return [{
+        "name": m.get("name"),
+        "race": m.get("race"),
+        "class": m.get("class"),
+        "pronouns": pronouns.get(m["id"], ""),
+    } for m in data["party"]["members"]]
+
+
+def _kills_on_date(data: dict, date) -> list[dict]:
+    """Every party kill recorded on `date` — the authoritative who-killed-what
+    for a session. Unlike append_kills this ignores the authored overlay: the
+    session author states counts from this log, not from creature tallies in the
+    narrative prose (which may credit NPCs or bulk kills the log does not)."""
+    out = []
+    for m in data["party"]["members"]:
+        for k in m.get("kills", []):
+            if k.get("date") == date:
+                out.append({
+                    "character": m["id"],
+                    "creature": k["creature"],
+                    "method": k["method"],
+                })
+    return out
+
+
+def _prior_narratives(entries: list, sid) -> list[dict]:
+    """Every session-log entry before `sid`, in log order, so a proper noun
+    established in an earlier session (a ship, a place, a person) is available
+    to a later session's author."""
+    out = []
+    for e in entries:
+        esid = e.get("session")
+        if sid is not None and esid is not None and esid < sid:
+            out.append({"session": esid, "text": e.get("text", "")})
+    return out
+
+
 # -- Append slice builders ---------------------------------------------------
 
 def append_kills(data: dict, authored: dict) -> list[tuple]:
@@ -172,8 +220,9 @@ def append_kills(data: dict, authored: dict) -> list[tuple]:
 
 def append_sessions(data: dict, authored: dict) -> list[tuple]:
     auth_sessions = {s["session"] for s in authored["sessions"]}
+    entries = data["session_log"]["entries"]
     out = []
-    for entry in data["session_log"]["entries"]:
+    for entry in entries:
         sid = entry.get("session")
         if sid in auth_sessions:
             continue
@@ -183,6 +232,9 @@ def append_sessions(data: dict, authored: dict) -> list[tuple]:
             "iu_date": iu_date(entry),
             "narrative": entry.get("text", ""),
             "chapter_marker": entry.get("chapter_marker", False),
+            "roster": _session_roster(data, authored),
+            "kills": _kills_on_date(data, entry.get("date")),
+            "prior_narratives": _prior_narratives(entries, sid),
         }))
     return out
 
@@ -309,6 +361,42 @@ def refresh_chapters(data: dict, authored: dict) -> list[tuple]:
             "starts_at_session": chapter["starts_at_session"],
             "sessions": sessions_in_chapter,
             "existing": {"title": chapter["title"], "epigraph": chapter["epigraph"]},
+        }))
+    return out
+
+
+def refresh_sessions(data: dict, authored: dict) -> list[tuple]:
+    """One verify/correct slice per already-authored session.
+
+    Mirrors refresh_chapters: every authored session is re-evaluated on each
+    refresh build. The slice carries the same fact context the author had
+    (this session's narrative, the roster, the kill log for its date, and every
+    prior session's narrative) plus the existing entry, so the transformer can
+    confirm the prose (`no_change`) or return a corrected rewrite when it
+    contradicts the source. This is the fact-checking pass that catches the
+    misreads no amount of extra slice input prevents (a swapped actor, a
+    mis-stated relationship): the append author drafts in voice, this pass
+    checks the draft against the canonical facts an independent second time.
+    """
+    entries = data["session_log"]["entries"]
+    by_session = {e.get("session"): e for e in entries}
+    out = []
+    for s in authored["sessions"]:
+        sid = s["session"]
+        entry = by_session.get(sid, {})
+        out.append((sid, {
+            "session": sid,
+            "real_date": s.get("date") or entry.get("date"),
+            "iu_date": iu_date(entry),
+            "narrative": entry.get("text", ""),
+            "roster": _session_roster(data, authored),
+            "kills": _kills_on_date(data, entry.get("date")),
+            "prior_narratives": _prior_narratives(entries, sid),
+            "existing": {
+                "title": s.get("title"),
+                "summary": s.get("summary"),
+                "silent_roll": s.get("silent_roll", []),
+            },
         }))
     return out
 

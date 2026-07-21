@@ -134,6 +134,25 @@ def apply_refresh_chapters(authored: dict, key, slice_data: dict, output: dict) 
     raise ValueError(f"chapter {chapter_id} not found in authored store")
 
 
+def apply_refresh_sessions(authored: dict, key, slice_data: dict, output: dict) -> None:
+    """Verify/correct pass over an authored session. `no_change` leaves the
+    entry untouched; `rewrite` replaces only the prose fields (title, summary,
+    silent_roll) and never the session id or date. `key` (the session id) is
+    matched via the slice, so casing/echo drift in the model output cannot
+    write to the wrong entry."""
+    if output["decision"] == "no_change":
+        return
+    fields = output["fields"] or {}
+    sid = slice_data["session"]
+    for s in authored["sessions"]:
+        if s["session"] == sid:
+            s["title"] = fields["title"]
+            s["summary"] = fields["summary"]
+            s["silent_roll"] = fields.get("silent_roll", [])
+            return
+    raise ValueError(f"session {sid!r} not found in authored store")
+
+
 def apply_refresh_npcs(authored: dict, key, slice_data: dict, output: dict) -> None:
     if output["decision"] == "no_change":
         return
