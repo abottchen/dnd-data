@@ -41,17 +41,17 @@
     "id": "chumble",
     "epithet": "of the Dhakaani, bound by pact to a shadow unseen",
     "reliquary_header": "Claimed by the shadow unseen",
-    "constellation_epithet": "much weight from a quiet hand",
-    "distinction_title": "Slayer of the Greatest Foe",
-    "distinction_subtitle": "whose Scorching Ray felled the heaviest thing the company has met",
-    "distinction_detail": "<b>450</b> XP &middot; among the heaviest single kills any hand has claimed",
+    "constellation_epithet": "much won from a quiet hand",
+    "distinction_title": "The Hardest Blow",
+    "distinction_subtitle": "whose single strike bit deeper than any other hand's",
+    "distinction_detail": "<b>25</b> damage in one blow &middot; the heaviest the company has struck",
     "archetype_badge": {
       "archetype": "lamplighter",
       "inscription": "Fifteen flasks of oil and a lamp that hasn't gone dark yet — a goblin who walked out of Dhakaan carrying enough light to argue with the night."
     },
     "distinction_basis": {
       "kind": "mechanical",
-      "atom": "is_party_biggest_kill",
+      "atom": "is_party_heaviest",
       "value": true
     },
     "sworn_creed": "bound in fire to a name struck in the dark — and the bargain still runs"
@@ -61,16 +61,16 @@
     "epithet": "of the Wulven, who answers the question with a crossbow and the doubt with the rail",
     "reliquary_header": "Sent over the rail to the sea",
     "constellation_epithet": "never far from the fray",
-    "distinction_title": "Favored of the Twenty",
-    "distinction_subtitle": "No other hand turns up the twenty so often.",
-    "distinction_detail": "<b>12</b> crit successes &middot; no hand in the company turns the twenty so often",
+    "distinction_title": "The Pendulum Hand",
+    "distinction_subtitle": "whose dice cut both ways in equal measure",
+    "distinction_detail": "<b>12</b> crit fails, more than any hand &middot; and <b>12</b> crit successes to match",
     "archetype_badge": {
       "archetype": "pack-mule",
       "inscription": "The hunting trap alone tips twenty-five pounds; above it ride scale mail and a heavy crossbow, and the wulven still finds room for caltrops, rope, and a block-and-tackle besides."
     },
     "distinction_basis": {
       "kind": "mechanical",
-      "atom": "is_party_most_crits",
+      "atom": "is_party_most_fumbles",
       "value": true
     },
     "sworn_creed": "the other self walks the dark road — he sends the echo where the bolt cannot follow"
@@ -82,7 +82,7 @@
     "constellation_epithet": "ever at the hunt, the soft-pawed shot",
     "distinction_title": "The Cat's Own Luck",
     "distinction_subtitle": "whose kept dice fall higher than any other hand at the table",
-    "distinction_detail": "<b>11.3</b> average kept d20 &middot; the kindest dice the company casts",
+    "distinction_detail": "<b>11.5</b> average kept d20 &middot; the kindest dice the company casts",
     "archetype_badge": {
       "archetype": "naturalist",
       "inscription": "One carved sprig of mistletoe, ribbon-tied and kept close — the whole of the primal green, if you know how to ask, flows through that small stem."

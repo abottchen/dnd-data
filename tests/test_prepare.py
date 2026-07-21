@@ -70,6 +70,21 @@ def test_prepare_creates_manifest_and_pending_files(run_env):
         assert (run_dir / entry["schema"]).exists()
 
 
+def test_prepare_records_verify_prompt_for_append_sessions(run_env):
+    """append-sessions pairs an independent verify pass. When it emits a slice,
+    prepare must freeze the verify prompt + schema and record them in the
+    manifest's `verify` map so /build-prose can dispatch the verifier in the
+    same run (same-build fact-check)."""
+    run_dir = prepare.run(no_refresh=True, force_refresh=False, keep_temp=False)
+    manifest = json.loads((run_dir / "manifest.json").read_text())
+
+    assert "append-sessions" in manifest["verify"], manifest["verify"]
+    vm = manifest["verify"]["append-sessions"]
+    assert (run_dir / vm["prompt_body"]).exists()
+    assert (run_dir / vm["schema"]).exists()
+    assert vm["model"] in {"sonnet", "opus"}
+
+
 def test_prepare_skips_refresh_pass_when_marker_current(run_env, monkeypatch):
     # Bump marker to latest so no refresh slices are produced.
     from build.store import load_authored, bump_marker
