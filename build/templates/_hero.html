@@ -1,0 +1,92 @@
+{% from "_macros.html" import kill_pips -%}
+{#- Landing top of the Company tab: the latest session in full, the level/XP
+    gauge, the Road Ahead digest, and a teaser into the Chronicle tab. All data
+    is already computed (latest / gauge / road_ahead_digest / recent). -#}
+<div class="landing">
+  {%- if latest %}
+  <div class="landing-band-label">The Latest</div>
+
+  <section class="hero">
+    <div class="hero-latest">
+      <div class="hero-eyebrow"><b>Chapter {{ latest.chapter_label }}</b> &nbsp;&middot;&nbsp; {{ latest.chapter_title }}</div>
+      <h2 class="hero-title">{{ latest.title }}</h2>
+      <div class="hero-meta">
+        <span class="num">Session {{ latest.session_label }}</span>
+        <span class="iu">{{ latest.iu_date }}</span>
+        <span class="real">{{ latest.real_date_label }}</span>
+        {%- if latest.kills_count > 0 %}
+        <span class="hero-pips">{{ kill_pips(latest.kill_pips) }}</span>
+        {%- else %}
+        <span class="quiet">&mdash; no blade lifted &mdash;</span>
+        {%- endif %}
+      </div>
+      <p class="hero-summary">{{ latest.summary | safe }}</p>
+    </div>
+
+    <div class="hero-rule" aria-hidden="true"></div>
+
+    {%- if gauge %}
+    <aside class="gauge{% if gauge.at_summit %} at-summit{% endif %}">
+      <div class="gauge-eyebrow">The Ascent</div>
+      <div class="gauge-level">Level {{ gauge.level }}</div>
+      {%- if gauge.at_summit %}
+      <div class="gauge-summit">{{ gauge.total_fmt }} XP earned &mdash; the summit, Level {{ gauge.level }}.</div>
+      {%- else %}
+      <div class="gauge-chart">
+        <div class="g-fig g-goal"><span>Level {{ gauge.next_level }}</span><b>{{ gauge.next_fmt }} XP</b></div>
+        <div class="g-fig g-togo"><b>{{ gauge.to_next_fmt }}</b><span>XP still to climb</span></div>
+        <div class="g-fig g-earned"><b>{{ gauge.total_fmt }}</b><span>XP earned</span></div>
+        <svg viewBox="{{ gauge.view_x }} {{ gauge.view_y }} {{ gauge.view_w }} {{ gauge.view_h }}"
+             preserveAspectRatio="none" role="img"
+             aria-label="The company's climb toward the next level, not yet reached">
+          <defs>
+            <linearGradient id="ascentFill" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="rgba(184,137,74,0.34)"/>
+              <stop offset="100%" stop-color="rgba(184,137,74,0.02)"/>
+            </linearGradient>
+          </defs>
+          <line class="g-goal-line" x1="{{ gauge.goal_x1 }}" y1="{{ gauge.goal_y }}" x2="{{ gauge.goal_x2 }}" y2="{{ gauge.goal_y }}"/>
+          <path class="g-area" d="{{ gauge.area_d }}"/>
+          <path class="g-line" d="{{ gauge.line_d }}"/>
+          <circle class="g-pulse" cx="{{ gauge.last_cx }}" cy="{{ gauge.last_cy }}" r="8"/>
+        </svg>
+      </div>
+      {%- endif %}
+    </aside>
+    {%- endif %}
+  </section>
+
+  {%- if road_ahead_digest.direction or road_ahead_digest.known %}
+  <div class="roadahead">
+    <div class="roadahead-eyebrow">The Road Ahead</div>
+    <div class="ra-turn-col">
+      <div class="ra-sub">Where they turn</div>
+      <p class="ra-turn">{{ road_ahead_digest.direction | safe }}</p>
+    </div>
+    <div class="ra-known-col">
+      <div class="ra-sub">What is known</div>
+      <div class="ra-known">
+        {%- for e in road_ahead_digest.known %}
+        <span class="ra-chip">{{ e.name | safe }}</span>
+        {%- endfor %}
+        {%- if road_ahead_digest.more_count > 0 %}
+        <a class="ra-more" href="#co-horizon">+{{ road_ahead_digest.more_count }} more &rarr;</a>
+        {%- endif %}
+      </div>
+    </div>
+  </div>
+  {%- endif %}
+
+  {%- if recent %}
+  <div class="recent">
+    <span class="recent-label">Previously</span>
+    <div class="recent-items">
+      {%- for r in recent %}
+      <span class="recent-item"><span class="n">{{ r.label }}</span>{{ r.title }}</span>
+      {%- endfor %}
+    </div>
+    <a href="#chronicle" class="recent-cta">Read the full Chronicle &rarr;</a>
+  </div>
+  {%- endif %}
+  {%- endif %}
+</div>
