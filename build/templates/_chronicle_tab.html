@@ -1,0 +1,33 @@
+{#- The Chronicle archive tab: the full session history, shown ONE chapter at a
+    time via the chapter switcher (see the IIFE in _script.html). The latest
+    chapter is active on load. The global Regnal rail rides the left margin. -#}
+<article class="character" id="chronicle" role="tabpanel" aria-labelledby="tab-chronicle">
+  <nav class="chapter-switcher" aria-label="Chapters">
+    {%- for ch in chronicle.chapters %}
+    <button type="button" class="chapter-switch-btn" data-chapter="{{ loop.index0 }}"
+            aria-selected="{{ 'true' if loop.last else 'false' }}">
+      Chapter {{ ch.label }}<span>{{ ch.title }}</span>
+    </button>
+    {%- endfor %}
+  </nav>
+
+  <div class="chronicle">
+    <aside class="chronicle-rail">
+      <div class="chronicle-rail-label">Regnal</div>
+      {%- for r in chronicle.rail %}
+      <div class="chronicle-month">{{ r.month }}</div>
+      <div class="chronicle-month-year">{{ r.year }}</div>
+      <div class="chronicle-month-count">{{ r.count }} session{% if r.count != 1 %}s{% endif %}</div>
+      {%- endfor %}
+    </aside>
+
+    <div class="chronicle-content">
+      {%- for ch in chronicle.chapters %}
+      <div class="chronicle-chapter-panel{% if loop.last %} active{% endif %}" data-chapter="{{ loop.index0 }}">
+        {%- set is_latest_chapter = loop.last %}
+        {% include "_chronicle.html" %}
+      </div>
+      {%- endfor %}
+    </div>
+  </div>
+</article>
