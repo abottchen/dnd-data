@@ -525,6 +525,46 @@ def compute_ascent(xp_log: Optional[dict]) -> Optional[dict]:
     }
 
 
+def compute_gauge(ascent: Optional[dict]) -> Optional[dict]:
+    """Compact level-progress gauge for the landing hero, derived from the Ascent
+    context. Frames the climb from just above the next-level line down to the
+    baseline, so the gap above the curve reads as 'still to climb'. None when
+    there is no XP yet (the hero omits the gauge)."""
+    if not ascent:
+        return None
+    goal = next((t for t in ascent["thresholds"] if t.get("top")), None)
+    goal_y = goal["y"] if goal else ascent["ybase"]  # summit: no ceiling above
+    left, right = ascent["plot_left"], ascent["plot_right"]
+    view_y = round(goal_y - 12, 2)  # headroom for the goal label
+    return {
+        "view_x": round(left - 8, 2),
+        "view_y": view_y,
+        "view_w": round(right - left + 16, 2),
+        "view_h": round(ascent["ybase"] - view_y, 2),
+        "goal_y": goal_y, "goal_x1": left, "goal_x2": right,
+        "line_d": ascent["line_d"], "area_d": ascent["area_d"],
+        "last_cx": ascent["last_cx"], "last_cy": ascent["last_cy"],
+        "level": ascent["level"],
+        "next_level": _to_roman(ascent["level_num"] + 1) if ascent["next_threshold"] else None,
+        "total_fmt": f'{ascent["total"]:,}',
+        "to_next_fmt": f'{ascent["to_next"]:,}',
+        "next_fmt": f'{ascent["next_threshold"]:,}' if ascent["next_threshold"] else None,
+        "at_summit": ascent["next_threshold"] is None,
+    }
+
+
+def compute_road_ahead_digest(road_ahead: Optional[dict], n: int = 5) -> dict:
+    """Compact Road Ahead for the hero band: the next-move prose + the first n
+    known threads + how many more remain (linking to the full flavor section)."""
+    ra = road_ahead or {}
+    known = ra.get("known", [])
+    return {
+        "direction": ra.get("direction", ""),
+        "known": known[:n],
+        "more_count": max(0, len(known) - n),
+    }
+
+
 SKILL_DISPLAY = {
     "acrobatics": "Acrobatics",
     "animalHandling": "Animal Handling",
@@ -959,6 +999,37 @@ def _render_session(entry: dict, auth_by_id: dict, kills_by_date: dict) -> dict:
         "kill_pips": kills,
     }
 
+def compute_latest(chronicle: dict) -> Optional[dict]:
+    """The newest session, surfaced for the landing hero. None when the log is
+    empty. The same session also renders in its chapter context in the Chronicle
+    tab; this just lifts it to the front page."""
+    for ch in reversed(chronicle.get("chapters", [])):
+        if ch.get("sessions"):
+            s = ch["sessions"][-1]
+            return {
+                "chapter_label": ch["label"],
+                "chapter_title": ch["title"],
+                "session_label": s["label"],
+                "session_id": s["id"],
+                "title": s["title"],
+                "iu_date": s["iu_date"],
+                "real_date_label": s["real_date_label"],
+                "kills_count": s["kills_count"],
+                "kill_pips": s["kill_pips"],
+                "summary": s["summary"],
+            }
+    return None
+
+
+def compute_recent(chronicle: dict, n: int = 2) -> list[dict]:
+    """The n sessions immediately before the latest, most-recent first, for the
+    landing's 'Previously' teaser into the Chronicle tab."""
+    flat = [s for ch in chronicle.get("chapters", []) for s in ch.get("sessions", [])]
+    prev = flat[:-1]  # drop the latest (surfaced by the hero)
+    return [{"label": s["label"], "title": s["title"], "id": s["id"]}
+            for s in reversed(prev[-n:])]
+
+
 def compute_distinctions(party: dict, characters_authored: list) -> list[dict]:
     """Pair each non-GM character with their authored distinction crown."""
     by_id = {a["id"]: a for a in characters_authored}
@@ -1038,6 +1109,9 @@ def compute_all(data: dict, authored: dict) -> dict:
     radar_by_id = {m["id"]: compute_radar(m)
                    for m in party.get("members", []) if m["id"] != "gm"}
     ascent = compute_ascent(data.get("xp_log"))
+    latest = compute_latest(chronicle)
+    recent = compute_recent(chronicle, n=2)
+    gauge = compute_gauge(ascent)
 
     char_auth_by_id = {a["id"]: a for a in authored["characters"]}
 
@@ -1062,6 +1136,7 @@ def compute_all(data: dict, authored: dict) -> dict:
         "readily by riddle and road as at the edge of a sword.",
     )
 
+    road_ahead_digest = compute_road_ahead_digest(site.get("road_ahead"))
     party_top_xp = _compute_party_top_xp(party, trials, n=3)
 
     return {
@@ -1082,6 +1157,10 @@ def compute_all(data: dict, authored: dict) -> dict:
         "distinctions": distinctions,
         "patron_die": patron,
         "ascent": ascent,
+        "latest": latest,
+        "recent": recent,
+        "gauge": gauge,
+        "road_ahead_digest": road_ahead_digest,
         "best_skill_by_id": best_skill_by_id,
         "radar_by_id": radar_by_id,
         "npcs_by_allegiance": _split_npcs(authored["npcs"]),

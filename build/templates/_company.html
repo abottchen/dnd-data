@@ -1,27 +1,33 @@
 {% from "_macros.html" import section_head, d20_histogram, d20_labels -%}
-{#- The illuminated index rail (§ rubric → section id). Keep in step with the
-    section_head calls below and the id="…" on each <section>; the trailing
-    entry (co-climb) targets the section rendered by _ascent.html. -#}
+{#- The illuminated index rail is the single source of truth for section order:
+    the rail below, each <section>'s id="…" (in DOM order), and every
+    section_head Roman numeral (via company_num) all read from this one list, so
+    resequencing means editing here and reordering the <section> blocks to match.
+    co-climb targets the section rendered by _ascent.html. Burden of Carry only
+    exists when inventory data is present, so it is appended conditionally and the
+    tail numerals (Burden, Patron Die) stay contiguous either way. -#}
 {%- set company_index = [
-      ("co-reckoning", "I",    "The Company's Ledger"),
-      ("co-stars",     "II",   "The Constellation"),
-      ("co-tally",     "III",  "The Bestiary"),
-      ("co-calendar",  "IV",   "The Chronicle"),
-      ("co-horizon",   "V",    "The Road Ahead"),
-      ("co-crowns",    "VI",   "Distinctions"),
-      ("co-fates",     "VII",  "The Patron Die"),
-      ("co-margins",   "VIII", "The Silent Roll"),
-      ("co-climb",     "IX",   "The Ascent"),
+      ("co-climb",     "The Ascent"),
+      ("co-stars",     "The Constellation"),
+      ("co-reckoning", "The Company's Ledger"),
+      ("co-tally",     "The Bestiary"),
+      ("co-horizon",   "The Road Ahead"),
+      ("co-crowns",    "Distinctions"),
     ] -%}
+{%- if company_strip %}{%- set company_index = company_index + [("co-burden", "Burden of Carry")] -%}{%- endif %}
+{%- set company_index = company_index + [("co-fates", "The Patron Die")] -%}
+{%- set _romans = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X"] -%}
+{%- set company_num = {} -%}
+{%- for id, title in company_index %}{%- set _ = company_num.update({id: _romans[loop.index0]}) -%}{%- endfor %}
 <article class="character" id="company" role="tabpanel" aria-labelledby="tab-company">
 
   <nav class="company-index" aria-label="The Company — index of sections">
     <div class="company-index-head">The Company</div>
     <ol class="company-index-list">
-      {%- for id, num, title in company_index %}
+      {%- for id, title in company_index %}
       <li>
         <a href="#{{ id }}" data-spy="{{ id }}">
-          <span class="ci-num">{{ num }}</span>
+          <span class="ci-num">{{ company_num[id] }}</span>
           <span class="ci-name">{{ title }}</span>
         </a>
       </li>
@@ -29,70 +35,12 @@
     </ol>
   </nav>
 
-  {%- if company_strip %}
-  <div class="company-strip">
-    <div class="company-strip-title">Burden of Carry</div>
-    <div class="company-strip-bars">
-      {%- for s in company_strip %}
-        <div class="company-strip-bar
-                    {%- if s.status == 'awaiting_manifest' %} awaiting{% endif %}"
-             data-slug="{{ s.slug }}"
-             data-shortname="{{ s.shortname }}"
-             data-weight="{{ s.total_weight }}"
-             data-capacity="{{ s.capacity }}"
-             data-rack="{{ s.breakdown.rack }}"
-             data-spotlight="{{ s.breakdown.spotlight }}"
-             data-manifest="{{ s.breakdown.manifest }}"
-             data-pct="{{ s.pct }}">
-          <div class="company-strip-name">{{ s.shortname }}</div>
-          <div class="company-strip-track">
-            {%- if s.status == 'ok' and s.capacity > 0 %}
-              {%- set pct = s.pct %}
-              <div class="company-strip-fill"
-                   style="--target-width: {{ pct }}%; animation-delay: {{ loop.index0 * 80 }}ms;"></div>
-            {%- endif %}
-          </div>
-          <div class="company-strip-numbers">
-            {%- if s.status == 'ok' %}
-              {{ s.total_weight }} / {{ s.capacity }} lb
-            {%- else %}
-              &mdash;
-            {%- endif %}
-          </div>
-        </div>
-      {%- endfor %}
-    </div>
-  </div>
-  {%- endif %}
+  {% include "_hero.html" %}
 
-  <section class="company-section company-ledger" id="co-reckoning">
-    {{ section_head("I", "The Reckoning", "The Company's Ledger", site.intro_epithet) }}
-    <div class="ledger-grid lead">
-      <div class="ledger-cell">
-        <div class="ledger-eyebrow">Souls Gathered</div>
-        <div class="ledger-val">{{ ledger.total_xp }}</div>
-        <div class="ledger-sub"><b>experience</b> &middot; total earned at the table</div>
-      </div>
-      <div class="ledger-cell">
-        <div class="ledger-eyebrow">Fallen by the Company</div>
-        <div class="ledger-val">{{ ledger.total_kills }}</div>
-        <div class="ledger-sub seal"><b>creatures</b> &middot; all hands</div>
-      </div>
-      <div class="ledger-cell">
-        <div class="ledger-eyebrow">Rolls Cast</div>
-        <div class="ledger-val">{{ ledger.total_rolls }}</div>
-        <div class="ledger-sub"><b>{{ ledger.total_d20s }}</b> on the twenty</div>
-      </div>
-      <div class="ledger-cell">
-        <div class="ledger-eyebrow">Sessions Kept</div>
-        <div class="ledger-val">{{ ledger.sessions_kept }}</div>
-        <div class="ledger-sub">nights at the table</div>
-      </div>
-    </div>
-  </section>
+  {% include "_ascent.html" %}
 
   <section class="company-section" id="co-stars">
-    {{ section_head("II", "The Stars", "The Constellation", "Each star a player. Brighter stars walk the road more often, distant stars carry the heavier load.", "rule") }}
+    {{ section_head(company_num["co-stars"], "The Stars", "The Constellation", "Each star a player. Brighter stars walk the road more often, distant stars carry the heavier load.", "rule") }}
     <div class="constellation">
       <div class="constellation-plot">
         <div class="constellation-grid"></div>
@@ -145,8 +93,34 @@
     </div>
   </section>
 
+  <section class="company-section company-ledger" id="co-reckoning">
+    {{ section_head(company_num["co-reckoning"], "The Reckoning", "The Company's Ledger", site.intro_epithet) }}
+    <div class="ledger-grid lead">
+      <div class="ledger-cell">
+        <div class="ledger-eyebrow">Souls Gathered</div>
+        <div class="ledger-val">{{ ledger.total_xp }}</div>
+        <div class="ledger-sub"><b>experience</b> &middot; from the slain, all hands</div>
+      </div>
+      <div class="ledger-cell">
+        <div class="ledger-eyebrow">Fallen by the Company</div>
+        <div class="ledger-val">{{ ledger.total_kills }}</div>
+        <div class="ledger-sub seal"><b>creatures</b> &middot; all hands</div>
+      </div>
+      <div class="ledger-cell">
+        <div class="ledger-eyebrow">Rolls Cast</div>
+        <div class="ledger-val">{{ ledger.total_rolls }}</div>
+        <div class="ledger-sub"><b>{{ ledger.total_d20s }}</b> on the twenty</div>
+      </div>
+      <div class="ledger-cell">
+        <div class="ledger-eyebrow">Sessions Kept</div>
+        <div class="ledger-val">{{ ledger.sessions_kept }}</div>
+        <div class="ledger-sub">nights at the table</div>
+      </div>
+    </div>
+  </section>
+
   <section class="company-section" id="co-tally">
-    {{ section_head("III", "The Tally", "The Bestiary", "Of every kind that fell, and the count of each.", "trefoil") }}
+    {{ section_head(company_num["co-tally"], "The Tally", "The Bestiary", "Of every kind that fell, and the count of each.", "trefoil") }}
     <div class="bestiary-grid">
       {%- for group in bestiary %}
       <div class="bestiary-group">
@@ -169,13 +143,8 @@
     </div>
   </section>
 
-  <section class="company-section" id="co-calendar">
-    {{ section_head("IV", "The Calendar", "The Chronicle", "Each session set down by hand, with date and hour, and what was done.") }}
-    {% include "_chronicle.html" %}
-  </section>
-
   <section class="company-section" id="co-horizon">
-    {{ section_head("V", "The Horizon", "The Road Ahead", "What is known, and where they turn.", "rule") }}
+    {{ section_head(company_num["co-horizon"], "The Horizon", "The Road Ahead", "What is known, and where they turn.", "rule") }}
     <div class="road-ahead">
       <div class="road-ahead-block">
         <div class="road-ahead-sub">What Is Known</div>
@@ -198,7 +167,7 @@
   </section>
 
   <section class="company-section" id="co-crowns">
-    {{ section_head("VI", "The Crowns", "Distinctions", "Each carries some honour the others do not.", "trefoil") }}
+    {{ section_head(company_num["co-crowns"], "The Crowns", "Distinctions", "Each carries some honour the others do not.", "trefoil") }}
     <div class="distinctions">
       {%- for d in distinctions %}
         {%- set member = (party.members | selectattr("id", "equalto", d.id) | first) %}
@@ -214,8 +183,44 @@
     </div>
   </section>
 
+  {%- if company_strip %}
+  <section class="company-section company-burden" id="co-burden">
+    {{ section_head(company_num["co-burden"], "The Burden", "Burden of Carry", "What each back bears upon the road.", "rule") }}
+    <div class="company-strip-bars">
+      {%- for s in company_strip %}
+        <div class="company-strip-bar
+                    {%- if s.status == 'awaiting_manifest' %} awaiting{% endif %}"
+             data-slug="{{ s.slug }}"
+             data-shortname="{{ s.shortname }}"
+             data-weight="{{ s.total_weight }}"
+             data-capacity="{{ s.capacity }}"
+             data-rack="{{ s.breakdown.rack }}"
+             data-spotlight="{{ s.breakdown.spotlight }}"
+             data-manifest="{{ s.breakdown.manifest }}"
+             data-pct="{{ s.pct }}">
+          <div class="company-strip-name">{{ s.shortname }}</div>
+          <div class="company-strip-track">
+            {%- if s.status == 'ok' and s.capacity > 0 %}
+              {%- set pct = s.pct %}
+              <div class="company-strip-fill"
+                   style="--target-width: {{ pct }}%; animation-delay: {{ loop.index0 * 80 }}ms;"></div>
+            {%- endif %}
+          </div>
+          <div class="company-strip-numbers">
+            {%- if s.status == 'ok' %}
+              {{ s.total_weight }} / {{ s.capacity }} lb
+            {%- else %}
+              &mdash;
+            {%- endif %}
+          </div>
+        </div>
+      {%- endfor %}
+    </div>
+  </section>
+  {%- endif %}
+
   <section class="company-section" id="co-fates">
-    {{ section_head("VII", "The Fates", "The Patron Die", "Of the rolls cast upon the twenty, here is how the die fell.") }}
+    {{ section_head(company_num["co-fates"], "The Fates", "The Patron Die", "Of the rolls cast upon the twenty, here is how the die fell.") }}
     <div class="patron-die">
       <div class="patron-die-chart">
         {{- d20_histogram(patron_die) }}
@@ -231,18 +236,4 @@
     </div>
   </section>
 
-  <section class="company-section silent-roll" id="co-margins">
-    {{ section_head("VIII", "The Quiet Margins", "The Silent Roll", "Sessions where no blade was lifted.", "rule") }}
-    <ul class="silent-roll-list">
-      {%- for ch in chronicle.chapters %}
-        {%- for s in ch.sessions %}
-          {%- for line in s.silent_roll %}
-      <li><b>{{ s.real_date_label }}</b> {{ line | safe }}</li>
-          {%- endfor %}
-        {%- endfor %}
-      {%- endfor %}
-    </ul>
-  </section>
-
-  {% include "_ascent.html" %}
 </article>

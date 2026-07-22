@@ -2174,7 +2174,6 @@ img.chronicle-session-pip:focus-visible {
 }
 
 /* The document flow rides the body column; the rail alone holds the margin. */
-#company > .company-strip,
 #company > section {
   grid-column: body;
   min-width: 0;
@@ -2447,15 +2446,9 @@ img.chronicle-session-pip:focus-visible {
 }
 .manifest-icon { width: 70%; height: 70%; object-fit: contain; }
 
-/* --- Company strip --------------------------------------- */
-.company-strip { margin-top: 1.2rem; }
-.company-strip-title {
-  font-size: 0.8rem;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--ink-faded, #7a6a55);
-  margin-bottom: 0.4rem;
-}
+/* --- Burden of Carry (co-burden) — per-member weight bars ---
+   The bars ride the body column inside their own numbered section, so the
+   section_head supplies the title; the strip carries only the bar grid. */
 .company-strip-bars {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
@@ -2871,4 +2864,204 @@ img.chronicle-session-pip:focus-visible {
   /* keep the hover legible but motionless */
   .whence-bar .whence-seg:hover { transform: none; }
   .ascent-pulse.run { animation: none !important; }
+}
+
+/* ─────────────────────────────────────────────────────────────────
+   Landing hero — latest story + level/XP gauge + Road Ahead, at the
+   top of the Company tab. Rides the body column of the #company grid.
+   ───────────────────────────────────────────────────────────────── */
+/* Hand off to the first flavor section on the same rhythm the sections keep
+   between themselves (.company-section margin-bottom), so the hero doesn't
+   crowd the Ledger's section-head below it. */
+#company > .landing { grid-column: body; min-width: 0; margin-bottom: 96px; }
+
+.landing-band-label {
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 9px; letter-spacing: 3px; text-transform: uppercase;
+  color: var(--brass-hi); font-weight: 600;
+  display: flex; align-items: center; gap: 12px; margin-bottom: 24px;
+}
+.landing-band-label::after { content: ""; flex: 1; height: 1px; background: var(--rule); }
+
+.hero { display: grid; grid-template-columns: 1.7fr 1px 0.9fr; gap: 40px; align-items: start; }
+.hero-rule { align-self: stretch; width: 1px; background: var(--rule); }
+
+.hero-eyebrow {
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 10px; letter-spacing: 4px; text-transform: uppercase;
+  color: var(--brass); margin-bottom: 14px;
+}
+.hero-eyebrow b { color: var(--brass-hi); font-weight: 600; }
+.hero-title {
+  font-family: 'Cormorant Garamond', serif; font-weight: 600;
+  font-size: 46px; line-height: 1.04; color: var(--paper); letter-spacing: 0.5px;
+  margin-bottom: 16px;
+}
+.hero-meta {
+  display: flex; align-items: baseline; gap: 22px; margin-bottom: 22px;
+  padding-bottom: 22px; border-bottom: 1px solid var(--rule); flex-wrap: wrap;
+}
+.hero-meta .num {
+  font-family: 'IBM Plex Sans', sans-serif; font-size: 10px; letter-spacing: 2.5px;
+  text-transform: uppercase; color: var(--paper-dim);
+}
+.hero-meta .iu {
+  font-family: 'Cormorant Garamond', serif; font-size: 20px; color: var(--brass);
+  letter-spacing: 0.3px;
+}
+.hero-meta .real {
+  font-family: 'IBM Plex Sans', sans-serif; font-size: 10px; letter-spacing: 1.8px;
+  text-transform: uppercase; color: var(--paper-dim);
+}
+.hero-meta .quiet {
+  margin-left: auto; font-family: 'EB Garamond', serif; font-style: italic;
+  font-size: 13px; color: var(--paper-dim);
+}
+.hero-meta .hero-pips { margin-left: auto; display: flex; gap: 5px; flex-wrap: wrap; }
+.hero-meta .hero-pips .chronicle-session-pip { width: 22px; height: 22px; }
+.hero-summary {
+  font-family: 'EB Garamond', serif; font-size: 17px; color: var(--paper);
+  line-height: 1.6; max-width: 660px; opacity: 0.9;
+}
+.hero-summary::first-letter {
+  font-family: 'Cormorant Garamond', serif; font-size: 3.1em; float: left;
+  line-height: 0.86; padding: 6px 12px 0 0; color: var(--brass); font-weight: 600;
+}
+
+/* Ascent gauge — level & progress toward next level */
+.gauge {
+  border: 1px solid var(--rule-strong); background: var(--ink-soft);
+  padding: 26px 28px 24px; position: sticky; top: 24px;
+}
+.gauge-eyebrow {
+  font-family: 'IBM Plex Sans', sans-serif; font-size: 9px; letter-spacing: 3px;
+  text-transform: uppercase; color: var(--brass-hi); font-weight: 600; margin-bottom: 12px;
+}
+.gauge-level {
+  font-family: 'Cormorant Garamond', serif; font-weight: 600; font-size: 64px;
+  color: var(--brass-hi); line-height: 0.9; letter-spacing: 0.5px;
+  text-shadow: 0 2px 24px rgba(184,137,74,0.35);
+}
+.gauge-chart { position: relative; height: 188px; margin: 20px 0 2px; }
+.gauge-chart svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.gauge-chart .g-goal-line { stroke: var(--brass); stroke-width: 1; stroke-dasharray: 4 4; opacity: 0.5; vector-effect: non-scaling-stroke; }
+.gauge-chart .g-area { fill: url(#ascentFill); }
+.gauge-chart .g-line { fill: none; stroke: var(--brass); stroke-width: 2.5; vector-effect: non-scaling-stroke; }
+.gauge-chart .g-pulse { fill: var(--brass-hi); }
+.g-fig { position: absolute; z-index: 2; line-height: 1.05; }
+.g-fig b {
+  font-family: 'Cormorant Garamond', serif; font-weight: 600; font-variant-numeric: tabular-nums;
+  display: block;
+}
+.g-fig span {
+  font-family: 'IBM Plex Sans', sans-serif; font-size: 9px; letter-spacing: 2px;
+  text-transform: uppercase; color: var(--paper-dim); margin-top: 4px; display: block;
+}
+.g-goal { top: -6px; right: 0; text-align: right; background: var(--ink-soft); padding: 2px 0 2px 14px; }
+.g-goal b { font-size: 17px; color: var(--paper-dim); }
+.g-goal span { color: var(--brass); }
+.g-togo { top: 40px; left: 0; text-align: left; }
+.g-togo b { font-size: 30px; color: var(--brass-hi); }
+.g-earned { bottom: 8px; right: 0; text-align: right; }
+.g-earned b { font-size: 30px; color: var(--paper); }
+/* Summit: no ceiling above — center a single "at the summit" note */
+.gauge.at-summit .gauge-chart { display: none; }
+.gauge-summit {
+  margin-top: 16px; font-family: 'EB Garamond', serif; font-style: italic;
+  font-size: 15px; color: var(--paper-dim);
+}
+
+/* Road Ahead band — pulled up as current data */
+.roadahead {
+  display: grid; grid-template-columns: 1.5fr 1fr; gap: 44px;
+  margin-top: 40px; padding: 26px 0 4px; border-top: 1px solid var(--rule);
+}
+.roadahead-eyebrow {
+  grid-column: 1 / -1; font-family: 'IBM Plex Sans', sans-serif; font-size: 9px;
+  letter-spacing: 3px; text-transform: uppercase; color: var(--brass-hi); font-weight: 600;
+}
+.ra-sub {
+  font-family: 'IBM Plex Sans', sans-serif; font-size: 9px; letter-spacing: 2.5px;
+  text-transform: uppercase; color: var(--paper-dim); margin-bottom: 10px;
+}
+.ra-turn {
+  font-family: 'EB Garamond', serif; font-size: 17px; color: var(--paper); line-height: 1.5; opacity: 0.92;
+}
+.ra-known { display: flex; flex-wrap: wrap; gap: 8px 10px; align-items: baseline; }
+.ra-chip {
+  font-family: 'EB Garamond', serif; font-size: 14px; color: var(--paper-dim);
+  border: 1px solid var(--rule); padding: 3px 11px; border-radius: 2px;
+}
+.ra-more {
+  font-family: 'IBM Plex Sans', sans-serif; font-size: 10px; letter-spacing: 1.5px;
+  color: var(--brass-dim); align-self: center; text-decoration: none;
+}
+.ra-more:hover { color: var(--brass-hi); }
+
+/* "Previously" teaser → Chronicle tab */
+.recent {
+  display: flex; align-items: center; gap: 28px; margin-top: 36px;
+  padding-top: 22px; border-top: 1px solid var(--rule); flex-wrap: wrap;
+}
+.recent-label {
+  font-family: 'IBM Plex Sans', sans-serif; font-size: 9px; letter-spacing: 3px;
+  text-transform: uppercase; color: var(--paper-dim);
+}
+.recent-items { display: flex; gap: 26px; flex: 1; flex-wrap: wrap; }
+.recent-item { font-family: 'EB Garamond', serif; font-style: italic; font-size: 16px; color: var(--paper-dim); }
+.recent-item .n { font-style: normal; font-family: 'IBM Plex Sans', sans-serif; font-size: 9px; letter-spacing: 2px; color: var(--brass-dim); margin-right: 8px; }
+.recent-cta {
+  font-family: 'Cormorant Garamond', serif; font-size: 20px; color: var(--brass-hi);
+  text-decoration: none; white-space: nowrap; letter-spacing: 0.3px;
+}
+.recent-cta:hover { color: var(--paper); }
+
+/* ─────────────────────────────────────────────────────────────────
+   Chronicle tab — the archive. Chapter switcher shows ONE chapter at a
+   time; the Silent Roll is folded into each session's expanded body.
+   ───────────────────────────────────────────────────────────────── */
+.tab-glyph {
+  width: 26px; height: 26px; border-radius: 50%; border: 1px solid var(--rule-strong);
+  display: inline-flex; align-items: center; justify-content: center; margin-right: 8px;
+  color: var(--brass); flex: 0 0 auto;
+}
+.tab.chronicle-tab.active .tab-glyph, .tab.chronicle-tab:hover .tab-glyph { color: var(--brass-hi); border-color: var(--brass); }
+
+.chapter-switcher {
+  display: flex; flex-wrap: wrap; gap: 10px; margin: 0 auto 28px;
+  max-width: 1180px;
+}
+.chapter-switch-btn {
+  background: none; border: 1px solid var(--rule); color: var(--paper-dim);
+  font-family: 'Cormorant Garamond', serif; font-size: 18px; padding: 8px 18px;
+  cursor: pointer; letter-spacing: 0.3px; display: flex; flex-direction: column; gap: 2px;
+  line-height: 1.1; text-align: left;
+}
+.chapter-switch-btn span {
+  font-family: 'EB Garamond', serif; font-style: italic; font-size: 12px;
+  color: var(--paper-dim); opacity: 0.7;
+}
+.chapter-switch-btn:hover { border-color: var(--rule-strong); color: var(--paper); }
+.chapter-switch-btn[aria-selected="true"] { border-color: var(--brass); color: var(--brass-hi); }
+.chapter-switch-btn[aria-selected="true"] span { color: var(--brass); opacity: 1; }
+
+.chronicle-chapter-panel { display: none; }
+.chronicle-chapter-panel.active { display: block; }
+
+.chronicle-session-quiet {
+  list-style: none; margin: 12px 0 0; padding: 10px 0 0 0; max-width: 700px;
+  border-top: 1px solid var(--rule);
+}
+.chronicle-session-quiet li {
+  font-family: 'EB Garamond', serif; font-style: italic; font-size: 14px;
+  color: var(--paper-dim); line-height: 1.5; margin: 0 0 4px; position: relative; padding-left: 16px;
+}
+.chronicle-session-quiet li::before { content: "\2022"; position: absolute; left: 4px; color: var(--brass-dim); }
+
+@media (max-width: 900px) {
+  .hero { grid-template-columns: 1fr; gap: 28px; }
+  .hero-rule { display: none; }
+  .gauge { position: static; }
+  .roadahead { grid-template-columns: 1fr; gap: 20px; }
+  .chapter-switcher { flex-wrap: nowrap; overflow-x: auto; }
 }

@@ -753,3 +753,18 @@
         if (openEl && !openEl.contains(e.target)) { Tip.cancelHide(); close(); }
       });
     })();
+
+    // Chronicle chapter switcher: show one chapter panel at a time. The newest
+    // chapter is active on load (marked in the template); clicking a button
+    // swaps the visible panel. Additive — independent of the tab switcher above.
+    (function () {
+      const root = document.getElementById('chronicle');
+      if (!root) return;
+      const btns = [...root.querySelectorAll('.chapter-switch-btn')];
+      const panels = [...root.querySelectorAll('.chronicle-chapter-panel')];
+      function show(idx) {
+        btns.forEach(b => b.setAttribute('aria-selected', String(+b.dataset.chapter === idx)));
+        panels.forEach(p => p.classList.toggle('active', +p.dataset.chapter === idx));
+      }
+      btns.forEach(b => b.addEventListener('click', () => show(+b.dataset.chapter)));
+    })();
