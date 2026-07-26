@@ -18,7 +18,7 @@ from pathlib import Path
 
 import jsonschema
 
-from . import registry, store
+from . import mapimage, registry, store
 from .paths import REPO_ROOT
 
 
@@ -171,7 +171,11 @@ def apply_run(run_dir: Path, *, skip_render: bool) -> dict:
         marker_new = manifest["latest"]
 
     render_ok: bool | None = None
+    map_result: dict | None = None
     if not skip_render and not pending and not rejected:
+        # Refresh the map derivative first so the render validates against a
+        # current artifact and the whole build lands in one commit.
+        map_result = mapimage.prepare_map()
         rr = _run_render()
         render_ok = rr["ok"]
         if not render_ok:
@@ -185,6 +189,7 @@ def apply_run(run_dir: Path, *, skip_render: bool) -> dict:
         "graduated": graduated,
         "marker_old": marker_old,
         "marker_new": marker_new,
+        "map": map_result,
         "render_ok": render_ok,
     }
 

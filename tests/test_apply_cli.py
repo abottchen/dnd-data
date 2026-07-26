@@ -284,3 +284,41 @@ def test_missing_slice_file_is_rejected_not_crash(staged_run):
     summary = apply_cli.apply_run(run_dir, skip_render=True)
     assert any(r["stem"] == entry["stem"] and "slice file missing" in r["reason"]
                for r in summary["rejected"])
+
+
+def _fill_all_results(run_dir: Path) -> None:
+    """Write a schema-valid result for every slice so apply reaches the render."""
+    manifest = json.loads((run_dir / "manifest.json").read_text())
+    for entry in manifest["slices"]:
+        _write_result(run_dir, entry, _valid_payload_for(entry, run_dir))
+
+
+def test_apply_run_prepares_the_map_before_rendering(staged_run, monkeypatch):
+    run_dir, _ = staged_run
+    _fill_all_results(run_dir)
+
+    order = []
+    monkeypatch.setattr(apply_cli.mapimage, "prepare_map",
+                        lambda: (order.append("map"),
+                                 {"status": "skipped", "src_bytes": 10, "out_bytes": 5})[1])
+    monkeypatch.setattr(apply_cli, "_run_render",
+                        lambda: (order.append("render"), {"ok": True, "stderr": ""})[1])
+
+    summary = apply_cli.apply_run(run_dir, skip_render=False)
+
+    assert order == ["map", "render"]
+    assert summary["map"]["status"] == "skipped"
+
+
+def test_apply_run_skips_the_map_when_the_render_is_skipped(staged_run, monkeypatch):
+    run_dir, _ = staged_run
+    _fill_all_results(run_dir)
+
+    def _boom():
+        raise AssertionError("the map must not be built when the render is skipped")
+
+    monkeypatch.setattr(apply_cli.mapimage, "prepare_map", _boom)
+
+    summary = apply_cli.apply_run(run_dir, skip_render=True)
+
+    assert summary["map"] is None
