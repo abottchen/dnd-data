@@ -1,0 +1,39 @@
+{% from "_macros.html" import section_head -%}
+{#- The Map tab: the party's annotated chart of Chult in a pan/zoom viewer.
+    The <img> carries data-src, not src — the full-resolution JPEG is only
+    fetched the first time this panel becomes active (see the map IIFE in
+    _script.html). -#}
+<article class="character" id="map" role="tabpanel" aria-labelledby="tab-map">
+  <section class="map-section">
+    {{ section_head("i", "Chult", site.player_map.heading, site.player_map.subtitle, "rule") }}
+
+    <div class="map-frame" id="map-frame">
+      <div class="map-viewport" id="map-viewport" tabindex="0" role="img"
+           aria-label="The player-annotated map of Chult. Drag to pan, arrow keys to move, plus and minus to zoom.">
+        <img class="map-image" id="map-image" alt="" draggable="false"
+             data-src="images/{{ site.player_map.image }}">
+        <div class="map-loading" id="map-loading">Unrolling the chart&hellip;</div>
+      </div>
+
+      <div class="map-controls">
+        <button type="button" class="map-btn" id="map-zoom-in" aria-label="Zoom in">+</button>
+        <button type="button" class="map-btn" id="map-zoom-out" aria-label="Zoom out">&minus;</button>
+        <button type="button" class="map-btn" id="map-zoom-reset" aria-label="Reset the view">&#x21ba;</button>
+        <button type="button" class="map-btn" id="map-fullscreen" aria-label="Fullscreen">&#x26F6;</button>
+      </div>
+
+      {#- Magnification gauge: log-scaled between fit-to-frame and the ceiling,
+          with a tick where one map pixel covers one screen pixel. -#}
+      <div class="map-gauge" aria-hidden="true">
+        <div class="map-gauge-label">Magnification</div>
+        <div class="map-gauge-track">
+          <div class="map-gauge-fill" id="map-gauge-fill"></div>
+          <div class="map-gauge-native" id="map-gauge-native"><span>1:1</span></div>
+        </div>
+        <div class="map-gauge-val" id="map-gauge-val">&times;1.0</div>
+      </div>
+    </div>
+
+    <p class="map-hint">Drag to pan &middot; scroll to zoom &middot; double-click to zoom in &middot; <kbd>0</kbd> resets</p>
+  </section>
+</article>

@@ -10,5 +10,6 @@
   "gm": {"name": "GM", "epithet": "behind the screen", "meta": ""},
   "known_npcs": ["Azlund"],
   "footnote": "fixtures only",
-  "refreshed_through_session": 1
+  "refreshed_through_session": 1,
+  "player_map": {"image": "chult-map.jpg", "heading": "The Map", "subtitle": "the test chart"}
 }

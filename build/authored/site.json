@@ -100,5 +100,10 @@
     "Liara Portyr",
     "Shago"
   ],
-  "ascent_read": "Legends forged mostly by steel, but the road and its riddles have left their mark on every hard-won mile."
+  "ascent_read": "Legends forged mostly by steel, but the road and its riddles have left their mark on every hard-won mile.",
+  "player_map": {
+    "image": "chult-map.jpg",
+    "heading": "The Map",
+    "subtitle": "The company's own chart of Chult · marked as they walked it"
+  }
 }
