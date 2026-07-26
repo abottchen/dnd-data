@@ -3121,8 +3121,9 @@ img.chronicle-session-pip:focus-visible {
 }
 .map-btn {
   width: 32px; height: 32px;
-  background: rgba(12, 10, 8, 0.72); border: 1px solid var(--rule);
-  color: var(--paper-dim);
+  /* Opaque enough to stay readable over the map's bright parchment areas */
+  background: rgba(12, 10, 8, 0.88); border: 1px solid var(--rule-strong);
+  color: var(--paper);
   font-family: 'IBM Plex Sans', sans-serif; font-size: 15px; line-height: 1;
   display: flex; align-items: center; justify-content: center; cursor: pointer;
 }
@@ -3132,12 +3133,12 @@ img.chronicle-session-pip:focus-visible {
 .map-gauge {
   position: absolute; left: 16px; bottom: 16px;
   display: flex; align-items: center; gap: 12px;
-  background: rgba(12, 10, 8, 0.72); border: 1px solid var(--rule);
-  padding: 8px 13px;
+  background: rgba(12, 10, 8, 0.88); border: 1px solid var(--rule-strong);
+  padding: 9px 13px 16px;   /* room under the track for the 1:1 tick label */
 }
 .map-gauge-label {
   font-family: 'IBM Plex Sans', sans-serif; font-size: 9px;
-  letter-spacing: 3px; text-transform: uppercase; color: var(--brass-dim);
+  letter-spacing: 3px; text-transform: uppercase; color: var(--brass);
 }
 .map-gauge-track { position: relative; width: 132px; height: 2px; background: var(--rule); }
 .map-gauge-fill { position: absolute; left: 0; top: 0; height: 2px; width: 0; background: var(--brass-hi); }
@@ -3145,7 +3146,7 @@ img.chronicle-session-pip:focus-visible {
 .map-gauge-native span {
   position: absolute; top: 11px; left: -8px;
   font-family: 'IBM Plex Sans', sans-serif; font-size: 8px;
-  letter-spacing: 1px; color: var(--brass-dim);
+  letter-spacing: 1px; color: var(--brass);
 }
 .map-gauge-val {
   font-family: 'IBM Plex Sans', sans-serif; font-size: 11px;
