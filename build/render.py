@@ -183,6 +183,8 @@ def validate_all(data: dict, authored: dict, images_dir: Path, fact_pack: dict |
     errors.extend(validate_distinction_basis(authored["characters"], fact_pack))
     errors.extend(validate_site(authored["site"], len(data["session_log"].get("entries", []))))
     errors.extend(validate_portraits(data["party"], images_dir))
+    player_map = authored["site"].get("player_map") or {}
+    errors.extend(validate_map(images_dir, player_map.get("image", "chult-map.jpg")))
     errors.extend(validate_dice_player_mapping(data.get("unmapped_players", [])))
     return errors
 
@@ -286,7 +288,7 @@ from build.validators import (KIND_MALFORMED, KIND_MISSING, KIND_ORPHAN,  # noqa
                               validate_dice_player_mapping,
                               validate_distinction_basis,
                               validate_distinction_uniqueness, validate_kills,
-                              validate_npcs, validate_portraits,
+                              validate_map, validate_npcs, validate_portraits,
                               validate_sessions, validate_site)
 
 # Back-compat aliases for the pre-split private names. load_data (above) calls

@@ -10,6 +10,11 @@ Three CLI forms:
       Validate every result file in <run-dir>, apply it to the authored
       store, bump the marker on full refresh-pass success, run render.py.
 
+  python -m build map [--force]
+      Re-encode data/chult-player-map.jpg into site/images/chult-map.jpg.
+      A no-op unless the source is newer than the derivative. Also runs
+      automatically inside `apply`, just before the render.
+
   python -m build       (convenience)
       Same as `prepare`, then prints the skill command to run next.
 """
@@ -50,6 +55,18 @@ def _cmd_apply(args) -> int:
               + ", ".join(summary["graduated"]), file=sys.stderr)
     if summary["marker_new"] != summary["marker_old"]:
         print(f"marker: {summary['marker_old']} → {summary['marker_new']}", file=sys.stderr)
+    m = summary.get("map")
+    if m:
+        from .mapimage import fmt_bytes
+        if m["status"] == "rebuilt":
+            print(f"map: rebuilt ({fmt_bytes(m['src_bytes'])} → {fmt_bytes(m['out_bytes'])})",
+                  file=sys.stderr)
+        elif m["status"] == "skipped":
+            print("map: up to date", file=sys.stderr)
+        else:
+            print("map: no source in data/ — keeping the committed derivative",
+                  file=sys.stderr)
+
     if summary["render_ok"] is True:
         print("render: OK", file=sys.stderr)
     elif summary["render_ok"] is False:
@@ -62,6 +79,20 @@ def _cmd_apply(args) -> int:
     if summary["render_ok"] is False:
         return 1
     return 0
+
+
+def _cmd_map(args) -> int:
+    from .mapimage import prepare_map, fmt_bytes, source_path, output_path
+    result = prepare_map(force=args.force)
+    if result["status"] == "rebuilt":
+        print(f"{output_path()}: rebuilt "
+              f"({fmt_bytes(result['src_bytes'])} → {fmt_bytes(result['out_bytes'])})")
+        return 0
+    if result["status"] == "skipped":
+        print(f"{output_path()}: up to date (pass --force to rebuild)")
+        return 0
+    print(f"no {source_path()} — nothing to build", file=sys.stderr)
+    return 1
 
 
 def main(argv=None) -> int:
@@ -77,6 +108,9 @@ def main(argv=None) -> int:
     p_apply.add_argument("run_dir")
     p_apply.add_argument("--skip-render", action="store_true")
 
+    p_map = sub.add_parser("map", help="Re-encode the player map for the web.")
+    p_map.add_argument("--force", action="store_true")
+
     try:
         args = parser.parse_args(argv)
     except SystemExit as exc:
@@ -88,6 +122,8 @@ def main(argv=None) -> int:
         return _cmd_prepare(ns)
     if args.cmd == "prepare":
         return _cmd_prepare(args)
+    if args.cmd == "map":
+        return _cmd_map(args)
     return _cmd_apply(args)
 
 

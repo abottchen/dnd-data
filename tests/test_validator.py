@@ -3,7 +3,7 @@ from build import render
 from build.render import (
     ValidationError, KIND_MISSING, KIND_MALFORMED, KIND_ORPHAN, validate_kills,
     validate_sessions, validate_chapters, validate_npcs, validate_characters, validate_site,
-    validate_portraits, validate_dice_player_mapping,
+    validate_portraits, validate_map, validate_dice_player_mapping,
     validate_distinction_basis, validate_distinction_uniqueness,
 )
 
@@ -204,6 +204,30 @@ def test_validate_portraits_skips_gm(tmp_path):
     images_dir.mkdir()
     party = {"members": [{"id": "gm", "image": "GM.png"}]}
     assert validate_portraits(party, images_dir) == []
+
+def test_validate_map_missing_file(tmp_path):
+    images_dir = tmp_path / "images"
+    images_dir.mkdir()
+    errors = validate_map(images_dir)
+    assert len(errors) == 1
+    assert errors[0].kind == "MISSING"
+    assert errors[0].kind_type == "map"
+    assert errors[0].key == ("chult-map.jpg",)
+    assert "python -m build map" in errors[0].field
+
+def test_validate_map_passes_when_file_present(tmp_path):
+    images_dir = tmp_path / "images"
+    images_dir.mkdir()
+    (images_dir / "chult-map.jpg").write_bytes(b"")
+    assert validate_map(images_dir) == []
+
+def test_validate_map_honors_authored_filename(tmp_path):
+    images_dir = tmp_path / "images"
+    images_dir.mkdir()
+    (images_dir / "chult-map.jpg").write_bytes(b"")
+    errors = validate_map(images_dir, "other-map.jpg")
+    assert len(errors) == 1
+    assert errors[0].key == ("other-map.jpg",)
 
 def test_validate_portraits_skips_member_without_image(tmp_path):
     images_dir = tmp_path / "images"

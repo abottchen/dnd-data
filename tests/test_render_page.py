@@ -78,3 +78,14 @@ def test_forbidden_names_regex_matches_full_name():
     # (the pre-commit/pre-push hooks scan committed content for it).
     name = "Si" + "mon Wei" + "l"
     assert re.search(_forbidden_names_regex(), name)
+
+
+def test_map_tab_and_panel_render(staged_env):
+    html, _ = _render_html(staged_env)
+    assert 'id="tab-map"' in html
+    assert 'id="map-viewport"' in html
+    assert 'data-src="images/chult-map.jpg"' in html
+    # The full-resolution JPEG must not be fetched until the tab is opened:
+    # a bare src= would load it on page load. Leading space so the check does
+    # not match the data-src attribute it is distinguishing itself from.
+    assert ' src="images/chult-map.jpg"' not in html

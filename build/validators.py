@@ -183,6 +183,16 @@ def validate_portraits(party: dict, images_dir: Path) -> list[ValidationError]:
             ))
     return errors
 
+def validate_map(images_dir: Path, filename: str = "chult-map.jpg") -> list[ValidationError]:
+    """The player-map derivative must exist in site/images/ (see build/mapimage.py)."""
+    if (images_dir / filename).exists():
+        return []
+    return [ValidationError(
+        KIND_MISSING, "map", (filename,),
+        field=f"'{filename}' not found in site/images/ — run "
+              f"`python -m build map` to build it from data/chult-player-map.jpg",
+    )]
+
 def validate_dice_player_mapping(unmapped_players: list[str]) -> list[ValidationError]:
     """Each upstream dice-roll player name must resolve to a slug via build/dice-players.json."""
     errors: list[ValidationError] = []
