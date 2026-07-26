@@ -3065,3 +3065,102 @@ img.chronicle-session-pip:focus-visible {
   .roadahead { grid-template-columns: 1fr; gap: 20px; }
   .chapter-switcher { flex-wrap: nowrap; overflow-x: auto; }
 }
+
+/* ─────────────────────────────────────────────────────────────────
+   Map tab — the company's annotated chart of Chult. Deep pan/zoom;
+   the magnification gauge marks 1:1, where one map pixel covers one
+   screen pixel, so it reads when you have pushed past the paper's grain.
+   ───────────────────────────────────────────────────────────────── */
+.tab.map-tab.active .tab-glyph,
+.tab.map-tab:hover .tab-glyph { color: var(--brass-hi); border-color: var(--brass); }
+
+.map-frame {
+  position: relative;
+  height: calc(100vh - 300px);
+  min-height: 480px;
+  border: 1px solid var(--rule-strong);
+  background: var(--ink-deep);
+  overflow: hidden;
+}
+/* Vignette: sinks the map's cut edges into the page rather than ending them */
+.map-frame::after {
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  box-shadow: inset 0 0 90px 20px rgba(12, 10, 8, 0.72);
+}
+
+.map-viewport {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden; cursor: grab;
+  touch-action: none;              /* the viewer owns pinch and drag */
+}
+.map-viewport:active { cursor: grabbing; }
+.map-viewport:focus-visible { outline: 1px solid var(--brass); outline-offset: -3px; }
+
+.map-image {
+  max-width: 100%; max-height: 100%;
+  transform-origin: center center;
+  will-change: transform;
+  user-select: none; -webkit-user-drag: none;
+}
+
+.map-loading {
+  position: absolute;
+  font-family: 'EB Garamond', serif; font-style: italic;
+  font-size: 16px; letter-spacing: 0.3px; color: var(--paper-dim);
+  animation: map-breathe 2.4s ease-in-out infinite;
+}
+@keyframes map-breathe { 0%, 100% { opacity: 0.35 } 50% { opacity: 0.8 } }
+@media (prefers-reduced-motion: reduce) {
+  .map-loading { animation: none; opacity: 0.6 }
+}
+
+.map-controls {
+  position: absolute; top: 14px; right: 14px;
+  display: flex; flex-direction: column; gap: 6px;
+}
+.map-btn {
+  width: 32px; height: 32px;
+  background: rgba(12, 10, 8, 0.72); border: 1px solid var(--rule);
+  color: var(--paper-dim);
+  font-family: 'IBM Plex Sans', sans-serif; font-size: 15px; line-height: 1;
+  display: flex; align-items: center; justify-content: center; cursor: pointer;
+}
+.map-btn:hover { color: var(--brass-hi); border-color: var(--brass); }
+.map-btn:focus-visible { outline: 1px solid var(--brass); outline-offset: 2px; }
+
+.map-gauge {
+  position: absolute; left: 16px; bottom: 16px;
+  display: flex; align-items: center; gap: 12px;
+  background: rgba(12, 10, 8, 0.72); border: 1px solid var(--rule);
+  padding: 8px 13px;
+}
+.map-gauge-label {
+  font-family: 'IBM Plex Sans', sans-serif; font-size: 9px;
+  letter-spacing: 3px; text-transform: uppercase; color: var(--brass-dim);
+}
+.map-gauge-track { position: relative; width: 132px; height: 2px; background: var(--rule); }
+.map-gauge-fill { position: absolute; left: 0; top: 0; height: 2px; width: 0; background: var(--brass-hi); }
+.map-gauge-native { position: absolute; top: -4px; left: 50%; width: 1px; height: 10px; background: var(--brass-dim); }
+.map-gauge-native span {
+  position: absolute; top: 11px; left: -8px;
+  font-family: 'IBM Plex Sans', sans-serif; font-size: 8px;
+  letter-spacing: 1px; color: var(--brass-dim);
+}
+.map-gauge-val {
+  font-family: 'IBM Plex Sans', sans-serif; font-size: 11px;
+  letter-spacing: 1px; color: var(--brass-hi); min-width: 40px;
+}
+
+.map-hint {
+  margin-top: 14px; text-align: center;
+  font-family: 'EB Garamond', serif; font-style: italic;
+  font-size: 13px; color: var(--paper-dim);
+}
+.map-hint kbd {
+  font-family: 'IBM Plex Sans', sans-serif; font-style: normal; font-size: 10px;
+  border: 1px solid var(--rule); padding: 1px 5px; color: var(--brass);
+}
+
+/* Fullscreen: the frame becomes the screen; controls and gauge ride along. */
+.map-frame:fullscreen { height: 100vh; min-height: 0; border: none; }
