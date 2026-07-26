@@ -8,8 +8,10 @@ Static GitHub Pages site visualizing data from an ongoing D&D campaign.
   - `site/index.html` — build artifact (committed).
   - `site/styles.css` — the design system (palette, typography, components).
   - `site/images/` — character portrait tokens. Filenames match each entry's `image` field in `data/party.json` (e.g. `chumble-crudluck.png`). The GM's token is `GM.png`.
+  - `site/images/chult-map.jpg` — committed web derivative of the annotated player map, built from the gitignored source by `build/mapimage.py`. Full resolution (6445×8640, ~12 MB) because the Map tab's viewer zooms past native pixel density.
 - `data/` — ingestion directory for source files (gitignored contents). Holds `party.json`, `session-log.json`, plus `dice/` and `inventory/` subdirectories. Files are dropped in manually from external sources; nothing in this repo writes to `data/`.
   - `data/party.json` — current party snapshot (character-sheet export).
+  - `data/chult-player-map.jpg` — the party's annotated map of Chult (~17 MB export). Source only; the served copy is the derivative in `site/images/`.
   - `data/dice/dicex-rolls-*.json` — dice-roll snapshots (dice-roller export).
   - `data/inventory/obr-inv-backup-*.json` — Owlbear Rodeo inventory exports.
   - `data/session-log.json` — per-session narrative entries with real + in-universe dates.
@@ -22,7 +24,8 @@ Static GitHub Pages site visualizing data from an ongoing D&D campaign.
   - `build/compute.py` — every `compute_*` (trials, fortune, radar / ascent / constellation geometry, chronicle, reliquary, …) and `compute_all`, which assembles the full template context. Imports `inventory` at module top: the old render↔inventory circular import is dissolved because `inventory` now imports the dice-map loader from `loaders`.
   - `build/paths.py`, `store.py`, `slices.py`, `registry.py`, `prepare.py`, `apply.py`, `apply_cli.py` — orchestrator submodules (path resolution, authored-store I/O, per-category slice builders, transformer registry, run-dir preparation, returned-prose application, manifest-driven apply + render).
   - `build/authored/` — JSON prose store: `kills.json`, `sessions.json`, `chapters.json`, `npcs.json`, `characters.json`, `site.json`. The only writable surface for the orchestrator's apply step.
-  - `build/templates/` — Jinja2 partials consumed by `build/render.py`. Locked; not modified by normal authoring. Reference assets via paths relative to `site/index.html` (e.g. `styles.css`, `images/...`).
+  - `build/mapimage.py` — re-encodes `data/chult-player-map.jpg` into `site/images/chult-map.jpg` at full resolution (`prepare_map`). Called by `apply` just before the render, and available standalone as `python -m build map [--force]`. A no-op unless the source is newer than the derivative, so ordinary builds pay nothing.
+  - `build/templates/` — Jinja2 partials consumed by `build/render.py`. Locked; not modified by normal authoring. Reference assets via paths relative to `site/index.html` (e.g. `styles.css`, `images/...`). `_map.html` is the Map tab; its pan/zoom viewer is the last IIFE in `_script.html`.
   - `build/dice-players.json` — substring map (first-name or handle → site slug) used by `loaders.py:resolve_dice_player` (re-exported through `build.render` for back-compat). Never records full real names.
 - `.claude/prompts/` — paired prompt and schema files, one pair per transformer (`append-kills`, `append-sessions`, `append-chapters`, `append-npcs`, `append-characters`, `append-sworn`, `refresh-known-npcs`, `refresh-chapters`, `refresh-npcs`, `refresh-characters`, `refresh-road-ahead`, `refresh-intro-epithet`, `refresh-ascent-read`, `refresh-archetype-inscription`). Each prompt has YAML frontmatter declaring its preferred model. One extra pair, `verify-sessions`, is not a transformer: it is the independent fact-check paired with `append-sessions`. `append-sessions` drafts a session's Chronicle entry in voice; then, in the same build, the `/build-prose` skill dispatches a `verify-sessions` sub-agent that re-reads the draft against the canonical record (roster, kill log, prior narratives) and writes the final entry (unchanged if accurate, corrected in voice otherwise). Its output conforms to the `append-sessions` schema, so apply consumes it unchanged. `prepare` freezes the verify pair and records it under the manifest's `verify` map for any authoring transformer that pairs one (see `build/prepare.py:VERIFY_FOR`).
 - `requirements.txt`, `.venv/` — Python dependencies (Jinja2, etc.).
@@ -60,6 +63,12 @@ CLI flags:
 - `prepare --force-refresh` — run them even when the marker is current.
 - `prepare --keep-temp` — preserve the run dir on success.
 - `apply --skip-render` — apply results but don't rebuild the site.
+
+Plus one asset CLI, run automatically inside `apply`:
+
+- `.venv/bin/python -m build map [--force]` — re-encode `data/chult-player-map.jpg`
+  into `site/images/chult-map.jpg`. Skips when the derivative is already newer
+  than the source.
 
 To publish: pull `main`, run `/build-prose`, commit `site/index.html`
 and `build/authored/*.json`, push.
@@ -108,6 +117,7 @@ End-to-end verification: run the three-step build (or just `build/render.py` to 
 
 - `site/index.html` ends with an inline `<script>` block (tab switcher + Other-Dice tooltip IIFE). It's the only client-side logic on the page — don't delete it or the page breaks silently.
 - Image filenames come from `data/party.json[i].image`, not the character `id` (e.g. Chumble's file is `chumble-crudluck.png`).
+- The map source stays in `data/` (gitignored); only the re-encoded derivative in `site/images/` is committed. Dropping in a new annotated map does nothing until `python -m build map` (or any full build) re-encodes it — and `validate_map` fails the render outright if the derivative is missing.
 - Templates use relative URLs (`styles.css`, `images/...`) — these resolve correctly only because `index.html`, `styles.css`, and `images/` all live together in `site/`. If you move any one of them, fix the others too.
 
 ## Privacy
