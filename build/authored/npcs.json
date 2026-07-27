@@ -253,5 +253,60 @@
     "name": "Shago",
     "epithet": "guide hired out of Fort Beluarian, five gold a day and a hundred fifty up front",
     "allegiance": "with"
+  },
+  {
+    "name": "Kwilgok",
+    "epithet": "a tortle dinosaur racer, steering Deadly Treasure the ankylosaurus from a howdah with a banana dangled on a pole",
+    "allegiance": null
+  },
+  {
+    "name": "Canker Keel",
+    "epithet": "albino dwarf who rode Juicy Stakes to a second-place finish in the dinosaur races",
+    "allegiance": null
+  },
+  {
+    "name": "Dark",
+    "epithet": "a rock gnome racer who rode the allosaurus Batton Down the Hatches to a mid-pack finish",
+    "allegiance": null
+  },
+  {
+    "name": "Sithi Vinecutter",
+    "epithet": "of the Shilku Outpost, who met the company at the hatch and offered the treasury's reward for firenewts driven from Hrakhamar",
+    "allegiance": "with"
+  },
+  {
+    "name": "Laz Drumthunder",
+    "epithet": "scout of the Shilku Outpost, two days overdue from the Valley of Lost Honor and sought by the party at Sithi Vinecutter's word",
+    "allegiance": "with"
+  },
+  {
+    "name": "Malkar Stonegrist",
+    "epithet": "scout of the Shilku outpost, two days overdue from the Valley of Lost Honor and sought by the party at Sithi Vinecutter's word",
+    "allegiance": "with"
+  },
+  {
+    "name": "Helga Ironfist",
+    "epithet": "healer of the Shilku Outpost, who mended the company's wounds and named where the gauntlet's secrets lay",
+    "allegiance": "with"
+  },
+  {
+    "name": "Yutmus Treasurehead",
+    "epithet": "bartender of the Shilku Outpost, won over by a jug of conjured honey, who still wonders after the airship crew he once saw fall from the northern sky",
+    "allegiance": "with"
+  },
+  {
+    "name": "Mardred Ungart",
+    "epithet": "smith of the Shilku outpost, who complains of obsidian and scraps and sent an adamantine pick north to Barendd",
+    "allegiance": "with"
+  },
+  {
+    "name": "Rurik Vinecutter",
+    "epithet": "of the Shilku Outpost, who lamented the food and sent the company looking for ohelo berries",
+    "allegiance": "with"
+  },
+  {
+    "name": "Barendd Torunn",
+    "epithet": "of the Shilku Outpost, freed from rubble in the passageways and repaid the company in gems for a new pick",
+    "allegiance": "with"
   }
 ]

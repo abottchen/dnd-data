@@ -62,8 +62,8 @@
     "reliquary_header": "Sent over the rail to the sea",
     "constellation_epithet": "never far from the fray",
     "distinction_title": "The Pendulum Hand",
-    "distinction_subtitle": "whose dice cut both ways in equal measure",
-    "distinction_detail": "<b>12</b> crit fails, more than any hand &middot; and <b>12</b> crit successes to match",
+    "distinction_subtitle": "whose dice cut both ways, and neither one gently",
+    "distinction_detail": "<b>14</b> crit fails, more than any hand &middot; and <b>12</b> crit successes swinging back",
     "archetype_badge": {
       "archetype": "pack-mule",
       "inscription": "The hunting trap alone tips twenty-five pounds; above it ride scale mail and a heavy crossbow, and the wulven still finds room for caltrops, rope, and a block-and-tackle besides."
@@ -82,7 +82,7 @@
     "constellation_epithet": "ever at the hunt, the soft-pawed shot",
     "distinction_title": "The Cat's Own Luck",
     "distinction_subtitle": "whose kept dice fall higher than any other hand at the table",
-    "distinction_detail": "<b>11.5</b> average kept d20 &middot; the kindest dice the company casts",
+    "distinction_detail": "<b>11.4</b> average kept d20 &middot; the kindest dice the company casts",
     "archetype_badge": {
       "archetype": "naturalist",
       "inscription": "One carved sprig of mistletoe, ribbon-tied and kept close — the whole of the primal green, if you know how to ask, flows through that small stem."

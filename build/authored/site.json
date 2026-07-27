@@ -3,7 +3,7 @@
   "page_subtitle": "A ledger of those who walk &middot; and those they have laid down",
   "intro_epithet": "Five travellers and a storyteller, bound to a doomed road",
   "footnote": "The names above are the names given &middot; the ones who fell were given no names",
-  "refreshed_through_session": 17,
+  "refreshed_through_session": 18,
   "road_ahead": {
     "known": [
       {
@@ -40,7 +40,7 @@
       }
     ],
     "was_known": [],
-    "direction": "Rokah's bargain dead at the gate of Fort Beluarian and his charter lost with it, the company takes up the Flaming Fist's contracts and sails a Baldurian ship south to Shilku, to learn why the city has gone dark."
+    "direction": "Shilku found not dark but dug in, its dwarves sheltering in an outpost beneath a sky that rains fire, the company marches the last thirty miles inland to take the forge at Hrakhamar back from the firenewts and to find two scouts overdue from the Valley of Lost Honor."
   },
   "gm": {
     "name": "The Dungeon Master",
@@ -98,7 +98,18 @@
     "Flask",
     "Aremag",
     "Liara Portyr",
-    "Shago"
+    "Shago",
+    "Kwilgok",
+    "Canker Keel",
+    "Dark",
+    "Sithi Vinecutter",
+    "Laz Drumthunder",
+    "Malkar Stonegrist",
+    "Helga Ironfist",
+    "Yutmus Treasurehead",
+    "Mardred Ungart",
+    "Rurik Vinecutter",
+    "Barendd Torunn"
   ],
   "ascent_read": "Legends forged mostly by steel, but the road and its riddles have left their mark on every hard-won mile.",
   "player_map": {

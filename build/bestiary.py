@@ -92,6 +92,9 @@ def _load_bestiary() -> dict[str, dict]:
 CUSTOM_NPC_STATBLOCKS = {
     "Wulf Rygor": "Scout",
     "Queen Grabstab": "Goblin Boss",
+    # Shilku companion-module variant: the same elemental as the XMM salamander,
+    # only without the spear, so it borrows that block for type, CR, and token.
+    "Unarmed Salamander": "Salamander",
 }
 
 # Explicit pip-icon overrides for named NPCs. Maps display name -> an image URL

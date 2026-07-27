@@ -35,24 +35,91 @@ def test_output_keeps_full_resolution(tmp_path):
         assert im.size == (300, 200)
 
 
-def test_skips_when_derivative_is_newer(tmp_path):
+def test_skips_when_source_is_unchanged(tmp_path):
     src = make_source(tmp_path / "src.jpg")
     out = tmp_path / "out.jpg"
-    prepare_map(src=src, out=out)
-    os.utime(src, (1_000_000, 1_000_000))     # source now much older
+    rec = tmp_path / "record.json"
+    prepare_map(src=src, out=out, record=rec)
     stamp = out.stat().st_mtime_ns
-    result = prepare_map(src=src, out=out)
+    result = prepare_map(src=src, out=out, record=rec)
     assert result["status"] == STATUS_SKIPPED
     assert out.stat().st_mtime_ns == stamp    # untouched
 
 
-def test_rebuilds_when_source_is_newer(tmp_path):
+def test_rebuilds_when_source_content_changes(tmp_path):
     src = make_source(tmp_path / "src.jpg")
     out = tmp_path / "out.jpg"
-    prepare_map(src=src, out=out)
-    os.utime(out, (1_000_000, 1_000_000))     # derivative now stale
-    result = prepare_map(src=src, out=out)
+    rec = tmp_path / "record.json"
+    prepare_map(src=src, out=out, record=rec)
+    make_source(src, size=(128, 96))          # a different map dropped in
+    result = prepare_map(src=src, out=out, record=rec)
     assert result["status"] == STATUS_REBUILT
+    with Image.open(out) as im:
+        assert im.size == (128, 96)
+
+
+def test_rebuilds_stale_derivative_that_mtime_calls_current(tmp_path):
+    """The git-checkout trap: a stale derivative whose mtime is newer than the
+    source. Git stamps working-tree files at checkout time, so any checkout,
+    pull, or stash after dropping in a new map made the old mtime guard skip
+    forever and silently serve the previous map."""
+    src = make_source(tmp_path / "src.jpg")
+    out = tmp_path / "out.jpg"
+    rec = tmp_path / "record.json"
+    prepare_map(src=src, out=out, record=rec)
+
+    make_source(src, size=(128, 96))          # new map dropped in ...
+    os.utime(src, (1_000_000, 1_000_000))     # ... then git touches the
+    os.utime(out, (2_000_000, 2_000_000))     # derivative, making it "newer"
+
+    result = prepare_map(src=src, out=out, record=rec)
+    assert result["status"] == STATUS_REBUILT
+    with Image.open(out) as im:
+        assert im.size == (128, 96)
+
+
+def test_rebuilds_when_record_is_missing(tmp_path):
+    """A fresh clone, or the first run after this guard landed, has no record.
+    Rebuilding once is cheap and self-healing; skipping would serve stale art."""
+    src = make_source(tmp_path / "src.jpg")
+    out = tmp_path / "out.jpg"
+    rec = tmp_path / "record.json"
+    prepare_map(src=src, out=out, record=rec)
+    rec.unlink()
+    assert prepare_map(src=src, out=out, record=rec)["status"] == STATUS_REBUILT
+
+
+def test_rebuilds_when_record_is_corrupt(tmp_path):
+    src = make_source(tmp_path / "src.jpg")
+    out = tmp_path / "out.jpg"
+    rec = tmp_path / "record.json"
+    prepare_map(src=src, out=out, record=rec)
+    rec.write_text("{ not json")
+    assert prepare_map(src=src, out=out, record=rec)["status"] == STATUS_REBUILT
+
+
+def test_record_holds_the_source_digest(tmp_path):
+    import hashlib
+    import json
+
+    src = make_source(tmp_path / "src.jpg")
+    out = tmp_path / "out.jpg"
+    rec = tmp_path / "record.json"
+    prepare_map(src=src, out=out, record=rec)
+    saved = json.loads(rec.read_text())
+    assert saved["source_sha256"] == hashlib.sha256(src.read_bytes()).hexdigest()
+    assert saved["output_bytes"] == out.stat().st_size
+
+
+def test_missing_source_leaves_the_record_alone(tmp_path):
+    src = make_source(tmp_path / "src.jpg")
+    out = tmp_path / "out.jpg"
+    rec = tmp_path / "record.json"
+    prepare_map(src=src, out=out, record=rec)
+    before = rec.read_text()
+    src.unlink()
+    assert prepare_map(src=src, out=out, record=rec)["status"] == STATUS_NO_SOURCE
+    assert rec.read_text() == before
 
 
 def test_force_rebuilds_a_current_derivative(tmp_path):
