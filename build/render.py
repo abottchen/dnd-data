@@ -17,6 +17,7 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+from datetime import date as _date, timedelta
 from pathlib import Path
 
 BUILD_DIR = Path(__file__).resolve().parent
@@ -24,6 +25,13 @@ REPO_ROOT = BUILD_DIR.parent
 
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
+
+def _day_before(iso: str) -> str | None:
+    """The ISO date one day before `iso`, or None if it isn't an ISO date."""
+    try:
+        return (_date.fromisoformat(iso) - timedelta(days=1)).isoformat()
+    except (TypeError, ValueError):
+        return None
 
 def load_data(data_dir: Path) -> dict:
     """Load upstream data files. Returns dict with party, dice_rolls, session_log."""
@@ -153,6 +161,24 @@ def load_data(data_dir: Path) -> dict:
 
     session_log = dict(session_log)
     session_log["entries"] = normalized_entries
+
+    # Kills are logged the morning after play, so the character-sheet export can
+    # stamp one with the day *after* the session that produced it. Every consumer
+    # keys a kill on this date: build/slices.py maps it to a session to author a
+    # slice, validate_kills matches it against the authored entry's key, and the
+    # Chronicle looks up pips by session date. Left raw, a next-day kill is
+    # skipped by prepare, then fails the render as MISSING while its already
+    # authored twin turns ORPHAN — and it renders under no session at all.
+    # Snap it back a day when, and only when, a session ran the day before and
+    # none ran on the kill's own date, so a kill is never moved off a real
+    # session and the drift can never compound past one day.
+    # Per the standing rule above: never edit upstream data, fill the gap here.
+    session_dates = {ne["date"] for ne in normalized_entries if ne.get("date")}
+    for m in party["members"]:
+        for k in m.get("kills", []):
+            prev = _day_before(k.get("date", ""))
+            if prev is not None and k["date"] not in session_dates and prev in session_dates:
+                k["date"] = prev
 
     return {
         "party": party,

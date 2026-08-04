@@ -29,6 +29,19 @@ def pytest_sessionstart(session):
             stacklevel=1)
 
 
+@pytest.fixture(autouse=True)
+def isolate_map_record(tmp_path, monkeypatch):
+    """build/map-source.json is committed and is the map's only staleness
+    signal, and prepare_map defaults its `record` argument to it. Point that
+    default at tmp_path for every test, so a call that omits record= cannot
+    stamp the repo's copy with fixture values — which would leave a digest
+    matching no real map, re-encoding 55 megapixels on every build until
+    someone noticed."""
+    from build import mapimage
+    monkeypatch.setattr(mapimage, "record_path",
+                        lambda: tmp_path / "map-source.json")
+
+
 @pytest.fixture
 def staged_env(tmp_path, monkeypatch):
     """Materialize fixture data + authored store + run root under tmp_path
