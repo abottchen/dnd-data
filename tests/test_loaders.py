@@ -66,6 +66,51 @@ def test_load_data_dedups_overlapping_dice_exports_by_timestamp(tmp_path: Path, 
     ]
     assert len(rolls) == 3  # not 5 — the overlapping a, b are taken once
 
+def _party_with_kill(date: str) -> str:
+    """A one-member party whose single kill carries `date`."""
+    return json.dumps([{"name": "Chumble Crudluck", "id": "mike-warlock",
+                        "kills": [{"creature": "Unarmed Salamander",
+                                   "method": "Eldritch Blast", "date": date}]}])
+
+def _log(*real_dates: str) -> str:
+    return json.dumps({"entries": [{"day": i, "realDate": d, "text": ""}
+                                   for i, d in enumerate(real_dates, start=1)]})
+
+def test_load_data_snaps_kill_logged_the_morning_after_to_its_session_date(tmp_path: Path):
+    """The GM logs a session's kills the next day, so the character-sheet export
+    can stamp one with the following date. It belongs to the session that ran the
+    night before, and every consumer keys kills on the raw date."""
+    (tmp_path / "party.json").write_text(_party_with_kill("2026-07-27"))
+    (tmp_path / "session-log.json").write_text(_log("07/26/2026"))
+    (tmp_path / "dice").mkdir()
+
+    data = load_data(tmp_path)
+
+    assert data["party"]["members"][0]["kills"][0]["date"] == "2026-07-26"
+
+def test_load_data_leaves_a_kill_dated_two_days_after_a_session_alone(tmp_path: Path):
+    """The snap absorbs one day of logging drift, not an open-ended search back
+    to the most recent session — a kill two days out stays where it is and is
+    reported, rather than being silently attributed to the wrong session."""
+    (tmp_path / "party.json").write_text(_party_with_kill("2026-07-28"))
+    (tmp_path / "session-log.json").write_text(_log("07/26/2026"))
+    (tmp_path / "dice").mkdir()
+
+    data = load_data(tmp_path)
+
+    assert data["party"]["members"][0]["kills"][0]["date"] == "2026-07-28"
+
+def test_load_data_keeps_a_kill_that_already_lands_on_a_session_date(tmp_path: Path):
+    """Back-to-back session days: a kill on its own session's date must not be
+    dragged onto the session before it just because one exists."""
+    (tmp_path / "party.json").write_text(_party_with_kill("2026-07-26"))
+    (tmp_path / "session-log.json").write_text(_log("07/25/2026", "07/26/2026"))
+    (tmp_path / "dice").mkdir()
+
+    data = load_data(tmp_path)
+
+    assert data["party"]["members"][0]["kills"][0]["date"] == "2026-07-26"
+
 
 def test_load_data_keeps_rolls_with_blank_timestamp(tmp_path: Path, monkeypatch):
     """A blank timestamp can't prove identity, so such rolls are never deduped —

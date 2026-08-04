@@ -486,5 +486,37 @@
     "method": "Eldritch Blast",
     "verse": "A salamander undone on the road toward Hrakhamar, ash still falling",
     "annotation": "Eldritch Blast &middot; five obsidian shards salvaged from what was left"
+  },
+  {
+    "character": "vex",
+    "date": "2026-08-02",
+    "creature": "Smoke Mephit",
+    "method": "Scimitar",
+    "verse": "A smoke mephit thinned to nothing over the forge",
+    "annotation": "Scimitar &middot; one stroke through smoke, and it was gone"
+  },
+  {
+    "character": "urida",
+    "date": "2026-08-02",
+    "creature": "Firenewt Warrior",
+    "method": "Shatter",
+    "verse": "A firenewt warrior dropped where the thunderclap passed",
+    "annotation": "Shatter &middot; the sound rolled through the forge, and he fell"
+  },
+  {
+    "character": "chumble",
+    "date": "2026-08-02",
+    "creature": "Smoke Mephit",
+    "method": "Wickles (familiar attack)",
+    "verse": "A second mephit unraveled before it could reform",
+    "annotation": "Wickles &middot; the familiar struck, and the smoke would not gather again"
+  },
+  {
+    "character": "lilac",
+    "date": "2026-08-02",
+    "creature": "Firenewt Warrior",
+    "method": "Longbow",
+    "verse": "An arrow found another warrior across the gantries",
+    "annotation": "Longbow &middot; loosed at range, and one warrior did not rise"
   }
 ]
