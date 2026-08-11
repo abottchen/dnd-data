@@ -518,5 +518,45 @@
     "method": "Longbow",
     "verse": "An arrow found another warrior across the gantries",
     "annotation": "Longbow &middot; loosed at range, and one warrior did not rise"
+  },
+  {
+    "character": "grieg",
+    "date": "2026-08-09",
+    "creature": "Giant Strider",
+    "method": "Trident",
+    "verse": "A giant strider's speed failed it at last.",
+    "annotation": "Trident &middot; one thrust and the running stopped for good."
+  },
+  {
+    "character": "grieg",
+    "date": "2026-08-09",
+    "creature": "Firenewt Warlock of Imix",
+    "method": "Trident",
+    "verse": "A firenewt warlock's flame guttered before the tines found him.",
+    "annotation": "Trident &middot; the last spell caught in his throat, unspoken."
+  },
+  {
+    "character": "lilac",
+    "date": "2026-08-09",
+    "creature": "Giant Strider",
+    "method": "Longbow",
+    "verse": "A strider fell mid-stride, the arrow already flown home.",
+    "annotation": "Longbow &middot; one clean draw, string still humming after."
+  },
+  {
+    "character": "lilac",
+    "date": "2026-08-09",
+    "creature": "Firenewt Warrior",
+    "method": "Longbow",
+    "verse": "Two firenewt warriors fell to the same steady bow.",
+    "annotation": "Longbow &middot; two shafts loosed, two warriors gone quiet."
+  },
+  {
+    "character": "lilac",
+    "date": "2026-08-09",
+    "creature": "Firenewt Warrior",
+    "method": "Scimitar",
+    "verse": "A third firenewt warrior met steel instead of the string.",
+    "annotation": "Scimitar &middot; the last of the three, and the closest."
   }
 ]

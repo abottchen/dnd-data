@@ -41,17 +41,17 @@
     "id": "chumble",
     "epithet": "of the Dhakaani, bound by pact to a shadow unseen",
     "reliquary_header": "Claimed by the shadow unseen",
-    "constellation_epithet": "much won from a quiet hand",
-    "distinction_title": "The Hardest Blow",
-    "distinction_subtitle": "whose single strike bit deeper than any other hand's",
-    "distinction_detail": "<b>25</b> damage in one blow &middot; the heaviest the company has struck",
+    "constellation_epithet": "seldom loud, and never long absent",
+    "distinction_title": "The Tallest Quarry",
+    "distinction_subtitle": "who brought down the greatest thing the company has faced",
+    "distinction_detail": "<b>1,800</b> XP in a single felling &middot; the largest kill any hand has claimed",
     "archetype_badge": {
       "archetype": "lamplighter",
       "inscription": "Fifteen flasks of oil and a lamp that hasn't gone dark yet — a goblin who walked out of Dhakaan carrying enough light to argue with the night."
     },
     "distinction_basis": {
       "kind": "mechanical",
-      "atom": "is_party_heaviest",
+      "atom": "is_party_biggest_kill",
       "value": true
     },
     "sworn_creed": "bound in fire to a name struck in the dark — and the bargain still runs"
@@ -63,7 +63,7 @@
     "constellation_epithet": "never far from the fray",
     "distinction_title": "The Pendulum Hand",
     "distinction_subtitle": "whose dice cut both ways, and neither one gently",
-    "distinction_detail": "<b>14</b> crit fails, more than any hand &middot; and <b>12</b> crit successes swinging back",
+    "distinction_detail": "<b>15</b> crit fails, more than any hand &middot; and <b>16</b> crit successes swinging back",
     "archetype_badge": {
       "archetype": "pack-mule",
       "inscription": "The hunting trap alone tips twenty-five pounds; above it ride scale mail and a heavy crossbow, and the wulven still finds room for caltrops, rope, and a block-and-tackle besides."
