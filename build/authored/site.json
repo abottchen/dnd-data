@@ -3,7 +3,7 @@
   "page_subtitle": "A ledger of those who walk &middot; and those they have laid down",
   "intro_epithet": "Five travellers and a storyteller, bound to a doomed road",
   "footnote": "The names above are the names given &middot; the ones who fell were given no names",
-  "refreshed_through_session": 19,
+  "refreshed_through_session": 20,
   "road_ahead": {
     "known": [
       {
@@ -40,7 +40,7 @@
       }
     ],
     "was_known": [],
-    "direction": "Laz and Malkar are found alive and spent in the firenewts' hands, and the company camps outside Hrakhamar's heat until the dwarves can wake and read the forge's symbols, then goes back in to take the rest of it."
+    "direction": "Sithi's dwarves hold the entrance and tend the broken scouts while the company works inward through Hrakhamar, killing striders and firenewts platform by platform to win the forge free long enough for the beginning and the ending keys to be struck."
   },
   "gm": {
     "name": "The Dungeon Master",
