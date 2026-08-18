@@ -34,7 +34,7 @@
         {{- kill_pips(s.kill_pips) }}
       </div>
       {%- endif %}
-      <div class="chronicle-session-summary">{{ s.summary | safe }}</div>
+      <div class="chronicle-session-summary">{{ s.summary | paragraphs }}</div>
       {%- if s.silent_roll %}
       <ul class="chronicle-session-quiet">
         {%- for line in s.silent_roll %}

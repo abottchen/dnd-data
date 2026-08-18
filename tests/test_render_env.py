@@ -17,3 +17,26 @@ def test_render_env_autoescapes(tmp_path):
     html = out.read_text()
     assert "<img onerror" not in html
     assert "&lt;img" in html
+
+
+def test_paragraphs_filter_splits_on_blank_lines(tmp_path):
+    """Authored prose uses a blank line as its only paragraph signal."""
+    tdir = tmp_path / "t"
+    tdir.mkdir()
+    (tdir / "base.html").write_text("<div>{{ v | paragraphs }}</div>")
+    out = tmp_path / "out.html"
+    render.render_page({"v": "First para.\n\nSecond para."}, tdir, out)
+    assert out.read_text() == "<div><p>First para.</p><p>Second para.</p></div>"
+
+
+def test_paragraphs_filter_escapes_and_handles_single_block(tmp_path):
+    """The filter replaces `| safe` on prose, so it must escape its input."""
+    tdir = tmp_path / "t"
+    tdir.mkdir()
+    (tdir / "base.html").write_text("<div>{{ v | paragraphs }}</div>")
+    out = tmp_path / "out.html"
+    render.render_page({"v": "Only one <img onerror=x> block."}, tdir, out)
+    html = out.read_text()
+    assert html.count("<p>") == 1
+    assert "<img onerror" not in html
+    assert "&lt;img" in html

@@ -20,7 +20,7 @@
         <span class="quiet">&mdash; no blade lifted &mdash;</span>
         {%- endif %}
       </div>
-      <p class="hero-summary">{{ latest.summary | safe }}</p>
+      <div class="hero-summary">{{ latest.summary | paragraphs }}</div>
     </div>
 
     <div class="hero-rule" aria-hidden="true"></div>
