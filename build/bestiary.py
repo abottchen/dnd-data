@@ -95,6 +95,10 @@ CUSTOM_NPC_STATBLOCKS = {
     # Shilku companion-module variant: the same elemental as the XMM salamander,
     # only without the spear, so it borrows that block for type, CR, and token.
     "Unarmed Salamander": "Salamander",
+    # Shilku companion-module reskin: the forge's labourers are firenewt warriors
+    # under the fiction of a different job, so they borrow the warrior's block.
+    # Without this they fall through to CR 0 and 10 XP.
+    "Firenewt Worker": "Firenewt Warrior",
 }
 
 # Explicit pip-icon overrides for named NPCs. Maps display name -> an image URL
