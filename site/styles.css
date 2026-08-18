@@ -1767,8 +1767,11 @@ img.chronicle-session-pip:focus-visible {
   max-width: 700px;
 }
 
+.chronicle-session-summary p { margin-bottom: 0.8em; }
+.chronicle-session-summary p:last-child { margin-bottom: 0; }
+
 /* Drop cap on the most-recent session's summary (last-of-type, when open) */
-.chronicle-session:last-of-type[open] .chronicle-session-summary::first-letter {
+.chronicle-session:last-of-type[open] .chronicle-session-summary > p:first-child::first-letter {
   font-family: 'Cormorant Garamond', serif;
   font-size: 3em;
   float: left;
@@ -2923,7 +2926,9 @@ img.chronicle-session-pip:focus-visible {
   font-family: 'EB Garamond', serif; font-size: 17px; color: var(--paper);
   line-height: 1.6; max-width: 660px; opacity: 0.9;
 }
-.hero-summary::first-letter {
+.hero-summary p { margin-bottom: 0.85em; }
+.hero-summary p:last-child { margin-bottom: 0; }
+.hero-summary > p:first-child::first-letter {
   font-family: 'Cormorant Garamond', serif; font-size: 3.1em; float: left;
   line-height: 0.86; padding: 6px 12px 0 0; color: var(--brass); font-weight: 600;
 }

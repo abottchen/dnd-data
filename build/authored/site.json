@@ -3,7 +3,7 @@
   "page_subtitle": "A ledger of those who walk &middot; and those they have laid down",
   "intro_epithet": "Five travellers and a storyteller, bound to a doomed road",
   "footnote": "The names above are the names given &middot; the ones who fell were given no names",
-  "refreshed_through_session": 20,
+  "refreshed_through_session": 21,
   "road_ahead": {
     "known": [
       {
@@ -40,7 +40,7 @@
       }
     ],
     "was_known": [],
-    "direction": "Sithi's dwarves hold the entrance and tend the broken scouts while the company works inward through Hrakhamar, killing striders and firenewts platform by platform to win the forge free long enough for the beginning and the ending keys to be struck."
+    "direction": "The forge is the dwarves' again, and the price of fire-proofed gear and the loan of Moradin's Gauntlet is a war owed: up Mount Todra to break whatever ritual the firenewts are raising, and after that into Wyrmheart Mine to pry out the red dragon."
   },
   "gm": {
     "name": "The Dungeon Master",
@@ -109,7 +109,11 @@
     "Yutmus Treasurehead",
     "Mardred Ungart",
     "Rurik Vinecutter",
-    "Barendd Torunn"
+    "Barendd Torunn",
+    "Bonson",
+    "Beezin",
+    "Grandon",
+    "Skip"
   ],
   "ascent_read": "Legends forged mostly by steel, but the road and its riddles have left their mark on every hard-won mile.",
   "player_map": {

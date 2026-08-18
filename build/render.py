@@ -16,6 +16,7 @@ on it).
 from __future__ import annotations
 import argparse
 import json
+import re
 import sys
 from datetime import date as _date, timedelta
 from pathlib import Path
@@ -214,6 +215,17 @@ def validate_all(data: dict, authored: dict, images_dir: Path, fact_pack: dict |
     errors.extend(validate_dice_player_mapping(data.get("unmapped_players", [])))
     return errors
 
+def _paragraphs(text: str) -> "object":
+    """Render authored prose as one or more <p> blocks.
+
+    Summaries are authored as plain text, where a blank line is the only
+    paragraph signal. Escaping happens here, so prose fields no longer need
+    `| safe` in the templates.
+    """
+    from markupsafe import Markup, escape
+    blocks = [b.strip() for b in re.split(r"\n\s*\n", (text or "").strip()) if b.strip()]
+    return Markup("".join(f"<p>{escape(b)}</p>" for b in blocks))
+
 def render_page(context: dict, templates_dir: Path, out_path: Path) -> None:
     from jinja2 import Environment, FileSystemLoader, StrictUndefined
     env = Environment(
@@ -224,6 +236,7 @@ def render_page(context: dict, templates_dir: Path, out_path: Path) -> None:
     )
     env.filters["roman"] = _to_roman
     env.filters["ability_mod"] = lambda score: (score - 10) // 2
+    env.filters["paragraphs"] = _paragraphs
     template = env.get_template("base.html")
     html = template.render(**context)
     out_path.write_text(html)
