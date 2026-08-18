@@ -558,5 +558,93 @@
     "method": "Scimitar",
     "verse": "A third firenewt warrior met steel instead of the string.",
     "annotation": "Scimitar &middot; the last of the three, and the closest."
+  },
+  {
+    "character": "grieg",
+    "date": "2026-08-16",
+    "creature": "Firenewt Warrior",
+    "method": "Trident",
+    "verse": "A firenewt warrior folded at the forge's threshold",
+    "annotation": "Trident · one thrust through scale, no cry raised"
+  },
+  {
+    "character": "vex",
+    "date": "2026-08-16",
+    "creature": "Firenewt Warrior",
+    "method": "Scimitar",
+    "verse": "A firenewt warrior cut short mid-charge",
+    "annotation": "Scimitar · one stroke, momentum undone"
+  },
+  {
+    "character": "vex",
+    "date": "2026-08-16",
+    "creature": "Firenewt Warlock of Imix",
+    "method": "Scimitar",
+    "verse": "Imix's warlock silenced before the chant could finish",
+    "annotation": "Scimitar · the invocation died with the caster"
+  },
+  {
+    "character": "urida",
+    "date": "2026-08-16",
+    "creature": "Firenewt Warrior",
+    "method": "Magic Missile",
+    "verse": "A firenewt warrior struck by light with nowhere to hide",
+    "annotation": "Magic Missile · force unerring, the warrior simply stopped"
+  },
+  {
+    "character": "urida",
+    "date": "2026-08-16",
+    "creature": "Firenewt Warrior",
+    "method": "Toll the Dead",
+    "verse": "A warrior heard the bell meant only for him",
+    "annotation": "Toll the Dead · the knell and the fall were one motion"
+  },
+  {
+    "character": "urida",
+    "date": "2026-08-16",
+    "creature": "Firenewt Worker",
+    "method": "Shatter",
+    "verse": "A firenewt worker caught in a wave of sound",
+    "annotation": "Shatter · the blast found bone before it found the wall"
+  },
+  {
+    "character": "chumble",
+    "date": "2026-08-16",
+    "creature": "Firenewt Warrior",
+    "method": "Eldritch Blast",
+    "verse": "A firenewt warrior thrown back by unseen force",
+    "annotation": "Eldritch Blast · the rod on his back answered with new light"
+  },
+  {
+    "character": "chumble",
+    "date": "2026-08-16",
+    "creature": "Firenewt Worker",
+    "method": "Eldritch Blast",
+    "verse": "A worker fell among the plundered armor",
+    "annotation": "Eldritch Blast · a second rune woke, unbidden"
+  },
+  {
+    "character": "chumble",
+    "date": "2026-08-16",
+    "creature": "Giant Strider",
+    "method": "Eldritch Blast",
+    "verse": "A giant strider brought down mid-stride by unseen force",
+    "annotation": "Eldritch Blast · the third kill, and the rod ran full of light"
+  },
+  {
+    "character": "lilac",
+    "date": "2026-08-16",
+    "creature": "Firenewt Worker",
+    "method": "Longbow",
+    "verse": "A worker dropped clean at the arrow's arrival",
+    "annotation": "Longbow · one shaft, one silence after"
+  },
+  {
+    "character": "lilac",
+    "date": "2026-08-16",
+    "creature": "Giant Strider",
+    "method": "Longbow",
+    "verse": "A giant strider brought down before it could turn to run",
+    "annotation": "Longbow · the last one didn't clear the yard"
   }
 ]

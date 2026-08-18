@@ -251,7 +251,7 @@
   },
   {
     "name": "Shago",
-    "epithet": "guide hired out of Fort Beluarian, five gold a day and a hundred fifty up front",
+    "epithet": "guide hired out of Fort Beluarian who took up a spear when the firenewts came for the forge",
     "allegiance": "with"
   },
   {
@@ -271,7 +271,7 @@
   },
   {
     "name": "Sithi Vinecutter",
-    "epithet": "of the Shilku Outpost, who met the company at the hatch and offered the treasury's reward for firenewts driven from Hrakhamar",
+    "epithet": "of Hrakhamar, who lent the company Moradin's Gauntlet on their word not to die with it in some hole",
     "allegiance": "with"
   },
   {
@@ -296,7 +296,7 @@
   },
   {
     "name": "Mardred Ungart",
-    "epithet": "smith of the Shilku outpost, who complains of obsidian and scraps and sent an adamantine pick north to Barendd",
+    "epithet": "albino dwarf smith who left Shilku's obsidian scraps behind to reforge the keys and open Hrakhamar's treasury to Moradin's Gauntlet",
     "allegiance": "with"
   },
   {
@@ -307,6 +307,26 @@
   {
     "name": "Barendd Torunn",
     "epithet": "of the Shilku Outpost, freed from rubble in the passageways and repaid the company in gems for a new pick",
+    "allegiance": "with"
+  },
+  {
+    "name": "Bonson",
+    "epithet": "of Sithi Vinecutter's escort, arrived at the mountain among albino dwarves and a spirit warrior",
+    "allegiance": "with"
+  },
+  {
+    "name": "Beezin",
+    "epithet": "one of Sithi Vinecutter's four companions, left with Bonson, Grandon, and Skip to guard the entrance",
+    "allegiance": "with"
+  },
+  {
+    "name": "Grandon",
+    "epithet": "of Sithi Vinecutter's company, who stayed to guard the entrance while the party pressed on",
+    "allegiance": "with"
+  },
+  {
+    "name": "Skip",
+    "epithet": "of Sithi Vinecutter's company, one of the albino dwarves and a spirit warrior who came to the group's aid",
     "allegiance": "with"
   }
 ]
