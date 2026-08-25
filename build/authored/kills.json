@@ -646,5 +646,29 @@
     "method": "Longbow",
     "verse": "A giant strider brought down before it could turn to run",
     "annotation": "Longbow · the last one didn't clear the yard"
+  },
+  {
+    "character": "grieg",
+    "date": "2026-08-23",
+    "creature": "Firenewt Warlock of Imix",
+    "method": "Heavy Crossbow",
+    "verse": "A firenewt warlock crumples where the ritual fire still hissed",
+    "annotation": "Heavy Crossbow · one bolt through chant and flame alike"
+  },
+  {
+    "character": "vex",
+    "date": "2026-08-23",
+    "creature": "Firenewt Warlock of Imix",
+    "method": "Heavy Crossbow",
+    "verse": "A second warlock falls at the caldera's smoking rim",
+    "annotation": "Heavy Crossbow · another bolt, another voice gone from the chant"
+  },
+  {
+    "character": "urida",
+    "date": "2026-08-23",
+    "creature": "Aspect of Imix",
+    "method": "Magic Missile",
+    "verse": "A phoenix of pure fire silenced above the shaking caldera",
+    "annotation": "Magic Missile · the killing blow, as lava sank back into the deep"
   }
 ]
