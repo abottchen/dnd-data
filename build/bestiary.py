@@ -112,16 +112,39 @@ CUSTOM_CREATURE_TOKENS = {
     "Queen Grabstab": "https://5e.tools/img/adventure/ToA/048-0322.webp",
 }
 
+# Fully custom creatures with no 5etools analogue at the right CR. Each entry
+# is a complete stand-in bestiary record: it enters the "Kinds Slain" tally,
+# grants CR/XP, and supplies its own token image, exactly as a real bestiary
+# hit would. Use this (not CUSTOM_NPC_STATBLOCKS) when no standard stat block
+# has the creature's actual type AND CR — e.g. the Shilku companion module's
+# Aspect of Imix ran at CR 6, and no standard CR 6 creature is an elemental.
+CUSTOM_CREATURES = {
+    "Aspect of Imix": {
+        "name": "Aspect of Imix",
+        "type": "elemental",
+        "cr": "6",
+        "source": "Shilku companion module (custom)",
+        "hasToken": True,
+        "token": None,
+        # 3e Monster Manual II phoenix art, per the module's handout.
+        "token_url": "https://static.wikia.nocookie.net/dungeonsdragons/images/8/8a/Phoenix_MM2_3e.jpg",
+    },
+}
+
 @functools.lru_cache(maxsize=2048)
 def bestiary_lookup(creature: str) -> Optional[dict]:
     """Return {name, type, cr, source, hasToken, token, token_url} for a creature, or None.
 
-    Falls back to CUSTOM_NPC_STATBLOCKS for named NPCs that borrow a standard
-    stat block; the returned entry keeps the NPC's display name."""
+    Falls back to CUSTOM_CREATURES for fully custom creatures, then to
+    CUSTOM_NPC_STATBLOCKS for named NPCs that borrow a standard stat block;
+    a borrowed entry keeps the NPC's display name."""
     by_name = _load_bestiary()
     entry = by_name.get(creature.casefold())
     if entry is not None:
         return entry
+    custom = CUSTOM_CREATURES.get(creature)
+    if custom is not None:
+        return custom
     statblock = CUSTOM_NPC_STATBLOCKS.get(creature)
     if statblock:
         base = by_name.get(statblock.casefold())
