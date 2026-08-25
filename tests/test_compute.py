@@ -42,6 +42,28 @@ def test_sessions_chart_uses_party_max_for_scaling():
     assert b_april23["count"] == 0
     assert b_april23["zero"] is True
 
+def test_sessions_chart_labels_anchor_months_not_sessions():
+    party = {"members": [
+        {"id": "a", "kills": [
+            {"date": "2026-12-20", "creature": "x", "method": "m"},
+            {"date": "2026-12-27", "creature": "x", "method": "m"},
+            {"date": "2027-01-03", "creature": "x", "method": "m"},
+            {"date": "2027-01-10", "creature": "x", "method": "m"},
+            {"date": "2027-02-07", "creature": "x", "method": "m"},
+        ]},
+    ]}
+    result = compute_sessions_chart(party)
+    # The axis brackets each month's run of bars; year only when it changes.
+    assert result["months"] == [
+        {"label": "DEC 2026", "n": 2},
+        {"label": "JAN 2027", "n": 2},
+        {"label": "FEB", "n": 1},
+    ]
+    # Full date survives per-bar for the tooltip.
+    assert [b["date_label"] for b in result["per_char"]["a"]] == [
+        "20 DEC 2026", "27 DEC 2026", "03 JAN 2027", "10 JAN 2027", "07 FEB 2027"]
+
+
 def test_fortune_average_and_sd_use_kept_d20s_only():
     events = [
         {"rolls": [{"type": "d20", "value": 15, "dropped": False}], "total": 15, "notation": "1d20", "date": "2026-04-01"},
@@ -505,6 +527,161 @@ def test_constellation_links_excludes_gm():
     result = compute_constellation(party, fortune_by_char, trials)
     assert {s["id"] for s in result["stars"]} == {"anton", "vex"}
     assert len(result["links"]) == 2  # two stars → closed loop has two segments
+
+
+# ── compute_constellation carded neighborhoods ─────────────────────────
+
+def _crowded_party():
+    """Real-shaped data: two far anchors + a trio near-tied on xp whose
+    rolls differ by less than a portrait height on the rendered plot."""
+    party, fortune, trials = _constellation_inputs(
+        ("vex", 1975), ("grieg", 1935), ("lilac", 1925),
+        ("chumble", 3400), ("urida", 4525),
+    )
+    for cid, rolls in (("vex", 415), ("grieg", 368), ("lilac", 390),
+                       ("chumble", 242), ("urida", 233)):
+        fortune[cid]["rolls_total"] = rolls
+    return party, fortune, trials
+
+
+def test_constellation_loose_group_cards_instead_of_system():
+    party, fortune, trials = _crowded_party()
+    result = compute_constellation(party, fortune, trials)
+    star_by_id = {s["id"]: s for s in result["stars"]}
+    # The trio spreads past the tie radius → no orbit system forms.
+    assert result["systems"] == []
+    for cid in ("vex", "grieg", "lilac"):
+        assert star_by_id[cid]["carded"] is True
+    for cid in ("chumble", "urida"):
+        assert star_by_id[cid]["carded"] is False
+    # Carded stars keep their true, distinct plot positions.
+    tops = {star_by_id[cid]["top_pct"] for cid in ("vex", "grieg", "lilac")}
+    assert len(tops) == 3
+
+
+def test_constellation_cards_stack_beside_group_in_point_order():
+    party, fortune, trials = _crowded_party()
+    result = compute_constellation(party, fortune, trials)
+    star_by_id = {s["id"]: s for s in result["stars"]}
+    trio = [star_by_id[c] for c in ("vex", "lilac", "grieg")]
+    # One shared column: same x, distinct ys, ordered like the points
+    # (vex has the most rolls → highest point → topmost card).
+    assert len({s["card_left_pct"] for s in trio}) == 1
+    assert trio[0]["card_top_pct"] < trio[1]["card_top_pct"] < trio[2]["card_top_pct"]
+    # Column stays inside the plot even though vex's point hugs the top edge.
+    assert trio[0]["card_top_pct"] >= 4
+    # One leader per carded star, running from its true point to its card.
+    assert len(result["leaders"]) == 3
+    leader_starts = {(ld["x1"], ld["y1"]) for ld in result["leaders"]}
+    assert leader_starts == {(s["left_pct"] * 10, s["top_pct"] * 10) for s in trio}
+
+
+def test_constellation_carded_stars_are_individual_link_nodes():
+    party, fortune, trials = _crowded_party()
+    result = compute_constellation(party, fortune, trials)
+    # Five stars, none merged → the constellation is a closed pentagon.
+    assert len(result["links"]) == 5
+
+
+def test_constellation_cards_keep_epithets_when_column_fits():
+    party, fortune, trials = _crowded_party()
+    result = compute_constellation(party, fortune, trials)
+    star_by_id = {s["id"]: s for s in result["stars"]}
+    # Three cards fit at full pitch → epithets stay under the portraits.
+    for cid in ("vex", "grieg", "lilac"):
+        assert star_by_id[cid]["card_dense"] is False
+
+
+def test_constellation_large_card_column_goes_dense():
+    # Four crowded members can't fit at epithet pitch inside the plot →
+    # the column tightens and epithets fold into the hover tooltip.
+    party, fortune, trials = _constellation_inputs(
+        ("vex", 1900), ("grieg", 1910), ("lilac", 1920), ("anton", 1930),
+        ("urida", 4525),
+    )
+    for cid, rolls in (("vex", 415), ("grieg", 400), ("lilac", 380),
+                       ("anton", 360), ("urida", 230)):
+        fortune[cid]["rolls_total"] = rolls
+    result = compute_constellation(party, fortune, trials)
+    star_by_id = {s["id"]: s for s in result["stars"]}
+    carded = [s for s in result["stars"] if s["carded"]]
+    assert {s["id"] for s in carded} == {"vex", "grieg", "lilac", "anton"}
+    for s in carded:
+        assert s["card_dense"] is True
+    # Even dense, the column stays inside the plot.
+    assert all(4 <= s["card_top_pct"] <= 96 for s in carded)
+    assert star_by_id["urida"]["carded"] is False
+
+
+def test_constellation_true_ties_still_form_systems():
+    # Identical coords give the points nothing to separate → orbit system,
+    # and no leaders/cards.
+    party, fortune, trials = _constellation_inputs(("vex", 100), ("grieg", 100))
+    result = compute_constellation(party, fortune, trials)
+    assert len(result["systems"]) == 1
+    assert result["leaders"] == []
+    for s in result["stars"]:
+        assert s["carded"] is False
+
+
+# ── compute_constellation axis domains ─────────────────────────────────
+
+def test_constellation_axis_floors_to_nice_step_below_min():
+    # Party min far above zero → the domain crops to the occupied range,
+    # with the lower bound floored to a round step (not the raw min).
+    party, fortune, trials = _constellation_inputs(
+        ("vex", 1925), ("urida", 4525)
+    )
+    fortune["vex"]["rolls_total"] = 415
+    fortune["urida"]["rolls_total"] = 233
+    result = compute_constellation(party, fortune, trials)
+    # xp span 2600 → step 500 → floor(1925) = 1500; rolls span 182 → step 50 → 200.
+    assert result["min_xp"] == 1500
+    assert result["min_rolls"] == 200
+    # Max still pins to the plot edges.
+    urida = next(s for s in result["stars"] if s["id"] == "urida")
+    vex = next(s for s in result["stars"] if s["id"] == "vex")
+    assert urida["left_pct"] == 96
+    assert vex["top_pct"] == 4
+    # min star now sits near the lower edge instead of mid-plot:
+    # (1925-1500)/3025*92+4 ≈ 17.
+    assert vex["left_pct"] == 17
+    # Mid ticks are the domain midpoints.
+    assert result["mid_xp"] == (1500 + 4525 + 1) // 2
+    assert result["mid_rolls"] == (200 + 415 + 1) // 2
+
+
+def test_constellation_axis_zoom_capped_at_four_x():
+    # A trivially tight spread must not be magnified into a full-axis gap:
+    # the domain always spans at least the top quarter of the max value.
+    party, fortune, trials = _constellation_inputs(
+        ("vex", 100), ("grieg", 100)
+    )
+    fortune["vex"]["rolls_total"] = 100
+    fortune["grieg"]["rolls_total"] = 98
+    result = compute_constellation(party, fortune, trials)
+    # lo capped to 0.75*100 = 75 (already a nice step), not floor(98).
+    assert result["min_rolls"] == 75
+    # 2-roll difference stays a near-tie on the plot → still one system.
+    assert len(result["systems"]) == 1
+
+
+def test_constellation_axis_keeps_zero_origin_when_min_is_low():
+    # A min close to zero floors all the way back to zero — early-campaign
+    # charts look exactly like the old fixed-origin plot.
+    party, fortune, trials = _constellation_inputs(
+        ("anton", 10), ("vex", 1000)
+    )
+    result = compute_constellation(party, fortune, trials)
+    assert result["min_xp"] == 0
+
+
+def test_constellation_axis_empty_party_defaults_to_zero():
+    result = compute_constellation({"members": []}, {}, {"per_char": {}})
+    assert result["min_xp"] == 0
+    assert result["min_rolls"] == 0
+    assert result["party_max_xp"] == 0
+
 
 # -- Fact pack: kill-derived atoms -------------------------------------------
 

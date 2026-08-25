@@ -204,6 +204,23 @@ def compute_sessions_chart(party: dict) -> dict:
     # Distinct sorted session dates across the party
     all_dates = sorted({k["date"] for m in members for k in m.get("kills", [])})
 
+    # Month groups for the axis: per-session date labels pile up as the log
+    # grows (same lesson as the ascent chart's x-axis), so the axis brackets
+    # each month's run of bars under one label; the year appears only when it
+    # changes. Bars keep the full date as `date_label` for the tooltip.
+    months: list[dict] = []
+    prev_ym: tuple[int, int] | None = None
+    prev_year: int | None = None
+    for d in all_dates:
+        y, mo = int(d[:4]), int(d[5:7])
+        if (y, mo) == prev_ym:
+            months[-1]["n"] += 1
+        else:
+            mon = _MONTHS_ABBR[mo - 1]
+            months.append({"label": mon if y == prev_year else f"{mon} {y}", "n": 1})
+            prev_ym = (y, mo)
+            prev_year = y
+
     # Per-char per-date counts
     per_char_per_date: dict[str, dict[str, list[dict]]] = {}
     for m in members:
@@ -234,7 +251,7 @@ def compute_sessions_chart(party: dict) -> dict:
             n = len(kl)
             bars.append({
                 "date": d,
-                "label": _short_date(d),
+                "date_label": _short_date(d),
                 "count": n,
                 "height_pct": round(n / scale * 100),
                 "zero": n == 0,
@@ -244,6 +261,7 @@ def compute_sessions_chart(party: dict) -> dict:
 
     return {
         "sessions": [{"date": d, "label": _short_date(d)} for d in all_dates],
+        "months": months,
         "per_char": per_char_bars,
         "party_max": party_max,
         "scale": scale,
@@ -706,28 +724,67 @@ def compute_radar(member: dict) -> dict:
             "shape": shape, "dots": dots, "labels": labels, "sectors": sectors}
 
 
+def _axis_floor(min_val: int, max_val: int) -> int:
+    """Lower bound for a constellation axis: the party min floored to a
+    'nice' step (1/2/5 × 10^k) so the tick reads as a deliberate number.
+
+    Both stats only ever grow, so a zero origin leaves an ever-widening
+    dead zone below the lowest star; cropping the domain to the occupied
+    range keeps the constellation filling the sky. Two guards: the domain
+    always spans at least the top quarter of the max (a near-tie must not
+    be magnified into a full-axis gap), and a min near zero floors back
+    to zero (early campaigns keep the fixed origin).
+    """
+    if max_val <= 0:
+        return 0
+    lo = min(min_val, max_val * 0.75)
+    target = (max_val - lo) / 3
+    step = 1
+    if target >= 1:
+        k = 10 ** math.floor(math.log10(target))
+        step = next(m * k for m in (5, 2, 1) if m * k <= target)
+    return max(0, int(lo // step) * int(step))
+
+
 def compute_constellation(party: dict, fortune_by_char: dict, trials: dict) -> dict:
     """Position each (non-GM) character by (xp, total rolls). Excludes GM.
 
-    When two or more characters round to the same plot coordinate they form
-    a 'system': portraits get an orbital offset around the shared center so
-    they no longer occlude each other, and a dashed brass ring is drawn
-    around the cluster. The constellation polygon connects cluster centers,
-    so a system counts as one node in the link sort.
+    Axis domains run from a nice-floored party minimum (see _axis_floor)
+    to the exact party maximum, so the leader stays pinned to the plot
+    edge with the record number as its tick.
+
+    When characters collide on the rendered plot, the treatment depends on
+    how tight the group is. A true tie (every pair within half a portrait)
+    forms a 'system': portraits get an orbital offset around the shared
+    center, a dashed brass ring is drawn around the cluster, and the system
+    counts as one node in the link sort. A looser crowd keeps one exact
+    star point per member; each portrait becomes a shrunken card in a
+    column beside the group, joined to its point by a leader line, and
+    every member stays its own link node.
     """
     members = [m for m in party.get("members", []) if m["id"] != "gm"]
     party_max_xp = max((trials["per_char"][m["id"]]["xp"] for m in members), default=0)
     party_max_rolls = max(
         (fortune_by_char[m["id"]]["rolls_total"] for m in members), default=0
     )
+    xp_lo = _axis_floor(
+        min((trials["per_char"][m["id"]]["xp"] for m in members), default=0),
+        party_max_xp,
+    )
+    rolls_lo = _axis_floor(
+        min((fortune_by_char[m["id"]]["rolls_total"] for m in members), default=0),
+        party_max_rolls,
+    )
+    xp_span = party_max_xp - xp_lo
+    rolls_span = party_max_rolls - rolls_lo
 
     raw: list[dict] = []
     for m in members:
         cid = m["id"]
         xp = trials["per_char"][cid]["xp"]
         rolls = fortune_by_char[cid]["rolls_total"]
-        left = round(xp / party_max_xp * 92 + 4) if party_max_xp else 4
-        top = round(96 - rolls / party_max_rolls * 92) if party_max_rolls else 96
+        left = round((xp - xp_lo) / xp_span * 92 + 4) if xp_span else 4
+        top = round(96 - (rolls - rolls_lo) / rolls_span * 92) if rolls_span else 96
         raw.append({
             "id": cid,
             "left_pct": left,
@@ -741,6 +798,7 @@ def compute_constellation(party: dict, fortune_by_char: dict, trials: dict) -> d
             "sd": fortune_by_char[cid]["sd"],
             "crits": fortune_by_char[cid]["crits"],
             "fumbles": fortune_by_char[cid]["fumbles"],
+            "carded": False,
         })
 
     # Cluster stars whose portraits would visually collide on the rendered
@@ -757,6 +815,18 @@ def compute_constellation(party: dict, fortune_by_char: dict, trials: dict) -> d
     # 52px portraits (see .constellation-star.in-system in styles.css) with
     # a small visual gap inside the orbit ring.
     ORBIT_RADIUS_PX = 36
+
+    # A colliding group only collapses into an orbit system when every pair
+    # sits within half a portrait — positions the eye can't tell apart. A
+    # looser group keeps one true star point per member; portraits move to a
+    # card column beside the group, joined by leader lines.
+    SYSTEM_TIE_PX = 36
+    CARD_OFFSET_PX = 90     # column distance from the group's near edge
+    CARD_PITCH_PX = 106       # 52px card portrait + name + epithet + breathing room
+    CARD_PITCH_DENSE_PX = 76  # epithet folded into the tooltip instead
+    CARD_MARGIN_X_PX = 30   # keep card centers inside the plot
+    CARD_TOP_MIN_PX = 30
+    CARD_BOTTOM_MAX_PX = PLOT_H_PX - 80  # room for name + epithet under the card
 
     # Single-linkage clustering via union-find over portrait-overlap pairs.
     parent = list(range(len(raw)))
@@ -791,6 +861,8 @@ def compute_constellation(party: dict, fortune_by_char: dict, trials: dict) -> d
     systems: list[dict] = []
     cluster_centers: list[tuple[float, float, int, str]] = []  # (left, top, min_xp, min_id) for link sort
 
+    leaders: list[dict] = []
+
     for group in groups.values():
         n = len(group)
         if n == 1:
@@ -800,6 +872,52 @@ def compute_constellation(party: dict, fortune_by_char: dict, trials: dict) -> d
             s["orbit_y_px"] = 0
             stars.append(s)
             cluster_centers.append((s["left_pct"], s["top_pct"], s["xp"], s["id"]))
+            continue
+
+        member_px = [(s["left_pct"] / 100 * PLOT_W_PX,
+                      s["top_pct"] / 100 * PLOT_H_PX) for s in group]
+        max_pair_px = max(
+            math.hypot(member_px[i][0] - member_px[j][0],
+                       member_px[i][1] - member_px[j][1])
+            for i in range(n) for j in range(i + 1, n)
+        )
+
+        if max_pair_px > SYSTEM_TIE_PX:
+            # Crowded but not tied: keep every member's true star point and
+            # stack the portrait cards in a column beside the group, on the
+            # side facing the plot's interior.
+            xs = [p[0] for p in member_px]
+            ys = [p[1] for p in member_px]
+            side = 1 if sum(xs) / n <= PLOT_W_PX / 2 else -1
+            edge_x = max(xs) if side == 1 else min(xs)
+            card_x = min(max(edge_x + side * CARD_OFFSET_PX, CARD_MARGIN_X_PX),
+                         PLOT_W_PX - CARD_MARGIN_X_PX)
+            # Full pitch leaves room for the epithet under each card; when a
+            # bigger group can't fit that column inside the plot, tighten the
+            # pitch and fold epithets into the hover tooltip.
+            dense = CARD_PITCH_PX * (n - 1) > CARD_BOTTOM_MAX_PX - CARD_TOP_MIN_PX
+            pitch = CARD_PITCH_DENSE_PX if dense else CARD_PITCH_PX
+            col_start = sum(ys) / n - pitch * (n - 1) / 2
+            col_start = min(max(col_start, CARD_TOP_MIN_PX),
+                            CARD_BOTTOM_MAX_PX - pitch * (n - 1))
+            group.sort(key=lambda s: (s["top_pct"], s["id"]))
+            for i, s in enumerate(group):
+                card_y = col_start + pitch * i
+                s["carded"] = True
+                s["card_dense"] = dense
+                s["system_size"] = 1
+                s["orbit_x_px"] = 0
+                s["orbit_y_px"] = 0
+                s["card_left_pct"] = round(card_x / PLOT_W_PX * 100, 2)
+                s["card_top_pct"] = round(card_y / PLOT_H_PX * 100, 2)
+                stars.append(s)
+                cluster_centers.append((s["left_pct"], s["top_pct"], s["xp"], s["id"]))
+                leaders.append({
+                    "x1": s["left_pct"] * 10,
+                    "y1": s["top_pct"] * 10,
+                    "x2": s["card_left_pct"] * 10,
+                    "y2": s["card_top_pct"] * 10,
+                })
             continue
 
         # Cluster center = centroid of member coords. Override each star's
@@ -852,10 +970,13 @@ def compute_constellation(party: dict, fortune_by_char: dict, trials: dict) -> d
         "stars": stars,
         "systems": systems,
         "links": links,
+        "leaders": leaders,
         "party_max_xp": party_max_xp,
         "party_max_rolls": party_max_rolls,
-        "mid_xp": (party_max_xp + 1) // 2,
-        "mid_rolls": (party_max_rolls + 1) // 2,
+        "min_xp": xp_lo,
+        "min_rolls": rolls_lo,
+        "mid_xp": (xp_lo + party_max_xp + 1) // 2,
+        "mid_rolls": (rolls_lo + party_max_rolls + 1) // 2,
     }
 
 def compute_bestiary(party: dict) -> list[dict]:

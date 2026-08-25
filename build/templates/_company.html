@@ -48,8 +48,8 @@
         <div class="constellation-axis-x-label">Contribution &middot; experience earned &rarr;</div>
         <span class="constellation-tick-y" style="top: 0%;">{{ constellation.party_max_rolls }}</span>
         <span class="constellation-tick-y" style="top: 50%;">{{ constellation.mid_rolls }}</span>
-        <span class="constellation-tick-y" style="top: 100%;">0</span>
-        <span class="constellation-tick-x" style="left: 4%;">0</span>
+        <span class="constellation-tick-y" style="top: 100%;">{{ constellation.min_rolls }}</span>
+        <span class="constellation-tick-x" style="left: 4%;">{{ constellation.min_xp }}</span>
         <span class="constellation-tick-x" style="left: 50%;">{{ constellation.mid_xp }}</span>
         <span class="constellation-tick-x" style="left: 96%;">{{ constellation.party_max_xp }}</span>
         {%- if constellation.links %}
@@ -57,8 +57,17 @@
           {%- for link in constellation.links %}
           <path class="link" d="M {{ link.x1 }} {{ link.y1 }} L {{ link.x2 }} {{ link.y2 }}"/>
           {%- endfor %}
+          {%- for leader in constellation.leaders %}
+          <path class="leader" d="M {{ leader.x1 }} {{ leader.y1 }} L {{ leader.x2 }} {{ leader.y2 }}"/>
+          {%- endfor %}
         </svg>
         {%- endif %}
+        {%- for star in constellation.stars if star.carded %}
+        <svg class="constellation-point" style="top: {{ star.top_pct }}%; left: {{ star.left_pct }}%;"
+             viewBox="-8 -8 16 16" aria-hidden="true">
+          <path d="M0 -7 L1.6 -1.6 L7 0 L1.6 1.6 L0 7 L-1.6 1.6 L-7 0 L-1.6 -1.6 Z"/>
+        </svg>
+        {%- endfor %}
         {%- for sys in constellation.systems %}
         <svg class="constellation-orbit" style="top: {{ sys.top_pct }}%; left: {{ sys.left_pct }}%;"
              viewBox="-100 -100 200 200" aria-hidden="true">
@@ -72,8 +81,8 @@
         {%- for star in constellation.stars %}
           {%- set member = (party.members | selectattr("id", "equalto", star.id) | first) %}
           {%- set auth = characters_authored[star.id] %}
-        <div class="constellation-star{% if star.system_size > 1 %} in-system{% endif %}"
-             style="top: {{ star.top_pct }}%; left: {{ star.left_pct }}%;{% if star.system_size > 1 %} --orbit-x: {{ star.orbit_x_px }}px; --orbit-y: {{ star.orbit_y_px }}px;{% endif %}"
+        <div class="constellation-star{% if star.system_size > 1 %} in-system{% endif %}{% if star.carded %} carded{% if star.card_dense %} dense{% endif %}{% endif %}"
+             style="top: {{ star.card_top_pct if star.carded else star.top_pct }}%; left: {{ star.card_left_pct if star.carded else star.left_pct }}%;{% if star.system_size > 1 %} --orbit-x: {{ star.orbit_x_px }}px; --orbit-y: {{ star.orbit_y_px }}px;{% endif %}"
              data-name="{{ star.name }}"
              data-epithet="{{ auth.constellation_epithet }}"
              data-xp="{{ star.xp }}"
