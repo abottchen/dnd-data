@@ -166,9 +166,7 @@
     (function () {
       // Sessions Chart ("Across the Ages") tooltips: read kills from each bar's data-kills attribute.
       document.querySelectorAll('.session-bar').forEach(bar => {
-        const labelEl = bar.querySelector('.bar-label');
-        if (!labelEl) return;
-        const date = labelEl.textContent.trim();
+        const date = bar.getAttribute('data-date') || '';
         let kills = [];
         try {
           kills = JSON.parse(bar.getAttribute('data-kills') || '[]');

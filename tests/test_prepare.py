@@ -128,7 +128,7 @@ def test_prepare_model_from_prompt_frontmatter(run_env):
     manifest = json.loads((run_dir / "manifest.json").read_text())
     models = {s["model"] for s in manifest["slices"]}
     # All entries should declare a known model (default "sonnet" if absent).
-    assert models <= {"sonnet", "opus"}
+    assert models <= {"sonnet", "opus", "fable"}
 
 
 def test_prepare_writes_keep_marker_when_keep_temp(run_env):

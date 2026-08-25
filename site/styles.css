@@ -834,7 +834,7 @@ main > article > section.proficiencies,
    Sessions chart ("Across the Ages")
    ───────────────────────────────────────────────────────────────── */
 .sessions {
-  max-width: 720px;
+  max-width: 1080px;
   margin: 32px auto 0;
 }
 
@@ -842,16 +842,48 @@ main > article > section.proficiencies,
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  gap: 48px;
-  padding: 8px 0 34px;
+  padding: 8px 0 28px;
   border-bottom: 1px solid var(--rule);
 }
 
+/* Months size themselves by session count (inline flex-grow), so every bar
+   stays the same width across groups and the bracket under each label spans
+   exactly that month's bars. */
+.session-month {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.session-month .month-bars {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.session-month .month-label {
+  border-top: 1px solid var(--rule);
+  margin: 12px 5px 0;
+  padding-top: 10px;
+  text-align: center;
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--paper-dim);
+  white-space: nowrap;
+}
+
+/* Each column owns its spacing (the bar fills 72% of it), so the chart can
+   absorb any session count by narrowing columns — a fixed flex gap would
+   reintroduce overflow once gaps alone exceeded the container. */
 .session-bar {
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 64px;
+  flex: 1 1 0;
+  min-width: 0;
+  max-width: 96px;
   position: relative;
   cursor: help;
 }
@@ -879,7 +911,7 @@ main > article > section.proficiencies,
 }
 
 .session-bar .bar {
-  width: 100%;
+  width: 72%;
   background: var(--brass);
   min-height: 2px;
   box-shadow: inset 0 2px 0 0 var(--brass-hi);
@@ -894,17 +926,6 @@ main > article > section.proficiencies,
 
 .session-bar:hover .bar:not(.zero) {
   filter: brightness(1.4);
-}
-
-.session-bar .bar-label {
-  font-family: 'IBM Plex Sans', sans-serif;
-  font-size: 10px;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  color: var(--paper-dim);
-  margin-top: 14px;
-  white-space: nowrap;
-  text-align: center;
 }
 
 /* ─────────────────────────────────────────────────────────────────
@@ -1418,6 +1439,47 @@ main > article > section.proficiencies,
 /* Inside a system the per-star epithet would overlap its neighbour's;
    the epithet remains in the hover tooltip (data-epithet) instead. */
 .constellation-star.in-system .star-epithet {
+  display: none;
+}
+
+/* A crowded neighborhood that isn't a true tie: each member keeps an exact
+   star point on the plot; the portrait becomes a small card in a column
+   beside the group, joined to its point by a hairline leader. */
+.constellation-point {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  transform: translate(-50%, -50%);
+  fill: var(--brass-hi);
+  opacity: 0.9;
+  pointer-events: none;
+  overflow: visible;
+  z-index: 1;
+}
+
+.constellation-lines .leader {
+  stroke: var(--brass);
+  stroke-width: 1;
+  opacity: 0.3;
+  fill: none;
+}
+
+.constellation-star.carded .portrait {
+  width: 52px;
+  height: 52px;
+}
+
+.constellation-star.carded .star-name {
+  font-size: 15px;
+}
+
+.constellation-star.carded .star-epithet {
+  max-width: 150px;
+}
+
+/* A dense column has no room under each card; the epithet stays in the
+   hover tooltip (data-epithet), as inside a system. */
+.constellation-star.carded.dense .star-epithet {
   display: none;
 }
 

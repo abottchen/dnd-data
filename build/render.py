@@ -304,7 +304,7 @@ def main() -> int:
 # (REPO_ROOT is on sys.path above). load_data/validate_all above resolve the
 # imported names at call time, so a bottom-of-module block is sufficient.
 from build.bestiary import (BESTIARY_GLOB, CUSTOM_CREATURE_TOKENS,  # noqa: F401,E402
-                            CUSTOM_NPC_STATBLOCKS, XP_BY_CR, bestiary_lookup,
+                            CUSTOM_CREATURES, CUSTOM_NPC_STATBLOCKS, XP_BY_CR, bestiary_lookup,
                             xp_for_cr, _creature_token_url, _kill_cr, _kill_xp,
                             _name_to_token_name)
 from build.compute import (SKILL_DISPLAY, compute_all, compute_ascent,  # noqa: F401,E402

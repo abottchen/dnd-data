@@ -251,7 +251,7 @@
   },
   {
     "name": "Shago",
-    "epithet": "guide hired out of Fort Beluarian who took up a spear when the firenewts came for the forge",
+    "epithet": "guide hired out of Fort Beluarian who broke the news that the Flaming Fist would claim half of everything they'd won",
     "allegiance": "with"
   },
   {
@@ -311,12 +311,12 @@
   },
   {
     "name": "Bonson",
-    "epithet": "of Sithi Vinecutter's escort, arrived at the mountain among albino dwarves and a spirit warrior",
+    "epithet": "of Sithi Vinecutter's escort, who kept watch outside and brought word of the unnatural stirring atop Mount Todra",
     "allegiance": "with"
   },
   {
     "name": "Beezin",
-    "epithet": "one of Sithi Vinecutter's four companions, left with Bonson, Grandon, and Skip to guard the entrance",
+    "epithet": "of Sithi Vinecutter's four companions, who came in from watch duty to report Mount Todra breaking loose",
     "allegiance": "with"
   },
   {
@@ -328,5 +328,15 @@
     "name": "Skip",
     "epithet": "of Sithi Vinecutter's company, one of the albino dwarves and a spirit warrior who came to the group's aid",
     "allegiance": "with"
+  },
+  {
+    "name": "Wickles",
+    "epithet": "Chumble's familiar, pickle-born and pickle-named, sent ahead to scout, eavesdrop, and strike when the moment calls",
+    "allegiance": "with"
+  },
+  {
+    "name": "Tzindelor",
+    "epithet": "young red dragon holding Wyrmheart Mine, a fight the company judged too costly to risk",
+    "allegiance": "against"
   }
 ]

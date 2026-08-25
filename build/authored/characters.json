@@ -8,8 +8,8 @@
     "distinction_subtitle": "whose single night turned five crit successes",
     "distinction_detail": "<b>5</b> crit successes in one session &middot; the brightest single night the table has seen",
     "archetype_badge": {
-      "archetype": "cellarer",
-      "inscription": "Ten days of rations and a full waterskin — the noble dragonborn ensures no one marches hungry, even when the road offers nothing."
+      "archetype": "featherfoot",
+      "inscription": "Studded leather instead of plate, a rapier before a blade — the noble dragonborn trades weight for speed and never looks back."
     },
     "distinction_basis": {
       "kind": "mechanical",
@@ -23,17 +23,17 @@
     "epithet": "of the Rock Gnomes, reader of the threefold weave",
     "reliquary_header": "Gathered to the bell's toll",
     "constellation_epithet": "the heaviest toll, and every bit earned",
-    "distinction_title": "The Reaping Hour",
-    "distinction_subtitle": "who once took twelve souls inside a single night",
-    "distinction_detail": "<b>12</b> kills in one session &middot; no greater single-day harvest told",
+    "distinction_title": "The Greatest Felling",
+    "distinction_subtitle": "who unmade the mightiest thing the company has faced",
+    "distinction_detail": "<b>2,300</b> XP in a single felling &middot; the largest kill any hand has claimed",
     "archetype_badge": {
-      "archetype": "featherfoot",
-      "inscription": "Travels lighter than any gnome has a right to — staff, two daggers, and a rain catcher folded tight, the whole kit barely whispering when she moves."
+      "archetype": "apothecary",
+      "inscription": "Four vials of unguent against Chult's biting clouds, and twenty red Ohelo berries picked fresh — she stocks the antidote before anyone else notices the wound."
     },
     "distinction_basis": {
       "kind": "mechanical",
-      "atom": "max_kills_in_one_session",
-      "value": 12
+      "atom": "is_party_biggest_kill",
+      "value": true
     },
     "sworn_creed": "force shaped at the source — the blast bends, and those beside her stand unburned"
   },
@@ -41,18 +41,18 @@
     "id": "chumble",
     "epithet": "of the Dhakaani, bound by pact to a shadow unseen",
     "reliquary_header": "Claimed by the shadow unseen",
-    "constellation_epithet": "seldom loud, and never long absent",
-    "distinction_title": "The Tallest Quarry",
-    "distinction_subtitle": "who brought down the greatest thing the company has faced",
-    "distinction_detail": "<b>1,800</b> XP in a single felling &middot; the largest kill any hand has claimed",
+    "constellation_epithet": "few throws, and great weight in them",
+    "distinction_title": "The Unbroken Thread",
+    "distinction_subtitle": "who has never gone three nights without a felling",
+    "distinction_detail": "longest quiet spell of <b>2</b> sessions &middot; no hand returns to the tally sooner",
     "archetype_badge": {
       "archetype": "lamplighter",
       "inscription": "Fifteen flasks of oil and a lamp that hasn't gone dark yet — a goblin who walked out of Dhakaan carrying enough light to argue with the night."
     },
     "distinction_basis": {
       "kind": "mechanical",
-      "atom": "is_party_biggest_kill",
-      "value": true
+      "atom": "longest_drought",
+      "value": 2
     },
     "sworn_creed": "bound in fire to a name struck in the dark — and the bargain still runs"
   },
@@ -63,7 +63,7 @@
     "constellation_epithet": "never far from the fray",
     "distinction_title": "The Pendulum Hand",
     "distinction_subtitle": "whose dice cut both ways, and neither one gently",
-    "distinction_detail": "<b>17</b> crit fails, more than any hand &middot; and <b>19</b> crit successes swinging back",
+    "distinction_detail": "<b>19</b> crit fails, more than any hand &middot; and <b>19</b> crit successes answering back, exactly level",
     "archetype_badge": {
       "archetype": "pack-mule",
       "inscription": "The hunting trap alone tips twenty-five pounds; above it ride scale mail and a heavy crossbow, and the wulven still finds room for caltrops, rope, and a block-and-tackle besides."
@@ -82,10 +82,10 @@
     "constellation_epithet": "ever at the hunt, the soft-pawed shot",
     "distinction_title": "The Cat's Own Luck",
     "distinction_subtitle": "whose kept dice fall higher than any other hand at the table",
-    "distinction_detail": "<b>11.1</b> average kept d20 &middot; the kindest dice the company casts",
+    "distinction_detail": "<b>11.0</b> average kept d20 &middot; the kindest dice the company casts",
     "archetype_badge": {
-      "archetype": "naturalist",
-      "inscription": "One carved sprig of mistletoe, ribbon-tied and kept close — the whole of the primal green, if you know how to ask, flows through that small stem."
+      "archetype": "quiver",
+      "inscription": "Sixteen enchanted arrows ride fletched and silent in her quiver, each one a held breath waiting on the pull of her string."
     },
     "distinction_basis": {
       "kind": "mechanical",
