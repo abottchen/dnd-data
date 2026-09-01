@@ -144,14 +144,6 @@
     "annotation": "Eldritch Blast &middot; the dead were still new enough to shatter"
   },
   {
-    "character": "chumble",
-    "date": "2026-05-03",
-    "creature": "Skeleton",
-    "method": "Eldritch Blast",
-    "verse": "A skeleton struck and scattered across the Throat's stones",
-    "annotation": "Eldritch Blast &middot; bone and void met in the dark — bone lost"
-  },
-  {
     "character": "lilac",
     "date": "2026-05-03",
     "creature": "Skeleton",
@@ -670,5 +662,45 @@
     "method": "Magic Missile",
     "verse": "A phoenix of pure fire silenced above the shaking caldera",
     "annotation": "Magic Missile · the killing blow, as lava sank back into the deep"
+  },
+  {
+    "character": "grieg",
+    "date": "2026-08-30",
+    "creature": "Magmin",
+    "method": "Trident",
+    "verse": "A magmin's ember guttered out, first of five to fall.",
+    "annotation": "Trident · one thrust, the fire went out before it caught."
+  },
+  {
+    "character": "vex",
+    "date": "2026-08-30",
+    "creature": "Magmin",
+    "method": "Scimitar",
+    "verse": "A second magmin fell, its glow dimming to gray.",
+    "annotation": "Scimitar · one clean cut, the coals cooled where it dropped."
+  },
+  {
+    "character": "lilac",
+    "date": "2026-08-30",
+    "creature": "Magmin",
+    "method": "Longbow",
+    "verse": "A third magmin dropped mid-stride, flame guttering before it reached her.",
+    "annotation": "Longbow · one arrow found it before it closed the distance."
+  },
+  {
+    "character": "lilac",
+    "date": "2026-08-30",
+    "creature": "Girallon",
+    "method": "Longbow",
+    "verse": "A girallon fell before it knew the ambush had begun.",
+    "annotation": "Longbow · one shaft found the guardian of another's stolen hoard."
+  },
+  {
+    "character": "chumble",
+    "date": "2026-05-03",
+    "creature": "Skeleton",
+    "method": "Eldritch Blast",
+    "verse": "A skeleton broken at Tymora's gate as the alarm bells rang",
+    "annotation": "Eldritch Blast &middot; bone scattered before the temple could fall"
   }
 ]

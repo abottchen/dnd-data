@@ -266,5 +266,19 @@
       "The return trip to Shilku Outpost takes ten days, and the next session starts there.",
       "The party plans to recall the Flaming Fist ship and return to Fort Beluarian, paying the Fist's half for now."
     ]
+  },
+  {
+    "session": 23,
+    "date": "2026-08-30",
+    "title": "Mostly Honest at Fort Beluarian",
+    "summary": "Understand what the company did at Fort Beluarian, because it took more nerve than the volcano. Liara Portyr had a month's worth of questions and a soldier's arithmetic, and when she asked for a tally of what Chult had yielded, they gave her one. A mostly honest one. Everything went on her table, adamantine ingots, captured steel, a heap of gold, everything but the half plate already buckled on Grieg's back and Moradin's Gauntlet, which no ledger in that fort ever heard named. The Fist took its cut, near forty parts in a hundred, and handed the steel straight to its soldiers. In return came a charter of exploration, permanent rooms, potions and scrolls, and a warm request to keep hunting ghouls and stranger things to the south. Shago watched the whole performance and said not one word to his paymasters. Afterward he told the company he was astonished they dared and impressed they got away with it, then signed on for another thirty days at a price they could not talk down. He is not Fist, as it turns out. He simply fights where the undead are.\n\nFire has largely stopped biting them. Mardred's plates and patches turned the whole company fire-resistant before they left the outpost, Vex most of all, and the magmins that tried them on the road to the coast learned it briefly. But mark what they found on the overland walk toward Port Nyanzaru: a rune cut into tree after tree that Vex's magic read as ice, a great pile of dung, and footprints too large for anything that ought to leave them. Frost giants, the company mused, in Chult of all places. Grieg said the quieter thing. The Ring of Winter. I know that ring's story. Every chronicler does. I do not believe this thread is finished with them.",
+    "silent_roll": [
+      "Wickles twice tried to slip into the Fist's vaults behind Gruta and never got through the door.",
+      "The Flaming Fist crew repaid 121 gp for the tribute forced at Aremag's crossing and handled the dragon turtle themselves on the return leg.",
+      "The party got the jump on two girallons on the road to Port Nyanzaru and killed them quickly, Lilac Mist's longbow taking one and Shago's spear the other. Their cache held a two-person tent, two healing kits, and a vial of wyvern poison.",
+      "Another ohela bush yielded 16 berries, and five magmins left 70 gp of obsidian for the slush fund.",
+      "Liara Portyr repositioned tokens on her map of Chult. The Fist intends to move on Hrakhamar and Shilku.",
+      "The party plans to sell off goods in Port Nyanzaru, show Musharib the Gauntlet, then continue down the River Soshenstar."
+    ]
   }
 ]

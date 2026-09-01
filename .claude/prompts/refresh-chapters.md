@@ -27,8 +27,14 @@ If the existing prose is still consistent with the data and still good prose by 
 - A fact has shifted (a new session changed what the chapter is fundamentally about).
 - A stronger angle exists that the original missed.
 - The line has gone stale.
+- The epigraph breaks a hard rule in the Voice section below. A rule-breaking
+  epigraph is always worth rewriting, however well it reads otherwise.
 
 The bias is heavily toward `no_change`. Cosmetic tweaks are not a reason to rewrite.
+
+A rewrite that only *appends* to the existing epigraph is never correct. A chapter gains
+sessions as the campaign runs, but its epigraph does not get longer. When there is more
+to cover, say what the chapter is about at a higher level. Never itemize it.
 
 # Output
 
@@ -38,9 +44,28 @@ The bias is heavily toward `no_change`. Cosmetic tweaks are not a reason to rewr
 
 # Voice (only if rewriting)
 
-Chapter epigraph: kenning sequence, em-dash separator. Single sentence. Cool, compact, slightly elegiac. No "Ye Olde", no chrome.
+Chapter epigraph: two to four plain sentences saying what the chapter has been about so
+far. Write it the way a person tells you what happened, in the same dry chronicler's
+register as the session summaries. Concrete, a little elegiac, allowed to be wry. No
+"Ye Olde", no chrome, no saga-fragment caption voice.
 
-> From the high tower to the seventh ford &mdash; by silence, by hunger, by oath, by signal.
+> They crossed in winter and lost both horses on the second pass. The abbey had
+> stood empty a year by the time they reached it, though nobody had thought to
+> tell the tax collector. What they carried out was worth less than burying their
+> own dead cost them.
+
+Name things that actually happened. One specific detail beats any general statement about
+what the chapter represents.
+
+Hard rules:
+
+- No em dashes (— or &mdash;) and no semicolons, anywhere in your output. Use a comma, a
+  colon, or start a new sentence.
+- Sentences with verbs, never a chain of fragments: no `by X, by Y, by Z` anaphora, no
+  `from A to B` framing device, no rule-of-three cadence, no matched parallel or aphorism
+  formulas.
+- No slop vocabulary or inflated significance: vibrant, pivotal, tapestry, interplay,
+  "stands as a testament", tacked-on participles (highlighting…, reflecting…).
 
 # Authorial restraint
 

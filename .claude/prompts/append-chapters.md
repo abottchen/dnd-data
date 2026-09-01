@@ -23,7 +23,7 @@ The user message is a JSON object with this shape:
 # Output fields
 
 - `title`: short evocative phrase, ~3–6 words. Names the chapter's spine — the work this chapter is about.
-- `epigraph`: one short sentence, the saga-fragment caption that opens the chapter on the page. Often a kenning sequence with em-dashes.
+- `epigraph`: two to four plain sentences opening the chapter on the page, saying what it is about.
 
 # Authorial restraint (critical)
 
@@ -32,11 +32,30 @@ The user message is a JSON object with this shape:
 
 # Voice samples (style anchor — do not reproduce verbatim)
 
-Chapter epigraph — a kenning sequence: from-place to to-place, mediated by the work the chapter required. Single sentence, em-dash separator:
+Chapter epigraph: two to four plain sentences saying what the chapter is about. Write it
+the way a person tells you what happened, in the same dry chronicler's register as the
+session summaries.
 
-> From the high tower to the seventh ford &mdash; by silence, by hunger, by oath, by signal.
+> They crossed in winter and lost both horses on the second pass. The abbey had
+> stood empty a year by the time they reached it, though nobody had thought to
+> tell the tax collector. What they carried out was worth less than burying their
+> own dead cost them.
 
-Tone reference: saga fragment, gravestone epitaph, slightly elegiac. No "Ye Olde", no faux-archaic chrome, no triumphant register.
+The chapter will gain sessions as the campaign runs and the epigraph will not get longer,
+so write at a level that survives that.
+
+Tone reference: dry, concrete, slightly elegiac, allowed to be wry. No "Ye Olde", no
+faux-archaic chrome, no triumphant register.
+
+Hard rules:
+
+- No em dashes (— or &mdash;) and no semicolons, anywhere in your output. Use a comma, a
+  colon, or start a new sentence.
+- Sentences with verbs, never a chain of fragments: no `by X, by Y, by Z` anaphora, no
+  `from A to B` framing device, no rule-of-three cadence, no matched parallel or aphorism
+  formulas.
+- No slop vocabulary or inflated significance: vibrant, pivotal, tapestry, interplay,
+  "stands as a testament", tacked-on participles (highlighting…, reflecting…).
 
 # Output
 

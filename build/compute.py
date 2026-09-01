@@ -7,6 +7,7 @@ the templates emit static SVG and the client script only animates.
 """
 from __future__ import annotations
 import math
+import re
 from collections import Counter
 from statistics import pstdev, median
 from typing import Optional
@@ -16,6 +17,14 @@ from .paths import REPO_ROOT
 from .validators import kill_key
 from .bestiary import (bestiary_lookup, XP_BY_CR, _kill_xp, _kill_cr,
                        CUSTOM_CREATURE_TOKENS)
+
+def _method_group(method: str) -> str:
+    """Group key for a kill method: the method minus any per-kill annotation.
+
+    "Trident (Yokka pulled a minion into the blow)" and "Trident" are the same
+    weapon and must tally together. Case-folded so casing never splits a group.
+    """
+    return re.sub(r"\s*\([^)]*\)", "", method).strip().casefold()
 
 def compute_trials(party: dict) -> dict:
     """Return per-character trials dict + party-wide aggregates needed by templates."""
@@ -29,19 +38,30 @@ def compute_trials(party: dict) -> dict:
         kill_count = len(kills)
 
         # Means of Ending: most common method; tiebreak highest CR; then alphabetical.
-        method_counter = Counter(k["method"] for k in kills)
+        # A method string may carry a per-kill annotation ("Trident (Yokka pulled a
+        # minion into the blow)"). That is a note about one kill, not a separate
+        # weapon, and counting the raw string splits the weapon's tally in two. So
+        # group on the method with any parenthetical stripped, and label the group
+        # with the variant that occurs most within it — which keeps a genuine
+        # qualifier like "Breath Weapon (Fire)" intact when it is the only variant.
+        groups: dict[str, list[str]] = {}
+        for k in kills:
+            groups.setdefault(_method_group(k["method"]), []).append(k["method"])
+        method_counter = Counter({g: len(v) for g, v in groups.items()})
+        label_for = {g: Counter(v).most_common(1)[0][0] for g, v in groups.items()}
         if method_counter:
             top_n = method_counter.most_common(1)[0][1]
             tied = [m_ for m_, n in method_counter.items() if n == top_n]
             if len(tied) == 1:
-                means = tied[0]
+                means = label_for[tied[0]]
             else:
-                # Tiebreak by max CR among kills using that method
-                def max_xp_for_method(method):
-                    crs = [_kill_cr(k["creature"]) for k in kills if k["method"] == method]
+                # Tiebreak by max CR among kills in that method group
+                def max_xp_for_method(group):
+                    crs = [_kill_cr(k["creature"]) for k in kills
+                           if _method_group(k["method"]) == group]
                     return max((XP_BY_CR.get(c, 0) for c in crs), default=0)
-                tied.sort(key=lambda mm: (-max_xp_for_method(mm), mm.lower()))
-                means = tied[0]
+                tied.sort(key=lambda mm: (-max_xp_for_method(mm), label_for[mm].lower()))
+                means = label_for[tied[0]]
             means_n = top_n
         else:
             means = "—"

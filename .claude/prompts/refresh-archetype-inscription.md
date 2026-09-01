@@ -17,7 +17,9 @@ The user message is a JSON object with this shape:
 The inscription is short prose, ~120–200 characters. Rewrite only when:
 1. There is no existing inscription for the current archetype, OR
 2. The existing inscription was written for a different archetype (`existing.archetype != archetype.slug`), OR
-3. The existing inscription is factually wrong about the items listed.
+3. The existing inscription is factually wrong about the items listed, OR
+4. The existing inscription breaks a hard rule below (an em dash, a semicolon, or
+   rule-of-three cadence).
 
 If the existing inscription still fits the data, return `decision: "no_change"`.
 
@@ -26,9 +28,9 @@ If the existing inscription still fits the data, return `decision: "no_change"`.
 One short line. Diegetic — speak from inside the world, not about the data. Anchor at one concrete item from the slice. Match the character's class/race register where natural. No catalog-voice. No invocations of "ye olde". Single sentence.
 
 Examples of register (do not reuse verbatim):
-- "Drags more steel up the trail than the rest together — only the wulven shoulders haven't started complaining."
+- "Drags more steel up the trail than the rest together, and only the wulven shoulders haven't started complaining."
 - "Carries six lanterns and a vow she made the dark, and lights only one at a time."
-- "The pack rattles when he walks — every spike, every coil, every scrap of rope someone might one day need."
+- "The pack rattles when he walks, and somewhere in it is the length of rope somebody will need one day."
 
 # Authorial restraint
 
@@ -36,6 +38,16 @@ Examples of register (do not reuse verbatim):
 - Do not name the archetype label inside the inscription (the label renders separately).
 - Do not reference real player names — this is in-world only.
 - Stay under 200 characters.
+
+# Hard rules
+
+- No em dashes (— or &mdash;) and no semicolons, anywhere in your output. Use a comma, a
+  colon, or start a new sentence.
+- No AI-tell rhetoric: rule-of-three cadence, matched parallel or aphorism formulas ("not
+  a P but a Q", "the P of Q"), false ranges, or chains of verbless fragments in place of a
+  sentence.
+- No slop vocabulary or inflated significance: vibrant, pivotal, tapestry, interplay,
+  "stands as a testament", tacked-on participles (highlighting…, reflecting…).
 
 # Output format
 

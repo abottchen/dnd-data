@@ -845,3 +845,41 @@ def test_compute_reliquary_joins_authored_verse_casefolded():
     rows = render.compute_reliquary(party, authored_kills)
     assert rows["vex"][0]["verse"] == "A verse."
     assert rows["vex"][0]["date_label"] == "19 APR 2026"
+
+
+# -- Means of Ending: annotated method variants ------------------------------
+
+def test_means_of_ending_groups_annotated_method_variants():
+    """A per-kill annotation must not split a weapon's tally.
+
+    Trident appears 3 times, one of them annotated; Warhammer twice. Counting the
+    raw method string would score Trident 2 and Warhammer 2, then break the tie
+    the wrong way. Grouped, Trident wins outright at 3.
+    """
+    party = {"members": [
+        {"id": "a", "kills": [
+            {"date": "2026-04-01", "creature": "Goblin", "method": "Trident"},
+            {"date": "2026-04-01", "creature": "Goblin", "method": "Trident"},
+            {"date": "2026-04-08", "creature": "Goblin",
+             "method": "Trident (Yokka pulled a minion into the blow)"},
+            {"date": "2026-04-08", "creature": "Goblin", "method": "Warhammer"},
+            {"date": "2026-04-15", "creature": "Goblin", "method": "Warhammer"},
+        ]},
+    ]}
+    trials = compute_trials(party)
+    assert trials["per_char"]["a"]["means"] == "Trident"
+    assert trials["per_char"]["a"]["means_n"] == 3
+
+
+def test_means_of_ending_keeps_a_real_qualifier_in_the_label():
+    """A parenthetical that is part of the method name survives as the label."""
+    party = {"members": [
+        {"id": "a", "kills": [
+            {"date": "2026-04-01", "creature": "Goblin", "method": "Breath Weapon (Fire)"},
+            {"date": "2026-04-01", "creature": "Goblin", "method": "Breath Weapon (Fire)"},
+            {"date": "2026-04-08", "creature": "Goblin", "method": "Scimitar"},
+        ]},
+    ]}
+    trials = compute_trials(party)
+    assert trials["per_char"]["a"]["means"] == "Breath Weapon (Fire)"
+    assert trials["per_char"]["a"]["means_n"] == 2

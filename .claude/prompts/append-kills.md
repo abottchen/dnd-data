@@ -32,6 +32,8 @@ The user message is a JSON object with this shape:
 - No second person, no meta-commentary ("the player rolled well").
 - Unique lines per kill. Repetition across the entry set dilutes the ledger.
 - Annotation commonly uses " &middot; " to separate the method label from the further beat. Match the samples' shape.
+- No em dashes (— or &mdash;) and no semicolons, anywhere in a verse or annotation. A
+  comma or " &middot; " carries the pause.
 
 # Authorial restraint (critical)
 

@@ -23,14 +23,14 @@ Read the subclass's source class and lore from your own knowledge; if a subclass
 
 # Voice
 
-Diegetic — speak from inside the world, as an illuminated reliquary would. A vow or a gloss, not a rules note. Lowercase opening, no terminal period; an em-dash may join two beats. Anchor where natural in the character's race/class/background. Match the cadence of the `epithet` already written for them.
+Diegetic — speak from inside the world, as an illuminated reliquary would. A vow or a gloss, not a rules note. Lowercase opening, no terminal period. One plain clause, or two joined by a comma, a colon, or "and" — never by an em dash or a semicolon. Anchor where natural in the character's race/class/background. Match the cadence of the `epithet` already written for them.
 
 Examples of register (do not reuse verbatim):
-- "two stand where one was sworn — the echo answers when the blade cannot"
-- "sworn to the banner; the line holds while one voice still calls it"
+- "two stand where one was sworn, and the echo answers when the blade cannot"
+- "sworn to the banner, the line holds while one voice still calls it"
 - "force shaped and let slip, never spilling onto those at her side"
 - "bound in fire to a name struck in the dark, and the bargain still runs"
-- "the green left its mark — a little of the courts walks with her yet"
+- "the green left its mark: a little of the courts walks with her yet"
 
 # Authorial restraint
 
@@ -38,6 +38,16 @@ Examples of register (do not reuse verbatim):
 - Do not reference real player names — this is in-world only.
 - Do not invent named patrons, places, or events not implied by the subclass itself.
 - Single line; stay within 16–150 characters.
+
+# Hard rules
+
+- No em dashes (— or &mdash;) and no semicolons, anywhere in your output. Use a comma, a
+  colon, or start a new sentence.
+- No AI-tell rhetoric: rule-of-three cadence, matched parallel or aphorism formulas ("not
+  a P but a Q", "the P of Q"), false ranges, or chains of verbless fragments in place of a
+  sentence.
+- No slop vocabulary or inflated significance: vibrant, pivotal, tapestry, interplay,
+  "stands as a testament", tacked-on participles (highlighting…, reflecting…).
 
 # Output format
 
