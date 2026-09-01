@@ -111,8 +111,8 @@
   },
   {
     "name": "Salida",
-    "epithet": "a jungle guide whose name appeared on the bulletin boards of Port Nyanzaru, known to work for Jobal",
-    "allegiance": null
+    "epithet": "a jungle guide named on Port Nyanzaru's bulletin boards, passed over when the party's eye fell on Musharib",
+    "allegiance": "with"
   },
   {
     "name": "Azaka Stormfang",
@@ -156,17 +156,17 @@
   },
   {
     "name": "Yokka",
-    "epithet": "goblin boss of Camp Righteous who surrendered after her last minion fell, then bartered information for her freedom",
+    "epithet": "goblin boss of Camp Righteous who fed a minion to the crit meant for her, then bought her last two survivors' freedom with a rival tribe's secrets",
     "allegiance": "with"
   },
   {
     "name": "Niles Breakbone",
-    "epithet": "commandant of Camp Vengeance, whose mood is foul and whose reinforcements never came",
+    "epithet": "commandant of Camp Vengeance, who turned on his own soldiers under a musk creeper's charm",
     "allegiance": "with"
   },
   {
     "name": "Ord Firebeard",
-    "epithet": "a soldier of Camp Vengeance, who spoke plainly of the camp's long deterioration",
+    "epithet": "of Camp Vengeance, who fought to defend it and wrote the party's letter to the general in Port Nyanzaru",
     "allegiance": "with"
   },
   {
@@ -251,7 +251,7 @@
   },
   {
     "name": "Shago",
-    "epithet": "guide hired out of Fort Beluarian who broke the news that the Flaming Fist would claim half of everything they'd won",
+    "epithet": "guide hired out of Fort Beluarian, unsworn to the Flaming Fist though he works with them, who caught the party's lie to Liara Portyr and said nothing",
     "allegiance": "with"
   },
   {
@@ -338,5 +338,10 @@
     "name": "Tzindelor",
     "epithet": "young red dragon holding Wyrmheart Mine, a fight the company judged too costly to risk",
     "allegiance": "against"
+  },
+  {
+    "name": "Gruta",
+    "epithet": "of the Flaming Fist, who fetches from a vault no other may follow her into",
+    "allegiance": "with"
   }
 ]

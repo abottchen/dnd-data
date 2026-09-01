@@ -34,6 +34,36 @@ You are a refresh-evaluation function for the dnd-data site. Read a character-re
    - narrative: `{"kind": "narrative", "sessions": [<ids>], "note": "<≤12-word gloss>"}`.
    - `distinction_detail` (HTML allowed) should cite the real number, e.g. `"<b>6</b> kills &middot; six different foes"`.
 
+# Epithet contract (epithet)
+
+The oneliner under the character's name. Two clauses: the lineage, then ONE signature
+trait.
+
+> of the Halflings, whose tongue cuts sharper than his blade
+
+1. **One trait only.** Never weld two traits together with a matched rhetorical pattern.
+   The pattern ends up doing the work a real observation should be doing. Pick the
+   stronger half and cut the rest.
+2. **Legible cold.** A reader meeting this character for the first time, who does not know
+   the campaign, must understand it. If the line names an object or a place, that thing
+   must be something the character is broadly known for, never a prop from one remembered
+   scene.
+3. **Grounded in the bulk of the record.** Derive the trait from this PC's `kills` and
+   `fact_pack` in the slice, weighted by the share of the record it accounts for. Whatever
+   sits behind only a small fraction of the kills is not the signature, however memorable
+   that night was.
+4. **Roughly eight to fourteen words**, in line with its siblings on the page.
+
+Hard rules:
+
+- No em dashes (— or &mdash;) and no semicolons, anywhere in your output. Use a comma, a
+  colon, or start a new sentence.
+- No AI-tell rhetoric: rule-of-three cadence, matched parallel or aphorism formulas ("not
+  a P but a Q", "the P of Q"), false ranges, or chains of verbless fragments in place of a
+  sentence.
+- No slop vocabulary or inflated significance: vibrant, pivotal, tapestry, interplay,
+  "stands as a testament", tacked-on participles (highlighting…, reflecting…).
+
 # Constellation epithet contract (constellation_epithet)
 
 The constellation plots every star by **presence (rolls cast, given as `rolls`) × contribution (experience earned, given as `xp`)**, clustered into systems. The epithet is a short, *celebratory* read on who this star is in the company — everyone here is a star; never tear one down.

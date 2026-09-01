@@ -9,14 +9,14 @@
     "distinction_detail": "<b>5</b> crit successes in one session &middot; the brightest single night the table has seen",
     "archetype_badge": {
       "archetype": "featherfoot",
-      "inscription": "Studded leather instead of plate, a rapier before a blade — the noble dragonborn trades weight for speed and never looks back."
+      "inscription": "He keeps to studded leather and a rapier at his hip, and for a dragonborn his size, crosses ground faster than anyone expects."
     },
     "distinction_basis": {
       "kind": "mechanical",
       "atom": "max_crits_in_one_session",
       "value": 5
     },
-    "sworn_creed": "sworn to the banner — her voice the line that holds when blades alone cannot"
+    "sworn_creed": "sworn to crown and company, his call steadies the line when others break"
   },
   {
     "id": "urida",
@@ -28,14 +28,14 @@
     "distinction_detail": "<b>2,300</b> XP in a single felling &middot; the largest kill any hand has claimed",
     "archetype_badge": {
       "archetype": "apothecary",
-      "inscription": "Four vials of unguent against Chult's biting clouds, and twenty red Ohelo berries picked fresh — she stocks the antidote before anyone else notices the wound."
+      "inscription": "She keeps three dozen Ohelo berries against the small hurts, and one vial of true healing saved only for the wound that finally frightens her."
     },
     "distinction_basis": {
       "kind": "mechanical",
       "atom": "is_party_biggest_kill",
       "value": true
     },
-    "sworn_creed": "force shaped at the source — the blast bends, and those beside her stand unburned"
+    "sworn_creed": "force bent to her reading of the weave, and spared before it reaches her allies"
   },
   {
     "id": "chumble",
@@ -47,33 +47,14 @@
     "distinction_detail": "longest quiet spell of <b>2</b> sessions &middot; no hand returns to the tally sooner",
     "archetype_badge": {
       "archetype": "lamplighter",
-      "inscription": "Fifteen flasks of oil and a lamp that hasn't gone dark yet — a goblin who walked out of Dhakaan carrying enough light to argue with the night."
+      "inscription": "Fifteen flasks of oil weigh down his pack, kept steady for the one lamp he lights when the shadow at his shoulder goes quiet and the tunnels close in."
     },
     "distinction_basis": {
       "kind": "mechanical",
       "atom": "longest_drought",
       "value": 2
     },
-    "sworn_creed": "bound in fire to a name struck in the dark — and the bargain still runs"
-  },
-  {
-    "id": "grieg",
-    "epithet": "of the Wulven, who answers the question with a crossbow and the doubt with the rail",
-    "reliquary_header": "Sent over the rail to the sea",
-    "constellation_epithet": "never far from the fray",
-    "distinction_title": "The Pendulum Hand",
-    "distinction_subtitle": "whose dice cut both ways, and neither one gently",
-    "distinction_detail": "<b>19</b> crit fails, more than any hand &middot; and <b>19</b> crit successes answering back, exactly level",
-    "archetype_badge": {
-      "archetype": "pack-mule",
-      "inscription": "The hunting trap alone tips twenty-five pounds; above it ride scale mail and a heavy crossbow, and the wulven still finds room for caltrops, rope, and a block-and-tackle besides."
-    },
-    "distinction_basis": {
-      "kind": "mechanical",
-      "atom": "is_party_most_fumbles",
-      "value": true
-    },
-    "sworn_creed": "the other self walks the dark road — he sends the echo where the bolt cannot follow"
+    "sworn_creed": "a devil holds his signature in blood, and its fire answers when he calls"
   },
   {
     "id": "lilac",
@@ -82,7 +63,7 @@
     "constellation_epithet": "ever at the hunt, the soft-pawed shot",
     "distinction_title": "The Cat's Own Luck",
     "distinction_subtitle": "whose kept dice fall higher than any other hand at the table",
-    "distinction_detail": "<b>11.0</b> average kept d20 &middot; the kindest dice the company casts",
+    "distinction_detail": "<b>11.1</b> average kept d20 &middot; the kindest dice the company casts",
     "archetype_badge": {
       "archetype": "quiver",
       "inscription": "Sixteen enchanted arrows ride fletched and silent in her quiver, each one a held breath waiting on the pull of her string."
@@ -92,6 +73,25 @@
       "atom": "is_party_luckiest",
       "value": true
     },
-    "sworn_creed": "the courts left their mark on her — glamour and dread in equal measure"
+    "sworn_creed": "she crossed once into the feywild, and it never fully let her walk back out"
+  },
+  {
+    "id": "grieg",
+    "epithet": "of the Wulven, who takes up whatever weapon the moment puts in reach",
+    "reliquary_header": "Felled by whatever came to hand",
+    "constellation_epithet": "no night finds his hands idle",
+    "distinction_title": "The Widest Arc",
+    "distinction_subtitle": "whose throws range widest from their own middle",
+    "distinction_detail": "spread of <b>6.1</b> &middot; <b>21</b> crit successes and <b>19</b> crit fails, both the company's most",
+    "distinction_basis": {
+      "kind": "mechanical",
+      "atom": "is_party_swingiest",
+      "value": true
+    },
+    "sworn_creed": "a second self hunts beside him, a blow struck from where he is not",
+    "archetype_badge": {
+      "archetype": "pack-mule",
+      "inscription": "A second suit of half plate rides in Grieg's pack beside the one he wears, because a beast hunter never leaves armor behind that he might still need."
+    }
   }
 ]

@@ -35,6 +35,8 @@ If the existing prose is still consistent with the data and still good prose by 
 - A thread genuinely resolved (move known → was_known).
 - The campaign's heading sentence is no longer accurate.
 - A gloss has gone stale enough that the data contradicts it.
+- The `direction` line or a gloss breaks a hard rule below (an em dash, a semicolon,
+  or rule-of-three cadence).
 
 The bias is heavily toward `no_change`. Cosmetic tweaks are not a reason to rewrite.
 
@@ -52,6 +54,16 @@ Campaign-spine register: name what each thread DOES, names what it threatens, na
 
 - Do not move a `known` entry to `was_known` unless `new_sessions` contains evidence of resolution.
 - Do not rewrite `direction` for ordinary progress; only for genuine turns.
+
+# Hard rules
+
+- No em dashes (— or &mdash;) and no semicolons, anywhere in your output. Use a comma, a
+  colon, or start a new sentence.
+- No AI-tell rhetoric: rule-of-three cadence, matched parallel or aphorism formulas ("not
+  a P but a Q", "the P of Q"), false ranges, or chains of verbless fragments in place of a
+  sentence.
+- No slop vocabulary or inflated significance: vibrant, pivotal, tapestry, interplay,
+  "stands as a testament", tacked-on participles (highlighting…, reflecting…).
 
 # Output format
 
