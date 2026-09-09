@@ -3,7 +3,7 @@
   "page_subtitle": "A ledger of those who walk &middot; and those they have laid down",
   "intro_epithet": "Five travellers and a storyteller, bound to a doomed road",
   "footnote": "The names above are the names given &middot; the ones who fell were given no names",
-  "refreshed_through_session": 23,
+  "refreshed_through_session": 24,
   "road_ahead": {
     "known": [
       {
@@ -40,7 +40,7 @@
       }
     ],
     "was_known": [],
-    "direction": "The tithe is counted out and the charter signed, and the company walks inland past Port Nyanzaru toward the River Soshenstar with a gauntlet the Fist was never told about."
+    "direction": "The company has followed the Soshenstar inland to the plateau at Mbala, where one hut still stands among the flattened ruins and a stepped ziggurat waits to the west."
   },
   "gm": {
     "name": "The Dungeon Master",
@@ -116,7 +116,11 @@
     "Skip",
     "Wickles",
     "Tzindelor",
-    "Gruta"
+    "Gruta",
+    "Ymezra",
+    "Omala",
+    "Eemux",
+    "Rork"
   ],
   "ascent_read": "Legends forged mostly by steel, but the road and its riddles have left their mark on every hard-won mile.",
   "player_map": {

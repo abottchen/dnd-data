@@ -81,7 +81,7 @@
   },
   {
     "name": "Inete",
-    "epithet": "who paid a hundred gold to follow her visions of a red-robed wizard into the Aldani Basin",
+    "epithet": "who paid a hundred gold to chase her visions of a red-robed wizard into the Aldani Basin, until an eblis carried her into the night and her taste for adventure did not return",
     "allegiance": "with"
   },
   {
@@ -136,7 +136,7 @@
   },
   {
     "name": "Jessamine",
-    "epithet": "one of the seven merchant princes of Port Nyanzaru, the one to talk to about poisons, whom Grandfather Zitembe suspects of underhanded dealing",
+    "epithet": "one of the seven merchant princes of Port Nyanzaru, dying of the death curse in secret, who paid over her price to help end it",
     "allegiance": "with"
   },
   {
@@ -156,7 +156,7 @@
   },
   {
     "name": "Yokka",
-    "epithet": "goblin boss of Camp Righteous who fed a minion to the crit meant for her, then bought her last two survivors' freedom with a rival tribe's secrets",
+    "epithet": "goblin boss of Camp Righteous who fed a minion to the crit meant for her, then set up shop in Port Nyanzaru selling masks and savoring the slaughter of a rival tribe's women and children",
     "allegiance": "with"
   },
   {
@@ -251,7 +251,7 @@
   },
   {
     "name": "Shago",
-    "epithet": "guide hired out of Fort Beluarian, unsworn to the Flaming Fist though he works with them, who caught the party's lie to Liara Portyr and said nothing",
+    "epithet": "guide out of Fort Beluarian, unsworn to the Flaming Fist he serves, who is marked for death by a writ at the Dye Works and already carries an iron token that says so",
     "allegiance": "with"
   },
   {
@@ -343,5 +343,25 @@
     "name": "Gruta",
     "epithet": "of the Flaming Fist, who fetches from a vault no other may follow her into",
     "allegiance": "with"
+  },
+  {
+    "name": "Ymezra",
+    "epithet": "Jessamine's daughter, who tests the poisons before her mother sells them",
+    "allegiance": "with"
+  },
+  {
+    "name": "Omala",
+    "epithet": "of the Dye Works, whose death writ the company left unclaimed",
+    "allegiance": null
+  },
+  {
+    "name": "Eemux",
+    "epithet": "who paints masks in Yokka's shop, one of two who lived through the fight at Camp Righteous",
+    "allegiance": null
+  },
+  {
+    "name": "Rork",
+    "epithet": "the business side of Yokka's mask trade, one of two who survived the fight at Camp Righteous",
+    "allegiance": null
   }
 ]
