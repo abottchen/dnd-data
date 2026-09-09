@@ -156,3 +156,19 @@ def test_main_apply_subcommand_requires_path(run_env, capsys):
     from build.__main__ import main
     rc = main(["apply"])
     assert rc != 0  # parser should reject missing positional
+
+
+def test_prepare_records_edit_prompt_for_append_sessions(run_env):
+    """append-sessions also pairs an editor pass (a reader's critique the author
+    revises against, before the fact verifier runs). When it emits a slice,
+    prepare must freeze the edit prompt + schema and record them in the
+    manifest's `edit` map so /build-prose can drive the critique/revise loop."""
+    run_dir = prepare.run(no_refresh=True, force_refresh=False, keep_temp=False)
+    manifest = json.loads((run_dir / "manifest.json").read_text())
+
+    assert "append-sessions" in manifest["edit"], manifest.get("edit")
+    em = manifest["edit"]["append-sessions"]
+    assert (run_dir / em["prompt_body"]).exists()
+    assert (run_dir / em["schema"]).exists()
+    assert em["model"] in {"sonnet", "opus", "fable"}
+    assert em["max_rounds"] >= 1

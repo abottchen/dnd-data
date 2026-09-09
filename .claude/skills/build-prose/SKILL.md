@@ -8,7 +8,7 @@ allowed-tools:
 
 # build-prose
 
-You are the loop driver for the dnd-data build's authoring step. You own all phases: kick off `prepare` to stage slices, dispatch a sub-agent per pending slice to write JSON results, dispatch an independent verify sub-agent to fact-check the drafts that call for it, then kick off `apply` to validate, persist authored prose, and render the site.
+You are the loop driver for the dnd-data build's authoring step. You own all phases: kick off `prepare` to stage slices, dispatch a sub-agent per pending slice to write JSON results, run the editor loop on the drafts that call for one, dispatch an independent verify sub-agent to fact-check them, then kick off `apply` to validate, persist authored prose, and render the site.
 
 ## Inputs
 
@@ -26,20 +26,17 @@ A valid run directory contains `manifest.json`, `pending/`, `results/`, `done/`,
    - If the command exits non-zero, print its stderr and stop.
 2. Read `<run-dir>/manifest.json`.
 3. Filter `slices` to entries whose `pending/<stem>.json` still exists (i.e. not yet authored). If the list is empty, skip straight to the apply step — `apply` still needs to run to render the site / bump the marker on a refresh-only build.
-4. Dispatch sub-agents in batches of up to 5 in a single message:
+4. **Author.** Dispatch sub-agents in batches of up to 5 in a single message:
    - `subagent_type: "general-purpose"`
-   - `model`: the entry's `model` field (`sonnet` or `opus`).
+   - `model`: the entry's `model` field (`sonnet`, `opus`, or `fable`).
    - **Prompt body** (substitute the bracketed fields):
 
          You are acting as the [transformer] transformer. Read these
-         two files only:
+         three files only:
 
          - prompt body: <run-dir>/[prompt_body]
          - schema: <run-dir>/[schema]
-
-         The slice input is:
-
-         <inline the entire contents of <run-dir>/[pending]>
+         - slice input: <run-dir>/[pending]
 
          Produce a single JSON object that conforms to the schema. Do
          not include any prose, markdown, or commentary — only the
@@ -48,12 +45,62 @@ A valid run directory contains `manifest.json`, `pending/`, `results/`, `done/`,
          <run-dir>/[result]
 
          Do not edit any other file. Do not run any other tool besides
-         Read (on the two paths above) and Write (on the result path).
+         Read (on the three paths above) and Write (on the result path).
 5. After every sub-agent in the batch returns, check `results/<stem>.json`:
    - If the file exists and parses as JSON, move `pending/<stem>.json` to `done/<stem>.json`.
    - If not, leave the pending file in place and log the slice in `<run-dir>/failures.json` (append, not overwrite).
 6. Repeat batches until `pending/` only contains slices that have failed at least once. Do not retry inside the same skill run — the user gets to decide whether to edit the slice or prompt first.
-7. **Verify pass** (independent, same-build fact-check): the manifest has a top-level `verify` map keyed by transformer name (currently just `append-sessions`). For every manifest slice whose `transformer` is a key in that map and which now has a `results/<stem>.json` file, dispatch one verify sub-agent (in the same batches-of-5 style):
+7. **Edit loop** (a reader's critique, which the author revises against): the manifest has a top-level `edit` map keyed by transformer name (currently just `append-sessions`), each entry carrying `prompt_body`, `schema`, `model`, and `max_rounds`. For every manifest slice whose `transformer` is a key in that map and which now has a `results/<stem>.json` file, run up to `max_rounds` rounds. In each round `n` (starting at 1):
+   - **Critique.** Dispatch the editor:
+     - `subagent_type: "general-purpose"`
+     - `model`: `manifest["edit"][transformer]["model"]`.
+     - **Prompt body** (the slice lives in `done/<stem>.json` once authored, else `pending/<stem>.json`):
+
+           You are the editor for the [transformer] transformer. Read
+           these five files only:
+
+           - editor prompt (your instructions): <run-dir>/[edit.prompt_body]
+           - editor schema: <run-dir>/[edit.schema]
+           - the writer's brief (the standard the draft is held to): <run-dir>/[prompt_body]
+           - the session slice (the only source of fact): <run-dir>/[slice path]
+           - the draft entry under review: <run-dir>/[result]
+
+           Follow the editor prompt. Return your critique as a single
+           JSON object conforming to the editor schema, and write it to:
+
+           <run-dir>/results/[stem].edit-[n].json
+
+           Do not edit any other file. Use only Read (on the five paths
+           above) and Write (on the critique path).
+
+   - Read the critique. If the file is missing or not valid JSON, keep the current draft and end the loop for this slice. If `verdict` is `accept`, end the loop for this slice.
+   - **Revise.** If `verdict` is `revise`, dispatch the author again, with the same `model` as the authoring slice:
+
+           You are acting as the [transformer] transformer, revising
+           your own draft against an editor's notes. Read these five
+           files only:
+
+           - prompt body: <run-dir>/[prompt_body]
+           - schema: <run-dir>/[schema]
+           - slice input: <run-dir>/[slice path]
+           - your draft: <run-dir>/[result]
+           - the editor's notes: <run-dir>/results/[stem].edit-[n].json
+
+           Revise the draft so that every note is addressed. Keep what
+           the notes do not touch. Every fact still comes only from the
+           slice. Produce a single JSON object that conforms to the
+           schema — the complete revised entry, not a reply to the
+           notes — and overwrite:
+
+           <run-dir>/[result]
+
+           Do not edit any other file. Use only Read (on the five paths
+           above) and Write (on the result path).
+
+     If the revision returns nothing or invalid JSON, keep the previous draft and end the loop for this slice.
+   - After `max_rounds` critiques the draft that stands is the one that goes forward, whatever the last verdict was. Critique files stay in `results/` for the record; `apply` never reads them.
+   - Batch editor dispatches (and revision dispatches) across slices in the same batches-of-5 style; the rounds for one slice are sequential.
+8. **Verify pass** (independent, same-build fact-check, after the edit loop has settled the prose): the manifest has a top-level `verify` map keyed by transformer name (currently just `append-sessions`). For every manifest slice whose `transformer` is a key in that map and which now has a `results/<stem>.json` file, dispatch one verify sub-agent (in the same batches-of-5 style):
    - `subagent_type: "general-purpose"`
    - `model`: `manifest["verify"][transformer]["model"]`.
    - **Prompt body** (substitute the bracketed fields; the slice lives in `done/<stem>.json` once authored, else `pending/<stem>.json`):
@@ -77,8 +124,8 @@ A valid run directory contains `manifest.json`, `pending/`, `results/`, `done/`,
          Do not edit any other file. Use only Read (on the four paths above)
          and Write (on the result path).
    - The verified JSON replaces the draft in `results/<stem>.json`; the apply step consumes it. If a verify sub-agent returns nothing or invalid JSON, leave the existing draft result in place (apply will still validate it). Verifying is idempotent, so a second `/build-prose <run-dir>` re-verifies safely.
-8. **Apply**: run `.venv/bin/python -m build apply <run-dir>` via Bash. Always run it, even when some slices failed — `apply` is safe to call with leftover pending slices (it just skips the render). Surface its stderr summary (applied / rejected / pending / marker / map / render) inline.
-9. End with a one-line status:
+9. **Apply**: run `.venv/bin/python -m build apply <run-dir>` via Bash. Always run it, even when some slices failed — `apply` is safe to call with leftover pending slices (it just skips the render). Surface its stderr summary (applied / rejected / pending / marker / map / render) inline.
+10. End with a one-line status:
    - All clean and render OK → `build complete`.
    - Anything rejected or still pending → name what failed and tell the user that `/build-prose <run-dir>` will resume from where it stopped after they fix the prompt or slice.
 
@@ -86,6 +133,7 @@ A valid run directory contains `manifest.json`, `pending/`, `results/`, `done/`,
 
 - Never modify `build/authored/*.json`. The apply step does that.
 - Never modify files under `<run-dir>/prompts/`. They are the frozen reference.
+- Never write an editor critique to a slice's result path. Critiques go to `results/<stem>.edit-<n>.json` only.
 - Never run `build/render.py` directly. The apply step does that.
 - If `manifest.json` is missing after prepare, print an error and exit.
 
@@ -93,4 +141,6 @@ A valid run directory contains `manifest.json`, `pending/`, `results/`, `done/`,
 
 If a sub-agent returns nothing or returns invalid JSON, do not write a placeholder result. Leave the pending file in place. The apply step will report it as pending; the user can fix the prompt or slice and re-run `/build-prose <run-dir>` to resume.
 
-A second `/build-prose <run-dir>` call is safe — it skips slices already moved to `done/` and retries anything still in `pending/`.
+If an editor or a revision sub-agent fails, the draft that already stands goes forward to verify and apply. A failed critique never blocks a build.
+
+A second `/build-prose <run-dir>` call is safe — it skips slices already moved to `done/` and retries anything still in `pending/`. Re-running the edit loop on an already-edited result starts the round count over, which is harmless.
