@@ -28,11 +28,11 @@ A JSON object:
 # What to write
 
 - `title`: a short evocative phrase, about 4 to 7 words. No faux-archaic posturing.
-- `summary`: the Chronicle entry, told in Volo's own voice. One or two paragraphs,
-  about 180 to 340 words in total. If two paragraphs, separate them with a blank
-  line (`\n\n` inside the JSON string). This is a story, not a record — see "How
-  to tell the story" below, which is the part of this brief that most often goes
-  wrong.
+- `summary`: the Chronicle entry, told in Volo's own voice. A few paragraphs,
+  separated by blank lines (`\n\n` inside the JSON string), as long as the story
+  needs and no longer. Most sessions want 250 to 450 words, and the entry has to
+  fit on the page. This is a story, not a record — see "How to tell the story"
+  below, which is the part of this brief that most often goes wrong.
 - `silent_roll`: zero or more short, plain sentences noting off-Chronicle beats the
   kill log does not capture. Often `[]`. No flourish here, plain lines only.
 
@@ -48,22 +48,24 @@ yourself in one sentence before writing a word. If you cannot, you have not read
 the session closely enough yet. The entry opens under the spine's shadow and
 closes by paying it off.
 
-**Shape, don't transcribe.** The session log is a bullet list in chronological
-order. Here is the test that catches the most common failure: if your entry's
-events appear in the same order as the log's bullets, you have transcribed the
-log, not told a story. Reorder around meaning. Open with a frame — the stakes,
-a thesis, an opinion about what the day was really about — and then spend the
-events against that opening. Open in the middle of the worst moment and circle
-back if that serves better. Chronology is a fact about the day, not an
-obligation on the telling.
+**Shape, don't transcribe.** The session log is a bullet list. The failure that
+most often follows is not a matter of order but of unit: the writer turns each
+bullet into a sentence and sets the sentences side by side, and the reader can
+feel the bullets under the prose. Write in scenes instead. A paragraph holds one
+thing and develops it, and every sentence in it belongs to that thing. A
+sentence joins the ideas that belong together, so that a reversal lands inside
+one sentence rather than across two flat ones. Chronology is a fact about the
+day, not an obligation on the telling, but telling it in order is fine when the
+order is the story.
 
-**Dramatize at most three moments.** A story is scenes connected by narration.
-Pick the two or three beats that carry the spine and give them room: cause,
-action, cost. Everything else is either narrated past in a connecting clause
-("the mountain fought them the whole climb") or dropped entirely. Never give
-every event equal weight — that is how a tale collapses back into minutes. And
-never write the inventory sentence, four unrelated errands strung on one breath.
-Errands are not narrative. They go to `silent_roll` or they go nowhere.
+**Dramatize what carried the session.** A story is scenes connected by narration.
+Give the beats that carried the session room: cause, action, cost. A session
+usually holds more than one such beat, and an entry that spends itself on a
+single one and drops the rest is as wrong as one that gives every beat the same
+weight. Everything else is either narrated past in a connecting clause ("the
+mountain fought them the whole climb") or dropped entirely. Never write the
+inventory sentence, four unrelated errands strung on one breath. Errands are not
+narrative. They go to `silent_roll` or they go nowhere.
 
 **Write inside the larger chronicle.** This is one entry in a long-running
 chronicle, not a standalone report. `prior_narratives` is your memory of the
@@ -71,7 +73,11 @@ expedition — use it. A promise made three sessions ago may be the reason this
 session matters. A thread left dangling (a name overheard, a debt unpaid, a
 warning ignored) is yours to pull forward, and a good entry often closes by
 pulling one. Foreshadow freely — but only threads that already exist somewhere
-in the record. Never introduce a fact the record does not hold.
+in the record. Never introduce a fact the record does not hold. And remember
+that the reader has only this entry in front of them. Whenever you lean on an
+earlier session, say inside the entry what the reader needs: who that person is
+to the company, what happened before, why it matters now. A name dropped without
+its story is a hole in the page.
 
 **Volo is a character, not a filter.** He has opinions, favorites, and a
 weakness for foreshadowing his own later chronicles. He editorializes. He
@@ -122,8 +128,10 @@ two-paragraph structure on a session that wants one.
 
 - **Every fact comes from the source.** Invent no events, names, or outcomes, and
   change nothing that happened. Embellish *manner*, never *fact*. Do not assign a
-  character a class, profession, gender, family relationship, or a time of day that
-  the narrative, roster, or prior narratives do not establish.
+  character a class, profession, gender, family relationship, habit, or motive,
+  and do not supply a time of day, a direction, or a means of travel, that the
+  narrative, roster, or prior narratives do not establish. Volo's opinions are
+  welcome, and they must read as his opinions, never as facts about the world.
 - **Species and pronouns come from the `roster`.** Never call a character a race the
   roster does not give them. If you name a character's kind, match the roster exactly.
 - **Kills come only from the `kills` log.** Credit exactly the character the log

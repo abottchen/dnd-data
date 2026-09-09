@@ -25,6 +25,16 @@ _STEM_SAFE = re.compile(r"[^A-Za-z0-9_.-]+")
 # transformer's schema, so apply consumes the verified result unchanged.
 VERIFY_FOR = {"append-sessions": "verify-sessions"}
 
+# Transformers that pair an editor pass with their authoring. The editor is a
+# reader, not a fact-checker: it returns quoted notes and an accept/revise
+# verdict, and the *author* revises its own draft against them. The skill runs
+# up to EDIT_MAX_ROUNDS critique/revise rounds before the verify pass. The
+# editor's output conforms to its own schema (edit-sessions.schema.json), is
+# written beside the result as `results/<stem>.edit-<n>.json`, and is never
+# consumed by apply.
+EDIT_FOR = {"append-sessions": "edit-sessions"}
+EDIT_MAX_ROUNDS = 2
+
 
 def _stem(transformer: str, key) -> str:
     return _STEM_SAFE.sub("-", f"{transformer}__{key}")
@@ -130,9 +140,22 @@ def run(*, no_refresh: bool, force_refresh: bool, keep_temp: bool) -> Path:
                 "schema": meta["schema_rel"],
             })
 
-    # Freeze the verify prompt for any authoring transformer that emitted a
-    # slice this run and pairs a verify pass. The skill reads manifest["verify"]
-    # to dispatch the verifier after each such slice is authored.
+    # Freeze the paired prompts (editor, then verifier) for any authoring
+    # transformer that emitted a slice this run. The skill reads
+    # manifest["edit"] to drive the critique/revise loop right after each such
+    # slice is authored, and manifest["verify"] to dispatch the fact-checker
+    # once the prose is settled.
+    edit_meta: dict = {}
+    for transformer, edit_name in EDIT_FOR.items():
+        if transformer in prompt_cache:
+            em = _prompt_meta(edit_name, frozen_prompts)
+            edit_meta[transformer] = {
+                "prompt_body": em["prompt_body_rel"],
+                "schema": em["schema_rel"],
+                "model": em["model"],
+                "max_rounds": EDIT_MAX_ROUNDS,
+            }
+
     verify_meta: dict = {}
     for transformer, verify_name in VERIFY_FOR.items():
         if transformer in prompt_cache:
@@ -151,6 +174,7 @@ def run(*, no_refresh: bool, force_refresh: bool, keep_temp: bool) -> Path:
         "keep_temp": keep_temp,
         "no_refresh": no_refresh,
         "slices": slices_out,
+        "edit": edit_meta,
         "verify": verify_meta,
     }
     (rdir / "manifest.json").write_text(

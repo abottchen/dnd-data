@@ -8,8 +8,8 @@
     "distinction_subtitle": "whose single night turned five crit successes",
     "distinction_detail": "<b>5</b> crit successes in one session &middot; the brightest single night the table has seen",
     "archetype_badge": {
-      "archetype": "featherfoot",
-      "inscription": "He keeps to studded leather and a rapier at his hip, and for a dragonborn his size, crosses ground faster than anyone expects."
+      "archetype": "cellarer",
+      "inscription": "Ten days of rations and a full waterskin ride behind his saddle, because a dragonborn lord never lets his own host go hungry before the battle starts."
     },
     "distinction_basis": {
       "kind": "mechanical",
@@ -91,7 +91,7 @@
     "sworn_creed": "a second self hunts beside him, a blow struck from where he is not",
     "archetype_badge": {
       "archetype": "pack-mule",
-      "inscription": "A second suit of half plate rides in Grieg's pack beside the one he wears, because a beast hunter never leaves armor behind that he might still need."
+      "inscription": "A 25-pound hunting trap waits in Grieg's pack for the day a beast needs catching instead of killing, one more weight a beast hunter carries just in case."
     }
   }
 ]

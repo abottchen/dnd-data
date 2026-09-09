@@ -1,0 +1,22 @@
+{
+  "type": "object",
+  "required": ["verdict", "notes", "read"],
+  "additionalProperties": false,
+  "properties": {
+    "verdict": {"type": "string", "enum": ["accept", "revise"]},
+    "notes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["quote", "problem"],
+        "additionalProperties": false,
+        "properties": {
+          "quote": {"type": "string"},
+          "problem": {"type": "string"},
+          "fix": {"type": "string"}
+        }
+      }
+    },
+    "read": {"type": "string"}
+  }
+}
