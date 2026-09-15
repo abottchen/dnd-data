@@ -702,5 +702,37 @@
     "method": "Eldritch Blast",
     "verse": "A skeleton broken at Tymora's gate as the alarm bells rang",
     "annotation": "Eldritch Blast &middot; bone scattered before the temple could fall"
+  },
+  {
+    "character": "grieg",
+    "date": "2026-09-13",
+    "creature": "Pterafolk",
+    "method": "Knocked off cliff",
+    "verse": "A pterafolk pitched backward into open sky and stone.",
+    "annotation": "Knocked Off Cliff &middot; no cry before the rock met it."
+  },
+  {
+    "character": "vex",
+    "date": "2026-09-13",
+    "creature": "Pterafolk",
+    "method": "Heavy Crossbow",
+    "verse": "A pterafolk broke from the nest and did not clear the ridge.",
+    "annotation": "Heavy Crossbow &middot; one bolt found it mid-flight."
+  },
+  {
+    "character": "urida",
+    "date": "2026-09-13",
+    "creature": "Pterafolk",
+    "method": "Shatter",
+    "verse": "Two pterafolk crumpled as the chimney rang with sudden sound.",
+    "annotation": "Shatter &middot; one note, twice repeated, and both went still."
+  },
+  {
+    "character": "chumble",
+    "date": "2026-09-13",
+    "creature": "Pterafolk",
+    "method": "Eldritch Blast",
+    "verse": "A pterafolk dropped beneath a streak of crackling force.",
+    "annotation": "Eldritch Blast &middot; it fell before it cleared the chimney's mouth."
   }
 ]
