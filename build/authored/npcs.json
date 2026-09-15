@@ -363,5 +363,10 @@
     "name": "Rork",
     "epithet": "the business side of Yokka's mask trade, one of two who survived the fight at Camp Righteous",
     "allegiance": null
+  },
+  {
+    "name": "Nanny Pu'pu",
+    "epithet": "last of Mbala, who offers to raise the dead and rivals the pterafolk for a taste of the living",
+    "allegiance": "against"
   }
 ]

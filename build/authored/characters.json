@@ -42,17 +42,17 @@
     "epithet": "of the Dhakaani, bound by pact to a shadow unseen",
     "reliquary_header": "Claimed by the shadow unseen",
     "constellation_epithet": "few throws, and great weight in them",
-    "distinction_title": "The Unbroken Thread",
-    "distinction_subtitle": "who has never gone three nights without a felling",
-    "distinction_detail": "longest quiet spell of <b>2</b> sessions &middot; no hand returns to the tally sooner",
+    "distinction_title": "The Level Ledger",
+    "distinction_subtitle": "whose crit successes and crit fails have come out dead even",
+    "distinction_detail": "<b>9</b> crit successes and <b>9</b> crit fails &middot; the only hand the dice have kept level",
     "archetype_badge": {
       "archetype": "lamplighter",
       "inscription": "Fifteen flasks of oil weigh down his pack, kept steady for the one lamp he lights when the shadow at his shoulder goes quiet and the tunnels close in."
     },
     "distinction_basis": {
       "kind": "mechanical",
-      "atom": "longest_drought",
-      "value": 2
+      "atom": "crits",
+      "value": 9
     },
     "sworn_creed": "a devil holds his signature in blood, and its fire answers when he calls"
   },
@@ -82,7 +82,7 @@
     "constellation_epithet": "no night finds his hands idle",
     "distinction_title": "The Widest Arc",
     "distinction_subtitle": "whose throws range widest from their own middle",
-    "distinction_detail": "spread of <b>6.1</b> &middot; <b>21</b> crit successes and <b>19</b> crit fails, both the company's most",
+    "distinction_detail": "spread of <b>6.1</b> &middot; <b>21</b> crit successes and <b>20</b> crit fails, both the company's most",
     "distinction_basis": {
       "kind": "mechanical",
       "atom": "is_party_swingiest",
