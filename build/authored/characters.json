@@ -20,7 +20,7 @@
   },
   {
     "id": "urida",
-    "epithet": "of the Rock Gnomes, reader of the threefold weave",
+    "epithet": "of the Rock Gnomes, who answers a crowd with a clap of thunder",
     "reliquary_header": "Gathered to the bell's toll",
     "constellation_epithet": "the heaviest toll, and every bit earned",
     "distinction_title": "The Greatest Felling",
@@ -42,17 +42,19 @@
     "epithet": "of the Dhakaani, bound by pact to a shadow unseen",
     "reliquary_header": "Claimed by the shadow unseen",
     "constellation_epithet": "few throws, and great weight in them",
-    "distinction_title": "The Level Ledger",
-    "distinction_subtitle": "whose crit successes and crit fails have come out dead even",
-    "distinction_detail": "<b>9</b> crit successes and <b>9</b> crit fails &middot; the only hand the dice have kept level",
+    "distinction_title": "The Only Eyes on the Stair",
+    "distinction_subtitle": "who climbed Orolunga on directions no one else could see",
+    "distinction_detail": "<b>Orolunga</b> &middot; at every landing a small figure showed him the way up, and no one else could see it",
     "archetype_badge": {
       "archetype": "lamplighter",
       "inscription": "Fifteen flasks of oil weigh down his pack, kept steady for the one lamp he lights when the shadow at his shoulder goes quiet and the tunnels close in."
     },
     "distinction_basis": {
-      "kind": "mechanical",
-      "atom": "crits",
-      "value": 9
+      "kind": "narrative",
+      "sessions": [
+        26
+      ],
+      "note": "alone saw the figures guiding the ziggurat climb"
     },
     "sworn_creed": "a devil holds his signature in blood, and its fire answers when he calls"
   },
@@ -63,7 +65,7 @@
     "constellation_epithet": "ever at the hunt, the soft-pawed shot",
     "distinction_title": "The Cat's Own Luck",
     "distinction_subtitle": "whose kept dice fall higher than any other hand at the table",
-    "distinction_detail": "<b>11.1</b> average kept d20 &middot; the kindest dice the company casts",
+    "distinction_detail": "<b>11.0</b> average kept d20 &middot; the kindest dice the company casts",
     "archetype_badge": {
       "archetype": "quiver",
       "inscription": "Sixteen enchanted arrows ride fletched and silent in her quiver, each one a held breath waiting on the pull of her string."
@@ -82,7 +84,7 @@
     "constellation_epithet": "no night finds his hands idle",
     "distinction_title": "The Widest Arc",
     "distinction_subtitle": "whose throws range widest from their own middle",
-    "distinction_detail": "spread of <b>6.1</b> &middot; <b>21</b> crit successes and <b>20</b> crit fails, both the company's most",
+    "distinction_detail": "spread of <b>6.1</b> &middot; <b>21</b> crit successes and <b>21</b> crit fails, both the company's most",
     "distinction_basis": {
       "kind": "mechanical",
       "atom": "is_party_swingiest",

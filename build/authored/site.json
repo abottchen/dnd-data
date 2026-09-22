@@ -3,7 +3,7 @@
   "page_subtitle": "A ledger of those who walk &middot; and those they have laid down",
   "intro_epithet": "Five travellers and a storyteller, bound to a doomed road",
   "footnote": "The names above are the names given &middot; the ones who fell were given no names",
-  "refreshed_through_session": 25,
+  "refreshed_through_session": 26,
   "road_ahead": {
     "known": [
       {
@@ -12,7 +12,7 @@
       },
       {
         "name": "The Soulmonger",
-        "gloss": "engine of the Death Curse, somewhere in Chult."
+        "gloss": "engine of the Death Curse, sunk in Omu between the Valley of Lost Honor and the Peaks of Flame."
       },
       {
         "name": "The Death Curse",
@@ -31,16 +31,17 @@
         "gloss": "Vex carries the pair, and Azlund waits at the other end."
       },
       {
-        "name": "Saja N'baza",
-        "gloss": "a name in Chult, sought by Artus for word of his lost wife."
-      },
-      {
         "name": "The Yuan-ti's Door",
         "gloss": "a yuan-ti drew blood and fled within, and Wickles watches from the eaves."
       }
     ],
-    "was_known": [],
-    "direction": "The company has carried Nanny Pu'pu's errand west out of Mbala to the ziggurat at Orolunga, where a stranger's fire is still smoking and something unseen has come up behind them."
+    "was_known": [
+      {
+        "name": "Saja N'baza",
+        "gloss": "the naga atop Orolunga, who answered once and cannot be asked again."
+      }
+    ],
+    "direction": "Saja N'baza has named what breaking the Death Curse will cost, Ras Nsi dead and the Soulmonger dug out of hidden Omu, and the company means to stop at Mbala on the way back to kill the hag who sent them."
   },
   "gm": {
     "name": "The Dungeon Master",
@@ -121,7 +122,9 @@
     "Omala",
     "Eemux",
     "Rork",
-    "Nanny Pu'pu"
+    "Nanny Pu'pu",
+    "Ras Nsi",
+    "Acererak"
   ],
   "ascent_read": "Legends forged mostly by steel, but the road and its riddles have left their mark on every hard-won mile.",
   "player_map": {
