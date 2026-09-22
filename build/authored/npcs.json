@@ -131,8 +131,8 @@
   },
   {
     "name": "Saja N'baza",
-    "epithet": "a contact in Chult whom Artus Cimber was traveling to meet in hopes of finding his lost wife",
-    "allegiance": null
+    "epithet": "the naga of Orolunga, seen only once in a lifetime, who named Ras Nsi's death the cure for the curse and sent them on with charms",
+    "allegiance": "with"
   },
   {
     "name": "Jessamine",
@@ -141,8 +141,8 @@
   },
   {
     "name": "Kwayothe",
-    "epithet": "merchant prince of Port Nyanzaru, whose trade runs in tej and insect repellant",
-    "allegiance": null
+    "epithet": "merchant prince of Port Nyanzaru, who means to kill Shago to settle a score with Zhanthi",
+    "allegiance": "against"
   },
   {
     "name": "Ifan Talro'a",
@@ -201,7 +201,7 @@
   },
   {
     "name": "Vorn",
-    "epithet": "a shield guardian bound to Urida's amulet, walking and following but stripped of every other power",
+    "epithet": "a shield guardian bound to Urida's amulet, crippled but for its power cube, whose sigils tie back to the trickster gods buried in Omu",
     "allegiance": "with"
   },
   {
@@ -251,7 +251,7 @@
   },
   {
     "name": "Shago",
-    "epithet": "guide out of Fort Beluarian, unsworn to the Flaming Fist he serves, who is marked for death by a writ at the Dye Works and already carries an iron token that says so",
+    "epithet": "guide out of Fort Beluarian, unsworn to the Flaming Fist he serves, marked for death by Kwayothe as punishment aimed at Zhanthi, and already carrying the iron token that says so",
     "allegiance": "with"
   },
   {
@@ -366,7 +366,17 @@
   },
   {
     "name": "Nanny Pu'pu",
-    "epithet": "last of Mbala, who offers to raise the dead and rivals the pterafolk for a taste of the living",
+    "epithet": "last of Mbala by her own claim, whom Artus took for a green hag and rival of the pterafolk for a taste of the living, who sent them to slay a naga that proved no enemy at all",
+    "allegiance": "against"
+  },
+  {
+    "name": "Ras Nsi",
+    "epithet": "raised from death more times than he can count, walking Acererak's leash toward the door that would loose the serpent who swallows the sun",
+    "allegiance": "against"
+  },
+  {
+    "name": "Acererak",
+    "epithet": "who slew and buried the nine trickster gods beneath Omu, and now steers Ras Nsi toward betrayal",
     "allegiance": "against"
   }
 ]
