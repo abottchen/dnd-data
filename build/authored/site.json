@@ -3,7 +3,7 @@
   "page_subtitle": "A ledger of those who walk &middot; and those they have laid down",
   "intro_epithet": "Five travellers and a storyteller, bound to a doomed road",
   "footnote": "The names above are the names given &middot; the ones who fell were given no names",
-  "refreshed_through_session": 26,
+  "refreshed_through_session": 27,
   "road_ahead": {
     "known": [
       {
@@ -33,6 +33,10 @@
       {
         "name": "The Yuan-ti's Door",
         "gloss": "a yuan-ti drew blood and fled within, and Wickles watches from the eaves."
+      },
+      {
+        "name": "The Heart of the Wild",
+        "gloss": "corrupted at the root, and eating away at the magic of Chult until someone mends it."
       }
     ],
     "was_known": [
@@ -41,7 +45,7 @@
         "gloss": "the naga atop Orolunga, who answered once and cannot be asked again."
       }
     ],
-    "direction": "Saja N'baza has named what breaking the Death Curse will cost, Ras Nsi dead and the Soulmonger dug out of hidden Omu, and the company means to stop at Mbala on the way back to kill the hag who sent them."
+    "direction": "With Nanny Pu'pu dead at Mbala and Artus Cimber hiding in Port Nyanzaru from the frost giant patrols, the company sets out for Tamalka Village to find Wainrath and learn how to mend the corrupted Heart of the Wild."
   },
   "gm": {
     "name": "The Dungeon Master",
