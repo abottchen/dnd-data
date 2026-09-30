@@ -734,5 +734,13 @@
     "method": "Eldritch Blast",
     "verse": "A pterafolk dropped beneath a streak of crackling force.",
     "annotation": "Eldritch Blast &middot; it fell before it cleared the chimney's mouth."
+  },
+  {
+    "character": "chumble",
+    "date": "2026-09-27",
+    "creature": "Flesh Golem",
+    "method": "Eldritch Blast",
+    "verse": "A flesh golem that clawed up from the dirt to seize a leg",
+    "annotation": "Eldritch Blast &middot; the hag's strange current spent, the grip let go"
   }
 ]
