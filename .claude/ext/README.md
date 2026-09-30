@@ -14,6 +14,13 @@ mklink /J .claude\ext\5etools-src %USERPROFILE%\Documents\Projects\5etools-src
 
 Adjust the target path to wherever you actually cloned `5etools-src`.
 
+`dnd-toa` is linked the same way (optional; it gives the Chronicle writer the
+module's own text for the places a session visits, via `build/reference.py`):
+
+```
+ln -s ~/projects/dnd-toa .claude/ext/dnd-toa
+```
+
 ## How skills use this
 
 Skills that need the data reference it via the `{{DATA_ROOT}}` placeholder. At skill start, Claude runs:

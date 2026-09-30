@@ -65,7 +65,7 @@ def _prompt_meta(name: str, frozen_prompts_dir: Path) -> dict:
 
     fm, body = parse_frontmatter(prompt_src.read_text())
     body_path = frozen_prompts_dir / f"{name}.md"
-    body_path.write_text(body)
+    body_path.write_text(expand_includes(body))
     schema_path = frozen_prompts_dir / f"{name}.schema.json"
     shutil.copy(schema_src, schema_path)
     return {
@@ -128,7 +128,7 @@ def run(*, no_refresh: bool, force_refresh: bool, keep_temp: bool) -> Path:
             (rdir / pending_rel).write_text(
                 json.dumps(slice_data, indent=2, ensure_ascii=False) + "\n"
             )
-            slices_out.append({
+            slice_entry = {
                 "transformer": entry.name,
                 "pass": entry.pass_name,
                 "key": key,
@@ -138,7 +138,18 @@ def run(*, no_refresh: bool, force_refresh: bool, keep_temp: bool) -> Path:
                 "result": result_rel,
                 "prompt_body": meta["prompt_body_rel"],
                 "schema": meta["schema_rel"],
-            })
+            }
+            # The editor reads the chronicle before it is allowed to see the
+            # session log (stage one of edit-sessions.md is a reader's read),
+            # so the pages go in a file of their own beside the slice.
+            if "chronicle" in slice_data:
+                (rdir / "context").mkdir(exist_ok=True)
+                chron_rel = f"context/{stem}.chronicle.json"
+                (rdir / chron_rel).write_text(
+                    json.dumps(slice_data["chronicle"], indent=2, ensure_ascii=False) + "\n"
+                )
+                slice_entry["chronicle"] = chron_rel
+            slices_out.append(slice_entry)
 
     # Freeze the paired prompts (editor, then verifier) for any authoring
     # transformer that emitted a slice this run. The skill reads
@@ -181,6 +192,26 @@ def run(*, no_refresh: bool, force_refresh: bool, keep_temp: bool) -> Path:
         json.dumps(manifest, indent=2, ensure_ascii=False) + "\n"
     )
     return rdir
+
+
+_INCLUDE = re.compile(r"^\{\{include:\s*([A-Za-z0-9_.-]+)\s*\}\}[ \t]*$", re.M)
+
+
+def expand_includes(body: str, prompts_dir: Path | None = None) -> str:
+    """Replace each `{{include: name.md}}` line with that file's body from the
+    prompts dir (its own frontmatter stripped). One level only: a shared
+    file such as publisher-notes.md is plain text that several prompts quote,
+    and freezing the expansion into the run dir keeps the record whole."""
+    base = PROMPTS_DIR if prompts_dir is None else prompts_dir
+
+    def sub(m: re.Match) -> str:
+        src = base / m.group(1)
+        if not src.exists():
+            raise FileNotFoundError(f"included prompt missing: {src}")
+        _, text = parse_frontmatter(src.read_text())
+        return text.rstrip("\n")
+
+    return _INCLUDE.sub(sub, body)
 
 
 class FrontmatterError(ValueError):

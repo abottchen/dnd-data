@@ -71,11 +71,18 @@ def test_append_sessions_emits_slice_per_unauthored_session(slice_env):
     assert body["chapter_marker"] is True
 
 
-def test_append_sessions_slice_carries_roster_kills_and_prior_narratives(slice_env):
+def test_append_sessions_slice_carries_roster_kills_chronicle_and_reference(slice_env, monkeypatch, tmp_path):
     """The session author needs canonical species (roster), the authoritative
-    kill log for this session's date, and every earlier session's narrative so
-    proper nouns established before this session carry forward."""
-    out = slices.append_sessions(slice_env["data"], slice_env["authored"])
+    kill log for this session's date, the chronicle so far (what the reader
+    has read), and the record behind the session (party sheets, module text,
+    bestiary). It never gets the prior session logs: the reader did not."""
+    from build import reference
+    monkeypatch.setenv("BUILD_TOA_ADVENTURE", str(tmp_path / "no-module.json"))
+    reference._adventure_sections.cache_clear()
+    try:
+        out = slices.append_sessions(slice_env["data"], slice_env["authored"])
+    finally:
+        reference._adventure_sections.cache_clear()
     _, body = out[0]  # session 2
 
     # Roster: one entry per party member, carrying species/class + a pronouns key.
@@ -88,10 +95,16 @@ def test_append_sessions_slice_carries_roster_kills_and_prior_narratives(slice_e
     # the whole party ledger.
     assert {(k["character"], k["creature"]) for k in body["kills"]} == {("anton", "Bandit")}
 
-    # Prior narratives: every session before this one, and none from this
-    # session or later.
-    assert {p["session"] for p in body["prior_narratives"]} == {1}
-    assert "Daggerford" in body["prior_narratives"][0]["text"]
+    # Chronicle: every authored entry before this one, title and text, and
+    # none from this session or later.
+    assert [(c["session"], c["title"]) for c in body["chronicle"]] == [(1, "First Light")]
+    assert "Daggerford" in body["chronicle"][0]["text"]
+    assert "prior_narratives" not in body
+
+    # Reference: the record, with every block present even when the module
+    # text is not linked on this machine.
+    assert set(body["reference"]) == {"party_sheets", "places", "creatures", "seen_before"}
+    assert {s["name"] for s in body["reference"]["party_sheets"]} == set(roster)
 
 
 def test_append_chapters_emits_slice_per_unauthored_marker(slice_env):

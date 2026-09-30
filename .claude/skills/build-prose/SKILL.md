@@ -46,6 +46,14 @@ A valid run directory contains `manifest.json`, `pending/`, `results/`, `done/`,
 
          Do not edit any other file. Do not run any other tool besides
          Read (on the three paths above) and Write (on the result path).
+
+     For `append-sessions` only, append this to the prompt body, because its
+     brief tells the writer to ask when it cannot tell whether the company
+     knows something in the reference:
+
+         One exception: if the prompt body tells you to ask before using
+         something, you may use AskUserQuestion, once, for that.
+
 5. After every sub-agent in the batch returns, check `results/<stem>.json`:
    - If the file exists and parses as JSON, move `pending/<stem>.json` to `done/<stem>.json`.
    - If not, leave the pending file in place and log the slice in `<run-dir>/failures.json` (append, not overwrite).
@@ -56,22 +64,34 @@ A valid run directory contains `manifest.json`, `pending/`, `results/`, `done/`,
      - `model`: `manifest["edit"][transformer]["model"]`.
      - **Prompt body** (the slice lives in `done/<stem>.json` once authored, else `pending/<stem>.json`):
 
-           You are the editor for the [transformer] transformer. Read
-           these five files only:
+           You are the editor for the [transformer] transformer. You read
+           in two stages, and the order matters: stage one is a reader's
+           read, and you must not open the session slice until stage one
+           is written to disk.
+
+           Stage one. Read these four files only, in this order:
 
            - editor prompt (your instructions): <run-dir>/[edit.prompt_body]
            - editor schema: <run-dir>/[edit.schema]
-           - the writer's brief (the standard the draft is held to): <run-dir>/[prompt_body]
-           - the session slice (the only source of fact): <run-dir>/[slice path]
+           - the chronicle so far (every earlier page): <run-dir>/[chronicle]
            - the draft entry under review: <run-dir>/[result]
 
-           Follow the editor prompt. Return your critique as a single
-           JSON object conforming to the editor schema, and write it to:
+           Follow the editor prompt's stage one and write your critique,
+           with `log_check` set to null, to:
 
            <run-dir>/results/[stem].edit-[n].json
 
+           Stage two. Only after that file is written, read the session
+           slice: <run-dir>/[slice path]. Follow the editor prompt's stage
+           two, fill in `log_check`, and overwrite the critique path with
+           the whole object. Do not change `through_line` or `verdict`.
+
            Do not edit any other file. Use only Read (on the five paths
            above) and Write (on the critique path).
+
+     `[chronicle]` is the slice's `chronicle` field in the manifest
+     (`context/<stem>.chronicle.json`), written by prepare for exactly this
+     purpose.
 
    - Read the critique. If the file is missing or not valid JSON, keep the current draft and end the loop for this slice. If `verdict` is `accept`, end the loop for this slice.
    - **Revise.** If `verdict` is `revise`, dispatch the author again, with the same `model` as the authoring slice:
@@ -87,17 +107,45 @@ A valid run directory contains `manifest.json`, `pending/`, `results/`, `done/`,
            - the editor's notes: <run-dir>/results/[stem].edit-[n].json
 
            Revise the draft so that every note is addressed. Keep what
-           the notes do not touch. Every fact still comes only from the
-           slice. Produce a single JSON object that conforms to the
-           schema — the complete revised entry, not a reply to the
-           notes — and overwrite:
+           the notes do not touch. The editor's `through_line` is the
+           story, and every paragraph serves it. Every fact still comes
+           from the slice, and nothing goes on the page the players do not
+           have. Produce a single JSON object that conforms to the schema,
+           the complete revised entry, not a reply to the notes, and
+           overwrite:
 
            <run-dir>/[result]
 
            Do not edit any other file. Use only Read (on the five paths
            above) and Write (on the result path).
 
-     If the revision returns nothing or invalid JSON, keep the previous draft and end the loop for this slice.
+   - **Redraft.** If `verdict` is `redraft`, the shape is wrong and revision cannot fix it. Dispatch the author fresh, with the same `model` as the authoring slice:
+
+           You are acting as the [transformer] transformer. Your last
+           draft was rejected by the editor, and you are starting over.
+           Read these five files only:
+
+           - prompt body: <run-dir>/[prompt_body]
+           - schema: <run-dir>/[schema]
+           - slice input: <run-dir>/[slice path]
+           - the rejected draft: <run-dir>/[result]
+           - the editor's notes: <run-dir>/results/[stem].edit-[n].json
+
+           The editor's `through_line` is the story this entry tells.
+           Start from it and from the first note, not from the rejected
+           draft: do not keep its paragraphs or its opening. Follow the
+           prompt body as if writing for the first time. Produce a single
+           JSON object that conforms to the schema, the complete entry,
+           and overwrite:
+
+           <run-dir>/[result]
+
+           Do not edit any other file. Use only Read (on the five paths
+           above) and Write (on the result path). If the prompt body tells
+           you to ask before using something, you may use AskUserQuestion,
+           once, for that.
+
+     If the revision or redraft returns nothing or invalid JSON, keep the previous draft and end the loop for this slice.
    - After `max_rounds` critiques the draft that stands is the one that goes forward, whatever the last verdict was. Critique files stay in `results/` for the record; `apply` never reads them.
    - Batch editor dispatches (and revision dispatches) across slices in the same batches-of-5 style; the rounds for one slice are sequential.
 8. **Verify pass** (independent, same-build fact-check, after the edit loop has settled the prose): the manifest has a top-level `verify` map keyed by transformer name (currently just `append-sessions`). For every manifest slice whose `transformer` is a key in that map and which now has a `results/<stem>.json` file, dispatch one verify sub-agent (in the same batches-of-5 style):

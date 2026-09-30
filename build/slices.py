@@ -14,7 +14,7 @@ import re
 import sys
 from collections import defaultdict
 
-from . import render
+from . import reference, render
 from .inventory import ARCHETYPE_SLATE, archetype_match
 
 _ARCHETYPE_LABELS = {a["slug"]: a["label"] for a in ARCHETYPE_SLATE}
@@ -129,10 +129,11 @@ def chapter_session_ids(chapter_id: int, chapters: list, session_log: dict) -> l
 # -- Session fact context ----------------------------------------------------
 # Session prose needs more than one session's narrative to get details right:
 # canonical species (roster), the authoritative kill log for the session's date,
-# and every earlier session's narrative so a proper noun introduced before this
-# session carries forward. The append-sessions slice carries all of it, and the
-# same slice is what the paired verify-sessions agent fact-checks the draft
-# against in the same build (see .claude/prompts/verify-sessions.md).
+# the chronicle so far (what the reader has read, and the writer's memory of
+# the expedition), and the record behind the session (party sheets, module
+# text, bestiary: see build/reference.py). The append-sessions slice carries
+# all of it, and the same slice is what the paired verify-sessions agent
+# fact-checks the draft against in the same build.
 
 def _session_roster(data: dict, authored: dict) -> list[dict]:
     """Canonical species/class for every party member, so session prose never
@@ -164,15 +165,18 @@ def _kills_on_date(data: dict, date) -> list[dict]:
     return out
 
 
-def _prior_narratives(entries: list, sid) -> list[dict]:
-    """Every session-log entry before `sid`, in log order, so a proper noun
-    established in an earlier session (a ship, a place, a person) is available
-    to a later session's author."""
+def _chronicle(authored: dict, sid) -> list[dict]:
+    """Every authored Chronicle entry before `sid`, in order. This is what the
+    reader has read when they turn to this session's page, so it is also the
+    writer's memory: a name spelled here keeps that spelling, a person on the
+    last page needs no introduction, and a fact no page ever gave the reader
+    is not one the writer may lean on."""
     out = []
-    for e in entries:
-        esid = e.get("session")
+    for s in sorted(authored.get("sessions", []), key=lambda s: s.get("session", 0)):
+        esid = s.get("session")
         if sid is not None and esid is not None and esid < sid:
-            out.append({"session": esid, "text": e.get("text", "")})
+            out.append({"session": esid, "title": s.get("title", ""),
+                        "text": s.get("summary", "")})
     return out
 
 
@@ -228,15 +232,18 @@ def append_sessions(data: dict, authored: dict) -> list[tuple]:
         sid = entry.get("session")
         if sid in auth_sessions:
             continue
+        narrative = entry.get("text", "")
+        kills = _kills_on_date(data, entry.get("date"))
         out.append((sid, {
             "session": sid,
             "real_date": entry.get("date"),
             "iu_date": iu_date(entry),
-            "narrative": entry.get("text", ""),
+            "narrative": narrative,
             "chapter_marker": entry.get("chapter_marker", False),
             "roster": _session_roster(data, authored),
-            "kills": _kills_on_date(data, entry.get("date")),
-            "prior_narratives": _prior_narratives(entries, sid),
+            "kills": kills,
+            "chronicle": _chronicle(authored, sid),
+            "reference": reference.build_reference(data, sid, narrative, kills),
         }))
     return out
 
