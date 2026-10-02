@@ -172,3 +172,43 @@ def test_prepare_records_edit_prompt_for_append_sessions(run_env):
     assert (run_dir / em["schema"]).exists()
     assert em["model"] in {"sonnet", "opus", "fable"}
     assert em["max_rounds"] >= 1
+
+
+# -- Prompt includes + chronicle context ------------------------------------
+
+def test_expand_includes_inlines_shared_prompt_text(tmp_path):
+    """`{{include: name.md}}` on a line of its own becomes that file's body,
+    with the included file's own frontmatter stripped."""
+    (tmp_path / "publisher-notes.md").write_text("---\nmodel: opus\n---\n> the note\n")
+    body = "head\n{{include: publisher-notes.md}}\ntail\n"
+    out = prepare.expand_includes(body, prompts_dir=tmp_path)
+    assert out == "head\n> the note\ntail\n"
+
+
+def test_expand_includes_missing_file_raises(tmp_path):
+    with pytest.raises(FileNotFoundError):
+        prepare.expand_includes("{{include: nope.md}}", prompts_dir=tmp_path)
+
+
+def test_prepare_freezes_prompts_with_includes_expanded(run_env):
+    """The frozen writer and editor prompts carry the publisher's notes
+    inline, so the run dir records exactly what the agents read."""
+    run_dir = prepare.run(no_refresh=True, force_refresh=False, keep_temp=False)
+    manifest = json.loads((run_dir / "manifest.json").read_text())
+    frozen = {(run_dir / s["prompt_body"]).read_text() for s in manifest["slices"]}
+    frozen.add((run_dir / manifest["edit"]["append-sessions"]["prompt_body"]).read_text())
+    assert not any("{{include:" in t for t in frozen)
+
+
+def test_prepare_writes_chronicle_context_for_session_slices(run_env):
+    """The editor's first read is pages only, so the chronicle goes in a file
+    of its own that the skill hands over before the slice."""
+    run_dir = prepare.run(no_refresh=True, force_refresh=False, keep_temp=False)
+    manifest = json.loads((run_dir / "manifest.json").read_text())
+    sess = [s for s in manifest["slices"] if s["transformer"] == "append-sessions"]
+    assert sess and all("chronicle" in s for s in sess)
+    for s in sess:
+        pages = json.loads((run_dir / s["chronicle"]).read_text())
+        assert isinstance(pages, list) and all({"session", "title", "text"} <= set(p) for p in pages)
+    others = [s for s in manifest["slices"] if s["transformer"] != "append-sessions"]
+    assert not any("chronicle" in s for s in others)

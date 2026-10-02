@@ -1,9 +1,10 @@
 {
   "type": "object",
-  "required": ["verdict", "notes", "read"],
+  "required": ["through_line", "verdict", "notes", "read", "log_check"],
   "additionalProperties": false,
   "properties": {
-    "verdict": {"type": "string", "enum": ["accept", "revise"]},
+    "through_line": {"type": "string"},
+    "verdict": {"type": "string", "enum": ["accept", "revise", "redraft"]},
     "notes": {
       "type": "array",
       "items": {
@@ -17,6 +18,22 @@
         }
       }
     },
-    "read": {"type": "string"}
+    "read": {"type": "string"},
+    "log_check": {
+      "anyOf": [
+        {"type": "null"},
+        {
+          "type": "object",
+          "required": ["log_order", "same_weight", "cut", "missing"],
+          "additionalProperties": false,
+          "properties": {
+            "log_order": {"type": "boolean"},
+            "same_weight": {"type": "string"},
+            "cut": {"type": "array", "items": {"type": "string"}},
+            "missing": {"type": "array", "items": {"type": "string"}}
+          }
+        }
+      ]
+    }
   }
 }

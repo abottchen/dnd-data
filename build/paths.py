@@ -20,6 +20,17 @@ def authored_dir() -> Path:
     return Path(os.environ.get("BUILD_AUTHORED_DIR", REPO_ROOT / "build" / "authored"))
 
 
+def toa_adventure_path() -> Path:
+    """The Tomb of Annihilation module text as 5etools JSON, reached through
+    the machine-local `.claude/ext/dnd-toa` link (see .claude/ext/README.md).
+    Override via BUILD_TOA_ADVENTURE. Missing is tolerated: the session
+    writer then gets no module text, and prepare says so once."""
+    override = os.environ.get("BUILD_TOA_ADVENTURE")
+    if override:
+        return Path(override)
+    return REPO_ROOT / ".claude" / "ext" / "dnd-toa" / "data" / "5etools" / "adventure-toa.json"
+
+
 def run_root() -> Path:
     """Parent of all run dirs. Override via BUILD_RUN_ROOT."""
     override = os.environ.get("BUILD_RUN_ROOT")
