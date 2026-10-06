@@ -24,10 +24,10 @@
         {"type": "null"},
         {
           "type": "object",
-          "required": ["log_order", "lifted", "same_weight", "cut", "missing"],
+          "required": ["coverage", "lifted", "same_weight", "cut", "missing"],
           "additionalProperties": false,
           "properties": {
-            "log_order": {"type": "boolean"},
+            "coverage": {"type": "string"},
             "lifted": {"type": "array", "items": {"type": "string"}},
             "same_weight": {"type": "string"},
             "cut": {"type": "array", "items": {"type": "string"}},

@@ -38,8 +38,11 @@ Then ask:
 - **Is this a story, or a list of what happened?** Hold each paragraph, and each
   event within it, against the through-line. An event that does not serve it
   is a line item, however well it is phrased. Its fix is to move it to
-  `silent_roll` or drop it, not to reword it. A list goes through the session's
-  events in order, gives each about the same space, and leaves none out.
+  `silent_roll` or drop it, not to reword it. A list has every event of the
+  session on the page, each at about the same length, with nothing left out.
+  Chronological order is not the problem; a story is usually chronological
+  too. The problem is a page that duplicates the log instead of telling a
+  story based on it.
 - **Does the story build to its turn, or give it away?** If the through-line is
   a reveal or a reversal, find the first sentence where the reader could know
   the answer. If that comes before the moment the company learned it, the
@@ -68,15 +71,15 @@ Write stage one to the critique path now, before you read anything else:
 ## Stage two: against the log
 
 Only now open the session slice and read `narrative`. Fill in the five
-`log_check` fields below (`log_order`, `lifted`, `same_weight`, `cut`,
+`log_check` fields below (`coverage`, `lifted`, `same_weight`, `cut`,
 `missing`), then overwrite the critique file with the whole object. Do not change `through_line`. You may lower the verdict to `redraft`
 after reading the log, and never raise it. You may add a note if the log shows
 the draft says a thing that did not happen or credits the wrong person, and
 that note begins "Log:".
 
-- `log_order`: is the entry's order the log's order, top to bottom? If it is,
-  and the plan's order was not, the draft was written from the log and not
-  from the plan: `redraft`.
+- `coverage`: how much of the log is on the page, in a sentence: which of
+  the log's events are there and which are not. If nearly all of them are,
+  the entry duplicates the log, whatever its order: `redraft`.
 - `lifted`: sentences of the draft that reword a log line. Quote each, with
   the log line beside it. One is enough for `redraft`.
 - `same_weight`: which events got about the same space regardless of their
