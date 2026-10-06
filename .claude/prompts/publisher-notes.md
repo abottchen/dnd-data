@@ -135,34 +135,6 @@ judgment, applied to real passages, so that you can apply it yourself.
 > fighter or gladiator". That doesn't extend to the catoblepas. They
 > obviously know the difference between that and other creatures.
 
-## What the fact-check and the editor sent back on session 28
-
-Not the publisher's words. These are the three things the fact-check or the
-editor cut from both drafts of session 28, so the writer stops making them.
-
-**Do not write a character doing something the log does not record, even if
-their sheet says they can.** Cut twice: "Then the trident came again, from
-where the echo stood this time, and found the keeper." The log says trident
-and nothing about the echo.
-
-**Take a person's gender from the record, and do not invent one.** The
-record is the chronicle, the module text, and the log, not the log alone.
-The fact-check cut "a man named Wainrath" for want of it in the log, but the
-module text in the slice says "Wainrath and the secrets of his clan," so
-that cut was wrong. It also cut "he said" for the raiders' leader, whose
-gender nothing in the slice gives, and that cut was right. Where none of the
-record gives it, write around it: "one of the raiders," "one of the three."
-
-**Do not copy a module or bestiary description in as a block, and do not
-place anything the log does not place.** Cut or trimmed: the catoblepas as a
-45-word bestiary catalogue in both drafts ("a thing put together from
-bloated buffalo and warthog and hippopotamus, a serpentine neck that can
-barely lift its head, bloodshot eyes, a club at the end of its tail, and a
-stink of death and swamp gas and skunk musk"); the trapdoor house as an
-inventory of its furniture; the bowmen put in "a hall of tables and empty
-barrels" when the log does not say where they were. Use one or two details
-from the description, in the sentence where the company meets the thing.
-
 ## How he would have told the fight
 
 Read this against the log for session 27 and notice everything in it that the
