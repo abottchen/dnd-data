@@ -140,25 +140,24 @@ judgment, applied to real passages, so that you can apply it yourself.
 Not the publisher's words. These are the three things the fact-check or the
 editor cut from both drafts of session 28, so the writer stops making them.
 
-**A capability on a sheet is not an event.** Cut twice: "Then the trident
-came again, from where the echo stood this time, and found the keeper." The
-log says trident, and nothing about the echo. Grieg can fight from two
-places; the page says he did only when the log does.
+**Do not write a character doing something the log does not record, even if
+their sheet says they can.** Cut twice: "Then the trident came again, from
+where the echo stood this time, and found the keeper." The log says trident
+and nothing about the echo.
 
-**The record gives no one a sex it does not state.** Cut: "a man named
-Wainrath"; "took apart a man inside"; "he said"; "one man." The log never
-says, so the page says "Wainrath," "one of the raiders," "one of the three."
+**Do not give anyone a gender the log does not state.** Cut: "a man named
+Wainrath"; "took apart a man inside"; "he said"; "one man." Write "Wainrath,"
+"one of the raiders," "one of the three."
 
-**The module's description is used where the company stands, not copied
-in.** Cut or trimmed: the catoblepas as a 45-word bestiary catalogue in both
-drafts ("a thing put together from bloated buffalo and warthog and
-hippopotamus, a serpentine neck that can barely lift its head, bloodshot
-eyes, a club at the end of its tail, and a stink of death and swamp gas and
-skunk musk"); the trapdoor house as an inventory of its furniture; the
-bowmen placed in "a hall of tables and empty barrels" the log never puts
-them in. The record says what a thing looked like. The page uses the one or
-two details the scene needs, in the sentence where the company meets it,
-and places nothing the log does not place.
+**Do not copy a module or bestiary description in as a block, and do not
+place anything the log does not place.** Cut or trimmed: the catoblepas as a
+45-word bestiary catalogue in both drafts ("a thing put together from
+bloated buffalo and warthog and hippopotamus, a serpentine neck that can
+barely lift its head, bloodshot eyes, a club at the end of its tail, and a
+stink of death and swamp gas and skunk musk"); the trapdoor house as an
+inventory of its furniture; the bowmen put in "a hall of tables and empty
+barrels" when the log does not say where they were. Use one or two details
+from the description, in the sentence where the company meets the thing.
 
 ## How he would have told the fight
 

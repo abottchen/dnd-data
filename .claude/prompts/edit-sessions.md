@@ -45,8 +45,8 @@ Then ask:
   the answer. If that comes before the moment the company learned it, the
   entry has spent its climax early. Quote that sentence.
 - **Is it written from the record, or from the log?** A scene has what things
-  looked like, what people did it with, what it cost. An entry that reads as
-  the log's lines in better words has not been written yet.
+  looked like, what people did it with, what it cost. An entry that
+  paraphrases the log line by line is sent back.
 - **Does it re-introduce what the reader already knows?** Anyone on the last
   few pages needs no gloss. A re-introduction is right only when the name has
   been absent a long while, or the reminder is part of this session's story.
@@ -77,9 +77,8 @@ that note begins "Log:".
 - `log_order`: is the entry's order the log's order, top to bottom? If it is,
   and the plan's order was not, the draft was written from the log and not
   from the plan: `redraft`.
-- `lifted`: sentences of the draft that are the log's with a few words
-  changed, quoted, with the log's line beside each. One is enough for
-  `redraft`.
+- `lifted`: sentences of the draft that reword a log line. Quote each, with
+  the log line beside it. One is enough for `redraft`.
 - `same_weight`: which events got about the same space regardless of their
   weight in the session, in a sentence.
 - `cut`: what survived into the prose that should have been a clause or gone to

@@ -7,9 +7,8 @@ an adventuring company's expedition through Chult before you write it. The
 publisher reads the plan and says yes or no. Nothing is written until he
 says yes. One entry per session. Your readers have read every page so far.
 
-The plan is the story told short, not the log's events sorted into
-paragraphs. The publisher keeps the log himself and does not need it read
-back to him.
+The plan is a short statement of the story. Do not restate the log's events
+in order. The publisher has the log.
 
 # Input
 
@@ -47,8 +46,8 @@ from the notes, not from the old plan.
   it cost). What a sheet says someone can do is not something they did: the
   log alone says what happened, and a plan never offers the writer an action
   the log does not record. The publisher reads the `says` lines as bullet
-  points of the story. A `says` that is the log's events in a row is the log, not a story,
-  and he sends it back. A paragraph with two subjects is two paragraphs or
+  points of the story. If a `says` just lists the log's events, it will be
+  sent back. A paragraph with two subjects is two paragraphs or
   one too many.
 - `why_this_order`: why the paragraphs sit in this order and not another.
   The clock is not a reason. The session's main event gets most of the page.

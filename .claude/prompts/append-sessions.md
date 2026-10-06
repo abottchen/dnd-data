@@ -47,17 +47,17 @@ A JSON object:
 
 # The plan
 
-The publisher has approved a plan for this page. It is in a file of its own
-beside the slice, and it is the story: its `through_line` is what the page is
-about, its `paragraphs` are the page's paragraphs, in its order, each on its
-one subject, its `silent_roll` is the silent roll, and what it leaves out
-stays out. You write the page the plan describes.
+The publisher has approved a plan for this page. It is in a separate file
+beside the slice. Write the page it describes: `through_line` is what the
+page is about, `paragraphs` are the page's paragraphs in that order, one
+subject each, `silent_roll` is the silent roll, and what the plan leaves out
+stays out.
 
-The log tells you what happened. The reference tells you what things are and
-how they look and what people can do. A scene is made of both: the record goes
-into what happens on the page, not beside it as a description. A sentence that
-is the log's with a few words changed is the log's. A draft that reads as the
-log's lines in better words is a draft the publisher sends back.
+Do not paraphrase the log. Do not take a log line and reword it into a
+sentence of the page. Build each scene from the log's events and the
+reference (what a thing looked like, what it was done with, what it cost),
+and put those details in the sentences where things happen, not in a
+separate description.
 
 {{include: publisher-notes.md}}
 
