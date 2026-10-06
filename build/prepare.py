@@ -12,9 +12,8 @@ import subprocess
 import sys
 from pathlib import Path
 
-from . import inventory, registry, render, store
-from .paths import (PROMPTS_DIR, REPO_ROOT, authored_dir, data_dir,
-                    new_run_id, run_dir)
+from . import inventory, paths, registry, render, store
+from .paths import REPO_ROOT, authored_dir, data_dir, new_run_id, run_dir
 
 _STEM_SAFE = re.compile(r"[^A-Za-z0-9_.-]+")
 
@@ -65,8 +64,8 @@ def _warn_if_hooks_inactive() -> None:
 
 def _prompt_meta(name: str, frozen_prompts_dir: Path) -> dict:
     """Copy prompt + schema into the run dir and return manifest fields."""
-    prompt_src = PROMPTS_DIR / f"{name}.md"
-    schema_src = PROMPTS_DIR / f"{name}.schema.json"
+    prompt_src = paths.prompts_dir() / f"{name}.md"
+    schema_src = paths.prompts_dir() / f"{name}.schema.json"
     if not prompt_src.exists():
         raise FileNotFoundError(f"prompt missing: {prompt_src}")
     if not schema_src.exists():
@@ -222,7 +221,7 @@ def expand_includes(body: str, prompts_dir: Path | None = None) -> str:
     prompts dir (its own frontmatter stripped). One level only: a shared
     file such as publisher-notes.md is plain text that several prompts quote,
     and freezing the expansion into the run dir keeps the record whole."""
-    base = PROMPTS_DIR if prompts_dir is None else prompts_dir
+    base = paths.prompts_dir() if prompts_dir is None else prompts_dir
 
     def sub(m: re.Match) -> str:
         src = base / m.group(1)

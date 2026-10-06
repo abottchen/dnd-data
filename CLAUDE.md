@@ -103,7 +103,7 @@ Pipeline (`apply` step):
 
 `.venv/bin/pytest tests/` runs the test suite — covers validators, key matching, computation formulas, slice builders, and bestiary lookup.
 
-`build/paths.py` honors four env vars for test isolation: `BUILD_DATA_DIR`, `BUILD_AUTHORED_DIR`, `BUILD_RUN_ROOT`, `BUILD_TOA_ADVENTURE`. `tests/test_slices.py` monkeypatches `BUILD_AUTHORED_DIR` to point at a fixture copy under `tmp_path`.
+`build/paths.py` honors five env vars for test isolation: `BUILD_DATA_DIR`, `BUILD_AUTHORED_DIR`, `BUILD_RUN_ROOT`, `BUILD_PROMPTS_DIR`, `BUILD_TOA_ADVENTURE`. `tests/test_slices.py` monkeypatches `BUILD_AUTHORED_DIR` to point at a fixture copy under `tmp_path`. The `staged_env` fixture in `tests/conftest.py` points `BUILD_PROMPTS_DIR` at a copy of `.claude/prompts/` with a stand-in in place of the gitignored `publisher-notes.md`, so the `prepare` and `apply` tests pass on a fresh clone and in CI, where the publisher's notes do not exist.
 
 End-to-end verification: run the three-step build (or just `build/render.py` to re-render without authoring) and visually check the rendered page via the local preview server.
 

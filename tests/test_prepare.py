@@ -1,6 +1,7 @@
 """Tests for build/prepare.py — slice gathering and run-dir population."""
 import json
 import os
+from pathlib import Path
 
 import pytest
 
@@ -188,6 +189,25 @@ def test_expand_includes_inlines_shared_prompt_text(tmp_path):
 def test_expand_includes_missing_file_raises(tmp_path):
     with pytest.raises(FileNotFoundError):
         prepare.expand_includes("{{include: nope.md}}", prompts_dir=tmp_path)
+
+
+def test_expand_includes_missing_publisher_notes_names_it_as_local(tmp_path):
+    """publisher-notes.md is gitignored, so a fresh clone lacks it. prepare
+    stops and says which file and why, rather than building without it."""
+    with pytest.raises(FileNotFoundError, match="local and gitignored"):
+        prepare.expand_includes("{{include: publisher-notes.md}}", prompts_dir=tmp_path)
+
+
+def test_prepare_freezes_the_stand_in_for_the_publishers_notes(run_env):
+    """The publisher's notes exist only on the publisher's machine, so the
+    suite points prepare at its own prompts dir (BUILD_PROMPTS_DIR) carrying a
+    stand-in. The frozen writer prompt must come from there, not from the
+    repo's .claude/prompts/, or every prepare.run fails on a fresh clone."""
+    stand_in = (Path(os.environ["BUILD_PROMPTS_DIR"]) / "publisher-notes.md").read_text()
+    run_dir = prepare.run(no_refresh=True, force_refresh=False, keep_temp=False)
+    manifest = json.loads((run_dir / "manifest.json").read_text())
+    writer = next(s for s in manifest["slices"] if s["transformer"] == "append-sessions")
+    assert stand_in.strip() in (run_dir / writer["prompt_body"]).read_text()
 
 
 def test_prepare_freezes_prompts_with_includes_expanded(run_env):

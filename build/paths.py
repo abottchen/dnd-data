@@ -2,7 +2,8 @@
 
 Every path resolves from REPO_ROOT (the repo this package lives in). Test
 isolation overrides via env vars: BUILD_DATA_DIR, BUILD_AUTHORED_DIR,
-BUILD_RUN_ROOT.
+BUILD_RUN_ROOT, BUILD_PROMPTS_DIR (and BUILD_TOA_ADVENTURE / BUILD_TOA_DOCS
+for the module text).
 """
 import datetime as _dt
 import os
@@ -10,6 +11,14 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 PROMPTS_DIR = REPO_ROOT / ".claude" / "prompts"
+
+
+def prompts_dir() -> Path:
+    """Where prepare reads prompts, schemas and their includes. Override via
+    BUILD_PROMPTS_DIR: the session briefs include publisher-notes.md, which is
+    gitignored and exists only on the publisher's machine, so the test suite
+    points this at a copy of the prompts carrying a stand-in for it."""
+    return Path(os.environ.get("BUILD_PROMPTS_DIR", PROMPTS_DIR))
 
 
 def data_dir() -> Path:
