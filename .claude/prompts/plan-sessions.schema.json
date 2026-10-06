@@ -1,0 +1,26 @@
+{
+  "type": "object",
+  "required": ["through_line", "opens_on", "paragraphs", "why_this_order", "silent_roll", "left_out"],
+  "additionalProperties": false,
+  "properties": {
+    "through_line": {"type": "string"},
+    "opens_on": {"type": "string"},
+    "paragraphs": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["subject", "says", "built_from"],
+        "additionalProperties": false,
+        "properties": {
+          "subject": {"type": "string"},
+          "says": {"type": "string"},
+          "built_from": {"type": "string"}
+        }
+      }
+    },
+    "why_this_order": {"type": "string"},
+    "silent_roll": {"type": "array", "items": {"type": "string"}},
+    "left_out": {"type": "array", "items": {"type": "string"}}
+  }
+}

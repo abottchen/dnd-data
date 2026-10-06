@@ -28,3 +28,6 @@ build/.run/
 *.swp
 *.swo
 *~
+
+# The publisher's notes are his own words on rejected drafts; local only, never committed.
+.claude/prompts/publisher-notes.md

@@ -1,0 +1,6 @@
+{
+  "name": "chronicle-review",
+  "version": "0.1.0",
+  "description": "A pane that shows a plan or an entry line by line, takes the publisher's notes against lines, and returns Approve, Send back or Stop.",
+  "types": "./types/index.d.ts"
+}

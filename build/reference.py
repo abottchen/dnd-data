@@ -19,7 +19,7 @@ import json
 import re
 import sys
 
-from .paths import REPO_ROOT, toa_adventure_path
+from .paths import REPO_ROOT, toa_adventure_path, toa_docs_glob
 
 BESTIARY_GLOB = ".claude/ext/5etools-src/data/bestiary/bestiary-*.json"
 FLUFF_GLOB = ".claude/ext/5etools-src/data/bestiary/fluff-bestiary-*.json"
@@ -43,7 +43,24 @@ _GENERIC_CREATURES = {
 
 # Parts of the book that are about running it, not about a place the company
 # can stand in. A log that says "death curse" is not asking for the foreword.
-_EXCLUDED_PATH_PARTS = {"Foreword", "Running the Adventure", "Conclusion", "Credits"}
+_EXCLUDED_PATH_PARTS = {
+    "Foreword", "Running the Adventure", "Conclusion", "Credits",
+    # The markdown transcriptions' front matter: the who's-who, the blurbs
+    # that summarize the whole trilogy, the transcriber's own notes.
+    "Contents", "Table of Contents", "About this transcription",
+    "Dramatis Personae", "Product Summary", "Series Overview",
+}
+
+# Markdown module text is read by heading. Page markers are the
+# transcription's structure, not the book's, and never open a section.
+_MD_HEADING = re.compile(r"^(#{1,6})\s+(.*?)\s*#*\s*$")
+_MD_PAGE = re.compile(r"^Page \d+$")
+_MD_EMPHASIS = re.compile(r"\*{1,3}|(?<!\w)_{1,2}|_{1,2}(?!\w)")
+# A top-level place named "<Something> of <Name>" is reached by its name
+# alone: a log that says Tamalka wants "The Village of Tamalka".
+_OF_NAME = re.compile(r"\bof ([A-Z][\w'-]{3,})$")
+_DM_NOTE = re.compile(r"\(DM [Nn]ote[^)]*\)")
+_BRACKETED = re.compile(r"\[[^\]]*\]")
 
 _SECTION_TYPES = ("section", "entries", "inset", "insetReadaloud")
 _TAG = re.compile(r"\{@\w+ ([^{}|]*)(?:\|[^{}]*)?\}")
@@ -167,16 +184,79 @@ def walk_sections(adventure: dict | list) -> list[dict]:
     return out
 
 
+def _md_line(raw: str) -> str | None:
+    """One markdown line as plain text, or None for lines that are not the
+    book's prose: table rows, rules, and the transcriber's bracketed notes
+    (`_[Printed page 9]_`, map and illustration descriptions)."""
+    s = raw.strip()
+    if not s:
+        return ""
+    if s.startswith("|") or s.startswith("---") or s.startswith("_[") or s.startswith("["):
+        return None
+    if s.startswith(">"):
+        s = "> " + s.lstrip("> ").strip()
+    return html.unescape(_MD_EMPHASIS.sub("", s)).strip()
+
+
+def walk_markdown_sections(text: str) -> list[dict]:
+    """Every heading of a markdown module transcription → {name, path, depth,
+    text}, the same shape `walk_sections` gives the 5etools JSON. Nesting
+    follows heading level; a section's text is its whole content,
+    subsections included, their headings kept as `## ` lines."""
+    out: list[dict] = []
+    stack: list[tuple[int, dict]] = []
+    for raw in text.splitlines():
+        m = _MD_HEADING.match(raw)
+        if m:
+            level, name = len(m.group(1)), m.group(2).strip()
+            if _MD_PAGE.match(name):
+                continue
+            while stack and stack[-1][0] >= level:
+                stack.pop()
+            path = [s[1]["name"] for s in stack] + [name]
+            sec = {"name": name, "path": path, "depth": len(path), "lines": []}
+            for _, anc in stack:
+                anc["lines"].append(f"## {name}")
+            stack.append((level, sec))
+            out.append(sec)
+            continue
+        line = _md_line(raw)
+        if line is None:
+            continue
+        for _, sec in stack:
+            sec["lines"].append(line)
+    return [{"name": s["name"], "path": s["path"], "depth": s["depth"],
+             "text": re.sub(r"\n{3,}", "\n\n", "\n".join(s["lines"])).strip()}
+            for s in out]
+
+
 @functools.lru_cache(maxsize=1)
 def _adventure_sections() -> tuple:
+    """Every section of every module the writer may draw on: the Tomb of
+    Annihilation JSON, then the markdown transcriptions beside it."""
+    out: list[dict] = []
     p = toa_adventure_path()
-    if not p.exists():
+    if p.exists():
+        with open(p) as f:
+            out.extend(walk_sections(json.load(f)))
+    for fpath in sorted(_glob.glob(toa_docs_glob())):
+        with open(fpath) as f:
+            out.extend(walk_markdown_sections(f.read()))
+    if not out:
         print(f"reference: no module text at {p}; the session writer gets none "
               "(link ../dnd-toa under .claude/ext/, see .claude/ext/README.md)",
               file=sys.stderr)
-        return ()
-    with open(p) as f:
-        return tuple(walk_sections(json.load(f)))
+    return tuple(out)
+
+
+def _names_place(section: dict, narrative: str) -> bool:
+    """Does the log name this section? By its whole name, as written; or,
+    for a section near the top of its chapter named "<Something> of <Name>",
+    by that name alone."""
+    if _word(section["name"]).search(narrative):
+        return True
+    m = _OF_NAME.search(section["name"])
+    return bool(m and section["depth"] <= 2 and _word(m.group(1)).search(narrative))
 
 
 def match_places(narrative: str, sections, *, limit: int = 6,
@@ -190,11 +270,14 @@ def match_places(narrative: str, sections, *, limit: int = 6,
     are biographies, and who someone secretly is comes from the log or not
     at all."""
     people = _named_creatures() if people is None else people
+    # A place the log names only inside a DM note is not one the company
+    # went to.
+    narrative = _BRACKETED.sub("", _DM_NOTE.sub("", narrative))
     hits = [s for s in sections
             if s["name"] not in _GENERIC_SECTIONS and len(s["name"]) >= 4
             and s["name"][0].isupper() and s["name"].casefold() not in people
             and not any(p in _EXCLUDED_PATH_PARTS or p.startswith("Appendix") for p in s["path"])
-            and _word(s["name"]).search(narrative)
+            and _names_place(s, narrative)
             and len(s["text"]) <= max_section_chars]
     paths = {tuple(h["path"]) for h in hits}
     keep = [h for h in hits

@@ -51,6 +51,9 @@ that is not in the log against `reference` and `chronicle`:
   when no one is credited by name.
 - Species and pronouns follow `roster`. Names are spelled as `chronicle`
   spells them.
+- A non-player character's gender is a fact of the record like any other.
+  Check the chronicle and the module text as well as the log before cutting
+  one. Cut it only when none of them gives it.
 - No em dash (— or &mdash;) and no semicolon anywhere.
 - `silent_roll` lines carry no dates and no bookkeeping.
 

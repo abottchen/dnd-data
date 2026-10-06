@@ -1,6 +1,7 @@
 """Tests for build/prepare.py — slice gathering and run-dir population."""
 import json
 import os
+from pathlib import Path
 
 import pytest
 
@@ -190,6 +191,25 @@ def test_expand_includes_missing_file_raises(tmp_path):
         prepare.expand_includes("{{include: nope.md}}", prompts_dir=tmp_path)
 
 
+def test_expand_includes_missing_publisher_notes_names_it_as_local(tmp_path):
+    """publisher-notes.md is gitignored, so a fresh clone lacks it. prepare
+    stops and says which file and why, rather than building without it."""
+    with pytest.raises(FileNotFoundError, match="local and gitignored"):
+        prepare.expand_includes("{{include: publisher-notes.md}}", prompts_dir=tmp_path)
+
+
+def test_prepare_freezes_the_stand_in_for_the_publishers_notes(run_env):
+    """The publisher's notes exist only on the publisher's machine, so the
+    suite points prepare at its own prompts dir (BUILD_PROMPTS_DIR) carrying a
+    stand-in. The frozen writer prompt must come from there, not from the
+    repo's .claude/prompts/, or every prepare.run fails on a fresh clone."""
+    stand_in = (Path(os.environ["BUILD_PROMPTS_DIR"]) / "publisher-notes.md").read_text()
+    run_dir = prepare.run(no_refresh=True, force_refresh=False, keep_temp=False)
+    manifest = json.loads((run_dir / "manifest.json").read_text())
+    writer = next(s for s in manifest["slices"] if s["transformer"] == "append-sessions")
+    assert stand_in.strip() in (run_dir / writer["prompt_body"]).read_text()
+
+
 def test_prepare_freezes_prompts_with_includes_expanded(run_env):
     """The frozen writer and editor prompts carry the publisher's notes
     inline, so the run dir records exactly what the agents read."""
@@ -212,3 +232,19 @@ def test_prepare_writes_chronicle_context_for_session_slices(run_env):
         assert isinstance(pages, list) and all({"session", "title", "text"} <= set(p) for p in pages)
     others = [s for s in manifest["slices"] if s["transformer"] != "append-sessions"]
     assert not any("chronicle" in s for s in others)
+
+
+def test_prepare_records_plan_prompt_for_append_sessions(run_env):
+    """append-sessions is planned before it is written: the planner's output
+    is shown to the publisher for sign-off, and the approved plan is an input
+    to the writer and the editor. prepare freezes the plan prompt + schema and
+    records them in the manifest's `plan` map."""
+    run_dir = prepare.run(no_refresh=True, force_refresh=False, keep_temp=False)
+    manifest = json.loads((run_dir / "manifest.json").read_text())
+
+    assert "append-sessions" in manifest["plan"], manifest.get("plan")
+    pm = manifest["plan"]["append-sessions"]
+    assert (run_dir / pm["prompt_body"]).exists()
+    assert (run_dir / pm["schema"]).exists()
+    assert pm["model"] in {"sonnet", "opus", "fable"}
+    assert "{{include:" not in (run_dir / pm["prompt_body"]).read_text()

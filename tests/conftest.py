@@ -6,9 +6,20 @@ from pathlib import Path
 
 import pytest
 
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+REPO_ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(REPO_ROOT))
 
 FIXTURES = Path(__file__).resolve().parent / "fixtures"
+
+# The session briefs include publisher-notes.md, which is gitignored and exists
+# only on the publisher's machine. The suite freezes this in its place so that
+# prepare reads the same prompts on every machine, CI included.
+PUBLISHER_NOTES_STAND_IN = (
+    "# The publisher\n\n"
+    "Stand-in for the publisher's notes. The real file is local to the "
+    "publisher's machine and never committed; the test suite freezes this "
+    "one in its place.\n"
+)
 
 
 def pytest_sessionstart(session):
@@ -59,7 +70,12 @@ def staged_env(tmp_path, monkeypatch):
         shutil.copy(f, authored_dir / f.name)
     run_root = tmp_path / "runs"
     run_root.mkdir()
+    prompts_dir = tmp_path / "prompts"
+    shutil.copytree(REPO_ROOT / ".claude" / "prompts", prompts_dir,
+                    ignore=shutil.ignore_patterns("publisher-notes.md"))
+    (prompts_dir / "publisher-notes.md").write_text(PUBLISHER_NOTES_STAND_IN)
     monkeypatch.setenv("BUILD_DATA_DIR", str(data_dir))
     monkeypatch.setenv("BUILD_AUTHORED_DIR", str(authored_dir))
     monkeypatch.setenv("BUILD_RUN_ROOT", str(run_root))
+    monkeypatch.setenv("BUILD_PROMPTS_DIR", str(prompts_dir))
     return tmp_path

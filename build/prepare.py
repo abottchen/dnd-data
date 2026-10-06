@@ -12,9 +12,8 @@ import subprocess
 import sys
 from pathlib import Path
 
-from . import inventory, registry, render, store
-from .paths import (PROMPTS_DIR, REPO_ROOT, authored_dir, data_dir,
-                    new_run_id, run_dir)
+from . import inventory, paths, registry, render, store
+from .paths import REPO_ROOT, authored_dir, data_dir, new_run_id, run_dir
 
 _STEM_SAFE = re.compile(r"[^A-Za-z0-9_.-]+")
 
@@ -34,6 +33,15 @@ VERIFY_FOR = {"append-sessions": "verify-sessions"}
 # consumed by apply.
 EDIT_FOR = {"append-sessions": "edit-sessions"}
 EDIT_MAX_ROUNDS = 2
+
+# Transformers that are planned before they are written. The planner reads the
+# same slice as the writer and returns the story the page will tell (its
+# through-line, one subject per paragraph, what goes to the silent roll, what
+# goes nowhere). The skill shows that plan to the publisher and waits for a
+# yes before any prose exists; the approved plan is then an input to the
+# writer and the editor. Written as `results/<stem>.plan-<n>.json`, approved
+# as `context/<stem>.plan.json`, never consumed by apply.
+PLAN_FOR = {"append-sessions": "plan-sessions"}
 
 
 def _stem(transformer: str, key) -> str:
@@ -56,8 +64,8 @@ def _warn_if_hooks_inactive() -> None:
 
 def _prompt_meta(name: str, frozen_prompts_dir: Path) -> dict:
     """Copy prompt + schema into the run dir and return manifest fields."""
-    prompt_src = PROMPTS_DIR / f"{name}.md"
-    schema_src = PROMPTS_DIR / f"{name}.schema.json"
+    prompt_src = paths.prompts_dir() / f"{name}.md"
+    schema_src = paths.prompts_dir() / f"{name}.schema.json"
     if not prompt_src.exists():
         raise FileNotFoundError(f"prompt missing: {prompt_src}")
     if not schema_src.exists():
@@ -177,6 +185,16 @@ def run(*, no_refresh: bool, force_refresh: bool, keep_temp: bool) -> Path:
                 "model": vm["model"],
             }
 
+    plan_meta: dict = {}
+    for transformer, plan_name in PLAN_FOR.items():
+        if transformer in prompt_cache:
+            pm = _prompt_meta(plan_name, frozen_prompts)
+            plan_meta[transformer] = {
+                "prompt_body": pm["prompt_body_rel"],
+                "schema": pm["schema_rel"],
+                "model": pm["model"],
+            }
+
     manifest = {
         "run_id": run_id,
         "marker": marker,
@@ -187,6 +205,7 @@ def run(*, no_refresh: bool, force_refresh: bool, keep_temp: bool) -> Path:
         "slices": slices_out,
         "edit": edit_meta,
         "verify": verify_meta,
+        "plan": plan_meta,
     }
     (rdir / "manifest.json").write_text(
         json.dumps(manifest, indent=2, ensure_ascii=False) + "\n"
@@ -202,12 +221,14 @@ def expand_includes(body: str, prompts_dir: Path | None = None) -> str:
     prompts dir (its own frontmatter stripped). One level only: a shared
     file such as publisher-notes.md is plain text that several prompts quote,
     and freezing the expansion into the run dir keeps the record whole."""
-    base = PROMPTS_DIR if prompts_dir is None else prompts_dir
+    base = paths.prompts_dir() if prompts_dir is None else prompts_dir
 
     def sub(m: re.Match) -> str:
         src = base / m.group(1)
         if not src.exists():
-            raise FileNotFoundError(f"included prompt missing: {src}")
+            hint = (" (this file is local and gitignored: the publisher's own "
+                    "notes, see CLAUDE.md)" if src.name == "publisher-notes.md" else "")
+            raise FileNotFoundError(f"included prompt missing: {src}{hint}")
         _, text = parse_frontmatter(src.read_text())
         return text.rstrip("\n")
 
