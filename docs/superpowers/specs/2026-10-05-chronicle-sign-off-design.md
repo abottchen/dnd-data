@@ -9,8 +9,7 @@ bestiary paragraph inserted, one sentence lifted nearly verbatim from the
 log, and two `revise` verdicts from the editor sub-agent that the pipeline
 published anyway because `max_rounds` had run out. The run dir was pruned
 on success, so the critiques were gone before the publisher could read
-them. The publisher's words: "I gave you an editor. How did it sign off on
-this?" It did not. Nothing in the pipeline required an accept.
+them. Nothing in the pipeline required an accept.
 
 ## What
 

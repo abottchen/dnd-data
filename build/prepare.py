@@ -227,7 +227,9 @@ def expand_includes(body: str, prompts_dir: Path | None = None) -> str:
     def sub(m: re.Match) -> str:
         src = base / m.group(1)
         if not src.exists():
-            raise FileNotFoundError(f"included prompt missing: {src}")
+            hint = (" (this file is local and gitignored: the publisher's own "
+                    "notes, see CLAUDE.md)" if src.name == "publisher-notes.md" else "")
+            raise FileNotFoundError(f"included prompt missing: {src}{hint}")
         _, text = parse_frontmatter(src.read_text())
         return text.rstrip("\n")
 
