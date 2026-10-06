@@ -1,9 +1,9 @@
 # The publisher
 
 The publisher reads every entry before it goes out and rejects most first
-drafts. These are his notes, quoted as he wrote them, on drafts of session 27
-that he sent back, followed by the way he would have told that session's
-fight. This is the standard. Nothing below is a rule to follow. It is his
+drafts. These are his notes, quoted as he wrote them, on drafts of sessions
+27 and 28 that he sent back, followed by the way he would have told session
+27's fight. This is the standard. Nothing below is a rule to follow. It is his
 judgment, applied to real passages, so that you can apply it yourself.
 
 ## On a draft as a whole
@@ -69,6 +69,96 @@ judgment, applied to real passages, so that you can apply it yourself.
 > There is no transition between the hag fight and the frost giants. That is
 > really jarring. Without a transition, it just looks like "oh, I forgot to
 > include an item from the list."
+
+## On a first paragraph that opened on why the company had come to Tamalka and then went on "Wickles went in first to look"
+
+> The intro paragraph is setting up the scene then just suddenly drops into a
+> blow by blow from the session log "Wickles went in first to look." The
+> entire remainder of that paragraph does not fit with the first sentences of
+> it. How is that proper paragraph structure?
+
+## On "When it was over there was no one left to ask what they had wanted," followed by "In the wreckage was a signet ring cut with a scaled claw, a mark neither Salida nor Shago knew"
+
+> "When it was over there was no one left to ask what they had wanted." feels
+> like the end of the story, but we immediately jump into something that seems
+> unworthy of mention. This still reads like a one to one line by line reading
+> of the session log with extra words.
+
+## On "the one who looked to be in charge turned to face them," where the log had "the one that appeared to be the leader turned and told them"
+
+> This is literally my exact words from the session log!
+
+## On a plan for session 28 shown as the log's events sorted into paragraphs
+
+> That didn't look like a prospective story. That looked like a
+> regurgitation of my notes from the session log.
+
+## On a plan's through-line, "Someone else wanted what the company came to Tamalka for, and got there first," and a later one that said the strangers' question was the company's
+
+> How do you know they want the same thing?
+
+> How do you know the question being asked is the one the party brought?
+
+## On a planned first paragraph about the letter Chumble Crudluck sent in with Wickles
+
+> Who cares about the letter? That is a trivial part of the story that is
+> irrelevant. It was essentially a joke by one of the players that I just
+> didn't want to forget. Why would it be here?
+
+## On a planned paragraph, "The ground and the archers. Pits, the two archers and the veteran fall"
+
+> "The ground"? Are you referring to the traps? When talking to me, use
+> normal language, not weird metaphors. Also, why would you note the number
+> of enemy types that fell? When a Tolkien recounts a battle, does he have
+> a line that says "and then they killed 3 wizards, 2 golems, and 1 ent"?
+
+## On a planned paragraph that had Wickles sent ahead into the maze
+
+> I do not see why Wickles being sent first would be notable enough to
+> mention.
+
+## On a silent roll that listed a jade statue and a scroll
+
+> Why the statue and scroll? Why would the history book need that? We
+> already track their inventory!
+
+## On "the veteran," where the log's kill table said Veteran
+
+> How does Volo know the other was a "veteran"? A veteran of what? In the
+> session log, it is a reference to a specific creature type, but in the
+> context of the story, what would a "veteran" mean?
+
+## On the next plan, which then called the catoblepas "the raiders' beast"
+
+> They know it was a catoblepas. My comment about veteran earlier was
+> specifically "how does a player know a veteran from an archer from a
+> fighter or gladiator". That doesn't extend to the catoblepas. They
+> obviously know the difference between that and other creatures.
+
+## What the fact-check and the editor sent back on session 28
+
+Not the publisher's words. These are the three things the fact-check or the
+editor cut from both drafts of session 28, so the writer stops making them.
+
+**A capability on a sheet is not an event.** Cut twice: "Then the trident
+came again, from where the echo stood this time, and found the keeper." The
+log says trident, and nothing about the echo. Grieg can fight from two
+places; the page says he did only when the log does.
+
+**The record gives no one a sex it does not state.** Cut: "a man named
+Wainrath"; "took apart a man inside"; "he said"; "one man." The log never
+says, so the page says "Wainrath," "one of the raiders," "one of the three."
+
+**The module's description is used where the company stands, not copied
+in.** Cut or trimmed: the catoblepas as a 45-word bestiary catalogue in both
+drafts ("a thing put together from bloated buffalo and warthog and
+hippopotamus, a serpentine neck that can barely lift its head, bloodshot
+eyes, a club at the end of its tail, and a stink of death and swamp gas and
+skunk musk"); the trapdoor house as an inventory of its furniture; the
+bowmen placed in "a hall of tables and empty barrels" the log never puts
+them in. The record says what a thing looked like. The page uses the one or
+two details the scene needs, in the sentence where the company meets it,
+and places nothing the log does not place.
 
 ## How he would have told the fight
 

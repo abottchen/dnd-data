@@ -742,5 +742,37 @@
     "method": "Eldritch Blast",
     "verse": "A flesh golem that clawed up from the dirt to seize a leg",
     "annotation": "Eldritch Blast &middot; the hag's strange current spent, the grip let go"
+  },
+  {
+    "character": "grieg",
+    "date": "2026-10-04",
+    "creature": "Catoblepas",
+    "method": "Trident",
+    "verse": "A catoblepas that guarded the raiders to its last",
+    "annotation": "Trident &middot; a pet put down beside the pits it kept"
+  },
+  {
+    "character": "grieg",
+    "date": "2026-10-04",
+    "creature": "Druid",
+    "method": "Trident",
+    "verse": "A druid carrying coin and a potion he never drank",
+    "annotation": "Trident &middot; the raid's last green hand, closed"
+  },
+  {
+    "character": "urida",
+    "date": "2026-10-04",
+    "creature": "Warrior Veteran",
+    "method": "Shatter",
+    "verse": "A veteran who held the burning village, then did not",
+    "annotation": "Shatter &middot; a hard sound, and the long habit of war ended"
+  },
+  {
+    "character": "chumble",
+    "date": "2026-10-04",
+    "creature": "Archer",
+    "method": "Eldritch Blast",
+    "verse": "An archer who had loosed one arrow too many at the sky",
+    "annotation": "Eldritch Blast &middot; the bow still strung, the shot never answered"
   }
 ]

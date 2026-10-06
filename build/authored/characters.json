@@ -61,17 +61,17 @@
     "epithet": "of the Tabaxi, who lets the bowstring do all her speaking",
     "reliquary_header": "Felled before they drew near",
     "constellation_epithet": "ever at the hunt, the soft-pawed shot",
-    "distinction_title": "The Cat's Own Luck",
-    "distinction_subtitle": "whose kept dice fall higher than any other hand at the table",
-    "distinction_detail": "<b>11.0</b> average kept d20 &middot; the kindest dice the company casts",
+    "distinction_title": "The Kinder Tally",
+    "distinction_subtitle": "the only hand whose crit successes outnumber her crit fails",
+    "distinction_detail": "<b>21</b> crit successes against <b>20</b> crit fails &middot; the only hand in the company still ahead",
     "archetype_badge": {
       "archetype": "naturalist",
       "inscription": "A sprig of mistletoe rides on her belt, tied with ribbon, and she reads the trail through it long before she lets an arrow fly."
     },
     "distinction_basis": {
       "kind": "mechanical",
-      "atom": "is_party_luckiest",
-      "value": true
+      "atom": "crits",
+      "value": 21
     },
     "sworn_creed": "she crossed once into the feywild, and it never fully let her walk back out"
   },
@@ -82,7 +82,7 @@
     "constellation_epithet": "no night finds his hands idle",
     "distinction_title": "The Widest Arc",
     "distinction_subtitle": "whose throws range widest from their own middle",
-    "distinction_detail": "spread of <b>6.1</b> &middot; <b>24</b> crit successes and <b>23</b> crit fails, both the company's most",
+    "distinction_detail": "spread of <b>6.1</b> &middot; <b>25</b> crit successes and <b>25</b> crit fails, both the company's most",
     "distinction_basis": {
       "kind": "mechanical",
       "atom": "is_party_swingiest",

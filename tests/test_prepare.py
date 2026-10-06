@@ -212,3 +212,19 @@ def test_prepare_writes_chronicle_context_for_session_slices(run_env):
         assert isinstance(pages, list) and all({"session", "title", "text"} <= set(p) for p in pages)
     others = [s for s in manifest["slices"] if s["transformer"] != "append-sessions"]
     assert not any("chronicle" in s for s in others)
+
+
+def test_prepare_records_plan_prompt_for_append_sessions(run_env):
+    """append-sessions is planned before it is written: the planner's output
+    is shown to the publisher for sign-off, and the approved plan is an input
+    to the writer and the editor. prepare freezes the plan prompt + schema and
+    records them in the manifest's `plan` map."""
+    run_dir = prepare.run(no_refresh=True, force_refresh=False, keep_temp=False)
+    manifest = json.loads((run_dir / "manifest.json").read_text())
+
+    assert "append-sessions" in manifest["plan"], manifest.get("plan")
+    pm = manifest["plan"]["append-sessions"]
+    assert (run_dir / pm["prompt_body"]).exists()
+    assert (run_dir / pm["schema"]).exists()
+    assert pm["model"] in {"sonnet", "opus", "fable"}
+    assert "{{include:" not in (run_dir / pm["prompt_body"]).read_text()

@@ -35,6 +35,15 @@ VERIFY_FOR = {"append-sessions": "verify-sessions"}
 EDIT_FOR = {"append-sessions": "edit-sessions"}
 EDIT_MAX_ROUNDS = 2
 
+# Transformers that are planned before they are written. The planner reads the
+# same slice as the writer and returns the story the page will tell (its
+# through-line, one subject per paragraph, what goes to the silent roll, what
+# goes nowhere). The skill shows that plan to the publisher and waits for a
+# yes before any prose exists; the approved plan is then an input to the
+# writer and the editor. Written as `results/<stem>.plan-<n>.json`, approved
+# as `context/<stem>.plan.json`, never consumed by apply.
+PLAN_FOR = {"append-sessions": "plan-sessions"}
+
 
 def _stem(transformer: str, key) -> str:
     return _STEM_SAFE.sub("-", f"{transformer}__{key}")
@@ -177,6 +186,16 @@ def run(*, no_refresh: bool, force_refresh: bool, keep_temp: bool) -> Path:
                 "model": vm["model"],
             }
 
+    plan_meta: dict = {}
+    for transformer, plan_name in PLAN_FOR.items():
+        if transformer in prompt_cache:
+            pm = _prompt_meta(plan_name, frozen_prompts)
+            plan_meta[transformer] = {
+                "prompt_body": pm["prompt_body_rel"],
+                "schema": pm["schema_rel"],
+                "model": pm["model"],
+            }
+
     manifest = {
         "run_id": run_id,
         "marker": marker,
@@ -187,6 +206,7 @@ def run(*, no_refresh: bool, force_refresh: bool, keep_temp: bool) -> Path:
         "slices": slices_out,
         "edit": edit_meta,
         "verify": verify_meta,
+        "plan": plan_meta,
     }
     (rdir / "manifest.json").write_text(
         json.dumps(manifest, indent=2, ensure_ascii=False) + "\n"

@@ -31,6 +31,16 @@ def toa_adventure_path() -> Path:
     return REPO_ROOT / ".claude" / "ext" / "dnd-toa" / "data" / "5etools" / "adventure-toa.json"
 
 
+def toa_docs_glob() -> str:
+    """Module text kept as markdown transcriptions in the `dnd-toa` checkout
+    (the Lost City of Mezro trilogy lives in `docs/`), read beside the 5etools
+    JSON. Override via BUILD_TOA_DOCS, a glob. Missing is tolerated."""
+    override = os.environ.get("BUILD_TOA_DOCS")
+    if override:
+        return override
+    return str(REPO_ROOT / ".claude" / "ext" / "dnd-toa" / "docs" / "*.md")
+
+
 def run_root() -> Path:
     """Parent of all run dirs. Override via BUILD_RUN_ROOT."""
     override = os.environ.get("BUILD_RUN_ROOT")

@@ -132,3 +132,75 @@ def test_build_reference_without_module_text(staged_env, monkeypatch, tmp_path):
                                     stat_blocks=frozenset())
     assert ref["places"] == [] and ref["seen_before"] == []
     reference._adventure_sections.cache_clear()
+
+
+# -- Markdown modules (the Lost City of Mezro transcription) ----------------
+
+MINI_MARKDOWN = """# Lost City of Mezro — Full Transcription
+
+## Contents
+
+| Section | Page |
+|---|---|
+
+# Chapter 1: The Runestone Guide
+
+## Page 10
+
+_[Printed page 9]_
+
+## The Village of Tamalka
+
+Smoke rises over the huts.
+
+### 1. Village Entrance
+
+***Pit.*** A pit beyond the archway.
+
+## Page 11
+
+### 2. The Grounds
+
+Bodies near the huts.
+
+## The Tunnel Maze
+
+Dark passages under the shrines.
+
+### Talking with Wainrath
+
+He tells them everything.
+"""
+
+
+def test_walk_markdown_sections_nests_by_heading_and_skips_page_markers():
+    secs = {s["name"]: s for s in reference.walk_markdown_sections(MINI_MARKDOWN)}
+    assert "Page 10" not in secs and "Page 11" not in secs
+    village = secs["The Village of Tamalka"]
+    assert village["path"] == ["Chapter 1: The Runestone Guide", "The Village of Tamalka"]
+    assert "Smoke rises" in village["text"]
+    assert "## 1. Village Entrance" in village["text"]      # subsection heading kept
+    assert "Pit. A pit beyond the archway." in village["text"]  # emphasis marks stripped
+    assert "## 2. The Grounds" in village["text"]           # a page marker does not break nesting
+    assert "Printed page" not in village["text"]            # bracketed transcription notes dropped
+    assert secs["Contents"]["text"] == ""                   # tables dropped
+    assert secs["1. Village Entrance"]["depth"] == 3
+    assert secs["The Tunnel Maze"]["path"] == ["Chapter 1: The Runestone Guide", "The Tunnel Maze"]
+
+
+def test_match_places_matches_of_name_sections_near_the_top_only():
+    secs = reference.walk_markdown_sections(MINI_MARKDOWN)
+    log = "Arrived in Tamalka Village to find it attacked. Went in looking for Wainrath."
+    hits = reference.match_places(log, secs, people=frozenset())
+    # "The Village of Tamalka" matches on Tamalka and folds its subsections;
+    # "Talking with Wainrath" is deep and not "of <Name>", so Wainrath in the
+    # log does not hand over the conversation script.
+    assert [h["name"] for h in hits] == ["The Village of Tamalka"]
+    assert "## 1. Village Entrance" in hits[0]["text"]
+
+
+def test_match_places_ignores_places_named_only_in_dm_notes():
+    secs = reference.walk_sections(MINI_ADVENTURE)
+    assert reference.match_places("Camped. (DM note: next stop is Mbala)", secs, people=frozenset()) == []
+    assert reference.match_places("Camped. [Mbala next]", secs, people=frozenset()) == []
+    assert [h["name"] for h in reference.match_places("Climbed to Mbala.", secs, people=frozenset())] == ["Mbala"]
