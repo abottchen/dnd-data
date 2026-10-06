@@ -67,9 +67,9 @@ Write stage one to the critique path now, before you read anything else:
 
 ## Stage two: against the log
 
-Only now open the session slice and read `narrative`. Answer five things and
-write them into `log_check`, then overwrite the critique file with the whole
-object. Do not change `through_line`. You may lower the verdict to `redraft`
+Only now open the session slice and read `narrative`. Fill in the five
+`log_check` fields below (`log_order`, `lifted`, `same_weight`, `cut`,
+`missing`), then overwrite the critique file with the whole object. Do not change `through_line`. You may lower the verdict to `redraft`
 after reading the log, and never raise it. You may add a note if the log shows
 the draft says a thing that did not happen or credits the wrong person, and
 that note begins "Log:".
