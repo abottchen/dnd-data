@@ -145,9 +145,13 @@ their sheet says they can.** Cut twice: "Then the trident came again, from
 where the echo stood this time, and found the keeper." The log says trident
 and nothing about the echo.
 
-**Do not give anyone a gender the log does not state.** Cut: "a man named
-Wainrath"; "took apart a man inside"; "he said"; "one man." Write "Wainrath,"
-"one of the raiders," "one of the three."
+**Take a person's gender from the record, and do not invent one.** The
+record is the chronicle, the module text, and the log, not the log alone.
+The fact-check cut "a man named Wainrath" for want of it in the log, but the
+module text in the slice says "Wainrath and the secrets of his clan," so
+that cut was wrong. It also cut "he said" for the raiders' leader, whose
+gender nothing in the slice gives, and that cut was right. Where none of the
+record gives it, write around it: "one of the raiders," "one of the three."
 
 **Do not copy a module or bestiary description in as a block, and do not
 place anything the log does not place.** Cut or trimmed: the catoblepas as a
