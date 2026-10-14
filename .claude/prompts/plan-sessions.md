@@ -23,8 +23,9 @@ The same material the writer will have:
   has read. Read the last few pages before the log.
 - `reference`: the record behind this session. `party_sheets` (what each
   member can do and carries), `places` (the module's text for the places the
-  log names), `creatures` (the bestiary on each creature met), `seen_before`
-  (earlier visits).
+  log names), `creatures` (the bestiary on each creature met), `earlier_logs`
+  (every earlier session's log, `{session, text}`, with the DM's notes cut:
+  what the company has seen and heard, which the pages do not all repeat).
 
 When the publisher has sent a plan back, you are also given that plan and his
 notes on it: each note quotes the line of the plan it is about. Plan again
@@ -62,6 +63,15 @@ from the notes, not from the old plan.
 Do not spoil anything. Nothing goes in the plan that the players do not have.
 No `(DM Note)` or `[bracketed]` line from the log. Nothing from `reference`
 that the company did not see, hear, or work out for themselves.
+
+What they have seen and heard is in this session's log and in `earlier_logs`.
+A thing named there the company has met or been told of, and the module's
+text on it is the record behind that: how a place they stood in looks, what a
+creature they fought is, what Chult says of a city or a god they have heard
+named. What the book keeps for the DM stays out: who someone secretly is,
+what is inside a place they have not entered, what a creature never showed
+them. A thing no log names has no text in the plan. Say in `built_from`
+which session gave the company each thing you draw on.
 
 Style: no em dashes (— or &mdash;) and no semicolons anywhere in your output.
 

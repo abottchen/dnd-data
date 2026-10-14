@@ -8,7 +8,9 @@ the writer works from the record instead of paraphrasing the log.
 
 Everything here is selection, not judgment. The module text carries things
 the company never learned, and the writer's brief holds it to what the
-players have: see .claude/prompts/append-sessions.md.
+players have: see .claude/prompts/append-sessions.md. What the players have
+is the logs, so every earlier session's log goes along too, with the DM's
+notes cut.
 """
 from __future__ import annotations
 
@@ -57,10 +59,19 @@ _MD_HEADING = re.compile(r"^(#{1,6})\s+(.*?)\s*#*\s*$")
 _MD_PAGE = re.compile(r"^Page \d+$")
 _MD_EMPHASIS = re.compile(r"\*{1,3}|(?<!\w)_{1,2}|_{1,2}(?!\w)")
 # A top-level place named "<Something> of <Name>" is reached by its name
-# alone: a log that says Tamalka wants "The Village of Tamalka".
-_OF_NAME = re.compile(r"\bof ([A-Z][\w'-]{3,})$")
-_DM_NOTE = re.compile(r"\(DM [Nn]ote[^)]*\)")
+# alone: a log that says Tamalka wants "The Village of Tamalka", and one that
+# says Obanashi wants "Fate of the Obanashi".
+_OF_NAME = re.compile(r"\bof (?:the )?([A-Z][\w'-]{3,})$")
+_ARTICLE = re.compile(r"^(?:The|A|An) ")
+# A DM note runs to the end of its line: the log writes both
+# "(DM Note: the king was Kwalu)" and "(DM note) she would have seen Mesika".
+_DM_NOTE = re.compile(r"\(DM [Nn]ote[^)]*\)[^\n]*")
+# A line that is only "DM notes:" or "(DM notes)" opens a block of notes,
+# each line unmarked, that runs to the log's next <br /> separator.
+_DM_BLOCK = re.compile(r"^\s*\(?DM notes?\)?:?\s*$", re.I)
+_SEPARATOR = re.compile(r"^\s*<br\s*/?>\s*$")
 _BRACKETED = re.compile(r"\[[^\]]*\]")
+_BULLET = re.compile(r"^[\s\-*]+")
 
 _SECTION_TYPES = ("section", "entries", "inset", "insetReadaloud")
 _TAG = re.compile(r"\{@\w+ ([^{}|]*)(?:\|[^{}]*)?\}")
@@ -96,6 +107,29 @@ def _word(name: str, *, flags: int = 0, plural: bool = False) -> re.Pattern:
             alts.append(re.escape(name[:-2]) + "ves")
         pat = "(?:" + "|".join(alts) + ")"
     return re.compile(r"(?<!\w)" + pat + r"(?!\w)", flags)
+
+
+def player_text(text: str | list) -> str:
+    """A log as the company has it: DM notes and bracketed asides cut, a
+    block of notes under a "DM notes:" header cut to the next separator, and
+    a line that was nothing but a note dropped. Bullets and indentation
+    stay. This is as reliable as the marking: a note with no marker is
+    invisible here, and only the briefs' rule stands behind it."""
+    if isinstance(text, list):
+        text = "\n".join(text)
+    out = []
+    in_notes = False
+    for raw in text.split("\n"):
+        if _DM_BLOCK.match(raw):
+            in_notes = True
+            continue
+        if in_notes:
+            in_notes = not _SEPARATOR.match(raw)
+            continue
+        line = _BRACKETED.sub("", _DM_NOTE.sub("", raw)).rstrip()
+        if _BULLET.sub("", line).strip():
+            out.append(line)
+    return "\n".join(out)
 
 
 # -- Party sheets -----------------------------------------------------------
@@ -249,11 +283,22 @@ def _adventure_sections() -> tuple:
     return tuple(out)
 
 
+def _name_variants(name: str) -> set[str]:
+    """The forms a log may use for a heading: as written, without its
+    article, and in the singular. "The Seething Halls" is reached by
+    "the Seething Hall"."""
+    out = {name, _ARTICLE.sub("", name)}
+    for n in list(out):
+        if n.endswith("s") and not n.endswith("ss"):
+            out.add(n[:-1])
+    return {v for v in out if len(v) >= 4}
+
+
 def _names_place(section: dict, narrative: str) -> bool:
-    """Does the log name this section? By its whole name, as written; or,
-    for a section near the top of its chapter named "<Something> of <Name>",
-    by that name alone."""
-    if _word(section["name"]).search(narrative):
+    """Does the log name this section? By its name, as written (case
+    matters), its article and plural aside; or, for a section near the top of
+    its chapter named "<Something> of <Name>", by that name alone."""
+    if any(_word(v).search(narrative) for v in _name_variants(section["name"])):
         return True
     m = _OF_NAME.search(section["name"])
     return bool(m and section["depth"] <= 2 and _word(m.group(1)).search(narrative))
@@ -272,7 +317,7 @@ def match_places(narrative: str, sections, *, limit: int = 6,
     people = _named_creatures() if people is None else people
     # A place the log names only inside a DM note is not one the company
     # went to.
-    narrative = _BRACKETED.sub("", _DM_NOTE.sub("", narrative))
+    narrative = player_text(narrative)
     hits = [s for s in sections
             if s["name"] not in _GENERIC_SECTIONS and len(s["name"]) >= 4
             and s["name"][0].isupper() and s["name"].casefold() not in people
@@ -349,6 +394,8 @@ def creature_lore(narrative: str, kills: list, *, fluff: dict | None = None,
     fluff = _load_fluff() if fluff is None else fluff
     skip = _named_creatures() if skip is None else skip
     stat_blocks = _bestiary_names()[0] if stat_blocks is None else stat_blocks
+    # A creature the DM's notes name is one the company has not met.
+    narrative = player_text(narrative)
     found = {k["creature"].casefold() for k in kills if k.get("creature")}
     for key in fluff:
         if (len(key) >= 4 and key not in _GENERIC_CREATURES and key in stat_blocks
@@ -362,28 +409,19 @@ def creature_lore(narrative: str, kills: list, *, fluff: dict | None = None,
     return out
 
 
-# -- Earlier visits ---------------------------------------------------------
+# -- Earlier logs -----------------------------------------------------------
 
-def seen_before(entries: list, sid, place_names: list) -> list[dict]:
-    """Player-facing log lines from earlier sessions that mention a place this
-    session visits. DM notes and bracketed asides are cut from the line."""
-    if not place_names:
-        return []
-    pats = [_word(n) for n in place_names]
+def earlier_logs(entries: list, sid) -> list[dict]:
+    """Every earlier session's log as the company has it, DM notes cut. This
+    is what the company has seen and heard, as against `chronicle`, which is
+    what the reader has read: the pages leave things out on purpose, and the
+    writer judges what the company knows by the logs, not the pages."""
     out = []
     for e in entries:
         esid = e.get("session")
         if esid is None or sid is None or esid >= sid:
             continue
-        text = e.get("text", "")
-        if isinstance(text, list):
-            text = "\n".join(text)
-        for raw in text.split("\n"):
-            line = re.sub(r"\(DM [Nn]ote[^)]*\)", "", raw)
-            line = re.sub(r"\[[^\]]*\]", "", line)
-            line = re.sub(r"^[\s\-*]+", "", line).strip()
-            if line and any(p.search(line) for p in pats):
-                out.append({"session": esid, "line": line})
+        out.append({"session": esid, "text": player_text(e.get("text", ""))})
     return out
 
 
@@ -403,6 +441,5 @@ def build_reference(data: dict, sid, narrative: str, kills: list, *,
         "places": places,
         "creatures": creature_lore(narrative, kills, fluff=fluff, skip=skip,
                                    stat_blocks=stat_blocks),
-        "seen_before": seen_before(data["session_log"]["entries"], sid,
-                                   [p["name"] for p in places]),
+        "earlier_logs": earlier_logs(data["session_log"]["entries"], sid),
     }
