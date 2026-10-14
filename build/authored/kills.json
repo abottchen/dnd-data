@@ -774,5 +774,29 @@
     "method": "Eldritch Blast",
     "verse": "An archer who had loosed one arrow too many at the sky",
     "annotation": "Eldritch Blast &middot; the bow still strung, the shot never answered"
+  },
+  {
+    "character": "grieg",
+    "date": "2026-10-11",
+    "creature": "Blackguard",
+    "method": "Trident",
+    "verse": "A blackguard who answered to no one, until the trident",
+    "annotation": "Trident &middot; the oath he kept ended on its points"
+  },
+  {
+    "character": "vex",
+    "date": "2026-10-11",
+    "creature": "Thug",
+    "method": "Longbow",
+    "verse": "A thug dropped from a distance he never crossed",
+    "annotation": "Longbow &middot; the string sang, and the work was done"
+  },
+  {
+    "character": "lilac",
+    "date": "2026-10-11",
+    "creature": "Thug",
+    "method": "Longbow",
+    "verse": "Another thug, brought down before he reached the line",
+    "annotation": "Longbow &middot; a second arrow, a second quiet"
   }
 ]

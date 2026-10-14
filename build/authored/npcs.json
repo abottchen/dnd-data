@@ -378,5 +378,15 @@
     "name": "Acererak",
     "epithet": "who slew and buried the nine trickster gods beneath Omu, and now steers Ras Nsi toward betrayal",
     "allegiance": "against"
+  },
+  {
+    "name": "Wainrath",
+    "epithet": "of Tamalka, sought on Artus Cimber's word, who named the Obanashi and gave the company a sounding stone to their temple",
+    "allegiance": "with"
+  },
+  {
+    "name": "Nava",
+    "epithet": "dryad at the mouth of the Seething Hall, who set the company challenges before the door",
+    "allegiance": null
   }
 ]

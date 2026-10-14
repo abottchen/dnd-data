@@ -3,7 +3,7 @@
     "id": "vex",
     "epithet": "of the Gold Dragonborn, born to breath and blade",
     "reliquary_header": "Given to edge and ember",
-    "constellation_epithet": "no hand cast more, nor more evenly",
+    "constellation_epithet": "ever in the press, the steadiest hand",
     "distinction_title": "The Brightest Salvo",
     "distinction_subtitle": "whose single night turned five crit successes",
     "distinction_detail": "<b>5</b> crit successes in one session &middot; the brightest single night the table has seen",
@@ -22,18 +22,18 @@
     "id": "urida",
     "epithet": "of the Rock Gnomes, who answers a crowd with a clap of thunder",
     "reliquary_header": "Gathered to the bell's toll",
-    "constellation_epithet": "the heaviest toll, and every bit earned",
-    "distinction_title": "The Greatest Felling",
-    "distinction_subtitle": "who unmade the mightiest thing the company has faced",
-    "distinction_detail": "<b>2,300</b> XP in a single felling &middot; the largest kill any hand has claimed",
+    "constellation_epithet": "most foes felled from the fewest throws",
+    "distinction_title": "The Fullest Night",
+    "distinction_subtitle": "who felled twelve foes in one session, three times any other hand's best",
+    "distinction_detail": "<b>12</b> kills in a single session &middot; no other hand has claimed more than <b>4</b> in a night",
     "archetype_badge": {
       "archetype": "apothecary",
       "inscription": "She keeps three dozen Ohelo berries against the small hurts, and one vial of true healing saved only for the wound that finally frightens her."
     },
     "distinction_basis": {
       "kind": "mechanical",
-      "atom": "is_party_biggest_kill",
-      "value": true
+      "atom": "max_kills_in_one_session",
+      "value": 12
     },
     "sworn_creed": "force bent to her reading of the weave, and spared before it reaches her allies"
   },
@@ -61,17 +61,17 @@
     "epithet": "of the Tabaxi, who lets the bowstring do all her speaking",
     "reliquary_header": "Felled before they drew near",
     "constellation_epithet": "ever at the hunt, the soft-pawed shot",
-    "distinction_title": "The Kinder Tally",
-    "distinction_subtitle": "the only hand whose crit successes outnumber her crit fails",
-    "distinction_detail": "<b>21</b> crit successes against <b>20</b> crit fails &middot; the only hand in the company still ahead",
+    "distinction_title": "The Kindest Dice",
+    "distinction_subtitle": "whose kept d20s run as high as any in the company",
+    "distinction_detail": "kept d20 average of <b>10.8</b> &middot; tied for the company's best",
     "archetype_badge": {
       "archetype": "naturalist",
       "inscription": "A sprig of mistletoe rides on her belt, tied with ribbon, and she reads the trail through it long before she lets an arrow fly."
     },
     "distinction_basis": {
       "kind": "mechanical",
-      "atom": "crits",
-      "value": 21
+      "atom": "is_party_luckiest",
+      "value": true
     },
     "sworn_creed": "she crossed once into the feywild, and it never fully let her walk back out"
   },
@@ -79,13 +79,13 @@
     "id": "grieg",
     "epithet": "of the Wulven, who takes up whatever weapon the moment puts in reach",
     "reliquary_header": "Felled by whatever came to hand",
-    "constellation_epithet": "no night finds his hands idle",
-    "distinction_title": "The Widest Arc",
-    "distinction_subtitle": "whose throws range widest from their own middle",
-    "distinction_detail": "spread of <b>6.1</b> &middot; <b>25</b> crit successes and <b>25</b> crit fails, both the company's most",
+    "constellation_epithet": "the busiest hand, and the greatest share",
+    "distinction_title": "The Mightiest Fall",
+    "distinction_subtitle": "who brought down the mightiest foe the company has faced",
+    "distinction_detail": "<b>3,900</b> XP in a single felling &middot; the Blackguard, the largest kill any hand has claimed",
     "distinction_basis": {
       "kind": "mechanical",
-      "atom": "is_party_swingiest",
+      "atom": "is_party_biggest_kill",
       "value": true
     },
     "sworn_creed": "a second self hunts beside him, a blow struck from where he is not",
