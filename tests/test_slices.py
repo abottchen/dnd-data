@@ -75,7 +75,8 @@ def test_append_sessions_slice_carries_roster_kills_chronicle_and_reference(slic
     """The session author needs canonical species (roster), the authoritative
     kill log for this session's date, the chronicle so far (what the reader
     has read), and the record behind the session (party sheets, module text,
-    bestiary). It never gets the prior session logs: the reader did not."""
+    bestiary, and every earlier session's log with the DM's notes cut: what
+    the company has seen and heard, which the pages do not all repeat)."""
     from build import reference
     monkeypatch.setenv("BUILD_TOA_ADVENTURE", str(tmp_path / "no-module.json"))
     reference._adventure_sections.cache_clear()
@@ -103,8 +104,10 @@ def test_append_sessions_slice_carries_roster_kills_chronicle_and_reference(slic
 
     # Reference: the record, with every block present even when the module
     # text is not linked on this machine.
-    assert set(body["reference"]) == {"party_sheets", "places", "creatures", "seen_before"}
+    assert set(body["reference"]) == {"party_sheets", "places", "creatures", "earlier_logs"}
     assert {s["name"] for s in body["reference"]["party_sheets"]} == set(roster)
+    assert [e["session"] for e in body["reference"]["earlier_logs"]] == [1]
+    assert "Daggerford" in body["reference"]["earlier_logs"][0]["text"]
 
 
 def test_append_chapters_emits_slice_per_unauthored_marker(slice_env):

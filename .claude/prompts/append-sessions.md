@@ -32,8 +32,9 @@ A JSON object:
   - `places`: the module's own text for the places this session's log names.
     What they look like, what is there, what lives there.
   - `creatures`: what the bestiary says each creature this session met is.
-  - `seen_before`: what the company saw at those places on earlier visits, from
-    the earlier logs.
+  - `earlier_logs`: every earlier session's log, `{session, text}`, with the
+    DM's notes cut. What the company has seen and heard, which the pages do
+    not all repeat.
 
 # What to write
 
@@ -98,12 +99,21 @@ Do not spoil anything. Nothing goes on the page that the players do not have.
 No `(DM Note)` or `[bracketed]` line from the log. Nothing from `reference`
 that the company did not see, hear, or work out for themselves: the module
 text describes places as the book knows them, and the book knows more than
-the company does. Use the chronicle and the log to judge what they have.
+the company does.
 
-If you cannot tell whether the company knows something you want to use, stop
-and ask with AskUserQuestion before you write. One question, quoting the
-passage you want to use and saying what makes you unsure. Then write to the
-answer.
+What they have seen and heard is in this session's log and in `earlier_logs`.
+A thing named there the company has met or been told of, and the module's
+text on it is the record behind that: how a place they stood in looks, what a
+creature they fought is, what Chult says of a city or a god they have heard
+named. What the book keeps for the DM stays out: who someone secretly is,
+what is inside a place they have not entered, what a creature never showed
+them. A thing no log names has no text on the page.
+
+If you cannot tell whether the company knows something you want to use, look
+for it in `earlier_logs` first: that is where the answer is. Only when no log
+settles it, stop and ask with AskUserQuestion before you write. One question,
+quoting the passage you want to use and saying what makes you unsure. Then
+write to the answer.
 
 Style: no em dashes (— or &mdash;) and no semicolons anywhere in your output.
 

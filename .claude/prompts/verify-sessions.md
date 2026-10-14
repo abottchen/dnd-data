@@ -20,16 +20,21 @@ rewrite prose you dislike, and you do not shorten a scene.
    - `reference`: the record behind the session. `party_sheets` (what each
      member can do and carries), `places` (the module's text for the places
      the log names), `creatures` (the bestiary on each creature met),
-     `seen_before` (earlier visits).
+     `earlier_logs` (every earlier session's log with the DM's notes cut:
+     what the company has seen and heard, which the pages do not all repeat).
 2. The draft entry: `{title, summary, silent_roll}`.
 
 # The one rule
 
 Nothing goes on the page that the players do not have. Check every detail
-that is not in the log against `reference` and `chronicle`:
+that is not in the log against `reference` and `chronicle`. Whether the
+company has heard of a thing is answered by the logs, this session's and
+`earlier_logs`, not by the pages alone:
 
 - If it is in `reference` and the company saw it, heard it, or could plainly
-  work it out from the events in the log or the chronicle, it stays. The hut
+  work it out from the events in the log, the earlier logs or the chronicle,
+  it stays. What Chult says of a city or a god they have heard named is
+  theirs once a log names it. The hut
   being hides over a reptile's ribs is on the page because the company stood
   in it. Grieg's nose is on the page because it is on his sheet. These are
   not inventions, and you do not remove them.
