@@ -798,5 +798,29 @@
     "method": "Longbow",
     "verse": "Another thug, brought down before he reached the line",
     "annotation": "Longbow &middot; a second arrow, a second quiet"
+  },
+  {
+    "character": "vex",
+    "date": "2026-10-18",
+    "creature": "Giant Constrictor Snake",
+    "method": "Scimitar",
+    "verse": "A constrictor unwound at last, its coils gone slack",
+    "annotation": "Scimitar &middot; the squeeze ended before the blade did"
+  },
+  {
+    "character": "urida",
+    "date": "2026-10-18",
+    "creature": "Assassin Vine",
+    "method": "Fireball",
+    "verse": "Assassin vines curled to ash beside the black water",
+    "annotation": "Fireball &middot; two cave-mouth ambushers, and the river took the smoke"
+  },
+  {
+    "character": "chumble",
+    "date": "2026-10-18",
+    "creature": "Spirit Naga",
+    "method": "Eldritch Blast",
+    "verse": "Hajoka, who feared no lightning, folded in his own hall",
+    "annotation": "Eldritch Blast &middot; a third rune woke on the rod"
   }
 ]

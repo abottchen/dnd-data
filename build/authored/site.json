@@ -3,7 +3,7 @@
   "page_subtitle": "A ledger of those who walk &middot; and those they have laid down",
   "intro_epithet": "Five travellers and a storyteller, bound to a doomed road",
   "footnote": "The names above are the names given &middot; the ones who fell were given no names",
-  "refreshed_through_session": 29,
+  "refreshed_through_session": 30,
   "road_ahead": {
     "known": [
       {
@@ -45,7 +45,7 @@
         "gloss": "the naga atop Orolunga, who answered once and cannot be asked again."
       }
     ],
-    "direction": "Sent by Wainrath to the Obanashi temple while Artus Cimber searches for its missing mage hunters, the company has opened the doors of the Seething Hall and found a woman inside who calls herself the last warrior of Mezro."
+    "direction": "With the temple's naga dead and Nerissa at their side, the company follows Xhosala out of the Obanashi temple toward the Forsaken Tree, hoping to reclaim what is left of the Heart of the Wild's power."
   },
   "gm": {
     "name": "The Dungeon Master",
@@ -130,7 +130,10 @@
     "Ras Nsi",
     "Acererak",
     "Wainrath",
-    "Nava"
+    "Nava",
+    "Nerissa",
+    "Rhoga",
+    "Xhosala"
   ],
   "ascent_read": "Legends forged mostly by steel, but the road and its riddles have left their mark on every hard-won mile.",
   "player_map": {

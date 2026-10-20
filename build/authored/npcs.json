@@ -388,5 +388,20 @@
     "name": "Nava",
     "epithet": "dryad at the mouth of the Seething Hall, who set the company challenges before the door",
     "allegiance": null
+  },
+  {
+    "name": "Nerissa",
+    "epithet": "a patrol-watcher engulfed in colored fire, who woke in the flooded ruins and came down through the clifftop crack to meet the company, offering to join them",
+    "allegiance": "with"
+  },
+  {
+    "name": "Rhoga",
+    "epithet": "a ghost of the western hallway, who told the company the temple's history and warned them of the naga in the eastern halls",
+    "allegiance": "with"
+  },
+  {
+    "name": "Xhosala",
+    "epithet": "met quarrelling with Artus Cimber at the cave mouth, who fears the Heart of the Wild would be used for one man's purpose, and who agreed to lead the company to the Forsaken Tree",
+    "allegiance": "with"
   }
 ]

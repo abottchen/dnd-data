@@ -31,3 +31,7 @@ build/.run/
 
 # The publisher's notes are his own words on rejected drafts; local only, never committed.
 .claude/prompts/publisher-notes.md
+.claude/prompts/chronicle-voice.md
+
+# Local notes, not for the public repo
+docs/known-issues.md

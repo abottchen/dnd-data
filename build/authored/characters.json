@@ -44,7 +44,7 @@
     "constellation_epithet": "few throws, and great weight in them",
     "distinction_title": "The Most Kinds Felled",
     "distinction_subtitle": "who has brought down more kinds of creature than any other hand",
-    "distinction_detail": "<b>8</b> creature types felled &middot; the broadest range of foes in the company",
+    "distinction_detail": "<b>9</b> creature types felled &middot; the broadest range of foes in the company",
     "archetype_badge": {
       "archetype": "lamplighter",
       "inscription": "Fifteen flasks of oil weigh down his pack, kept steady for the one lamp he lights when the shadow at his shoulder goes quiet and the tunnels close in."
@@ -52,7 +52,7 @@
     "distinction_basis": {
       "kind": "mechanical",
       "atom": "distinct_type_count",
-      "value": 8
+      "value": 9
     },
     "sworn_creed": "a devil holds his signature in blood, and its fire answers when he calls"
   },
@@ -61,17 +61,19 @@
     "epithet": "of the Tabaxi, who lets the bowstring do all her speaking",
     "reliquary_header": "Felled before they drew near",
     "constellation_epithet": "ever at the hunt, the soft-pawed shot",
-    "distinction_title": "The Kindest Dice",
-    "distinction_subtitle": "whose kept d20s run as high as any in the company",
-    "distinction_detail": "kept d20 average of <b>10.8</b> &middot; tied for the company's best",
+    "distinction_title": "The Timely Draught",
+    "distinction_subtitle": "who poured a healing potion into Urida when the naga's lightning dropped her",
+    "distinction_detail": "Session <b>30</b> &middot; Urida, felled by the spirit naga's lightning bolt, brought back to her feet",
     "archetype_badge": {
       "archetype": "naturalist",
       "inscription": "A sprig of mistletoe rides on her belt, tied with ribbon, and she reads the trail through it long before she lets an arrow fly."
     },
     "distinction_basis": {
-      "kind": "mechanical",
-      "atom": "is_party_luckiest",
-      "value": true
+      "kind": "narrative",
+      "sessions": [
+        30
+      ],
+      "note": "revived Urida with a healing potion during the spirit naga fight"
     },
     "sworn_creed": "she crossed once into the feywild, and it never fully let her walk back out"
   },
@@ -79,14 +81,14 @@
     "id": "grieg",
     "epithet": "of the Wulven, who takes up whatever weapon the moment puts in reach",
     "reliquary_header": "Felled by whatever came to hand",
-    "constellation_epithet": "the busiest hand, and the greatest share",
-    "distinction_title": "The Mightiest Fall",
-    "distinction_subtitle": "who brought down the mightiest foe the company has faced",
-    "distinction_detail": "<b>3,900</b> XP in a single felling &middot; the Blackguard, the largest kill any hand has claimed",
+    "constellation_epithet": "the busiest hand, and richly paid for it",
+    "distinction_title": "The Heaviest Blow",
+    "distinction_subtitle": "whose single strike has landed harder than any other in the company",
+    "distinction_detail": "<b>69</b> damage in a single blow &middot; the hardest hit any hand has struck",
     "distinction_basis": {
       "kind": "mechanical",
-      "atom": "is_party_biggest_kill",
-      "value": true
+      "atom": "heaviest_blow",
+      "value": 69
     },
     "sworn_creed": "a second self hunts beside him, a blow struck from where he is not",
     "archetype_badge": {
