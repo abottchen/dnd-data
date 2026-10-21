@@ -14,7 +14,7 @@ import re
 import sys
 from collections import defaultdict
 
-from . import reference, render
+from . import render
 from .inventory import ARCHETYPE_SLATE, archetype_match
 
 _ARCHETYPE_LABELS = {a["slug"]: a["label"] for a in ARCHETYPE_SLATE}
@@ -126,60 +126,6 @@ def chapter_session_ids(chapter_id: int, chapters: list, session_log: dict) -> l
     return [e["session"] for e in session_log["entries"][chapter_start_idx - 1:chapter_end_idx]]
 
 
-# -- Session fact context ----------------------------------------------------
-# Session prose needs more than one session's narrative to get details right:
-# canonical species (roster), the authoritative kill log for the session's date,
-# the chronicle so far (what the reader has read, and the writer's memory of
-# the expedition), and the record behind the session (party sheets, module
-# text, bestiary: see build/reference.py). The append-sessions slice carries
-# all of it, and the same slice is what the paired verify-sessions agent
-# fact-checks the draft against in the same build.
-
-def _session_roster(data: dict, authored: dict) -> list[dict]:
-    """Canonical species/class for every party member, so session prose never
-    has to guess a character's race. Pronouns ride along when the prepare-time
-    side channel supplied them (empty string otherwise)."""
-    pronouns = authored.get("pronouns_by_id", {})
-    return [{
-        "name": m.get("name"),
-        "race": m.get("race"),
-        "class": m.get("class"),
-        "pronouns": pronouns.get(m["id"], ""),
-    } for m in data["party"]["members"]]
-
-
-def _kills_on_date(data: dict, date) -> list[dict]:
-    """Every party kill recorded on `date` — the authoritative who-killed-what
-    for a session. Unlike append_kills this ignores the authored overlay: the
-    session author states counts from this log, not from creature tallies in the
-    narrative prose (which may credit NPCs or bulk kills the log does not)."""
-    out = []
-    for m in data["party"]["members"]:
-        for k in m.get("kills", []):
-            if k.get("date") == date:
-                out.append({
-                    "character": m["id"],
-                    "creature": k["creature"],
-                    "method": k["method"],
-                })
-    return out
-
-
-def _chronicle(authored: dict, sid) -> list[dict]:
-    """Every authored Chronicle entry before `sid`, in order. This is what the
-    reader has read when they turn to this session's page, so it is also the
-    writer's memory: a name spelled here keeps that spelling, a person on the
-    last page needs no introduction, and a fact no page ever gave the reader
-    is not one the writer may lean on."""
-    out = []
-    for s in sorted(authored.get("sessions", []), key=lambda s: s.get("session", 0)):
-        esid = s.get("session")
-        if sid is not None and esid is not None and esid < sid:
-            out.append({"session": esid, "title": s.get("title", ""),
-                        "text": s.get("summary", "")})
-    return out
-
-
 # -- Append slice builders ---------------------------------------------------
 
 def append_kills(data: dict, authored: dict) -> list[tuple]:
@@ -220,30 +166,6 @@ def append_kills(data: dict, authored: dict) -> list[tuple]:
             "real_date": date,
             "narrative": session.get("text", ""),
             "kills": kills,
-        }))
-    return out
-
-
-def append_sessions(data: dict, authored: dict) -> list[tuple]:
-    auth_sessions = {s["session"] for s in authored["sessions"]}
-    entries = data["session_log"]["entries"]
-    out = []
-    for entry in entries:
-        sid = entry.get("session")
-        if sid in auth_sessions:
-            continue
-        narrative = entry.get("text", "")
-        kills = _kills_on_date(data, entry.get("date"))
-        out.append((sid, {
-            "session": sid,
-            "real_date": entry.get("date"),
-            "iu_date": iu_date(entry),
-            "narrative": narrative,
-            "chapter_marker": entry.get("chapter_marker", False),
-            "roster": _session_roster(data, authored),
-            "kills": kills,
-            "chronicle": _chronicle(authored, sid),
-            "reference": reference.build_reference(data, sid, narrative, kills),
         }))
     return out
 

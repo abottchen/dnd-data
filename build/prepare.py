@@ -17,33 +17,6 @@ from .paths import REPO_ROOT, authored_dir, data_dir, new_run_id, run_dir
 
 _STEM_SAFE = re.compile(r"[^A-Za-z0-9_.-]+")
 
-# Transformers that pair an independent verify pass with their authoring. The
-# verify agent runs at dispatch time (in the /build-prose skill), right after
-# the author writes a draft, so the entity is fact-checked in the same build it
-# is authored. The verify prompt's output conforms to the *authoring*
-# transformer's schema, so apply consumes the verified result unchanged.
-VERIFY_FOR = {"append-sessions": "verify-sessions"}
-
-# Transformers that pair an editor pass with their authoring. The editor is a
-# reader, not a fact-checker: it returns quoted notes and an accept/revise
-# verdict, and the *author* revises its own draft against them. The skill runs
-# up to EDIT_MAX_ROUNDS critique/revise rounds before the verify pass. The
-# editor's output conforms to its own schema (edit-sessions.schema.json), is
-# written beside the result as `results/<stem>.edit-<n>.json`, and is never
-# consumed by apply.
-EDIT_FOR = {"append-sessions": "edit-sessions"}
-EDIT_MAX_ROUNDS = 2
-
-# Transformers that are planned before they are written. The planner reads the
-# same slice as the writer and returns the story the page will tell (its
-# through-line, one subject per paragraph, what goes to the silent roll, what
-# goes nowhere). The skill shows that plan to the publisher and waits for a
-# yes before any prose exists; the approved plan is then an input to the
-# writer and the editor. Written as `results/<stem>.plan-<n>.json`, approved
-# as `context/<stem>.plan.json`, never consumed by apply.
-PLAN_FOR = {"append-sessions": "plan-sessions"}
-
-
 def _stem(transformer: str, key) -> str:
     return _STEM_SAFE.sub("-", f"{transformer}__{key}")
 
@@ -147,53 +120,7 @@ def run(*, no_refresh: bool, force_refresh: bool, keep_temp: bool) -> Path:
                 "prompt_body": meta["prompt_body_rel"],
                 "schema": meta["schema_rel"],
             }
-            # The editor reads the chronicle before it is allowed to see the
-            # session log (stage one of edit-sessions.md is a reader's read),
-            # so the pages go in a file of their own beside the slice.
-            if "chronicle" in slice_data:
-                (rdir / "context").mkdir(exist_ok=True)
-                chron_rel = f"context/{stem}.chronicle.json"
-                (rdir / chron_rel).write_text(
-                    json.dumps(slice_data["chronicle"], indent=2, ensure_ascii=False) + "\n"
-                )
-                slice_entry["chronicle"] = chron_rel
             slices_out.append(slice_entry)
-
-    # Freeze the paired prompts (editor, then verifier) for any authoring
-    # transformer that emitted a slice this run. The skill reads
-    # manifest["edit"] to drive the critique/revise loop right after each such
-    # slice is authored, and manifest["verify"] to dispatch the fact-checker
-    # once the prose is settled.
-    edit_meta: dict = {}
-    for transformer, edit_name in EDIT_FOR.items():
-        if transformer in prompt_cache:
-            em = _prompt_meta(edit_name, frozen_prompts)
-            edit_meta[transformer] = {
-                "prompt_body": em["prompt_body_rel"],
-                "schema": em["schema_rel"],
-                "model": em["model"],
-                "max_rounds": EDIT_MAX_ROUNDS,
-            }
-
-    verify_meta: dict = {}
-    for transformer, verify_name in VERIFY_FOR.items():
-        if transformer in prompt_cache:
-            vm = _prompt_meta(verify_name, frozen_prompts)
-            verify_meta[transformer] = {
-                "prompt_body": vm["prompt_body_rel"],
-                "schema": vm["schema_rel"],
-                "model": vm["model"],
-            }
-
-    plan_meta: dict = {}
-    for transformer, plan_name in PLAN_FOR.items():
-        if transformer in prompt_cache:
-            pm = _prompt_meta(plan_name, frozen_prompts)
-            plan_meta[transformer] = {
-                "prompt_body": pm["prompt_body_rel"],
-                "schema": pm["schema_rel"],
-                "model": pm["model"],
-            }
 
     manifest = {
         "run_id": run_id,
@@ -203,9 +130,6 @@ def run(*, no_refresh: bool, force_refresh: bool, keep_temp: bool) -> Path:
         "keep_temp": keep_temp,
         "no_refresh": no_refresh,
         "slices": slices_out,
-        "edit": edit_meta,
-        "verify": verify_meta,
-        "plan": plan_meta,
     }
     (rdir / "manifest.json").write_text(
         json.dumps(manifest, indent=2, ensure_ascii=False) + "\n"
@@ -219,16 +143,14 @@ _INCLUDE = re.compile(r"^\{\{include:\s*([A-Za-z0-9_.-]+)\s*\}\}[ \t]*$", re.M)
 def expand_includes(body: str, prompts_dir: Path | None = None) -> str:
     """Replace each `{{include: name.md}}` line with that file's body from the
     prompts dir (its own frontmatter stripped). One level only: a shared
-    file such as publisher-notes.md is plain text that several prompts quote,
-    and freezing the expansion into the run dir keeps the record whole."""
+    file is plain text that several prompts quote, and freezing the expansion
+    into the run dir keeps the record whole."""
     base = paths.prompts_dir() if prompts_dir is None else prompts_dir
 
     def sub(m: re.Match) -> str:
         src = base / m.group(1)
         if not src.exists():
-            hint = (" (this file is local and gitignored: the publisher's own "
-                    "notes, see CLAUDE.md)" if src.name == "publisher-notes.md" else "")
-            raise FileNotFoundError(f"included prompt missing: {src}{hint}")
+            raise FileNotFoundError(f"included prompt missing: {src}")
         _, text = parse_frontmatter(src.read_text())
         return text.rstrip("\n")
 

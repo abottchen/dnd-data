@@ -7,7 +7,7 @@ def test_registry_lists_every_transformer():
     names = {entry.name for entry in registry.ALL}
     assert names == {
         "refresh-known-npcs",
-        "append-kills", "append-sessions", "append-chapters",
+        "append-kills", "append-chapters",
         "append-npcs", "append-characters", "append-sworn",
         "refresh-chapters", "refresh-npcs", "refresh-characters",
         "refresh-road-ahead", "refresh-intro-epithet",
