@@ -38,15 +38,6 @@ def _valid_payload_for(entry: dict, run_dir: Path) -> dict:
     transformer = entry["transformer"]
     if transformer == "append-kills":
         return {"fields": {}, "reason": "test fixture"}
-    if transformer == "append-sessions":
-        return {
-            "fields": {
-                "title": "Test Title",
-                "summary": "A short summary of this session.",
-                "silent_roll": [],
-            },
-            "reason": "test fixture",
-        }
     if transformer == "append-chapters":
         return {
             "fields": {
@@ -80,9 +71,9 @@ def test_apply_missing_results_reports_pending(staged_run):
 def test_apply_validates_schema_and_rejects_malformed(staged_run):
     run_dir, _ = staged_run
     manifest = json.loads((run_dir / "manifest.json").read_text())
-    # Pick the first append-sessions slice — its schema requires a "fields"
+    # Pick the first append-chapters slice — its schema requires a "fields"
     # object. Write something that fails validation.
-    target = next(s for s in manifest["slices"] if s["transformer"] == "append-sessions")
+    target = next(s for s in manifest["slices"] if s["transformer"] == "append-chapters")
     _write_result(run_dir, target, {"bogus": "not the right shape"})
 
     summary = apply_cli.apply_run(run_dir, skip_render=True)
@@ -93,18 +84,17 @@ def test_apply_validates_schema_and_rejects_malformed(staged_run):
 
 
 def test_apply_applies_valid_results_and_persists_authored(staged_run):
-    """Write a schema-valid append-sessions result and confirm the authored
-    store gains the session entry after apply."""
+    """Write a schema-valid append-chapters result and confirm the authored
+    store gains the chapter entry after apply."""
     run_dir, authored_dir = staged_run
     manifest = json.loads((run_dir / "manifest.json").read_text())
-    target = next(s for s in manifest["slices"] if s["transformer"] == "append-sessions")
+    target = next(s for s in manifest["slices"] if s["transformer"] == "append-chapters")
     slice_data = json.loads((run_dir / target["pending"]).read_text())
 
     _write_result(run_dir, target, {
         "fields": {
             "title": "Test Title",
-            "summary": "A short summary of this session.",
-            "silent_roll": []
+            "epigraph": "A test epigraph."
         },
         "reason": "test fixture"
     })
@@ -112,8 +102,8 @@ def test_apply_applies_valid_results_and_persists_authored(staged_run):
     summary = apply_cli.apply_run(run_dir, skip_render=True)
     assert target["stem"] in {a["stem"] for a in summary["applied"]}
 
-    sessions = json.loads((authored_dir / "sessions.json").read_text())
-    matching = [s for s in sessions if s["session"] == slice_data["session"]]
+    chapters = json.loads((authored_dir / "chapters.json").read_text())
+    matching = [c for c in chapters if c["starts_at_session"] == slice_data["starts_at_session"]]
     assert matching
     assert matching[0]["title"] == "Test Title"
 
@@ -122,14 +112,13 @@ def test_apply_is_idempotent_on_rerun(staged_run):
     """A second apply pass with the same result file should not double-apply."""
     run_dir, authored_dir = staged_run
     manifest = json.loads((run_dir / "manifest.json").read_text())
-    target = next(s for s in manifest["slices"] if s["transformer"] == "append-sessions")
+    target = next(s for s in manifest["slices"] if s["transformer"] == "append-chapters")
     slice_data = json.loads((run_dir / target["pending"]).read_text())
 
     _write_result(run_dir, target, {
         "fields": {
             "title": "Idempotent",
-            "summary": "Once.",
-            "silent_roll": []
+            "epigraph": "Once."
         },
         "reason": "test fixture"
     })
@@ -137,8 +126,8 @@ def test_apply_is_idempotent_on_rerun(staged_run):
     apply_cli.apply_run(run_dir, skip_render=True)
     apply_cli.apply_run(run_dir, skip_render=True)
 
-    sessions = json.loads((authored_dir / "sessions.json").read_text())
-    matching = [s for s in sessions if s["session"] == slice_data["session"]]
+    chapters = json.loads((authored_dir / "chapters.json").read_text())
+    matching = [c for c in chapters if c["starts_at_session"] == slice_data["starts_at_session"]]
     assert len(matching) == 1  # not duplicated by the second apply
 
 
@@ -147,14 +136,13 @@ def test_apply_reads_slice_from_done_when_skill_moved_it(staged_run):
     apply_cli must still find the slice in that case."""
     run_dir, authored_dir = staged_run
     manifest = json.loads((run_dir / "manifest.json").read_text())
-    target = next(s for s in manifest["slices"] if s["transformer"] == "append-sessions")
+    target = next(s for s in manifest["slices"] if s["transformer"] == "append-chapters")
     slice_data = json.loads((run_dir / target["pending"]).read_text())
 
     _write_result(run_dir, target, {
         "fields": {
             "title": "Moved-to-done Title",
-            "summary": "Slice was relocated by the skill.",
-            "silent_roll": []
+            "epigraph": "Slice was relocated by the skill."
         },
         "reason": "test fixture"
     })
@@ -167,8 +155,8 @@ def test_apply_reads_slice_from_done_when_skill_moved_it(staged_run):
 
     summary = apply_cli.apply_run(run_dir, skip_render=True)
     assert target["stem"] in {a["stem"] for a in summary["applied"]}
-    sessions = json.loads((authored_dir / "sessions.json").read_text())
-    matching = [s for s in sessions if s["session"] == slice_data["session"]]
+    chapters = json.loads((authored_dir / "chapters.json").read_text())
+    matching = [c for c in chapters if c["starts_at_session"] == slice_data["starts_at_session"]]
     assert matching and matching[0]["title"] == "Moved-to-done Title"
 
 
@@ -220,13 +208,12 @@ def test_failed_apply_leaves_no_partial_mutation(staged_run):
     # one successful apply — otherwise apply_run's `if applied: persist()`
     # gate never fires and kills.json would trivially stay untouched
     # regardless of whether the mid-loop mutation leaked, masking the bug.
-    sessions_entry = next(s for s in manifest["slices"]
-                          if s["transformer"] == "append-sessions")
-    _write_result(run_dir, sessions_entry, {
+    chapters_entry = next(s for s in manifest["slices"]
+                          if s["transformer"] == "append-chapters")
+    _write_result(run_dir, chapters_entry, {
         "fields": {
-            "title": "Unrelated Session",
-            "summary": "A session applied successfully in the same run.",
-            "silent_roll": [],
+            "title": "Unrelated Chapter",
+            "epigraph": "A chapter applied successfully in the same run.",
         },
         "reason": "test",
     })
@@ -234,7 +221,7 @@ def test_failed_apply_leaves_no_partial_mutation(staged_run):
     before = json.loads((authored_dir / "kills.json").read_text())
     summary = apply_cli.apply_run(run_dir, skip_render=True)
     assert any(r["stem"] == entry["stem"] for r in summary["rejected"])
-    assert any(a["stem"] == sessions_entry["stem"] for a in summary["applied"])
+    assert any(a["stem"] == chapters_entry["stem"] for a in summary["applied"])
     after = json.loads((authored_dir / "kills.json").read_text())
     assert after == before  # no partial append persisted
 

@@ -1,7 +1,6 @@
 """Tests for build/prepare.py — slice gathering and run-dir population."""
 import json
 import os
-from pathlib import Path
 
 import pytest
 
@@ -69,21 +68,6 @@ def test_prepare_creates_manifest_and_pending_files(run_env):
         assert (run_dir / entry["pending"]).exists()
         assert (run_dir / entry["prompt_body"]).exists()
         assert (run_dir / entry["schema"]).exists()
-
-
-def test_prepare_records_verify_prompt_for_append_sessions(run_env):
-    """append-sessions pairs an independent verify pass. When it emits a slice,
-    prepare must freeze the verify prompt + schema and record them in the
-    manifest's `verify` map so /build-prose can dispatch the verifier in the
-    same run (same-build fact-check)."""
-    run_dir = prepare.run(no_refresh=True, force_refresh=False, keep_temp=False)
-    manifest = json.loads((run_dir / "manifest.json").read_text())
-
-    assert "append-sessions" in manifest["verify"], manifest["verify"]
-    vm = manifest["verify"]["append-sessions"]
-    assert (run_dir / vm["prompt_body"]).exists()
-    assert (run_dir / vm["schema"]).exists()
-    assert vm["model"] in {"sonnet", "opus"}
 
 
 def test_prepare_skips_refresh_pass_when_marker_current(run_env, monkeypatch):
@@ -159,29 +143,11 @@ def test_main_apply_subcommand_requires_path(run_env, capsys):
     assert rc != 0  # parser should reject missing positional
 
 
-def test_prepare_records_edit_prompt_for_append_sessions(run_env):
-    """append-sessions also pairs an editor pass (a reader's critique the author
-    revises against, before the fact verifier runs). When it emits a slice,
-    prepare must freeze the edit prompt + schema and record them in the
-    manifest's `edit` map so /build-prose can drive the critique/revise loop."""
-    run_dir = prepare.run(no_refresh=True, force_refresh=False, keep_temp=False)
-    manifest = json.loads((run_dir / "manifest.json").read_text())
-
-    assert "append-sessions" in manifest["edit"], manifest.get("edit")
-    em = manifest["edit"]["append-sessions"]
-    assert (run_dir / em["prompt_body"]).exists()
-    assert (run_dir / em["schema"]).exists()
-    assert em["model"] in {"sonnet", "opus", "fable"}
-    assert em["max_rounds"] >= 1
-
-
-# -- Prompt includes + chronicle context ------------------------------------
-
 def test_expand_includes_inlines_shared_prompt_text(tmp_path):
     """`{{include: name.md}}` on a line of its own becomes that file's body,
     with the included file's own frontmatter stripped."""
-    (tmp_path / "publisher-notes.md").write_text("---\nmodel: opus\n---\n> the note\n")
-    body = "head\n{{include: publisher-notes.md}}\ntail\n"
+    (tmp_path / "shared.md").write_text("---\nmodel: opus\n---\n> the note\n")
+    body = "head\n{{include: shared.md}}\ntail\n"
     out = prepare.expand_includes(body, prompts_dir=tmp_path)
     assert out == "head\n> the note\ntail\n"
 
@@ -189,62 +155,3 @@ def test_expand_includes_inlines_shared_prompt_text(tmp_path):
 def test_expand_includes_missing_file_raises(tmp_path):
     with pytest.raises(FileNotFoundError):
         prepare.expand_includes("{{include: nope.md}}", prompts_dir=tmp_path)
-
-
-def test_expand_includes_missing_publisher_notes_names_it_as_local(tmp_path):
-    """publisher-notes.md is gitignored, so a fresh clone lacks it. prepare
-    stops and says which file and why, rather than building without it."""
-    with pytest.raises(FileNotFoundError, match="local and gitignored"):
-        prepare.expand_includes("{{include: publisher-notes.md}}", prompts_dir=tmp_path)
-
-
-def test_prepare_freezes_the_stand_in_for_the_publishers_notes(run_env):
-    """The publisher's notes exist only on the publisher's machine, so the
-    suite points prepare at its own prompts dir (BUILD_PROMPTS_DIR) carrying a
-    stand-in. The frozen writer prompt must come from there, not from the
-    repo's .claude/prompts/, or every prepare.run fails on a fresh clone."""
-    stand_in = (Path(os.environ["BUILD_PROMPTS_DIR"]) / "publisher-notes.md").read_text()
-    run_dir = prepare.run(no_refresh=True, force_refresh=False, keep_temp=False)
-    manifest = json.loads((run_dir / "manifest.json").read_text())
-    writer = next(s for s in manifest["slices"] if s["transformer"] == "append-sessions")
-    assert stand_in.strip() in (run_dir / writer["prompt_body"]).read_text()
-
-
-def test_prepare_freezes_prompts_with_includes_expanded(run_env):
-    """The frozen writer and editor prompts carry the publisher's notes
-    inline, so the run dir records exactly what the agents read."""
-    run_dir = prepare.run(no_refresh=True, force_refresh=False, keep_temp=False)
-    manifest = json.loads((run_dir / "manifest.json").read_text())
-    frozen = {(run_dir / s["prompt_body"]).read_text() for s in manifest["slices"]}
-    frozen.add((run_dir / manifest["edit"]["append-sessions"]["prompt_body"]).read_text())
-    assert not any("{{include:" in t for t in frozen)
-
-
-def test_prepare_writes_chronicle_context_for_session_slices(run_env):
-    """The editor's first read is pages only, so the chronicle goes in a file
-    of its own that the skill hands over before the slice."""
-    run_dir = prepare.run(no_refresh=True, force_refresh=False, keep_temp=False)
-    manifest = json.loads((run_dir / "manifest.json").read_text())
-    sess = [s for s in manifest["slices"] if s["transformer"] == "append-sessions"]
-    assert sess and all("chronicle" in s for s in sess)
-    for s in sess:
-        pages = json.loads((run_dir / s["chronicle"]).read_text())
-        assert isinstance(pages, list) and all({"session", "title", "text"} <= set(p) for p in pages)
-    others = [s for s in manifest["slices"] if s["transformer"] != "append-sessions"]
-    assert not any("chronicle" in s for s in others)
-
-
-def test_prepare_records_plan_prompt_for_append_sessions(run_env):
-    """append-sessions is planned before it is written: the planner's output
-    is shown to the publisher for sign-off, and the approved plan is an input
-    to the writer and the editor. prepare freezes the plan prompt + schema and
-    records them in the manifest's `plan` map."""
-    run_dir = prepare.run(no_refresh=True, force_refresh=False, keep_temp=False)
-    manifest = json.loads((run_dir / "manifest.json").read_text())
-
-    assert "append-sessions" in manifest["plan"], manifest.get("plan")
-    pm = manifest["plan"]["append-sessions"]
-    assert (run_dir / pm["prompt_body"]).exists()
-    assert (run_dir / pm["schema"]).exists()
-    assert pm["model"] in {"sonnet", "opus", "fable"}
-    assert "{{include:" not in (run_dir / pm["prompt_body"]).read_text()

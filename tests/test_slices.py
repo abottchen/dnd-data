@@ -60,56 +60,6 @@ def test_append_kills_emits_slice_per_session_with_new_kills(slice_env):
     assert "Daggerford" in s["narrative"]
 
 
-def test_append_sessions_emits_slice_per_unauthored_session(slice_env):
-    out = slices.append_sessions(slice_env["data"], slice_env["authored"])
-    assert len(out) == 1
-    key, body = out[0]
-    assert key == 2
-    assert body["session"] == 2
-    assert body["real_date"] == "2026-04-23"
-    assert "crossroads" in body["narrative"]
-    assert body["chapter_marker"] is True
-
-
-def test_append_sessions_slice_carries_roster_kills_chronicle_and_reference(slice_env, monkeypatch, tmp_path):
-    """The session author needs canonical species (roster), the authoritative
-    kill log for this session's date, the chronicle so far (what the reader
-    has read), and the record behind the session (party sheets, module text,
-    bestiary, and every earlier session's log with the DM's notes cut: what
-    the company has seen and heard, which the pages do not all repeat)."""
-    from build import reference
-    monkeypatch.setenv("BUILD_TOA_ADVENTURE", str(tmp_path / "no-module.json"))
-    reference._adventure_sections.cache_clear()
-    try:
-        out = slices.append_sessions(slice_env["data"], slice_env["authored"])
-    finally:
-        reference._adventure_sections.cache_clear()
-    _, body = out[0]  # session 2
-
-    # Roster: one entry per party member, carrying species/class + a pronouns key.
-    roster = {r["name"]: r for r in body["roster"]}
-    assert roster["Anton Truebranch"]["race"] == "Halfling"
-    assert roster["Vex Stormcaller"]["class"] == "Fighter"
-    assert all("pronouns" in r for r in body["roster"])
-
-    # Kill log: only this session's date (2026-04-23 → Anton's Bandit), never
-    # the whole party ledger.
-    assert {(k["character"], k["creature"]) for k in body["kills"]} == {("anton", "Bandit")}
-
-    # Chronicle: every authored entry before this one, title and text, and
-    # none from this session or later.
-    assert [(c["session"], c["title"]) for c in body["chronicle"]] == [(1, "First Light")]
-    assert "Daggerford" in body["chronicle"][0]["text"]
-    assert "prior_narratives" not in body
-
-    # Reference: the record, with every block present even when the module
-    # text is not linked on this machine.
-    assert set(body["reference"]) == {"party_sheets", "places", "creatures", "earlier_logs"}
-    assert {s["name"] for s in body["reference"]["party_sheets"]} == set(roster)
-    assert [e["session"] for e in body["reference"]["earlier_logs"]] == [1]
-    assert "Daggerford" in body["reference"]["earlier_logs"][0]["text"]
-
-
 def test_append_chapters_emits_slice_per_unauthored_marker(slice_env):
     out = slices.append_chapters(slice_env["data"], slice_env["authored"])
     assert len(out) == 1
@@ -291,7 +241,6 @@ def test_refresh_known_npcs_tolerates_missing_known_npcs_field(slice_env):
 
 @pytest.mark.parametrize("builder_name", [
     "append_kills",
-    "append_sessions",
     "append_chapters",
     "append_npcs",
     "append_characters",

@@ -6,7 +6,7 @@ A static GitHub Pages site visualizing data from an ongoing D&D campaign.
 
 JSON snapshots from external sources (character sheets, dice roller, Owlbear Rodeo, session log) are dropped into `data/` (gitignored). A deterministic Python builder reads those snapshots plus a small store of human-authored prose, validates everything, and renders `site/index.html` via Jinja2 templates. A GitHub Actions workflow uploads the committed `site/` directory to GitHub Pages.
 
-When new source data lands, the authored prose store needs new entries (kill verses, session summaries, NPC epithets, etc.) and existing entries may need a refresh. That work runs locally in a single command: the `/build-prose` skill inside a Claude Code session, which drives prepare → in-session authoring → apply end-to-end. See [Build architecture](#build-architecture).
+When new source data lands, the authored prose store needs new entries (kill verses, chapter epigraphs, NPC epithets, etc.) and existing entries may need a refresh. That work runs locally in a single command: the `/build-prose` skill inside a Claude Code session, which drives prepare → in-session authoring → apply end-to-end. See [Build architecture](#build-architecture).
 
 See [`CLAUDE.md`](CLAUDE.md) for full architecture detail and validation rules.
 
@@ -74,7 +74,7 @@ Validation gates the render: any `MISSING` or `MALFORMED` authored entry causes 
 
 The run directory under `build/.run/<timestamp>/` is preserved on failure for inspection (and on success with `prepare --keep-temp`); otherwise it is cleaned up automatically after a clean apply.
 
-Each transformer's preferred model (`sonnet` or `opus`) is declared in YAML frontmatter at the top of `.claude/prompts/<name>.md`. Sonnet handles per-item, short-output transformers (`append-kills`, `append-sessions`, `append-npcs`, `refresh-npcs`, `refresh-intro-epithet`); Opus handles slices that aggregate across the campaign and grow with it (`append-chapters`, `append-characters`, `refresh-chapters`, `refresh-characters`, `refresh-road-ahead`).
+Each transformer's preferred model (`sonnet` or `opus`) is declared in YAML frontmatter at the top of `.claude/prompts/<name>.md`. Sonnet handles per-item, short-output transformers (`append-kills`, `append-npcs`, `refresh-npcs`, `refresh-intro-epithet`); Opus handles slices that aggregate across the campaign and grow with it (`append-chapters`, `append-characters`, `refresh-chapters`, `refresh-characters`, `refresh-road-ahead`).
 
 ## Files
 

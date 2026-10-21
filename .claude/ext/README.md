@@ -14,8 +14,9 @@ mklink /J .claude\ext\5etools-src %USERPROFILE%\Documents\Projects\5etools-src
 
 Adjust the target path to wherever you actually cloned `5etools-src`.
 
-`dnd-toa` is linked the same way (optional; it gives the Chronicle writer the
-module's own text for the places a session visits, via `build/reference.py`):
+`dnd-toa` is linked the same way (optional; it holds the Tomb of Annihilation
+module text as 5etools JSON at `data/5etools/adventure-toa.json`, and nothing
+in the build reads it at present):
 
 ```
 ln -s ~/projects/dnd-toa .claude/ext/dnd-toa

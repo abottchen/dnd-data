@@ -49,19 +49,6 @@ def apply_append_kills(authored: dict, key, slice_data: dict, output: dict) -> N
         existing.add(normalized)
 
 
-def apply_append_sessions(authored: dict, key, slice_data: dict, output: dict) -> None:
-    if any(s["session"] == slice_data["session"] for s in authored["sessions"]):
-        raise ValueError(f"session {slice_data['session']} already authored")
-    fields = output["fields"]
-    authored["sessions"].append({
-        "session": slice_data["session"],
-        "date": slice_data["real_date"],
-        "title": fields["title"],
-        "summary": fields["summary"],
-        "silent_roll": fields.get("silent_roll", []),
-    })
-
-
 def apply_append_chapters(authored: dict, key, slice_data: dict, output: dict) -> None:
     chapter_id = int(key)
     if any(c["id"] == chapter_id for c in authored["chapters"]):

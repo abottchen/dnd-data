@@ -123,15 +123,6 @@ def test_append_npcs_rejects_existing_name():
                                 {"fields": {"epithet": "x", "allegiance": "with"}})
 
 
-def test_append_sessions_rejects_existing_session():
-    authored = {"sessions": [{"session": 2, "date": "2026-04-23",
-                              "title": "t", "summary": "s", "silent_roll": []}]}
-    slice_data = {"session": 2, "real_date": "2026-04-23"}
-    output = {"fields": {"title": "new", "summary": "new", "silent_roll": []}}
-    with pytest.raises(ValueError, match="already authored"):
-        apply.apply_append_sessions(authored, 2, slice_data, output)
-
-
 # -- apply_refresh_chapters --------------------------------------------------
 
 def test_refresh_chapters_no_change_is_noop():

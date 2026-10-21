@@ -28,8 +28,6 @@ ALL: tuple[Transformer, ...] = (
 
     Transformer("append-kills", "append",
                 slices.append_kills, apply.apply_append_kills),
-    Transformer("append-sessions", "append",
-                slices.append_sessions, apply.apply_append_sessions),
     Transformer("append-chapters", "append",
                 slices.append_chapters, apply.apply_append_chapters),
     Transformer("append-npcs", "append",
