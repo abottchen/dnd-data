@@ -136,6 +136,93 @@
     "Xhosala",
     "Wren"
   ],
+  "circles": [
+    {
+      "key": "house-of-healing",
+      "title": "The House of Healing",
+      "kind": "company"
+    },
+    {
+      "key": "horizon",
+      "title": "The Horizon",
+      "kind": "company"
+    },
+    {
+      "key": "companys-own",
+      "title": "The Company's Own",
+      "kind": "company"
+    },
+    {
+      "key": "guides",
+      "title": "The Guides",
+      "kind": "company"
+    },
+    {
+      "key": "port-nyanzaru",
+      "title": "The People of Port Nyanzaru",
+      "kind": "company"
+    },
+    {
+      "key": "merchant-princes",
+      "title": "The Merchant Princes",
+      "kind": "company"
+    },
+    {
+      "key": "dinosaur-racers",
+      "title": "The Dinosaur Racers",
+      "kind": "company"
+    },
+    {
+      "key": "camp-vengeance",
+      "title": "Camp Vengeance",
+      "kind": "company"
+    },
+    {
+      "key": "yokkas-goblins",
+      "title": "Yokka's Goblins",
+      "kind": "company"
+    },
+    {
+      "key": "nuanwa-olerros-scouts",
+      "title": "Nuanwa Olerro's Scouts",
+      "kind": "company"
+    },
+    {
+      "key": "fort-beluarian",
+      "title": "Fort Beluarian",
+      "kind": "company"
+    },
+    {
+      "key": "shilku-dwarves",
+      "title": "The Shilku Dwarves",
+      "kind": "company"
+    },
+    {
+      "key": "harpers",
+      "title": "The Harpers",
+      "kind": "faction"
+    },
+    {
+      "key": "zhentarim",
+      "title": "The Zhentarim",
+      "kind": "faction"
+    },
+    {
+      "key": "order-of-the-gauntlet",
+      "title": "The Order of the Gauntlet",
+      "kind": "faction"
+    },
+    {
+      "key": "emerald-enclave",
+      "title": "The Emerald Enclave",
+      "kind": "faction"
+    },
+    {
+      "key": "flaming-fist",
+      "title": "The Flaming Fist",
+      "kind": "faction"
+    }
+  ],
   "ascent_read": "Legends forged mostly by steel, but the road and its riddles have left their mark on every hard-won mile.",
   "player_map": {
     "image": "chult-map.jpg",
