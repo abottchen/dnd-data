@@ -175,6 +175,27 @@ catch-all; a company of one is not a group.
   the registry is ignored by the renderer (the validator reports it); an
   absent registry means every NPC files under the catch-all.
 
+## As built (deviations recorded after implementation)
+
+- Registry proposals from the discovery pass carry a required `members`
+  list (canonical NPC names, at least one), and apply files already
+  authored members under the new circle at once. Reason: every slice in a
+  run is prepared from the pre-run store, so a circle proposed for NPCs who
+  are already authored could never gain members through the pipeline, and
+  the memberless-circle rule would then fail the render until a hand edit.
+  Members not yet authored are placed by their own `append-npcs` slice on
+  the next build.
+- Apply normalises `circles` to companies-first order rather than trusting
+  the model's ordering; the validator accepts either order.
+- Registry as populated for session 31: twelve companies (the House of
+  Healing, the Horizon, the Company's Own, the Guides, the People of Port
+  Nyanzaru, the Merchant Princes, the Dinosaur Racers, Camp Vengeance,
+  Yokka's Goblins, Nuanwa Olerro's Scouts, Fort Beluarian, the Shilku
+  Dwarves) and five factions (Harpers, Zhentarim, Order of the Gauntlet,
+  Emerald Enclave, Flaming Fist). Fifteen NPCs file under the catch-all.
+  Calls worth a second look are listed in the implementing agent's report
+  and summarised in the pull request.
+
 ## Decisions made without the user
 
 - Factions are marks, companies are the spine (agreed in conversation).
