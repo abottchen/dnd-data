@@ -29,14 +29,13 @@ An NPC is a **named, sentient, person-like character** the party interacts with 
 Include:
 - Named persons (e.g. "Azlund", "Volothamp Geddarm", "Wakanga").
 - Companions with a will of their own who travel with the party under their own name (a saurial who chose to come), as distinct from creatures a player character conjured, bound, or owns.
-- Distinctive unnamed figures that recur or are referred to by descriptive title (e.g. "The Fleeing Yuan-ti").
 
 Exclude:
 - Player characters: every name in `party`. They are tracked separately.
 - Anything a player character owns, summons, binds, or commands: familiars and other spell-made creatures, constructs such as a shield guardian, mounts, pets. They belong to that character's story, not to the cast; `not_npcs` lists the ones the text keeps naming.
 - Place names, ship names, organization names.
 - Mounts, vendor stock animals, or one-off creatures (a rented dinosaur is not an NPC; a dinosaur racer is).
-- Generic crowds ("a stablehand", "the merchants") unless they recur with a name.
+- Generic crowds ("a stablehand", "the merchants") and unnamed figures, however distinctive ("the fleeing yuan-ti", "the wounded man"). A descriptive title is not a name; without a name there is no entry.
 - Monsters slain in combat (those go through the kills pipeline).
 
 When in doubt, prefer **omission**. A thin authored entry for a non-character is worse than a missing one.

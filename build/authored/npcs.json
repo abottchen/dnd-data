@@ -66,12 +66,6 @@
     ]
   },
   {
-    "name": "The Fleeing Yuan-ti",
-    "allegiance": "against",
-    "epithet": "who struck from the rooftops and fled before the reckoning",
-    "circles": []
-  },
-  {
     "name": "Torgg",
     "epithet": "officer of the ship's crew who dismissed a crewmate for incompetence and yielded the hiring manifest when Anton asked",
     "allegiance": "with",
@@ -215,7 +209,7 @@
   {
     "name": "Kwayothe",
     "epithet": "merchant prince of Port Nyanzaru, who means to kill Shago to settle a score with Zhanthi",
-    "allegiance": "against",
+    "allegiance": null,
     "circles": [
       "merchant-princes"
     ]
@@ -514,7 +508,7 @@
   {
     "name": "Tzindelor",
     "epithet": "young red dragon holding Wyrmheart Mine, a fight the company judged too costly to risk",
-    "allegiance": "against",
+    "allegiance": null,
     "circles": []
   },
   {
