@@ -5,6 +5,7 @@ data (party/session-log) against the authored prose store and returns a list of
 ValidationError; a non-empty list gates the render in build/render.py.
 """
 from __future__ import annotations
+import re
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -216,6 +217,68 @@ def validate_site(site: dict, latest_session: int) -> list[ValidationError]:
     for f in DEAD_SITE_FIELDS:
         if f in site:
             errors.append(ValidationError(KIND_MALFORMED, "site", ("singleton",), field=f))
+    return errors
+
+CIRCLE_KINDS = ("company", "faction")
+CIRCLE_KEY = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
+
+def validate_circles(site: dict, npcs: list) -> list[ValidationError]:
+    """The NPC-circle registry (`site.circles`) and every NPC's `circles` list.
+
+    Registry entries are `{key, title, kind}`: keys are unique slugs, titles
+    are non-blank, kind is "company" or "faction". An absent registry reads
+    as empty (cold start). Every authored NPC must carry a `circles` list
+    whose keys all exist in the registry, with no duplicates. Every registry
+    circle must have at least one member: a circle nobody belongs to is
+    clutter, and most likely a key typo.
+    """
+    errors: list[ValidationError] = []
+    registry = site.get("circles", [])
+    if not isinstance(registry, list):
+        errors.append(ValidationError(KIND_MALFORMED, "site", ("singleton",), field="circles"))
+        registry = []
+
+    keys: set[str] = set()
+    for i, entry in enumerate(registry):
+        if not isinstance(entry, dict):
+            errors.append(ValidationError(KIND_MALFORMED, "circles", (i,), field="entry"))
+            continue
+        key = entry.get("key")
+        label = key if isinstance(key, str) and key else i
+        if not isinstance(key, str) or not CIRCLE_KEY.match(key):
+            errors.append(ValidationError(KIND_MALFORMED, "circles", (label,), field="key"))
+        elif key in keys:
+            errors.append(ValidationError(KIND_MALFORMED, "circles", (key,), field="duplicate key"))
+        else:
+            keys.add(key)
+        title = entry.get("title")
+        if not isinstance(title, str) or not title.strip():
+            errors.append(ValidationError(KIND_MALFORMED, "circles", (label,), field="title"))
+        if entry.get("kind") not in CIRCLE_KINDS:
+            errors.append(ValidationError(KIND_MALFORMED, "circles", (label,), field="kind"))
+
+    members: dict[str, int] = {k: 0 for k in keys}
+    for npc in npcs:
+        name = npc.get("name")
+        circles = npc.get("circles")
+        if not isinstance(circles, list):
+            errors.append(ValidationError(KIND_MALFORMED, "npcs", (name,), field="circles"))
+            continue
+        seen: set = set()
+        for key in circles:
+            if key in seen:
+                errors.append(ValidationError(
+                    KIND_MALFORMED, "npcs", (name,), field=f"circles duplicates '{key}'"))
+                continue
+            seen.add(key)
+            if key not in members:
+                errors.append(ValidationError(
+                    KIND_MALFORMED, "npcs", (name,), field=f"circles unknown key '{key}'"))
+                continue
+            members[key] += 1
+    for key, count in members.items():
+        if count == 0:
+            errors.append(ValidationError(KIND_ORPHAN, "circles", (key,)))
     return errors
 
 def collect_npcs_from_log(session_log: dict, site: dict) -> list[str]:

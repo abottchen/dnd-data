@@ -22,3 +22,110 @@ def test_no_change_allows_null_fields(schema_path):
     schema = json.loads(schema_path.read_text())
     ok = {"decision": "no_change", "fields": None, "reason": "r"}
     jsonschema.validate(ok, schema)  # must not raise
+
+
+# -- NPC circles -------------------------------------------------------------
+
+def _schema(name: str) -> dict:
+    return json.loads((PROMPTS / f"{name}.schema.json").read_text())
+
+
+def _npc_fields(**over) -> dict:
+    base = {"epithet": "of the guides", "allegiance": "with", "circles": ["guides"]}
+    base.update(over)
+    return base
+
+
+def test_append_npcs_requires_circles():
+    schema = _schema("append-npcs")
+    jsonschema.validate({"fields": _npc_fields(), "reason": "r"}, schema)
+    bad = {"fields": {"epithet": "e", "allegiance": "with"}, "reason": "r"}
+    with pytest.raises(jsonschema.ValidationError):
+        jsonschema.validate(bad, schema)
+
+
+def test_append_npcs_allows_empty_circles():
+    jsonschema.validate({"fields": _npc_fields(circles=[]), "reason": "r"},
+                        _schema("append-npcs"))
+
+
+@pytest.mark.parametrize("circles", [
+    ["guides", "guides"],      # duplicate
+    ["The Guides"],            # not a slug
+    ["guides-"],               # trailing hyphen
+    [""],                      # blank
+    "guides",                  # not a list
+])
+def test_append_npcs_rejects_malformed_circles(circles):
+    with pytest.raises(jsonschema.ValidationError):
+        jsonschema.validate({"fields": _npc_fields(circles=circles), "reason": "r"},
+                            _schema("append-npcs"))
+
+
+def test_refresh_npcs_rewrite_requires_circles():
+    schema = _schema("refresh-npcs")
+    jsonschema.validate({"decision": "rewrite", "fields": _npc_fields(), "reason": "r"},
+                        schema)
+    bad = {"decision": "rewrite",
+           "fields": {"epithet": "e", "allegiance": "with"}, "reason": "r"}
+    with pytest.raises(jsonschema.ValidationError):
+        jsonschema.validate(bad, schema)
+
+
+def test_refresh_known_npcs_circles_are_optional():
+    schema = _schema("refresh-known-npcs")
+    jsonschema.validate({"decision": "rewrite",
+                         "fields": {"known_npcs": ["Azlund"]}, "reason": "r"}, schema)
+
+
+def test_refresh_known_npcs_accepts_circle_additions():
+    schema = _schema("refresh-known-npcs")
+    ok = {"decision": "rewrite", "reason": "r", "fields": {
+        "known_npcs": ["Azlund", "Xhosala", "Shago"],
+        "circles": [
+            {"key": "obanashi", "title": "The Obanashi", "kind": "company",
+             "members": ["Xhosala"]},
+            {"key": "ytepka-society", "title": "The Ytepka Society", "kind": "faction",
+             "members": ["Shago"]},
+        ],
+    }}
+    jsonschema.validate(ok, schema)
+
+
+def _addition(**over):
+    base = {"key": "obanashi", "title": "The Obanashi", "kind": "company",
+            "members": ["Xhosala"]}
+    base.update(over)
+    for k in [k for k, v in base.items() if v is None]:
+        del base[k]
+    return base
+
+
+@pytest.mark.parametrize("circle", [
+    _addition(kind="guild"),                 # bad kind
+    _addition(kind=None),                    # no kind
+    _addition(title=""),                     # blank title
+    _addition(title=None),                   # no title
+    _addition(key="The Obanashi"),           # not a slug
+    _addition(key=None),                     # no key
+    _addition(members=None),                 # no members: who belongs?
+    _addition(members=[]),                   # a circle nobody belongs to
+    _addition(members="Xhosala"),            # not a list
+    _addition(members=["Xhosala", "Xhosala"]),  # duplicate member
+    _addition(note="x"),                     # extra prop
+])
+def test_refresh_known_npcs_rejects_malformed_circle_additions(circle):
+    schema = _schema("refresh-known-npcs")
+    bad = {"decision": "rewrite", "reason": "r",
+           "fields": {"known_npcs": ["Azlund"], "circles": [circle]}}
+    with pytest.raises(jsonschema.ValidationError):
+        jsonschema.validate(bad, schema)
+
+
+def test_refresh_known_npcs_rejects_duplicate_circle_additions():
+    schema = _schema("refresh-known-npcs")
+    c = _addition()
+    bad = {"decision": "rewrite", "reason": "r",
+           "fields": {"known_npcs": ["Azlund"], "circles": [c, dict(c)]}}
+    with pytest.raises(jsonschema.ValidationError):
+        jsonschema.validate(bad, schema)

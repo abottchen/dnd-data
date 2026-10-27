@@ -15,6 +15,26 @@ include it in the end-of-run report; the others return None.
 from . import render
 
 
+def _circle_kinds(authored: dict) -> dict:
+    """key -> kind for every circle in the registry (site.circles)."""
+    site = authored.get("site") or {}
+    return {c["key"]: c.get("kind") for c in (site.get("circles") or [])}
+
+
+def _resolve_circles(authored: dict, circles: list) -> list:
+    """Check an NPC's circle keys against the registry and put companies
+    ahead of factions (stable within each kind), so the first entry is the
+    home circle whatever order the model listed them in. An unknown key
+    raises ValueError: the result is rejected rather than landing a dangling
+    key that validate_circles would fail the render on."""
+    kinds = _circle_kinds(authored)
+    unknown = [k for k in circles if k not in kinds]
+    if unknown:
+        raise ValueError("unknown circle key(s): " + ", ".join(repr(k) for k in unknown))
+    return ([k for k in circles if kinds[k] != "faction"]
+            + [k for k in circles if kinds[k] == "faction"])
+
+
 def apply_append_kills(authored: dict, key, slice_data: dict, output: dict) -> None:
     """Each entry in output['fields'] keys by <char>__<date>__<creature>__<method>;
     we look the kill up in the slice's kills array (using render.kill_key for
@@ -73,10 +93,12 @@ def apply_append_npcs(authored: dict, key, slice_data: dict, output: dict) -> No
     if any(n["name"] == key for n in authored["npcs"]):
         raise ValueError(f"npc {key!r} already authored")
     fields = output["fields"]
+    circles = _resolve_circles(authored, list(fields["circles"]))
     authored["npcs"].append({
         "name": key,
         "epithet": fields["epithet"],
         "allegiance": fields.get("allegiance"),
+        "circles": circles,
     })
 
 
@@ -128,8 +150,11 @@ def apply_refresh_npcs(authored: dict, key, slice_data: dict, output: dict) -> N
     name = key
     for n in authored["npcs"]:
         if n["name"] == name:
+            # Resolve before touching the entry so a bad key leaves it intact.
+            circles = _resolve_circles(authored, list(fields["circles"]))
             n["epithet"] = fields["epithet"]
             n["allegiance"] = fields["allegiance"]
+            n["circles"] = circles
             return
     raise ValueError(f"npc {name!r} not found in authored store")
 
@@ -184,10 +209,52 @@ def apply_refresh_ascent_read(authored: dict, key, slice_data: dict, output: dic
 
 
 def apply_refresh_known_npcs(authored: dict, key, slice_data: dict, output: dict) -> None:
+    """Replace `site.known_npcs` and merge any proposed circles into the
+    registry (`site.circles`), append-only: a proposal whose key already
+    exists is skipped whole, members included, because the pipeline never
+    renames, removes, or re-populates a published circle.
+
+    Each accepted circle's `members` who already have an authored entry are
+    filed under it here. The per-NPC slices of this same run were prepared
+    before this result existed, so nothing else would place them and the
+    circle would sit memberless, which validate_circles fails the render on.
+    Members not yet authored are left to append-npcs, whose next slice will
+    carry the new circle. A member outside the (new) known_npcs list is a
+    typo or an invention: the whole result is refused before any mutation.
+    """
     if output["decision"] == "no_change":
         return
     fields = output["fields"] or {}
-    authored["site"]["known_npcs"] = list(fields["known_npcs"])
+    site = authored["site"]
+    known = list(fields["known_npcs"])
+    known_set = set(known)
+    present = {c["key"] for c in (site.get("circles") or [])}
+    accepted = []
+    for c in fields.get("circles") or []:
+        if c["key"] in present:
+            continue
+        for m in c.get("members", []):
+            if m not in known_set:
+                raise ValueError(
+                    f"circle {c['key']!r} names member {m!r}, which is not a known NPC")
+        accepted.append(c)
+        present.add(c["key"])
+
+    site["known_npcs"] = known
+    if not accepted:
+        return
+    registry = site.setdefault("circles", [])
+    npcs_by_name = {n["name"]: n for n in authored.get("npcs", [])}
+    for c in accepted:
+        registry.append({"key": c["key"], "title": c["title"], "kind": c["kind"]})
+        for m in c.get("members", []):
+            npc = npcs_by_name.get(m)
+            if npc is None:
+                continue
+            circles = list(npc.get("circles", []))
+            if c["key"] not in circles:
+                circles.append(c["key"])
+            npc["circles"] = _resolve_circles(authored, circles)
 
 
 def apply_refresh_archetype_inscription(authored: dict, key, slice_data: dict, output: dict) -> None:

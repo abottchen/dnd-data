@@ -2,411 +2,642 @@
   {
     "name": "Azlund",
     "allegiance": "with",
-    "epithet": "of the House of Healing, whose oath bound the road"
+    "epithet": "of the House of Healing, whose oath bound the road",
+    "circles": [
+      "house-of-healing",
+      "harpers"
+    ]
   },
   {
     "name": "Tessa",
     "allegiance": "with",
-    "epithet": "who walked the company down to the docks where the Horizon was moored"
+    "epithet": "who walked the company down to the docks where the Horizon was moored",
+    "circles": [
+      "house-of-healing"
+    ]
   },
   {
     "name": "Rindal",
     "allegiance": "with",
-    "epithet": "first mate of the Horizon, whose tour named the crew"
+    "epithet": "first mate of the Horizon, whose tour named the crew",
+    "circles": [
+      "horizon"
+    ]
   },
   {
     "name": "Captain Brennan",
     "allegiance": "with",
-    "epithet": "veteran of the Nyanzaru run, who gave them a cloak of billowing for six ropes held"
+    "epithet": "veteran of the Nyanzaru run, who gave them a cloak of billowing for six ropes held",
+    "circles": [
+      "horizon"
+    ]
   },
   {
     "name": "Pip",
     "allegiance": "with",
-    "epithet": "cook of the Horizon, who minded the cheese and would not be lied to"
+    "epithet": "cook of the Horizon, who minded the cheese and would not be lied to",
+    "circles": [
+      "horizon"
+    ]
   },
   {
-    "name": "Corwin, called Artus Cimber",
+    "name": "Artus Cimber",
     "allegiance": "with",
-    "epithet": "who hid his name in a glove and a ring, and turned alone to the pirates so the company might live"
+    "epithet": "who hid his name in a glove and a ring, and turned alone to the pirates so the company might live",
+    "circles": [
+      "horizon"
+    ]
   },
   {
     "name": "Dragonbait",
     "allegiance": "with",
-    "epithet": "saurial of many scents, who held the prow when the sahuagin came"
+    "epithet": "saurial of many scents, who held the prow when the sahuagin came",
+    "circles": [
+      "horizon"
+    ]
   },
   {
     "name": "Harlen",
     "allegiance": "against",
-    "epithet": "Zhentarim spy, the wrong sailor, the cheese-thief, knocked cold in the galley as the party was teleported away"
+    "epithet": "Zhentarim spy, the wrong sailor, the cheese-thief, knocked cold in the galley as the party was teleported away",
+    "circles": [
+      "horizon",
+      "zhentarim"
+    ]
   },
   {
     "name": "The Fleeing Yuan-ti",
     "allegiance": "against",
-    "epithet": "who struck from the rooftops and fled before the reckoning"
+    "epithet": "who struck from the rooftops and fled before the reckoning",
+    "circles": []
   },
   {
     "name": "Torgg",
     "epithet": "officer of the ship's crew who dismissed a crewmate for incompetence and yielded the hiring manifest when Anton asked",
-    "allegiance": "with"
+    "allegiance": "with",
+    "circles": [
+      "horizon"
+    ]
   },
   {
     "name": "Volo",
     "epithet": "the wandering chronicler met near the Temple of Savras, who sold the company his Guide to Monsters and bade them find a guide before the jungle",
-    "allegiance": "with"
+    "allegiance": "with",
+    "circles": []
   },
   {
     "name": "Lilac Mist",
     "epithet": "tabaxi dinosaur racer of Port Nyanzaru who won the track and joined the expedition into the jungle, where her goodberries, spellwork, and longbow have proven indispensable",
-    "allegiance": "with"
+    "allegiance": "with",
+    "circles": [
+      "dinosaur-racers"
+    ]
   },
   {
     "name": "Kessra",
     "epithet": "nearly lost overboard when the storm struck, caught at the rail by Vex with Anton bracing him",
-    "allegiance": "with"
+    "allegiance": "with",
+    "circles": [
+      "horizon"
+    ]
   },
   {
     "name": "Wakanga",
     "epithet": "one of Port Nyanzaru's seven merchant princes, who gave Urida a journal pointing to a magical object in the jungle and asked her to retrieve it",
-    "allegiance": "with"
+    "allegiance": "with",
+    "circles": [
+      "merchant-princes"
+    ]
   },
   {
     "name": "Musharib",
     "epithet": "a guide in Jobal's employ who led them into the jungle at his asking price, got lost more than once, fought at their side, then resigned his post and stayed behind in Port Nyanzaru",
-    "allegiance": "with"
+    "allegiance": "with",
+    "circles": [
+      "guides"
+    ]
   },
   {
     "name": "Zindar",
     "epithet": "gold half-dragon harbormaster, who bid the company safe passage and named the pirates a challenge not yet answered",
-    "allegiance": "with"
+    "allegiance": "with",
+    "circles": [
+      "port-nyanzaru"
+    ]
   },
   {
     "name": "Inete",
     "epithet": "who paid a hundred gold to chase her visions of a red-robed wizard into the Aldani Basin, until an eblis carried her into the night and her taste for adventure did not return",
-    "allegiance": "with"
+    "allegiance": "with",
+    "circles": [
+      "port-nyanzaru"
+    ]
   },
   {
     "name": "Undril Silvertusk",
     "epithet": "the Order of the Gauntlet medic who kept the company on their feet through the fall of Camp Vengeance",
-    "allegiance": "with"
+    "allegiance": "with",
+    "circles": [
+      "camp-vengeance",
+      "order-of-the-gauntlet"
+    ]
   },
   {
     "name": "Grandfather Zitembe",
     "epithet": "of the Temple of Savras in Port Nyanzaru, whose guides were consulted for a donation and who came when his acolyte had fallen",
-    "allegiance": "with"
+    "allegiance": "with",
+    "circles": [
+      "port-nyanzaru"
+    ]
   },
   {
     "name": "Ekene-Afa",
     "epithet": "merchant prince of Port Nyanzaru whose commerce is weapons, and who recognized Lilac by face from the racing circuit",
-    "allegiance": "with"
+    "allegiance": "with",
+    "circles": [
+      "merchant-princes"
+    ]
   },
   {
     "name": "Odele",
     "epithet": "a name spoken in concern, warning the captain of a storm in the ship's path",
-    "allegiance": null
+    "allegiance": null,
+    "circles": [
+      "horizon"
+    ]
   },
   {
     "name": "Eku",
     "epithet": "a guide for hire, whose name appeared on the bulletin boards of Port Nyanzaru alongside Musharib and Salida",
-    "allegiance": null
+    "allegiance": null,
+    "circles": [
+      "guides"
+    ]
   },
   {
     "name": "Salida",
     "epithet": "a jungle guide the naga named as Ras Nsi's creature, hired for 150gp so she could be questioned outside town",
-    "allegiance": "against"
+    "allegiance": "against",
+    "circles": [
+      "guides"
+    ]
   },
   {
     "name": "Azaka Stormfang",
     "epithet": "whose name appeared on a wanted poster outside the Thundering Lizard Inn, alongside Hew Hackinstone",
-    "allegiance": null
+    "allegiance": null,
+    "circles": [
+      "guides"
+    ]
   },
   {
     "name": "Hew Hackinstone",
     "epithet": "a wanted face whose poster hung beside Azaka Stormfang's on the board outside the Thundering Lizard Inn",
-    "allegiance": null
+    "allegiance": null,
+    "circles": [
+      "guides"
+    ]
   },
   {
     "name": "Jobal",
     "epithet": "merchant prince of Port Nyanzaru, who controls the jungle guides",
-    "allegiance": "with"
+    "allegiance": "with",
+    "circles": [
+      "merchant-princes"
+    ]
   },
   {
     "name": "Saja N'baza",
     "epithet": "the naga of Orolunga, seen only once in a lifetime, who named Ras Nsi's death the cure for the curse and sent them on with charms",
-    "allegiance": "with"
+    "allegiance": "with",
+    "circles": []
   },
   {
     "name": "Jessamine",
     "epithet": "one of the seven merchant princes of Port Nyanzaru, dying of the death curse in secret, who paid over her price to help end it",
-    "allegiance": "with"
+    "allegiance": "with",
+    "circles": [
+      "merchant-princes"
+    ]
   },
   {
     "name": "Kwayothe",
     "epithet": "merchant prince of Port Nyanzaru, who means to kill Shago to settle a score with Zhanthi",
-    "allegiance": "against"
+    "allegiance": "against",
+    "circles": [
+      "merchant-princes"
+    ]
   },
   {
     "name": "Ifan Talro'a",
     "epithet": "merchant prince of Port Nyanzaru who controls the sale of animals",
-    "allegiance": null
+    "allegiance": null,
+    "circles": [
+      "merchant-princes"
+    ]
   },
   {
     "name": "Zhanthi",
     "epithet": "one of Port Nyanzaru's merchant princes, dealer in gems and jewelry",
-    "allegiance": null
+    "allegiance": null,
+    "circles": [
+      "merchant-princes"
+    ]
   },
   {
     "name": "Yokka",
     "epithet": "goblin boss of Camp Righteous who fed a minion to the crit meant for her, then set up shop in Port Nyanzaru selling masks and savoring the slaughter of a rival tribe's women and children",
-    "allegiance": "with"
+    "allegiance": "with",
+    "circles": [
+      "yokkas-goblins"
+    ]
   },
   {
     "name": "Niles Breakbone",
     "epithet": "commandant of Camp Vengeance, who turned on his own soldiers under a musk creeper's charm",
-    "allegiance": "with"
+    "allegiance": "with",
+    "circles": [
+      "camp-vengeance",
+      "order-of-the-gauntlet"
+    ]
   },
   {
     "name": "Ord Firebeard",
     "epithet": "of Camp Vengeance, who fought to defend it and wrote the party's letter to the general in Port Nyanzaru",
-    "allegiance": "with"
+    "allegiance": "with",
+    "circles": [
+      "camp-vengeance",
+      "order-of-the-gauntlet"
+    ]
   },
   {
     "name": "Perne Salhana",
     "epithet": "soldier of Camp Vengeance, found wounded outside the cave where the plant held sway",
-    "allegiance": "with"
+    "allegiance": "with",
+    "circles": [
+      "camp-vengeance",
+      "order-of-the-gauntlet"
+    ]
   },
   {
     "name": "Wulf Rygor",
     "epithet": "a scout at Camp Vengeance whose enchanted plant led him into a cave, where he fought to the death against the party",
-    "allegiance": "against"
+    "allegiance": "against",
+    "circles": [
+      "camp-vengeance",
+      "order-of-the-gauntlet"
+    ]
   },
   {
     "name": "Nuanwa Olerro",
     "epithet": "priest of Mielikki who led three Emerald Enclave scouts through the jungle heat and offered the party her camp on 22 Flamerule",
-    "allegiance": "with"
+    "allegiance": "with",
+    "circles": [
+      "nuanwa-olerros-scouts",
+      "emerald-enclave"
+    ]
   },
   {
     "name": "Bakari",
     "epithet": "scout of the Emerald Enclave under Nuanwa Olerro, who kept watch around the camp",
-    "allegiance": "with"
+    "allegiance": "with",
+    "circles": [
+      "nuanwa-olerros-scouts",
+      "emerald-enclave"
+    ]
   },
   {
     "name": "Imka",
     "epithet": "one of Nuanwa Olerro's three Emerald Enclave scouts, trying to learn from the priest but not quite grasping it",
-    "allegiance": "with"
+    "allegiance": "with",
+    "circles": [
+      "nuanwa-olerros-scouts",
+      "emerald-enclave"
+    ]
   },
   {
     "name": "Doruk",
     "epithet": "scout of the Emerald Enclave under Nuanwa Olerro, whose approval comes only in grunts",
-    "allegiance": "with"
+    "allegiance": "with",
+    "circles": [
+      "nuanwa-olerros-scouts",
+      "emerald-enclave"
+    ]
   },
   {
     "name": "Vorn",
     "epithet": "a shield guardian bound to Urida's amulet, crippled but for its power cube, whose sigils tie back to the trickster gods buried in Omu",
-    "allegiance": "with"
+    "allegiance": "with",
+    "circles": [
+      "companys-own"
+    ]
   },
   {
     "name": "Faroul & Gondolo",
     "epithet": "guide service posted on the bulletin board, called terrible racers who nonetheless rode Zongo to third place",
-    "allegiance": null
+    "allegiance": null,
+    "circles": [
+      "dinosaur-racers",
+      "guides"
+    ]
   },
   {
     "name": "Tiryki",
     "epithet": "chultan dinosaur racer, son of Ekene-Afa, who rode Banana Candy against the company at the races",
-    "allegiance": null
+    "allegiance": null,
+    "circles": [
+      "dinosaur-racers"
+    ]
   },
   {
     "name": "The Honeyman",
     "epithet": "left to the ants by the goblins he tried to rob, who marked their camp for the company once healed",
-    "allegiance": "with"
+    "allegiance": "with",
+    "circles": []
   },
   {
     "name": "Qawasha",
     "epithet": "druid guide of Fort Beluarian, who would not walk with them until their road led to the undead",
-    "allegiance": "with"
+    "allegiance": "with",
+    "circles": [
+      "guides"
+    ]
   },
   {
     "name": "Rokah",
     "epithet": "whose distraction plan failed, and who slipped into the jungle rather than back to the ship",
-    "allegiance": "with"
+    "allegiance": "with",
+    "circles": []
   },
   {
     "name": "River",
     "epithet": "paired with Flask as Rokah's own guide, who slipped back into the jungle with him rather than return to the ship",
-    "allegiance": "against"
+    "allegiance": "against",
+    "circles": [
+      "guides"
+    ]
   },
   {
     "name": "Flask",
     "epithet": "one of Rokah's jungle guides, who slipped back into the jungle rather than return to the ship",
-    "allegiance": "against"
+    "allegiance": "against",
+    "circles": [
+      "guides"
+    ]
   },
   {
     "name": "Aremag",
     "epithet": "a Dragon Turtle who guards the coastal waters and would not let the party pass without tribute",
-    "allegiance": "against"
+    "allegiance": "against",
+    "circles": []
   },
   {
     "name": "Liara Portyr",
     "epithet": "of the Flaming Fist at Fort Beluarian, who buys ghoul heads by the score and sent the company toward Shilku's silence",
-    "allegiance": "with"
+    "allegiance": "with",
+    "circles": [
+      "fort-beluarian",
+      "flaming-fist"
+    ]
   },
   {
     "name": "Shago",
     "epithet": "guide out of Fort Beluarian, unsworn to the Flaming Fist he serves, marked for death by Kwayothe as punishment aimed at Zhanthi, and already carrying the iron token that says so",
-    "allegiance": "with"
+    "allegiance": "with",
+    "circles": [
+      "guides"
+    ]
   },
   {
     "name": "Kwilgok",
     "epithet": "a tortle dinosaur racer, steering Deadly Treasure the ankylosaurus from a howdah with a banana dangled on a pole",
-    "allegiance": null
+    "allegiance": null,
+    "circles": [
+      "dinosaur-racers"
+    ]
   },
   {
     "name": "Canker Keel",
     "epithet": "albino dwarf who rode Juicy Stakes to a second-place finish in the dinosaur races",
-    "allegiance": null
+    "allegiance": null,
+    "circles": [
+      "dinosaur-racers"
+    ]
   },
   {
     "name": "Dark",
     "epithet": "a rock gnome racer who rode the allosaurus Batton Down the Hatches to a mid-pack finish",
-    "allegiance": null
+    "allegiance": null,
+    "circles": [
+      "dinosaur-racers"
+    ]
   },
   {
     "name": "Sithi Vinecutter",
     "epithet": "of Hrakhamar, who lent the company Moradin's Gauntlet on their word not to die with it in some hole",
-    "allegiance": "with"
+    "allegiance": "with",
+    "circles": [
+      "shilku-dwarves"
+    ]
   },
   {
     "name": "Laz Drumthunder",
     "epithet": "scout out of Shilku Outpost, found exhausted among the firenewts' captives at Hrakhamar and cut loose by the party",
-    "allegiance": "with"
+    "allegiance": "with",
+    "circles": [
+      "shilku-dwarves"
+    ]
   },
   {
     "name": "Malkar Stonegrist",
     "epithet": "scout of the Shilku outpost, found deep in exhaustion among the firenewts' captives at Hrakhamar and freed by the party",
-    "allegiance": "with"
+    "allegiance": "with",
+    "circles": [
+      "shilku-dwarves"
+    ]
   },
   {
     "name": "Helga Ironfist",
     "epithet": "healer of the Shilku Outpost, who mended the company's wounds and named where the gauntlet's secrets lay",
-    "allegiance": "with"
+    "allegiance": "with",
+    "circles": [
+      "shilku-dwarves"
+    ]
   },
   {
     "name": "Yutmus Treasurehead",
     "epithet": "bartender of the Shilku Outpost, won over by a jug of conjured honey, who still wonders after the airship crew he once saw fall from the northern sky",
-    "allegiance": "with"
+    "allegiance": "with",
+    "circles": [
+      "shilku-dwarves"
+    ]
   },
   {
     "name": "Mardred Ungart",
     "epithet": "albino dwarf smith who left Shilku's obsidian scraps behind to reforge the keys and open Hrakhamar's treasury to Moradin's Gauntlet",
-    "allegiance": "with"
+    "allegiance": "with",
+    "circles": [
+      "shilku-dwarves"
+    ]
   },
   {
     "name": "Rurik Vinecutter",
     "epithet": "of the Shilku Outpost, who lamented the food and sent the company looking for ohelo berries",
-    "allegiance": "with"
+    "allegiance": "with",
+    "circles": [
+      "shilku-dwarves"
+    ]
   },
   {
     "name": "Barendd Torunn",
     "epithet": "of the Shilku Outpost, freed from rubble in the passageways and repaid the company in gems for a new pick",
-    "allegiance": "with"
+    "allegiance": "with",
+    "circles": [
+      "shilku-dwarves"
+    ]
   },
   {
     "name": "Bonson",
     "epithet": "of Sithi Vinecutter's escort, who kept watch outside and brought word of the unnatural stirring atop Mount Todra",
-    "allegiance": "with"
+    "allegiance": "with",
+    "circles": [
+      "shilku-dwarves"
+    ]
   },
   {
     "name": "Beezin",
     "epithet": "of Sithi Vinecutter's four companions, who came in from watch duty to report Mount Todra breaking loose",
-    "allegiance": "with"
+    "allegiance": "with",
+    "circles": [
+      "shilku-dwarves"
+    ]
   },
   {
     "name": "Grandon",
     "epithet": "of Sithi Vinecutter's company, who stayed to guard the entrance while the party pressed on",
-    "allegiance": "with"
+    "allegiance": "with",
+    "circles": [
+      "shilku-dwarves"
+    ]
   },
   {
     "name": "Skip",
     "epithet": "of Sithi Vinecutter's company, one of the albino dwarves and a spirit warrior who came to the group's aid",
-    "allegiance": "with"
+    "allegiance": "with",
+    "circles": [
+      "shilku-dwarves"
+    ]
   },
   {
     "name": "Wickles",
     "epithet": "Chumble's familiar, pickle-born and pickle-named, sent ahead to scout, eavesdrop, and strike when the moment calls",
-    "allegiance": "with"
+    "allegiance": "with",
+    "circles": [
+      "companys-own"
+    ]
   },
   {
     "name": "Tzindelor",
     "epithet": "young red dragon holding Wyrmheart Mine, a fight the company judged too costly to risk",
-    "allegiance": "against"
+    "allegiance": "against",
+    "circles": []
   },
   {
     "name": "Gruta",
     "epithet": "of the Flaming Fist, who fetches from a vault no other may follow her into",
-    "allegiance": "with"
+    "allegiance": "with",
+    "circles": [
+      "fort-beluarian",
+      "flaming-fist"
+    ]
   },
   {
     "name": "Ymezra",
     "epithet": "Jessamine's daughter, who tests the poisons before her mother sells them",
-    "allegiance": "with"
+    "allegiance": "with",
+    "circles": [
+      "port-nyanzaru"
+    ]
   },
   {
     "name": "Omala",
     "epithet": "of the Dye Works, whose death writ the company left unclaimed",
-    "allegiance": null
+    "allegiance": null,
+    "circles": [
+      "port-nyanzaru"
+    ]
   },
   {
     "name": "Eemux",
     "epithet": "who paints masks in Yokka's shop, one of two who lived through the fight at Camp Righteous",
-    "allegiance": null
+    "allegiance": null,
+    "circles": [
+      "yokkas-goblins"
+    ]
   },
   {
     "name": "Rork",
     "epithet": "the business side of Yokka's mask trade, one of two who survived the fight at Camp Righteous",
-    "allegiance": null
+    "allegiance": null,
+    "circles": [
+      "yokkas-goblins"
+    ]
   },
   {
     "name": "Nanny Pu'pu",
     "epithet": "the hag of Mbala, who sent them to slay a naga that proved no enemy, then played the wounded man in her own ambush and fell to Shago's spear",
-    "allegiance": "against"
+    "allegiance": "against",
+    "circles": []
   },
   {
     "name": "Ras Nsi",
     "epithet": "raised from death more times than he can count, walking Acererak's leash toward the door that would loose the serpent who swallows the sun",
-    "allegiance": "against"
+    "allegiance": "against",
+    "circles": []
   },
   {
     "name": "Acererak",
     "epithet": "who slew and buried the nine trickster gods beneath Omu, and now steers Ras Nsi toward betrayal",
-    "allegiance": "against"
+    "allegiance": "against",
+    "circles": []
   },
   {
     "name": "Wainrath",
     "epithet": "of Tamalka, sought on Artus Cimber's word, who named the Obanashi and gave the company a sounding stone to their temple",
-    "allegiance": "with"
+    "allegiance": "with",
+    "circles": []
   },
   {
     "name": "Nava",
     "epithet": "dryad at the mouth of the Seething Hall, who set the company challenges before the door",
-    "allegiance": null
+    "allegiance": null,
+    "circles": []
   },
   {
     "name": "Nerissa",
     "epithet": "who remembers little of herself, and whom Wren named as Mesika, a death-curse investigator whose journal the company has read",
-    "allegiance": "with"
+    "allegiance": "with",
+    "circles": []
   },
   {
     "name": "Rhoga",
     "epithet": "a ghost of the western hallway, who told the company the temple's history and warned them of the naga in the eastern halls",
-    "allegiance": "with"
+    "allegiance": "with",
+    "circles": []
   },
   {
     "name": "Xhosala",
     "epithet": "met quarrelling with Artus Cimber at the cave mouth, who fears the Heart of the Wild would be used for one man's purpose, and who agreed to lead the company to the Forsaken Tree",
-    "allegiance": "with"
+    "allegiance": "with",
+    "circles": []
   },
   {
     "name": "Wren",
     "epithet": "called Soggy Wren, who keeps a journal of the death curse at Kaya's House of Repose and opened it to the company in trade for what they knew",
-    "allegiance": "with"
+    "allegiance": "with",
+    "circles": [
+      "port-nyanzaru",
+      "harpers"
+    ]
   }
 ]
