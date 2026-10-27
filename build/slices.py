@@ -201,13 +201,16 @@ def append_npcs(data: dict, authored: dict) -> list[tuple]:
     expected = render.collect_npcs_from_log(data["session_log"], authored["site"])
     missing = [n for n in expected if n not in auth_names]
     out = []
+    # The circle registry rides in every NPC slice: the transformer files the
+    # NPC under one registry key (or returns null when none fits).
+    registry = list(authored["site"].get("circles", []))
     for name in missing:
         npc_mentions = []
         for entry in data["session_log"]["entries"]:
             text = entry.get("text", "")
             if mentions(name, text):
                 npc_mentions.append({"session": entry.get("session"), "line": text})
-        out.append((name, {"name": name, "mentions": npc_mentions}))
+        out.append((name, {"name": name, "mentions": npc_mentions, "circles": registry}))
     return out
 
 
@@ -313,6 +316,7 @@ def refresh_npcs(data: dict, authored: dict) -> list[tuple]:
     new_session_ids = None if force else {
         e.get("session") for e in _new_entries(data, authored)
     }
+    registry = list(authored["site"].get("circles", []))
 
     out = []
     for npc in authored["npcs"]:
@@ -329,7 +333,11 @@ def refresh_npcs(data: dict, authored: dict) -> list[tuple]:
         out.append((name, {
             "name": name,
             "mentions": all_mentions,
-            "existing": {"epithet": npc["epithet"], "allegiance": npc.get("allegiance")},
+            "circles": registry,
+            "existing": {
+                "epithet": npc["epithet"],
+                "circle": npc.get("circle"),
+            },
         }))
     return out
 
@@ -406,10 +414,21 @@ def refresh_known_npcs(data: dict, authored: dict) -> list[tuple]:
     existing belief), this task is name-extraction over the full corpus. We
     pass every session so the model can catch names missed in earlier runs;
     `existing` tells it which names are already covered.
+
+    The same pass owns additions to the circle registry (`site.circles`):
+    `existing_circles` is the registry as it stands, so a proposal never
+    duplicates a circle the site already files people under.
+
+    `party` (the player characters' names) and `not_npcs` (`site.not_npcs`:
+    recurring names that are not NPCs, a familiar, a construct the party owns)
+    tell the model what never belongs on the list; apply drops them anyway.
     """
     return [("all", {
         "sessions": list(data["session_log"]["entries"]),
         "existing": list(authored["site"].get("known_npcs", [])),
+        "existing_circles": list(authored["site"].get("circles", [])),
+        "party": [m["name"] for m in data["party"].get("members", []) if m.get("name")],
+        "not_npcs": list(authored["site"].get("not_npcs", [])),
     })]
 
 

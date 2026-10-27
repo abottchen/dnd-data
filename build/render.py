@@ -197,6 +197,8 @@ def validate_all(data: dict, authored: dict, images_dir: Path, fact_pack: dict |
     errors.extend(validate_chapters(data["session_log"], authored["chapters"]))
     npcs = collect_npcs_from_log(data["session_log"], authored["site"])
     errors.extend(validate_npcs(npcs, authored["npcs"]))
+    errors.extend(validate_circles(authored["site"], authored["npcs"]))
+    errors.extend(validate_not_npcs(authored["site"], data["party"], authored["npcs"]))
     errors.extend(validate_characters(data["party"], authored["characters"]))
     errors.extend(validate_distinction_uniqueness(authored["characters"]))
     if fact_pack is None:
@@ -324,10 +326,10 @@ from build.loaders import (load_authored, load_character_pronouns,  # noqa: F401
 from build.validators import (KIND_MALFORMED, KIND_MISSING, KIND_ORPHAN,  # noqa: F401,E402
                               ValidationError, collect_npcs_from_log, kill_key,
                               validate_chapters, validate_characters,
-                              validate_dice_player_mapping,
+                              validate_circles, validate_dice_player_mapping,
                               validate_distinction_basis,
                               validate_distinction_uniqueness, validate_kills,
-                              validate_map, validate_npcs, validate_portraits,
+                              validate_map, validate_not_npcs, validate_npcs, validate_portraits,
                               validate_sessions, validate_site)
 
 # Back-compat aliases for the pre-split private names. load_data (above) calls

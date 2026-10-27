@@ -58,13 +58,11 @@
     "Rindal",
     "Captain Brennan",
     "Pip",
-    "Corwin, called Artus Cimber",
+    "Artus Cimber",
     "Dragonbait",
     "Harlen",
-    "The Fleeing Yuan-ti",
     "Kessra",
     "Torgg",
-    "Lilac Mist",
     "Volo",
     "Wakanga",
     "Musharib",
@@ -93,14 +91,13 @@
     "Bakari",
     "Imka",
     "Doruk",
-    "Vorn",
     "Faroul & Gondolo",
     "Tiryki",
     "The Honeyman",
     "Qawasha",
     "Rokah",
-    "River",
-    "Flask",
+    "River Mist",
+    "Flask of Wine",
     "Aremag",
     "Liara Portyr",
     "Shago",
@@ -119,7 +116,6 @@
     "Beezin",
     "Grandon",
     "Skip",
-    "Wickles",
     "Tzindelor",
     "Gruta",
     "Ymezra",
@@ -135,6 +131,69 @@
     "Rhoga",
     "Xhosala",
     "Wren"
+  ],
+  "not_npcs": [
+    {
+      "name": "Wickles",
+      "why": "Chumble's familiar, a creature of his pact"
+    },
+    {
+      "name": "Vorn",
+      "why": "the shield guardian bound to Urida's amulet"
+    }
+  ],
+  "circles": [
+    {
+      "key": "horizon",
+      "title": "The Horizon"
+    },
+    {
+      "key": "companions",
+      "title": "The Companions",
+      "billing": "principal"
+    },
+    {
+      "key": "enemy",
+      "title": "The Enemy",
+      "billing": "principal"
+    },
+    {
+      "key": "guides",
+      "title": "The Guides"
+    },
+    {
+      "key": "port-nyanzaru",
+      "title": "The People of Port Nyanzaru"
+    },
+    {
+      "key": "merchant-princes",
+      "title": "The Merchant Princes"
+    },
+    {
+      "key": "dinosaur-racers",
+      "title": "The Dinosaur Racers",
+      "billing": "aside"
+    },
+    {
+      "key": "camp-vengeance",
+      "title": "Camp Vengeance"
+    },
+    {
+      "key": "nuanwa-olerros-scouts",
+      "title": "Nuanwa Olerro's Scouts"
+    },
+    {
+      "key": "fort-beluarian",
+      "title": "Fort Beluarian"
+    },
+    {
+      "key": "shilku-dwarves",
+      "title": "The Shilku Dwarves"
+    },
+    {
+      "key": "harpers",
+      "title": "The Harpers"
+    }
   ],
   "ascent_read": "Legends forged mostly by steel, but the road and its riddles have left their mark on every hard-won mile.",
   "player_map": {

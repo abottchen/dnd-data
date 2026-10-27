@@ -1,30 +1,96 @@
 {
   "type": "object",
-  "required": ["decision", "fields", "reason"],
+  "required": [
+    "decision",
+    "fields",
+    "reason"
+  ],
   "additionalProperties": false,
   "properties": {
     "decision": {
       "type": "string",
-      "enum": ["no_change", "rewrite"]
+      "enum": [
+        "no_change",
+        "rewrite"
+      ]
     },
     "fields": {
-      "type": ["object", "null"],
-      "required": ["known_npcs"],
+      "type": [
+        "object",
+        "null"
+      ],
+      "required": [
+        "known_npcs"
+      ],
       "additionalProperties": false,
       "properties": {
         "known_npcs": {
           "type": "array",
-          "items": {"type": "string"},
+          "items": {
+            "type": "string"
+          },
           "uniqueItems": true
+        },
+        "circles": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "object",
+            "required": [
+              "key",
+              "title",
+              "members"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "key": {
+                "type": "string",
+                "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+              },
+              "title": {
+                "type": "string",
+                "minLength": 1
+              },
+              "billing": {
+                "type": "string",
+                "enum": [
+                  "principal",
+                  "aside"
+                ]
+              },
+              "members": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "minItems": 1,
+                "uniqueItems": true
+              }
+            }
+          }
         }
       }
     },
-    "reason": {"type": "string"}
+    "reason": {
+      "type": "string"
+    }
   },
   "allOf": [
     {
-      "if": {"properties": {"decision": {"const": "rewrite"}}},
-      "then": {"properties": {"fields": {"type": "object"}}}
+      "if": {
+        "properties": {
+          "decision": {
+            "const": "rewrite"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "fields": {
+            "type": "object"
+          }
+        }
+      }
     }
   ]
 }

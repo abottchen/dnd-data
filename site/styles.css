@@ -2151,60 +2151,159 @@ img.chronicle-session-pip:focus-visible {
    ───────────────────────────────────────────────────────────────── */
 .dramatis-personae { margin-bottom: 56px; }
 
-.dramatis-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1px;
-  background: var(--rule);
-  border: 1px solid var(--rule-strong);
-  max-width: 1180px;
+/* One column, a boxed block per circle. Entries are a name column and a
+   description column, like a playbill's cast list. Circles with someone
+   named lately are live blocks; the rest are one folded row each in a last
+   box. Every fold is the same <details> control: a count line while
+   closed, a "fold" control while open, one open at a time, animated by
+   the cast IIFE in _script.html. */
+.cast-plate {
+  max-width: 880px;
   margin: 0 auto;
 }
 
-.dramatis-column {
+.cast-circle {
   background: var(--ink-soft);
-  padding: 24px 28px;
-}
-
-.dramatis-sub {
-  font-family: 'IBM Plex Sans', sans-serif;
-  font-size: 10px;
-  letter-spacing: 3px;
-  text-transform: uppercase;
-  color: var(--brass);
+  border: 1px solid var(--rule-strong);
+  padding: 18px 24px 12px;
   margin-bottom: 14px;
-  border-bottom: 1px solid var(--rule);
-  padding-bottom: 8px;
 }
 
-.dramatis-list { list-style: none; }
-
-.dramatis-list .npc {
-  display: block;
-  padding: 12px 0;
+.cast-circle-head {
+  margin: 0 0 10px;
+  padding-bottom: 6px;
   border-bottom: 1px solid var(--rule);
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 21px;
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--brass-hi);
+}
+.cast-circle[data-billing="aside"] .cast-circle-head,
+.cast-circle.catch-all .cast-circle-head { color: var(--brass-dim); }
+
+.cast-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
 }
 
-.dramatis-list .npc:last-child { border-bottom: none; }
+.cast-entry {
+  display: grid;
+  grid-template-columns: 190px 1fr;
+  column-gap: 20px;
+  align-items: baseline;
+  margin: 0 0 9px;
+}
 
 .npc-name {
-  display: block;
   font-family: 'Cormorant Garamond', serif;
   font-weight: 600;
-  font-size: 20px;
+  font-size: 18px;
+  line-height: 1.2;
   color: var(--brass);
-  letter-spacing: 0.3px;
-  line-height: 1.1;
 }
 
-.npc-epithet {
-  display: block;
+.npc-desc {
   font-family: 'EB Garamond', serif;
-  font-style: italic;
-  font-size: 14px;
+  font-size: 15.5px;
+  line-height: 1.45;
+  color: var(--paper);
+  opacity: 0.9;
+}
+
+/* The fold. */
+.cast-fold > summary {
+  list-style: none;
+  cursor: pointer;
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 12.5px;
+  line-height: 1.5;
   color: var(--paper-dim);
-  margin-top: 4px;
-  line-height: 1.4;
+}
+.cast-fold > summary::-webkit-details-marker { display: none; }
+.cast-fold > summary:hover { color: var(--paper); }
+.cast-fold > summary:focus-visible { outline: 1px solid var(--brass-hi); outline-offset: 4px; }
+
+/* In a live block the count line sits in the description column. */
+.cast-circle > .cast-fold > summary { padding: 0 0 6px 210px; }
+.cast-circle > .cast-fold > summary::before {
+  content: '';
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  margin-right: 8px;
+  vertical-align: 2px;
+  border-right: 1px solid var(--brass);
+  border-bottom: 1px solid var(--brass);
+  transform: rotate(-45deg);
+}
+.cast-circle > .cast-fold[open] > summary { padding-left: 0; }
+.cast-circle > .cast-fold[open] > summary::before { display: none; }
+
+.cast-fold .fold-open { display: none; }
+.cast-fold[open] > summary .fold-closed { display: none; }
+.cast-fold[open] > summary .fold-open {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.fold-ctl {
+  color: var(--brass);
+  white-space: nowrap;
+}
+.fold-ctl::after {
+  content: '';
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  margin-left: 7px;
+  vertical-align: 2px;
+  border-right: 1px solid currentColor;
+  border-bottom: 1px solid currentColor;
+  transform: rotate(-135deg);
+}
+
+.cast-fold[open] {
+  border-left: 2px solid var(--brass-dim);
+  padding-left: 12px;
+  margin-top: 6px;
+}
+.cast-fold .fold-body { overflow: hidden; }       /* the IIFE animates its height */
+.cast-fold .fold-body > .cast-list { padding: 8px 0 6px; }
+
+/* Circles with nobody named lately: one row each, in a box of their own. */
+.cast-dormant {
+  background: var(--ink-soft);
+  border: 1px solid var(--rule-strong);
+  padding: 6px 24px;
+}
+.cast-dormant > .cast-fold > summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 14px;
+  padding: 10px 0 9px;
+  border-bottom: 1px solid var(--rule);
+}
+.cast-dormant > .cast-fold:last-child > summary { border-bottom: 0; }
+.cast-dormant > .cast-fold:last-child[open] > summary { border-bottom: 1px solid var(--rule); }
+.cast-dormant > .cast-fold > summary .title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--brass-dim);
+}
+.cast-dormant > .cast-fold > summary:hover .title,
+.cast-dormant > .cast-fold[open] > summary .title { color: var(--brass); }
+.cast-dormant > .cast-fold > summary .fold-closed { white-space: nowrap; }
+.cast-dormant > .cast-fold[open] { margin: 6px 0; }
+
+@media (max-width: 900px) {
+  .cast-circle, .cast-dormant { padding-left: 16px; padding-right: 16px; }
+  .cast-entry { grid-template-columns: 1fr; row-gap: 2px; }
+  .cast-circle > .cast-fold > summary { padding-left: 0; }
 }
 
 /* ─────────────────────────────────────────────────────────────────

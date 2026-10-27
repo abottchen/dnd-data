@@ -5,6 +5,7 @@ data (party/session-log) against the authored prose store and returns a list of
 ValidationError; a non-empty list gates the render in build/render.py.
 """
 from __future__ import annotations
+import re
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -217,6 +218,113 @@ def validate_site(site: dict, latest_session: int) -> list[ValidationError]:
         if f in site:
             errors.append(ValidationError(KIND_MALFORMED, "site", ("singleton",), field=f))
     return errors
+
+CIRCLE_BILLINGS = ("principal", "aside")
+CIRCLE_FIELDS = ("key", "title", "billing")
+CIRCLE_KEY = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
+NPC_RETIRED_FIELDS = ("circles", "allegiance")
+
+def validate_circles(site: dict, npcs: list) -> list[ValidationError]:
+    """The circle registry (`site.circles`) and every NPC's `circle`.
+
+    Registry entries are `{key, title}` plus an optional `billing` of
+    "principal" or "aside": keys are unique slugs, titles are non-blank, and
+    no other field is allowed. An absent registry reads as empty (cold
+    start). Every authored NPC carries `circle`, a registry key or null, and
+    nothing of the retired contract (`circles`, `allegiance`). Every registry
+    circle has at least one member: a circle nobody belongs to is clutter,
+    and most likely a key typo.
+    """
+    errors: list[ValidationError] = []
+    registry = site.get("circles", [])
+    if not isinstance(registry, list):
+        errors.append(ValidationError(KIND_MALFORMED, "site", ("singleton",), field="circles"))
+        registry = []
+
+    keys: set[str] = set()
+    for i, entry in enumerate(registry):
+        if not isinstance(entry, dict):
+            errors.append(ValidationError(KIND_MALFORMED, "circles", (i,), field="entry"))
+            continue
+        key = entry.get("key")
+        label = key if isinstance(key, str) and key else i
+        if not isinstance(key, str) or not CIRCLE_KEY.match(key):
+            errors.append(ValidationError(KIND_MALFORMED, "circles", (label,), field="key"))
+        elif key in keys:
+            errors.append(ValidationError(KIND_MALFORMED, "circles", (key,), field="duplicate key"))
+        else:
+            keys.add(key)
+        title = entry.get("title")
+        if not isinstance(title, str) or not title.strip():
+            errors.append(ValidationError(KIND_MALFORMED, "circles", (label,), field="title"))
+        if "billing" in entry and entry["billing"] not in CIRCLE_BILLINGS:
+            errors.append(ValidationError(KIND_MALFORMED, "circles", (label,), field="billing"))
+        for f in entry:
+            if f not in CIRCLE_FIELDS:
+                errors.append(ValidationError(KIND_MALFORMED, "circles", (label,), field=f))
+
+    members: dict[str, int] = {k: 0 for k in keys}
+    for npc in npcs:
+        name = npc.get("name")
+        for stale in NPC_RETIRED_FIELDS:
+            if stale in npc:
+                errors.append(ValidationError(KIND_MALFORMED, "npcs", (name,), field=stale))
+        if "circle" not in npc:
+            errors.append(ValidationError(KIND_MALFORMED, "npcs", (name,), field="circle"))
+            continue
+        circle = npc["circle"]
+        if circle is None:
+            continue
+        if not isinstance(circle, str):
+            errors.append(ValidationError(KIND_MALFORMED, "npcs", (name,), field="circle"))
+            continue
+        if circle not in members:
+            errors.append(ValidationError(
+                KIND_MALFORMED, "npcs", (name,), field=f"circle unknown key '{circle}'"))
+            continue
+        members[circle] += 1
+    for key, count in members.items():
+        if count == 0:
+            errors.append(ValidationError(KIND_ORPHAN, "circles", (key,)))
+    return errors
+
+def not_npc_names(site: dict, party_names) -> set[str]:
+    """Casefolded names that are never NPCs: the player characters and every
+    entry of `site.not_npcs` (`{name, why}`: a familiar, a construct the party
+    owns). Shared by apply, which drops them from a discovery result, and by
+    validate_not_npcs, which fails the render if one reached the store."""
+    names = {str(n).strip().casefold() for n in party_names if n}
+    for e in site.get("not_npcs") or []:
+        if isinstance(e, dict) and isinstance(e.get("name"), str) and e["name"].strip():
+            names.add(e["name"].strip().casefold())
+    return names
+
+
+def validate_not_npcs(site: dict, party: dict, npcs: list) -> list[ValidationError]:
+    """`site.not_npcs` is a list of `{name, why}` with a non-blank name, and
+    neither it nor the party roster may overlap `site.known_npcs` or the
+    authored NPC entries. A player character, a familiar or a shield guardian
+    filed as an NPC is MALFORMED npcs (<name>) field=not_npc."""
+    errors: list[ValidationError] = []
+    entries = site.get("not_npcs")
+    if entries is None:
+        entries = []
+    if not isinstance(entries, list):
+        errors.append(ValidationError(KIND_MALFORMED, "site", ("singleton",), field="not_npcs"))
+        entries = []
+    for e in entries:
+        if not (isinstance(e, dict) and isinstance(e.get("name"), str) and e["name"].strip()):
+            errors.append(ValidationError(KIND_MALFORMED, "site", ("singleton",), field="not_npcs"))
+    excluded = not_npc_names(site, [m.get("name") for m in party.get("members", [])])
+    flagged: set[str] = set()
+    candidates = list(site.get("known_npcs") or []) + [
+        n.get("name") for n in npcs if isinstance(n, dict)]
+    for name in candidates:
+        if isinstance(name, str) and name.casefold() in excluded and name not in flagged:
+            flagged.add(name)
+            errors.append(ValidationError(KIND_MALFORMED, "npcs", (name,), field="not_npc"))
+    return errors
+
 
 def collect_npcs_from_log(session_log: dict, site: dict) -> list[str]:
     """Return the canonical list of NPC names whose epithets must be authored.

@@ -19,11 +19,14 @@ Static GitHub Pages site visualizing data from an ongoing D&D campaign.
   - `build/__main__.py` — orchestrator entry point. Subcommands: `prepare` (gather slices into a run dir) and `apply` (validate results, write authored JSON, render).
   - `build/render.py` — CLI + Jinja render layer. Loads `data/` (`load_data`, incl. the real-name privacy scrub) + `build/authored/*.json`, wires `validate_all` (fact pack built once in `main` and passed in), and renders `site/index.html` from `build/templates/*.html`. Keeps `BUILD_DIR = Path(__file__).resolve().parent` (templates / authored) and `REPO_ROOT = BUILD_DIR.parent` (`data/`, `site/`), plus a re-export shim (absolute `from build.…` imports so `python build/render.py` still runs as a script) so the pre-split public surface stays importable through `build.render` — tests and `build/slices.py` rely on it.
   - `build/loaders.py` — authored-store, PC-pronoun, and dice-player-map loading: `load_authored`, `load_character_pronouns`, `load_dice_player_map` / `resolve_dice_player` (longest-pattern-first substring resolve), plus the `_mdy_to_iso` / `_has_chapter_marker` session-log normalizers. Owns `BUILD_DIR` for `dice-players.json` / `character-pronouns.json`.
-  - `build/validators.py` — `ValidationError` + every `validate_*` (kills, sessions, chapters, npcs, characters, portraits, site, dice-player mapping, distinction basis/uniqueness) and the `kill_key` / `collect_npcs_from_log` helpers.
+  - `build/validators.py` — `ValidationError` + every `validate_*` (kills, sessions, chapters, npcs, circles, characters, portraits, site, dice-player mapping, distinction basis/uniqueness) and the `kill_key` / `collect_npcs_from_log` helpers.
   - `build/bestiary.py` — 5etools bestiary lookup (`bestiary_lookup`; the `BESTIARY_GLOB` under `.claude/ext/` is resolved from `build.paths.REPO_ROOT`) plus the CR→XP tables (`XP_BY_CR`, `xp_for_cr`, `_kill_cr` / `_kill_xp`).
-  - `build/compute.py` — every `compute_*` (trials, fortune, radar / ascent / constellation geometry, chronicle, reliquary, …) and `compute_all`, which assembles the full template context. Imports `inventory` at module top: the old render↔inventory circular import is dissolved because `inventory` now imports the dice-map loader from `loaders`.
+  - `build/compute.py` — every `compute_*` (trials, fortune, radar / ascent / constellation geometry, chronicle, reliquary, cast, …) and `compute_all`, which assembles the full template context. Imports `inventory` at module top: the old render↔inventory circular import is dissolved because `inventory` now imports the dice-map loader from `loaders`.
   - `build/paths.py`, `store.py`, `slices.py`, `registry.py`, `prepare.py`, `apply.py`, `apply_cli.py` — orchestrator submodules (path resolution, authored-store I/O, per-category slice builders, transformer registry, run-dir preparation, returned-prose application, manifest-driven apply + render).
   - `build/authored/` — JSON prose store: `kills.json`, `sessions.json`, `chapters.json`, `npcs.json`, `characters.json`, `site.json`. The only writable surface for the orchestrator's apply step.
+    - `site.json` → `circles`: the NPC-circle registry, `[{"key", "title", "billing"?}]`; `billing` is `principal` or `aside`, keys are slugs and stable once published.
+    - `npcs.json` → `circle`: required on every entry, one registry key or `null`.
+    - `site.json` → `not_npcs`: `[{"name", "why"}]`, recurring names that are not NPCs (a familiar, a construct the party owns); with the party roster it is the exclusion set that apply and `validate_not_npcs` enforce.
   - `build/mapimage.py` — re-encodes `data/chult-player-map.jpg` into `site/images/chult-map.jpg` at full resolution (`prepare_map`). Called by `apply` just before the render, and available standalone as `python -m build map [--force]`. A no-op unless the source's SHA-256 differs from the one recorded in `build/map-source.json`, so ordinary builds pay nothing.
   - `build/map-source.json` — committed record of the SHA-256 `site/images/chult-map.jpg` was last built from, plus its byte size. This is the map's staleness signal; mtimes are deliberately not consulted, because the derivative is git-tracked and git stamps working-tree files at checkout time, so a pull or stash after dropping in a new map would leave the stale derivative looking newer than its own source. Delete it to force a one-off rebuild.
   - `build/templates/` — Jinja2 partials consumed by `build/render.py`. Locked; not modified by normal authoring. Reference assets via paths relative to `site/index.html` (e.g. `styles.css`, `images/...`). `_map.html` is the Map tab; its pan/zoom viewer is the last IIFE in `_script.html`.
@@ -82,17 +85,21 @@ The `build` package prepares authoring slices, dispatches them in-session via th
 
 Pipeline (`prepare` step):
 1. Load source data from `data/` + authored prose from `build/authored/`.
-2. **Discovery pass** — when `latest_session > site.refreshed_through_session`, run `refresh-known-npcs` to extract any newly named NPCs from new session text and append them to `site.known_npcs`. Runs before the append pass so newly discovered names flow into per-NPC epithet authoring on the same build. Returns `no_change` or `rewrite`.
-3. **Append pass** — for each category (`kills`, `chapters`, `npcs`, `characters`, `sworn`), the slice builder in `build/slices.py` computes a set difference between `data/` and `build/authored/` (keyed on `(character, date, creature, method)` for kills, `name` for NPCs, etc.). One slice is emitted per missing entity. Deleting a single entry from an authored file causes that one entry to be re-authored on the next run; nothing else moves.
-4. **Refresh pass** — when `latest_session > site.refreshed_through_session`, evaluate each `refresh-*` transformer (`chapters`, `npcs`, `characters`, `road-ahead`, `intro-epithet`); each returns `no_change` or `rewrite`.
+2. **Discovery pass** — when `latest_session > site.refreshed_through_session`, run `refresh-known-npcs` to extract any newly named NPCs from new session text and append them to `site.known_npcs`. Runs before the append pass so newly discovered names flow into per-NPC epithet authoring on the same build. Returns `no_change` or `rewrite`. It also proposes new circles for the registry, and never a name from the party roster or `site.not_npcs`; apply enforces both.
+3. **Append pass** — for each category (`kills`, `chapters`, `npcs`, `characters`, `sworn`), the slice builder in `build/slices.py` computes a set difference between `data/` and `build/authored/` (keyed on `(character, date, creature, method)` for kills, `name` for NPCs, etc.). One slice is emitted per missing entity. Deleting a single entry from an authored file causes that one entry to be re-authored on the next run; nothing else moves. The `append-npcs` result places the NPC in `circle` with a registry key or null.
+4. **Refresh pass** — when `latest_session > site.refreshed_through_session`, evaluate each `refresh-*` transformer (`chapters`, `npcs`, `characters`, `road-ahead`, `intro-epithet`); each returns `no_change` or `rewrite`. A `refresh-npcs` rewrite returns `circle`, so a refresh can move an NPC.
 5. Write all pending slices + frozen prompts to `build/.run/<timestamp>/pending/`.
 
 In-session (`/build-prose` skill): it dispatches one sub-agent per pending slice; each sub-agent reads the slice + frozen prompt, authors prose, and writes a JSON result file to `build/.run/<timestamp>/results/`. Then apply runs.
 
 Pipeline (`apply` step):
 1. Validate each result file against its JSON Schema.
-2. Apply results to authored sections; bump `site.refreshed_through_session` on full refresh-pass success.
+2. Apply results to authored sections; bump `site.refreshed_through_session` on full refresh-pass success. An NPC's `circle` is checked against the registry; registry proposals merge append-only (key, title, billing) and file their already-authored members, and the pipeline never renames or removes a circle.
 3. Run `build/render.py`.
+
+### NPC circles
+
+The GM tab's cast is grouped by circle. The authoring rules live in the three NPC prompts (`append-npcs`, `refresh-npcs`, `refresh-known-npcs`); `validate_circles` and `validate_not_npcs` gate the render; the renderer is `compute.compute_cast` → `_gm.html`; the design record is `docs/superpowers/specs/2026-10-26-npc-circles-design.md`.
 
 ## Chronicle session entries
 

@@ -334,6 +334,45 @@
       });
     })();
 
+    // --- Cast: folds (one open at a time, animated) ---
+    (function () {
+      const folds = Array.from(document.querySelectorAll('#gm details.cast-fold'));
+      if (!folds.length) return;
+      const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const DUR = 240;
+      const body = d => d.querySelector(':scope > .fold-body');
+      const busy = b => b && b.getAnimations && b.getAnimations().length > 0;
+      function open(d) {
+        d.open = true;
+        const b = body(d);
+        if (reduce || !b || !b.animate) return;
+        const a = b.animate([{ height: '0px', opacity: 0 }, { height: b.scrollHeight + 'px', opacity: 1 }],
+                            { duration: DUR, easing: 'ease-out' });
+        setTimeout(() => a.cancel(), DUR + 60);   // backstop: settle at natural height
+      }
+      function close(d) {
+        const b = body(d);
+        if (reduce || !b || !b.animate) { d.open = false; return; }
+        const a = b.animate([{ height: b.scrollHeight + 'px', opacity: 1 }, { height: '0px', opacity: 0 }],
+                            { duration: DUR, easing: 'ease-in', fill: 'forwards' });
+        // finish events can lag a frame in a throttled tab; the timer is the backstop.
+        const done = () => { if (d.open) { d.open = false; a.cancel(); } };
+        a.onfinish = done;
+        setTimeout(done, DUR + 60);
+      }
+      folds.forEach(d => {
+        const s = d.querySelector(':scope > summary');
+        if (!s) return;
+        s.addEventListener('click', e => {
+          e.preventDefault();
+          if (busy(body(d))) return;
+          if (d.open) { close(d); return; }
+          folds.forEach(o => { if (o !== d && o.open && !busy(body(o))) close(o); });
+          open(d);
+        });
+      });
+    })();
+
     // --- Pack: Manifest chip tooltips ---
     (function () {
       document.querySelectorAll('.manifest-chip').forEach(el => {

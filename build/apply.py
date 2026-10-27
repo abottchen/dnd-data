@@ -12,8 +12,27 @@ Signature: apply_*(authored, key, slice_data, output) -> None | dict
 `apply_refresh_road_ahead` returns a graduations dict so the orchestrator can
 include it in the end-of-run report; the others return None.
 """
-from . import render
+import sys
 
+from . import render, validators
+
+
+def _circle_keys(authored: dict) -> set:
+    """Every key in the circle registry (site.circles)."""
+    site = authored.get("site") or {}
+    return {c["key"] for c in (site.get("circles") or []) if isinstance(c, dict) and c.get("key")}
+
+
+def _resolve_circle(authored: dict, circle):
+    """Check an NPC's circle against the registry. Null is fine (the NPC files
+    under the catch-all); an unknown key raises ValueError so the result is
+    rejected rather than landing a dangling key that validate_circles would
+    fail the render on."""
+    if circle is None:
+        return None
+    if circle not in _circle_keys(authored):
+        raise ValueError(f"unknown circle key: {circle!r}")
+    return circle
 
 def apply_append_kills(authored: dict, key, slice_data: dict, output: dict) -> None:
     """Each entry in output['fields'] keys by <char>__<date>__<creature>__<method>;
@@ -76,7 +95,7 @@ def apply_append_npcs(authored: dict, key, slice_data: dict, output: dict) -> No
     authored["npcs"].append({
         "name": key,
         "epithet": fields["epithet"],
-        "allegiance": fields.get("allegiance"),
+        "circle": _resolve_circle(authored, fields.get("circle")),
     })
 
 
@@ -128,8 +147,10 @@ def apply_refresh_npcs(authored: dict, key, slice_data: dict, output: dict) -> N
     name = key
     for n in authored["npcs"]:
         if n["name"] == name:
+            # Resolve before touching the entry so a bad key leaves it intact.
+            circle = _resolve_circle(authored, fields.get("circle"))
             n["epithet"] = fields["epithet"]
-            n["allegiance"] = fields["allegiance"]
+            n["circle"] = circle
             return
     raise ValueError(f"npc {name!r} not found in authored store")
 
@@ -184,10 +205,67 @@ def apply_refresh_ascent_read(authored: dict, key, slice_data: dict, output: dic
 
 
 def apply_refresh_known_npcs(authored: dict, key, slice_data: dict, output: dict) -> None:
+    """Replace `site.known_npcs` and merge any proposed circles into the
+    registry (`site.circles`), append-only: a proposal whose key already
+    exists is skipped whole, members included, because the pipeline never
+    renames, removes, or re-populates a published circle.
+
+    Each accepted circle's `members` who already have an authored entry are
+    filed under it here, moving them if they were filed elsewhere: the
+    proposal names them. The per-NPC slices of this same run were prepared
+    before this result existed, so nothing else would place them and the
+    circle would sit memberless, which validate_circles fails the render on.
+    Members not yet authored are left to append-npcs, whose next slice will
+    carry the new circle. A member outside the (new) known_npcs list is a
+    typo or an invention: the whole result is refused before any mutation.
+    Of a proposal, only `key`, `title` and `billing` reach the registry.
+
+    A player character (the slice's `party`) or a name in `site.not_npcs` is
+    never an NPC, however the model filed it: such names are dropped from the
+    list and from proposed circles' members, and a proposal left with no
+    member is dropped whole, so one slip does not fail the run.
+    """
     if output["decision"] == "no_change":
         return
     fields = output["fields"] or {}
-    authored["site"]["known_npcs"] = list(fields["known_npcs"])
+    site = authored["site"]
+    excluded = validators.not_npc_names(site, slice_data.get("party", []))
+    dropped = [n for n in fields["known_npcs"] if n.casefold() in excluded]
+    if dropped:
+        print(f"apply: refresh-known-npcs dropped {', '.join(dropped)} (not NPCs)",
+              file=sys.stderr)
+    known = [n for n in fields["known_npcs"] if n.casefold() not in excluded]
+    known_set = set(known)
+    present = {c["key"] for c in (site.get("circles") or [])}
+    accepted = []
+    for c in fields.get("circles") or []:
+        if c["key"] in present:
+            continue
+        proposed = c.get("members", [])
+        members = [m for m in proposed if m.casefold() not in excluded]
+        if proposed and not members:
+            continue
+        for m in members:
+            if m not in known_set:
+                raise ValueError(
+                    f"circle {c['key']!r} names member {m!r}, which is not a known NPC")
+        accepted.append({**c, "members": members})
+        present.add(c["key"])
+
+    site["known_npcs"] = known
+    if not accepted:
+        return
+    registry = site.setdefault("circles", [])
+    npcs_by_name = {n["name"]: n for n in authored.get("npcs", [])}
+    for c in accepted:
+        entry = {"key": c["key"], "title": c["title"]}
+        if "billing" in c:
+            entry["billing"] = c["billing"]
+        registry.append(entry)
+        for m in c.get("members", []):
+            npc = npcs_by_name.get(m)
+            if npc is not None:
+                npc["circle"] = c["key"]
 
 
 def apply_refresh_archetype_inscription(authored: dict, key, slice_data: dict, output: dict) -> None:

@@ -1,20 +1,33 @@
 {
   "type": "object",
-  "required": ["fields", "reason"],
+  "required": [
+    "fields",
+    "reason"
+  ],
   "additionalProperties": false,
   "properties": {
     "fields": {
       "type": "object",
-      "required": ["epithet", "allegiance"],
+      "required": [
+        "epithet",
+        "circle"
+      ],
       "additionalProperties": false,
       "properties": {
-        "epithet": {"type": "string"},
-        "allegiance": {
-          "type": ["string", "null"],
-          "enum": ["with", "against", null]
+        "epithet": {
+          "type": "string"
+        },
+        "circle": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
         }
       }
     },
-    "reason": {"type": "string"}
+    "reason": {
+      "type": "string"
+    }
   }
 }

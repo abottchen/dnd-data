@@ -1,4 +1,26 @@
 {% from "_macros.html" import section_head -%}
+{#- The cast is a printed dramatis personae: one column, a block per circle
+    (the group the players would look for someone in), each entry a name
+    column and a description column. A circle is live when someone in it
+    was named in the last few sessions (compute.CAST_PRESENT_WINDOW) or it
+    is billed principal: the named get full entries and the rest fold
+    behind a count line. Circles with nobody named lately are one folded
+    row each below the column. Every fold is the same <details> control,
+    one open at a time, animated by the cast IIFE in _script.html.
+    Contract: docs/superpowers/specs/2026-10-26-npc-circles-design.md. -#}
+{%- macro entry(e) -%}
+<li class="cast-entry" id="npc-{{ e.slug }}"><span class="npc-name">{{ e.name }}</span><span class="npc-desc">{{ e.epithet | safe }}</span></li>
+{%- endmacro %}
+{%- macro fold_body(c) -%}
+<div class="fold-body"><ul class="cast-list">
+            {%- for e in c.rollcall %}
+            {{ entry(e) }}
+            {%- endfor %}
+          </ul></div>
+{%- endmacro %}
+{%- macro since(c) -%}
+{%- if c.last_seen_label %}, not seen since session {{ c.last_seen_label }}{% endif -%}
+{%- endmacro %}
 <article class="character" id="gm" role="tabpanel" aria-labelledby="tab-gm">
   {%- set gm_member = {"id": "gm"} %}
   {%- set gm_fortune = fortune.get("gm") %}
@@ -18,29 +40,40 @@
 
   <section class="dramatis-personae">
     {{ section_head("i", "The Cast", "Dramatis Personae", "Those who walked beside, and those who stood athwart.", "trefoil") }}
-    <div class="dramatis-grid">
-      <div class="dramatis-column">
-        <div class="dramatis-sub">Those Who Stood With Them</div>
-        <ul class="dramatis-list">
-          {%- for n in npcs_by_allegiance.with %}
-          <li class="npc">
-            <span class="npc-name">{{ n.name }}</span>
-            <span class="npc-epithet">{{ n.epithet | safe }}</span>
-          </li>
+    <div class="cast-plate">
+      {%- for c in cast.live %}
+      <section class="cast-circle{% if c.catch_all %} catch-all{% endif %}" id="circle-{{ c.key }}" data-circle="{{ c.key }}"{% if c.billing %} data-billing="{{ c.billing }}"{% endif %}>
+        <h3 class="cast-circle-head">{{ c.title }}</h3>
+        <ul class="cast-list">
+          {%- for e in c.present %}
+          {{ entry(e) }}
           {%- endfor %}
         </ul>
+        {%- if c.rollcall %}
+        <details class="cast-fold">
+          <summary>
+            <span class="fold-closed">and {{ c.rollcall | length }} more{{ since(c) }}</span>
+            <span class="fold-open"><span>{% if c.last_seen_label %}the {{ c.rollcall | length }} not seen since session {{ c.last_seen_label }}{% else %}the {{ c.rollcall | length }} the log never names{% endif %}</span><span class="fold-ctl">fold</span></span>
+          </summary>
+          {{ fold_body(c) }}
+        </details>
+        {%- endif %}
+      </section>
+      {%- endfor %}
+      {%- if cast.dormant %}
+      <div class="cast-dormant">
+        {%- for c in cast.dormant %}
+        <details class="cast-fold{% if c.catch_all %} catch-all{% endif %}" id="circle-{{ c.key }}" data-circle="{{ c.key }}"{% if c.billing %} data-billing="{{ c.billing }}"{% endif %}>
+          <summary>
+            <span class="title">{{ c.title }}</span>
+            <span class="fold-closed">{{ c.total }} name{% if c.total != 1 %}s{% endif %}{{ since(c) }}</span>
+            <span class="fold-open fold-ctl">fold</span>
+          </summary>
+          {{ fold_body(c) }}
+        </details>
+        {%- endfor %}
       </div>
-      <div class="dramatis-column">
-        <div class="dramatis-sub">Those Who Stood Against Them</div>
-        <ul class="dramatis-list">
-          {%- for n in npcs_by_allegiance.against %}
-          <li class="npc">
-            <span class="npc-name">{{ n.name }}</span>
-            <span class="npc-epithet">{{ n.epithet | safe }}</span>
-          </li>
-          {%- endfor %}
-        </ul>
-      </div>
+      {%- endif %}
     </div>
   </section>
 

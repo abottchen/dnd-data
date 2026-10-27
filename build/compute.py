@@ -1304,7 +1304,7 @@ def compute_all(data: dict, authored: dict) -> dict:
         "road_ahead_digest": road_ahead_digest,
         "best_skill_by_id": best_skill_by_id,
         "radar_by_id": radar_by_id,
-        "npcs_by_allegiance": _split_npcs(authored["npcs"]),
+        "cast": compute_cast(authored["npcs"], session_log, authored["site"].get("circles", [])),
         "inventory_by_id": inventory_bundle["by_id"],
         "company_strip": inventory_bundle["company_strip"],
         "archetype_inscriptions": inscriptions,
@@ -1342,11 +1342,113 @@ def _compute_header_eyebrow(chronicle: dict, ledger: dict) -> list[str]:
         lines.append(f"{sessions} {word} Kept")
     return [ln for ln in lines if ln]
 
-def _split_npcs(npcs: list) -> dict:
-    return {
-        "with": [n for n in npcs if n.get("allegiance") == "with"],
-        "against": [n for n in npcs if n.get("allegiance") == "against"],
-    }
+# -- Dramatis Personae: the cast plate ---------------------------------------
+# Contract: docs/superpowers/specs/2026-10-26-npc-circles-design.md.
+# Each NPC files under one circle (or the catch-all). A circle is live when
+# anyone in it was named in the last CAST_PRESENT_WINDOW sessions, or when
+# it is billed principal; the named get full entries and the rest fold.
+# The name match is deliberately stricter than slices.mentions(): that one
+# is case-insensitive because an authoring slice should err toward more
+# context, but here a hit on "the river" or "dark" would keep River and Dark
+# present for good. Exact-case whole-word match first; case-insensitive only
+# when the exact name never appears anywhere in the log (it writes "the
+# honeyman").
+CAST_PRESENT_WINDOW = 3
+CAST_CATCH_ALL_KEY = "road"
+CAST_CATCH_ALL_TITLE = "Met Along the Road"
+CAST_TIERS = {"principal": 0, None: 1, "aside": 2}
+
+
+def _cast_name_keys(name: str) -> list[str]:
+    keys = [p.strip() for p in name.split(" & ") if p.strip()]
+    keys += [k[4:] for k in keys if k.startswith("The ")]
+    return keys
+
+
+def _cast_scan(keys: list[str], entries: list[dict], flags: int) -> list[int]:
+    hits = []
+    for e in entries:
+        text = e.get("text", "")
+        if any(re.search(r"\b" + re.escape(k) + r"\b", text, flags) for k in keys):
+            hits.append(e["session"])
+    return hits
+
+
+def npc_sessions(name: str, session_log: dict) -> list[int]:
+    """Session ids (log order) whose text names this NPC."""
+    entries = session_log.get("entries", [])
+    keys = _cast_name_keys(name)
+    return _cast_scan(keys, entries, 0) or _cast_scan(keys, entries, re.IGNORECASE)
+
+
+def _cast_slug(name: str) -> str:
+    return re.sub(r"[^a-z0-9]+", "-", name.casefold()).strip("-") or "npc"
+
+
+def compute_cast(npcs: list, session_log: dict, circles: list | None = None,
+                 window: int = CAST_PRESENT_WINDOW) -> dict:
+    """The GM tab's cast plate: `live`, the circles with someone named in the
+    last `window` sessions (and every principal circle, whatever its
+    recency), and `dormant`, the rest. Both run principals first, then
+    ordinary circles by most recent mention (ties by how many sessions name
+    the circle, then by first mention), then asides, with the catch-all for
+    NPCs in no circle always last.
+
+    Each block: `key`, `title`, `billing` ("principal", "aside" or None),
+    `catch_all`, `present` (full entries: members named in the window, or
+    every member of a principal circle), `rollcall` (the folded rest),
+    `total`, and `last_seen_label` (the latest session anyone folded was
+    named, Roman, or ""). Both lists run in order of first meeting;
+    never-named NPCs sink to the end. An unknown key is ignored here (the
+    validator reports it) and a missing `circle` reads as none, so a
+    half-migrated store still renders."""
+    registry = {c["key"]: c for c in (circles or []) if isinstance(c, dict) and c.get("key")}
+    entries = session_log.get("entries", [])
+    latest = max((e["session"] for e in entries), default=0)
+    present_from = latest - window + 1
+    seen = {n["name"]: npc_sessions(n["name"], session_log) for n in npcs}
+    # Stable sort: never-seen names keep their authored order at the end.
+    ordered = sorted(npcs, key=lambda n: (not seen[n["name"]], (seen[n["name"]] or [0])[0]))
+
+    blocks: dict[str, dict] = {}
+
+    def block(key: str) -> dict:
+        if key not in blocks:
+            c = registry.get(key)
+            blocks[key] = {
+                "key": key,
+                "title": c["title"] if c else CAST_CATCH_ALL_TITLE,
+                "billing": (c or {}).get("billing"),
+                "catch_all": c is None,
+                "present": [], "rollcall": [],
+                "_sessions": set(),
+            }
+        return blocks[key]
+
+    for n in ordered:
+        key = n.get("circle")
+        b = block(key if key in registry else CAST_CATCH_ALL_KEY)
+        sessions = seen[n["name"]]
+        entry = {"name": n["name"], "slug": _cast_slug(n["name"]), "epithet": n.get("epithet", "")}
+        present = b["billing"] == "principal" or (bool(sessions) and sessions[-1] >= present_from)
+        (b["present"] if present else b["rollcall"]).append(entry)
+        b["_sessions"].update(sessions)
+
+    live: list[dict] = []
+    dormant: list[dict] = []
+    for b in blocks.values():
+        folded_last = max((seen[e["name"]][-1] for e in b["rollcall"] if seen[e["name"]]), default=None)
+        b["total"] = len(b["present"]) + len(b["rollcall"])
+        b["last_seen_label"] = _to_roman(folded_last) if folded_last else ""
+        named = b.pop("_sessions")
+        tier = 3 if b["catch_all"] else CAST_TIERS[b["billing"]]
+        b["_order"] = (tier, -max(named, default=0), -len(named), min(named, default=0))
+        (live if b["present"] else dormant).append(b)
+    for group in (live, dormant):
+        group.sort(key=lambda b: b["_order"])
+        for b in group:
+            del b["_order"]
+    return {"live": live, "dormant": dormant}
 
 def compute_cr_label(creature: str) -> str:
     info = bestiary_lookup(creature)

@@ -33,9 +33,13 @@ def _forbidden_names_regex() -> str:
     return pattern
 
 
-def _render_html(staged_env) -> str:
+def _render_html(staged_env, npcs: list | None = None, circles: list | None = None) -> str:
     """Load staged fixture data + authored store, run compute_all, and render
     the page, returning the rendered HTML text and the authored store.
+
+    `npcs` and `circles` are appended to the authored NPC list and circle
+    registry in memory only: the checked-in fixture keeps the NPC list empty
+    so test_slices can see Azlund as un-authored.
 
     The `vex` party member is deliberately left out of
     tests/fixtures/sample_authored/characters.json — test_slices.py relies on
@@ -53,6 +57,8 @@ def _render_html(staged_env) -> str:
         "constellation_epithet": "x", "distinction_title": "x",
         "distinction_subtitle": "x", "distinction_detail": "x",
     })
+    authored["npcs"].extend(npcs or [])
+    authored["site"].setdefault("circles", []).extend(circles or [])
     context = render.compute_all(data, authored)
     out = staged_env / "index.html"
     render.render_page(context, TEMPLATES, out)
@@ -78,6 +84,35 @@ def test_forbidden_names_regex_matches_full_name():
     # (the pre-commit/pre-push hooks scan committed content for it).
     name = "Si" + "mon Wei" + "l"
     assert re.search(_forbidden_names_regex(), name)
+
+
+def test_gm_cast_renders_circles_and_folds_the_unseen(staged_env):
+    html, _ = _render_html(
+        staged_env,
+        circles=[{"key": "merchants", "title": "The Merchants"},
+                 {"key": "villains", "title": "The Villains", "billing": "principal"}],
+        npcs=[
+            {"name": "Azlund", "epithet": "of the House of Healing", "circle": "merchants"},
+            {"name": "Hollow Ghost", "epithet": "never named again", "circle": "merchants"},
+            {"name": "Acererak", "epithet": "the lich", "circle": "villains"},
+            {"name": "Tiryki", "epithet": "a racer", "circle": None},
+        ])
+    gm = html[html.index('id="gm"'):]
+    # Principals first, then the circle with someone named lately; the
+    # catch-all for the ungrouped last.
+    assert gm.index('data-circle="villains"') < gm.index('data-circle="merchants"') < gm.index('data-circle="road"')
+    # Azlund is named in the fixture log: a full entry, name then description.
+    assert 'id="npc-azlund"' in gm
+    assert '<span class="npc-name">Azlund</span>' in gm
+    assert 'class="npc-desc">of the House of Healing' in gm
+    # Acererak never is, but a principal is always in full.
+    assert 'id="npc-acererak"' in gm
+    # Hollow Ghost never is, so it sits folded behind a count line.
+    assert 'class="cast-fold"' in gm
+    assert "Hollow Ghost" in gm
+    assert "and 1 more" in gm
+    for retired in ("dramatis-grid", "cast-legend", "npc-sigil", "npc-against", "cast-rollcall"):
+        assert retired not in gm
 
 
 def test_map_tab_and_panel_render(staged_env):
