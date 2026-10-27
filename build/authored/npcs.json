@@ -391,7 +391,7 @@
   },
   {
     "name": "Nerissa",
-    "epithet": "a patrol-watcher engulfed in colored fire, who woke in the flooded ruins and came down through the clifftop crack to meet the company, offering to join them",
+    "epithet": "who remembers little of herself, and whom Wren named as Mesika, a death-curse investigator whose journal the company has read",
     "allegiance": "with"
   },
   {
@@ -402,6 +402,11 @@
   {
     "name": "Xhosala",
     "epithet": "met quarrelling with Artus Cimber at the cave mouth, who fears the Heart of the Wild would be used for one man's purpose, and who agreed to lead the company to the Forsaken Tree",
+    "allegiance": "with"
+  },
+  {
+    "name": "Wren",
+    "epithet": "called Soggy Wren, who keeps a journal of the death curse at Kaya's House of Repose and opened it to the company in trade for what they knew",
     "allegiance": "with"
   }
 ]

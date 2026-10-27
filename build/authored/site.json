@@ -3,7 +3,7 @@
   "page_subtitle": "A ledger of those who walk &middot; and those they have laid down",
   "intro_epithet": "Five travellers and a storyteller, bound to a doomed road",
   "footnote": "The names above are the names given &middot; the ones who fell were given no names",
-  "refreshed_through_session": 30,
+  "refreshed_through_session": 31,
   "road_ahead": {
     "known": [
       {
@@ -45,7 +45,7 @@
         "gloss": "the naga atop Orolunga, who answered once and cannot be asked again."
       }
     ],
-    "direction": "With the temple's naga dead and Nerissa at their side, the company follows Xhosala out of the Obanashi temple toward the Forsaken Tree, hoping to reclaim what is left of the Heart of the Wild's power."
+    "direction": "Back in Port Nyanzaru with Nerissa's old name of Mesika in hand, the company means to tell Artus what Wren revealed, then rejoin Xhosala at the Seething Halls and press on to the Forsaken Tree."
   },
   "gm": {
     "name": "The Dungeon Master",
@@ -133,7 +133,8 @@
     "Nava",
     "Nerissa",
     "Rhoga",
-    "Xhosala"
+    "Xhosala",
+    "Wren"
   ],
   "ascent_read": "Legends forged mostly by steel, but the road and its riddles have left their mark on every hard-won mile.",
   "player_map": {
