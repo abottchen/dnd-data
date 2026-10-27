@@ -42,12 +42,12 @@ A rewrite returns the full `circles` list, not a delta: carry `existing.circles`
 - Every NPC files under the group the players know them as. The memory test: *if a player had to say who this person was in five words, which group would they name?*
 - Choose keys from `circles` only; never invent one. `[]` is the honest answer when no registry circle fits.
 - Companies first, most salient first (the first company is the home circle); factions after the companies. One company and at most one faction is the ordinary case; two companies is rare.
-- The group, never the place or the way they arrived: a guide hired at a fort is a guide, and someone who travels with the party for the long haul is a companion, not crew of the ship they sailed in on. A faction is a mark worn after the company, not a home. A tie to one other person is epithet material, not a circle.
+- Where the players would look for them: people who move with the story by role (a guide hired at a fort is a guide; a long-haul travelling companion is a companion, not crew of the ship they sailed in on), people who stay put by where they are found (a stallholder in Port Nyanzaru is one of its people). One household or one stall is not a circle. A faction is a mark worn after the company, not a home. A tie to one other person is epithet material, not a circle.
 
 # Output
 
 - If unchanged: `decision: "no_change"`, `fields: null`.
-- If rewriting: `decision: "rewrite"`, `fields: {epithet, allegiance, circles}` with the new prose and placement. `allegiance` is `"with"` or `"against"`.
+- If rewriting: `decision: "rewrite"`, `fields: {epithet, allegiance, circles}` with the new prose and placement. `allegiance` is `"with"`, `"against"`, or `null` (neither); `"against"` only for an NPC who acted against the party or set themselves against it, never for a rival's hireling or someone who merely declined to help.
 - `reason`: one short sentence — whichever decision, explain it briefly.
 
 # Voice (only if rewriting)

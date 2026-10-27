@@ -241,7 +241,7 @@
     "epithet": "goblin boss of Camp Righteous who fed a minion to the crit meant for her, then set up shop in Port Nyanzaru selling masks and savoring the slaughter of a rival tribe's women and children",
     "allegiance": "with",
     "circles": [
-      "yokkas-goblins"
+      "port-nyanzaru"
     ]
   },
   {
@@ -353,17 +353,17 @@
     "circles": []
   },
   {
-    "name": "River",
-    "epithet": "paired with Flask as Rokah's own guide, who slipped back into the jungle with him rather than return to the ship",
-    "allegiance": "against",
+    "name": "River Mist",
+    "epithet": "paired with Flask of Wine as Rokah's own guide, who slipped back into the jungle with him rather than return to the ship",
+    "allegiance": null,
     "circles": [
       "guides"
     ]
   },
   {
-    "name": "Flask",
+    "name": "Flask of Wine",
     "epithet": "one of Rokah's jungle guides, who slipped back into the jungle rather than return to the ship",
-    "allegiance": "against",
+    "allegiance": null,
     "circles": [
       "guides"
     ]
@@ -547,7 +547,7 @@
     "epithet": "who paints masks in Yokka's shop, one of two who lived through the fight at Camp Righteous",
     "allegiance": null,
     "circles": [
-      "yokkas-goblins"
+      "port-nyanzaru"
     ]
   },
   {
@@ -555,7 +555,7 @@
     "epithet": "the business side of Yokka's mask trade, one of two who survived the fight at Camp Righteous",
     "allegiance": null,
     "circles": [
-      "yokkas-goblins"
+      "port-nyanzaru"
     ]
   },
   {

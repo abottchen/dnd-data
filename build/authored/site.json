@@ -97,8 +97,8 @@
     "The Honeyman",
     "Qawasha",
     "Rokah",
-    "River",
-    "Flask",
+    "River Mist",
+    "Flask of Wine",
     "Aremag",
     "Liara Portyr",
     "Shago",
@@ -182,11 +182,6 @@
     {
       "key": "camp-vengeance",
       "title": "Camp Vengeance",
-      "kind": "company"
-    },
-    {
-      "key": "yokkas-goblins",
-      "title": "Yokka's Goblins",
       "kind": "company"
     },
     {

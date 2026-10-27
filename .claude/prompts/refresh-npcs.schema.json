@@ -1,35 +1,75 @@
 {
   "type": "object",
-  "required": ["decision", "fields", "reason"],
+  "required": [
+    "decision",
+    "fields",
+    "reason"
+  ],
   "additionalProperties": false,
   "properties": {
     "decision": {
       "type": "string",
-      "enum": ["no_change", "rewrite"]
+      "enum": [
+        "no_change",
+        "rewrite"
+      ]
     },
     "fields": {
-      "type": ["object", "null"],
-      "required": ["epithet", "allegiance", "circles"],
+      "type": [
+        "object",
+        "null"
+      ],
+      "required": [
+        "epithet",
+        "allegiance",
+        "circles"
+      ],
       "additionalProperties": false,
       "properties": {
-        "epithet": {"type": "string"},
+        "epithet": {
+          "type": "string"
+        },
         "allegiance": {
-          "type": "string",
-          "enum": ["with", "against"]
+          "type": [
+            "string",
+            "null"
+          ],
+          "enum": [
+            "with",
+            "against",
+            null
+          ]
         },
         "circles": {
           "type": "array",
-          "items": {"type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"},
+          "items": {
+            "type": "string",
+            "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+          },
           "uniqueItems": true
         }
       }
     },
-    "reason": {"type": "string"}
+    "reason": {
+      "type": "string"
+    }
   },
   "allOf": [
     {
-      "if": {"properties": {"decision": {"const": "rewrite"}}},
-      "then": {"properties": {"fields": {"type": "object"}}}
+      "if": {
+        "properties": {
+          "decision": {
+            "const": "rewrite"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "fields": {
+            "type": "object"
+          }
+        }
+      }
     }
   ]
 }

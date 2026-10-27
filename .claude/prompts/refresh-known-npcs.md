@@ -52,7 +52,7 @@ Propose a new circle only when all of these hold:
 
 - The session text introduces it, and nothing in `existing_circles` covers it under any key or title. Never re-propose, rename, or drop an existing circle; the registry is append-only.
 - At least one NPC in the full `known_npcs` list (existing or newly added) belongs to it. A company needs two or more members: a company of one is not a group. A faction may have a single known bearer.
-- It is a group, not a place. "The guides" is a group; "Port Nyanzaru" is a place — though the set of city folk the party dealt with can be a company ("the people of Port Nyanzaru").
+- It is a group the players would name. A role shared on the road ("the guides") is one; so is the set of folk settled in one place ("the people of Port Nyanzaru"). One household or one stall is not: its people file under the place they are found.
 - A tie between two people (an agent and his master, a mother and her daughter) is not a group.
 
 Each proposal is `{key, title, kind, members}`:
