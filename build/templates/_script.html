@@ -767,6 +767,28 @@
       btns.forEach(b => b.addEventListener('click', () => show(+b.dataset.chapter)));
     })();
 
+    // Landing hero: the latest story scrolls inside a capped box. Mark it so
+    // the stylesheet can fade the bottom edge while there is more to read
+    // (has-more), fade the top once the reader has moved past the opening
+    // (scrolled), and drop the bottom fade at the end (at-end) so the last
+    // lines are never dimmed. Re-measured when the box resizes, which also
+    // covers the Company tab becoming visible after a load on another tab.
+    (function () {
+      const box = document.querySelector('.hero-summary');
+      if (!box) return;
+      const SLACK = 2;
+      function mark() {
+        const more = box.scrollHeight - box.clientHeight > SLACK;
+        box.classList.toggle('has-more', more);
+        box.classList.toggle('scrolled', more && box.scrollTop > 8);
+        box.classList.toggle('at-end', more && box.scrollTop + box.clientHeight >= box.scrollHeight - SLACK);
+      }
+      box.addEventListener('scroll', mark, { passive: true });
+      if ('ResizeObserver' in window) new ResizeObserver(mark).observe(box);
+      else window.addEventListener('resize', mark);
+      mark();
+    })();
+
     (function () {
       // Map tab: deep pan/zoom over the company's annotated chart of Chult.
       // Scale 1 is fit-to-frame (the <img> is CSS-fitted by max-width/height);

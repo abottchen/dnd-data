@@ -2984,15 +2984,44 @@ img.chronicle-session-pip:focus-visible {
 }
 .hero-meta .hero-pips { margin-left: auto; display: flex; gap: 5px; flex-wrap: wrap; }
 .hero-meta .hero-pips .chronicle-session-pip { width: 22px; height: 22px; }
+/* The latest story scrolls inside a capped box rather than pushing the
+   gauge and the Road Ahead below the fold. A long entry fades out at the
+   bottom edge to say there is more; the fade is a mask on the box itself
+   (not an overlay) so the page's grain shows through the dissolve. The
+   script toggles the two fade lengths: the bottom one closes once the
+   reader reaches the end, and a short top one opens once they have
+   scrolled past the first lines. Short entries never overflow, so for
+   them the box is just the text. */
+@property --hero-fade-t { syntax: '<length>'; inherits: false; initial-value: 0px; }
+@property --hero-fade-b { syntax: '<length>'; inherits: false; initial-value: 0px; }
 .hero-summary {
   font-family: 'EB Garamond', serif; font-size: 17px; color: var(--paper);
   line-height: 1.6; max-width: 660px; opacity: 0.9;
+  max-height: clamp(360px, 48vh, 540px);
+  overflow-y: auto; overscroll-behavior: contain;
+  padding-right: 18px; scrollbar-gutter: stable;
+  scrollbar-width: thin; scrollbar-color: var(--brass-dim) transparent;
+  --hero-fade-t: 0px; --hero-fade-b: 0px;
+  -webkit-mask-image: linear-gradient(to bottom,
+    transparent 0, #000 var(--hero-fade-t),
+    #000 calc(100% - var(--hero-fade-b)), transparent 100%);
+  mask-image: linear-gradient(to bottom,
+    transparent 0, #000 var(--hero-fade-t),
+    #000 calc(100% - var(--hero-fade-b)), transparent 100%);
+  transition: --hero-fade-t 220ms ease, --hero-fade-b 220ms ease;
 }
+.hero-summary.has-more { --hero-fade-b: 88px; }
+.hero-summary.has-more.scrolled { --hero-fade-t: 40px; }
+.hero-summary.has-more.at-end { --hero-fade-b: 0px; }
+.hero-summary:focus-visible { outline: 1px solid var(--brass); outline-offset: 8px; }
 .hero-summary p { margin-bottom: 0.85em; }
 .hero-summary p:last-child { margin-bottom: 0; }
 .hero-summary > p:first-child::first-letter {
   font-family: 'Cormorant Garamond', serif; font-size: 3.1em; float: left;
   line-height: 0.86; padding: 6px 12px 0 0; color: var(--brass); font-weight: 600;
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-summary { transition: none; }
 }
 
 /* Ascent gauge — level & progress toward next level */

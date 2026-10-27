@@ -20,7 +20,10 @@
         <span class="quiet">&mdash; no blade lifted &mdash;</span>
         {%- endif %}
       </div>
-      <div class="hero-summary">{{ latest.summary | paragraphs }}</div>
+      {#- A scroll region: focusable so the keyboard can scroll it, and
+          named so a screen reader says what it is. The script marks it
+          has-more / scrolled / at-end for the fade. -#}
+      <div class="hero-summary" tabindex="0" role="region" aria-label="The latest session, in full">{{ latest.summary | paragraphs }}</div>
     </div>
 
     <div class="hero-rule" aria-hidden="true"></div>
