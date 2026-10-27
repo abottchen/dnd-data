@@ -10,6 +10,8 @@ The user message is a JSON object with this shape:
 - `sessions` (array): every session log entry to date. Each item has at minimum `{day, realDate, text}`.
 - `existing` (array of str): the current `known_npcs` list — the canonical names of every NPC the site already tracks.
 - `existing_circles` (array): the current circle registry. Each item: `{key, title, kind}`. See "What counts as a circle".
+- `party` (array of str): the player characters' names. Never NPCs, however often the text names them.
+- `not_npcs` (array): names the text keeps using that are not NPCs, each `{name, why}` (a familiar, a construct the party owns). Never propose these.
 
 # Spoiler rules (omit, do not paraphrase)
 
@@ -25,12 +27,13 @@ The user message is a JSON object with this shape:
 An NPC is a **named, sentient, person-like character** the party interacts with — allies, antagonists, vendors, contacts, faction figures.
 
 Include:
-- Named persons (e.g. "Lilac Mist", "Volothamp Geddarm", "Wakanga").
-- Sentient companions and creature characters with proper names (e.g. saurials, talking familiars with established roles).
+- Named persons (e.g. "Azlund", "Volothamp Geddarm", "Wakanga").
+- Companions with a will of their own who travel with the party under their own name (a saurial who chose to come), as distinct from creatures a player character conjured, bound, or owns.
 - Distinctive unnamed figures that recur or are referred to by descriptive title (e.g. "The Fleeing Yuan-ti").
 
 Exclude:
-- Player characters (already tracked separately).
+- Player characters: every name in `party`. They are tracked separately.
+- Anything a player character owns, summons, binds, or commands: familiars and other spell-made creatures, constructs such as a shield guardian, mounts, pets. They belong to that character's story, not to the cast; `not_npcs` lists the ones the text keeps naming.
 - Place names, ship names, organization names.
 - Mounts, vendor stock animals, or one-off creatures (a rented dinosaur is not an NPC; a dinosaur racer is).
 - Generic crowds ("a stablehand", "the merchants") unless they recur with a name.
@@ -82,7 +85,7 @@ Use the form the session text uses on first introduction. If the text gives both
 - Every name added must trace to at least one mention in `sessions[*].text`.
 - Every circle proposed must trace to the text naming the group, and every member to a line placing that NPC in it.
 - Do not invent NPCs the data does not name.
-- Do not include the GM, player characters, or party pets/familiars unless they have an established named role distinct from a PC's belonging.
+- Do not include the GM, any name in `party`, any name in `not_npcs`, or a creature a player character owns or conjured. Apply drops such names if they slip through, and a circle proposed around one is wasted.
 
 # Output format
 

@@ -383,3 +383,20 @@ def test_refresh_known_npcs_slice_tolerates_missing_registry(slice_env):
     authored["site"].pop("circles", None)
     _, body = slices.refresh_known_npcs(slice_env["data"], authored)[0]
     assert body["existing_circles"] == []
+
+
+def test_refresh_known_npcs_slice_carries_party_and_not_npcs(slice_env):
+    """The discovery pass must know who the player characters are and which
+    recurring names are not NPCs, so it never proposes either."""
+    authored = slice_env["authored"]
+    authored["site"]["not_npcs"] = [{"name": "Wickles", "why": "a familiar"}]
+    _, body = slices.refresh_known_npcs(slice_env["data"], authored)[0]
+    assert body["party"] == ["Anton Truebranch", "Vex Stormcaller"]
+    assert body["not_npcs"] == [{"name": "Wickles", "why": "a familiar"}]
+
+
+def test_refresh_known_npcs_slice_tolerates_missing_not_npcs(slice_env):
+    authored = slice_env["authored"]
+    authored["site"].pop("not_npcs", None)
+    _, body = slices.refresh_known_npcs(slice_env["data"], authored)[0]
+    assert body["not_npcs"] == []

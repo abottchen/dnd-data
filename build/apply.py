@@ -12,7 +12,9 @@ Signature: apply_*(authored, key, slice_data, output) -> None | dict
 `apply_refresh_road_ahead` returns a graduations dict so the orchestrator can
 include it in the end-of-run report; the others return None.
 """
-from . import render
+import sys
+
+from . import render, validators
 
 
 def _circle_kinds(authored: dict) -> dict:
@@ -221,23 +223,37 @@ def apply_refresh_known_npcs(authored: dict, key, slice_data: dict, output: dict
     Members not yet authored are left to append-npcs, whose next slice will
     carry the new circle. A member outside the (new) known_npcs list is a
     typo or an invention: the whole result is refused before any mutation.
+
+    A player character (the slice's `party`) or a name in `site.not_npcs` is
+    never an NPC, however the model filed it: such names are dropped from the
+    list and from proposed circles' members, and a proposal left with no
+    member is dropped whole, so one slip does not fail the run.
     """
     if output["decision"] == "no_change":
         return
     fields = output["fields"] or {}
     site = authored["site"]
-    known = list(fields["known_npcs"])
+    excluded = validators.not_npc_names(site, slice_data.get("party", []))
+    dropped = [n for n in fields["known_npcs"] if n.casefold() in excluded]
+    if dropped:
+        print(f"apply: refresh-known-npcs dropped {', '.join(dropped)} (not NPCs)",
+              file=sys.stderr)
+    known = [n for n in fields["known_npcs"] if n.casefold() not in excluded]
     known_set = set(known)
     present = {c["key"] for c in (site.get("circles") or [])}
     accepted = []
     for c in fields.get("circles") or []:
         if c["key"] in present:
             continue
-        for m in c.get("members", []):
+        proposed = c.get("members", [])
+        members = [m for m in proposed if m.casefold() not in excluded]
+        if proposed and not members:
+            continue
+        for m in members:
             if m not in known_set:
                 raise ValueError(
                     f"circle {c['key']!r} names member {m!r}, which is not a known NPC")
-        accepted.append(c)
+        accepted.append({**c, "members": members})
         present.add(c["key"])
 
     site["known_npcs"] = known

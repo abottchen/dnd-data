@@ -3,6 +3,7 @@ from build import render
 from build.render import (
     ValidationError, KIND_MISSING, KIND_MALFORMED, KIND_ORPHAN, validate_kills,
     validate_sessions, validate_chapters, validate_npcs, validate_characters, validate_site,
+    validate_not_npcs,
     validate_portraits, validate_map, validate_dice_player_mapping,
     validate_distinction_basis, validate_distinction_uniqueness,
 )
@@ -452,3 +453,30 @@ def test_validate_all_wires_circles(staged_env, tmp_path):
     errors = render.validate_all(data, authored, images_dir=tmp_path)
     assert any(e.kind_type == "npcs" and e.key == ("Azlund",)
                and "no-such-circle" in (e.field or "") for e in errors)
+
+
+# -- not_npcs: player characters and denied names are never NPCs -------------
+
+def test_validate_not_npcs_flags_player_characters_and_denied_names():
+    site = {"known_npcs": ["Azlund", "Lilac Mist", "Wickles"],
+            "not_npcs": [{"name": "Wickles", "why": "a familiar"},
+                         {"name": "Vorn", "why": "a shield guardian"}]}
+    party = {"members": [{"id": "lilac", "name": "Lilac Mist"}]}
+    errors = validate_not_npcs(site, party, [_npc("Azlund", []), _npc("Vorn", [])])
+    assert sorted(e.key[0] for e in errors) == ["Lilac Mist", "Vorn", "Wickles"]
+    assert all(e.kind == KIND_MALFORMED and e.kind_type == "npcs"
+               and e.field == "not_npc" for e in errors)
+
+def test_validate_not_npcs_passes_when_clean():
+    site = {"known_npcs": ["Azlund"], "not_npcs": [{"name": "Wickles", "why": "a familiar"}]}
+    party = {"members": [{"id": "lilac", "name": "Lilac Mist"}]}
+    assert validate_not_npcs(site, party, [_npc("Azlund", [])]) == []
+
+def test_validate_not_npcs_tolerates_absent_list():
+    assert validate_not_npcs({"known_npcs": ["Azlund"]}, {"members": []}, []) == []
+
+@pytest.mark.parametrize("bad", ["Wickles", {"why": "a familiar"}, {"name": " ", "why": "x"}])
+def test_validate_not_npcs_rejects_malformed_entry(bad):
+    errors = validate_not_npcs({"known_npcs": [], "not_npcs": [bad]}, {"members": []}, [])
+    assert any(e.kind == KIND_MALFORMED and e.kind_type == "site"
+               and e.field == "not_npcs" for e in errors)

@@ -281,6 +281,44 @@ def validate_circles(site: dict, npcs: list) -> list[ValidationError]:
             errors.append(ValidationError(KIND_ORPHAN, "circles", (key,)))
     return errors
 
+def not_npc_names(site: dict, party_names) -> set[str]:
+    """Casefolded names that are never NPCs: the player characters and every
+    entry of `site.not_npcs` (`{name, why}`: a familiar, a construct the party
+    owns). Shared by apply, which drops them from a discovery result, and by
+    validate_not_npcs, which fails the render if one reached the store."""
+    names = {str(n).strip().casefold() for n in party_names if n}
+    for e in site.get("not_npcs") or []:
+        if isinstance(e, dict) and isinstance(e.get("name"), str) and e["name"].strip():
+            names.add(e["name"].strip().casefold())
+    return names
+
+
+def validate_not_npcs(site: dict, party: dict, npcs: list) -> list[ValidationError]:
+    """`site.not_npcs` is a list of `{name, why}` with a non-blank name, and
+    neither it nor the party roster may overlap `site.known_npcs` or the
+    authored NPC entries. A player character, a familiar or a shield guardian
+    filed as an NPC is MALFORMED npcs (<name>) field=not_npc."""
+    errors: list[ValidationError] = []
+    entries = site.get("not_npcs")
+    if entries is None:
+        entries = []
+    if not isinstance(entries, list):
+        errors.append(ValidationError(KIND_MALFORMED, "site", ("singleton",), field="not_npcs"))
+        entries = []
+    for e in entries:
+        if not (isinstance(e, dict) and isinstance(e.get("name"), str) and e["name"].strip()):
+            errors.append(ValidationError(KIND_MALFORMED, "site", ("singleton",), field="not_npcs"))
+    excluded = not_npc_names(site, [m.get("name") for m in party.get("members", [])])
+    flagged: set[str] = set()
+    candidates = list(site.get("known_npcs") or []) + [
+        n.get("name") for n in npcs if isinstance(n, dict)]
+    for name in candidates:
+        if isinstance(name, str) and name.casefold() in excluded and name not in flagged:
+            flagged.add(name)
+            errors.append(ValidationError(KIND_MALFORMED, "npcs", (name,), field="not_npc"))
+    return errors
+
+
 def collect_npcs_from_log(session_log: dict, site: dict) -> list[str]:
     """Return the canonical list of NPC names whose epithets must be authored.
     Priority: per-entry `npcs` field; fallback: site.known_npcs allowlist.

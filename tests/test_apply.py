@@ -265,11 +265,11 @@ def test_refresh_known_npcs_no_change_is_noop():
 def test_refresh_known_npcs_rewrite_replaces_list():
     authored = {"site": {"known_npcs": ["Azlund", "Tessa"]}}
     output = {"decision": "rewrite",
-              "fields": {"known_npcs": ["Azlund", "Tessa", "Lilac Mist"]},
-              "reason": "session 6 introduced Lilac Mist"}
+              "fields": {"known_npcs": ["Azlund", "Tessa", "Volo"]},
+              "reason": "session 6 introduced Volo"}
     apply.apply_refresh_known_npcs(authored, key="all",
                                    slice_data={}, output=output)
-    assert authored["site"]["known_npcs"] == ["Azlund", "Tessa", "Lilac Mist"]
+    assert authored["site"]["known_npcs"] == ["Azlund", "Tessa", "Volo"]
 
 
 def test_refresh_known_npcs_rewrite_preserves_order():
@@ -571,3 +571,35 @@ def test_append_characters_rejects_existing_id():
                                  "distinction_detail": "d", "distinction_basis": {}}}}
     with pytest.raises(ValueError, match="already authored"):
         apply.apply_append_characters(authored, "all", {}, output)
+
+
+def test_refresh_known_npcs_drops_party_and_denied_names():
+    """A player character or a name in site.not_npcs is never an NPC, however
+    the model files it; apply drops the name rather than failing the run."""
+    authored = {"site": {"known_npcs": ["Azlund"],
+                         "not_npcs": [{"name": "Wickles", "why": "a familiar"}]}}
+    output = {"decision": "rewrite", "reason": "r",
+              "fields": {"known_npcs": ["Azlund", "Lilac Mist", "wickles", "Tessa"]}}
+    apply.apply_refresh_known_npcs(authored, "all", {"party": ["Lilac Mist"]}, output)
+    assert authored["site"]["known_npcs"] == ["Azlund", "Tessa"]
+
+
+def test_refresh_known_npcs_drops_denied_members_from_proposals():
+    """A proposed circle loses its excluded members, and one left with no
+    member is dropped whole rather than entering the registry memberless."""
+    authored = {"site": {"known_npcs": ["Azlund"], "circles": [],
+                         "not_npcs": [{"name": "Wickles", "why": "a familiar"}]},
+                "npcs": [{"name": "Tessa", "epithet": "e", "allegiance": "with",
+                          "circles": []}]}
+    output = {"decision": "rewrite", "reason": "r", "fields": {
+        "known_npcs": ["Azlund", "Tessa", "Wickles"],
+        "circles": [
+            {"key": "companions", "title": "The Companions", "kind": "company",
+             "members": ["Wickles", "Tessa"]},
+            {"key": "pets", "title": "The Pets", "kind": "company",
+             "members": ["Wickles"]},
+        ]}}
+    apply.apply_refresh_known_npcs(authored, "all", {}, output)
+    assert authored["site"]["known_npcs"] == ["Azlund", "Tessa"]
+    assert [c["key"] for c in authored["site"]["circles"]] == ["companions"]
+    assert authored["npcs"][0]["circles"] == ["companions"]

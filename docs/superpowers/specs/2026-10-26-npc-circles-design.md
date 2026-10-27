@@ -203,6 +203,14 @@ catch-all; a company of one is not a group.
   second was folded in rather than leave two two-member circles that both
   mean "goes where the party goes". The prompts now say that how someone
   arrived is not their group.
+- Three of the 82 were not NPCs at all: Lilac Mist is a player character
+  (the discovery prompt had used her name as its example of a named
+  person), Wickles is Chumble's familiar and Vorn a shield guardian the
+  party owns. All three are out of the store. The discovery slice now
+  carries the party roster and a `site.not_npcs` deny list (Wickles,
+  Vorn, each with a why), apply drops any such name from a result, and a
+  validator fails the render if one reaches `known_npcs` or `npcs.json`.
+  Faroul & Gondolo file under the Guides only, on the user's word.
 
 ## Decisions made without the user
 

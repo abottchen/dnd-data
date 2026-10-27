@@ -419,11 +419,17 @@ def refresh_known_npcs(data: dict, authored: dict) -> list[tuple]:
     The same pass owns additions to the circle registry (`site.circles`):
     `existing_circles` is the registry as it stands, so a proposal never
     duplicates a circle the site already files people under.
+
+    `party` (the player characters' names) and `not_npcs` (`site.not_npcs`:
+    recurring names that are not NPCs, a familiar, a construct the party owns)
+    tell the model what never belongs on the list; apply drops them anyway.
     """
     return [("all", {
         "sessions": list(data["session_log"]["entries"]),
         "existing": list(authored["site"].get("known_npcs", [])),
         "existing_circles": list(authored["site"].get("circles", [])),
+        "party": [m["name"] for m in data["party"].get("members", []) if m.get("name")],
+        "not_npcs": list(authored["site"].get("not_npcs", [])),
     })]
 
 

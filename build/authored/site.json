@@ -64,7 +64,6 @@
     "The Fleeing Yuan-ti",
     "Kessra",
     "Torgg",
-    "Lilac Mist",
     "Volo",
     "Wakanga",
     "Musharib",
@@ -93,7 +92,6 @@
     "Bakari",
     "Imka",
     "Doruk",
-    "Vorn",
     "Faroul & Gondolo",
     "Tiryki",
     "The Honeyman",
@@ -119,7 +117,6 @@
     "Beezin",
     "Grandon",
     "Skip",
-    "Wickles",
     "Tzindelor",
     "Gruta",
     "Ymezra",
@@ -135,6 +132,16 @@
     "Rhoga",
     "Xhosala",
     "Wren"
+  ],
+  "not_npcs": [
+    {
+      "name": "Wickles",
+      "why": "Chumble's familiar, a creature of his pact"
+    },
+    {
+      "name": "Vorn",
+      "why": "the shield guardian bound to Urida's amulet"
+    }
   ],
   "circles": [
     {

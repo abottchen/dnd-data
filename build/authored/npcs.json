@@ -86,14 +86,6 @@
     "circles": []
   },
   {
-    "name": "Lilac Mist",
-    "epithet": "tabaxi dinosaur racer of Port Nyanzaru who won the track and joined the expedition into the jungle, where her goodberries, spellwork, and longbow have proven indispensable",
-    "allegiance": "with",
-    "circles": [
-      "dinosaur-racers"
-    ]
-  },
-  {
     "name": "Kessra",
     "epithet": "nearly lost overboard when the storm struck, caught at the rail by Vex with Anton bracing him",
     "allegiance": "with",
@@ -325,19 +317,10 @@
     ]
   },
   {
-    "name": "Vorn",
-    "epithet": "a shield guardian bound to Urida's amulet, crippled but for its power cube, whose sigils tie back to the trickster gods buried in Omu",
-    "allegiance": "with",
-    "circles": [
-      "companions"
-    ]
-  },
-  {
     "name": "Faroul & Gondolo",
     "epithet": "guide service posted on the bulletin board, called terrible racers who nonetheless rode Zongo to third place",
     "allegiance": null,
     "circles": [
-      "dinosaur-racers",
       "guides"
     ]
   },
@@ -526,14 +509,6 @@
     "allegiance": "with",
     "circles": [
       "shilku-dwarves"
-    ]
-  },
-  {
-    "name": "Wickles",
-    "epithet": "Chumble's familiar, pickle-born and pickle-named, sent ahead to scout, eavesdrop, and strike when the moment calls",
-    "allegiance": "with",
-    "circles": [
-      "companions"
     ]
   },
   {
