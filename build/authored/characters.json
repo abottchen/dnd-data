@@ -61,9 +61,9 @@
     "epithet": "of the Tabaxi, who lets the bowstring do all her speaking",
     "reliquary_header": "Felled before they drew near",
     "constellation_epithet": "ever at the hunt, the soft-pawed shot",
-    "distinction_title": "The Timely Draught",
-    "distinction_subtitle": "who poured a healing potion into Urida when the naga's lightning dropped her",
-    "distinction_detail": "Session <b>30</b> &middot; Urida, felled by the spirit naga's lightning bolt, brought back to her feet",
+    "distinction_title": "The Second Search",
+    "distinction_subtitle": "who crept back for Nerissa's journal while its owner slept",
+    "distinction_detail": "Session <b>31</b> &middot; Nerissa's hidden journal lifted from her pack, read by night, and returned unnoticed",
     "archetype_badge": {
       "archetype": "naturalist",
       "inscription": "A sprig of mistletoe rides on her belt, tied with ribbon, and she reads the trail through it long before she lets an arrow fly."
@@ -71,9 +71,9 @@
     "distinction_basis": {
       "kind": "narrative",
       "sessions": [
-        30
+        31
       ],
-      "note": "revived Urida with a healing potion during the spirit naga fight"
+      "note": "retrieved and read Nerissa's hidden journal while she slept"
     },
     "sworn_creed": "she crossed once into the feywild, and it never fully let her walk back out"
   },
