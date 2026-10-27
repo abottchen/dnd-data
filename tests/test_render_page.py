@@ -33,9 +33,13 @@ def _forbidden_names_regex() -> str:
     return pattern
 
 
-def _render_html(staged_env) -> str:
+def _render_html(staged_env, npcs: list | None = None, circles: list | None = None) -> str:
     """Load staged fixture data + authored store, run compute_all, and render
     the page, returning the rendered HTML text and the authored store.
+
+    `npcs` and `circles` are appended to the authored NPC list and circle
+    registry in memory only: the checked-in fixture keeps the NPC list empty
+    so test_slices can see Azlund as un-authored.
 
     The `vex` party member is deliberately left out of
     tests/fixtures/sample_authored/characters.json — test_slices.py relies on
@@ -53,6 +57,8 @@ def _render_html(staged_env) -> str:
         "constellation_epithet": "x", "distinction_title": "x",
         "distinction_subtitle": "x", "distinction_detail": "x",
     })
+    authored["npcs"].extend(npcs or [])
+    authored["site"].setdefault("circles", []).extend(circles or [])
     context = render.compute_all(data, authored)
     out = staged_env / "index.html"
     render.render_page(context, TEMPLATES, out)
@@ -78,6 +84,34 @@ def test_forbidden_names_regex_matches_full_name():
     # (the pre-commit/pre-push hooks scan committed content for it).
     name = "Si" + "mon Wei" + "l"
     assert re.search(_forbidden_names_regex(), name)
+
+
+def test_gm_cast_renders_circles_and_folds_the_unseen(staged_env):
+    html, _ = _render_html(
+        staged_env,
+        circles=[{"key": "merchants", "title": "The Merchants", "kind": "company"},
+                 {"key": "harpers", "title": "The Harpers", "kind": "faction"}],
+        npcs=[
+            {"name": "Azlund", "allegiance": "with", "epithet": "of the House of Healing",
+             "circles": ["merchants", "harpers"]},
+            {"name": "Hollow Ghost", "allegiance": "against", "epithet": "never named again",
+             "circles": ["merchants"]},
+            {"name": "Tiryki", "allegiance": None, "epithet": "a merchant prince", "circles": []},
+        ])
+    gm = html[html.index('id="gm"'):]
+    # Circles are blocks; the catch-all for the ungrouped comes last.
+    assert gm.index('data-circle="merchants"') < gm.index('data-circle="road"')
+    # Azlund is named in the fixture log: a full run-in entry with an anchor,
+    # a Harper mark after the name, then the comma and the epithet.
+    assert 'id="npc-azlund"' in gm
+    assert '<span class="npc-name">Azlund</span>' in gm
+    assert "<title>The Harpers</title>" in gm
+    assert ", of the House of Healing" in gm
+    # Hollow Ghost never is, so it sits in the roll call with its against-mark.
+    assert 'class="cast-rollcall"' in gm
+    assert "Hollow Ghost" in gm
+    assert "stood against them" in gm
+    assert "dramatis-grid" not in gm
 
 
 def test_map_tab_and_panel_render(staged_env):

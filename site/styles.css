@@ -2151,60 +2151,216 @@ img.chronicle-session-pip:focus-visible {
    ───────────────────────────────────────────────────────────────── */
 .dramatis-personae { margin-bottom: 56px; }
 
-.dramatis-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1px;
-  background: var(--rule);
-  border: 1px solid var(--rule-strong);
+/* One plate; a block per circle (the group the party knew people as),
+   flowing in two columns. Entries are run-in like a printed dramatis
+   personae: name, comma, epithet, hanging indent. Within a circle the
+   people named lately have entries and the rest are a roll call of bare
+   names, a native <details> that is the section's only fold. Marks sit in
+   the same place on every line: seal-red diamond before an "against" name,
+   brass faction sigil after the name. */
+.cast-plate {
   max-width: 1180px;
   margin: 0 auto;
-}
-
-.dramatis-column {
   background: var(--ink-soft);
-  padding: 24px 28px;
+  border: 1px solid var(--rule-strong);
+  padding: 26px 32px 18px;
 }
 
-.dramatis-sub {
+.cast-circles {
+  columns: 2;
+  column-gap: 48px;
+  column-rule: 1px solid var(--rule);
+}
+
+.cast-circle {
+  break-inside: avoid;
+  margin-bottom: 28px;
+}
+
+.cast-circle-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
   font-family: 'IBM Plex Sans', sans-serif;
   font-size: 10px;
+  font-weight: 500;
   letter-spacing: 3px;
   text-transform: uppercase;
   color: var(--brass);
-  margin-bottom: 14px;
   border-bottom: 1px solid var(--rule);
   padding-bottom: 8px;
+  margin-bottom: 8px;
 }
 
-.dramatis-list { list-style: none; }
-
-.dramatis-list .npc {
-  display: block;
-  padding: 12px 0;
-  border-bottom: 1px solid var(--rule);
+.cast-circle-head .count {
+  color: var(--paper-dim);
+  letter-spacing: 1px;
+  font-variant-numeric: tabular-nums;
 }
 
-.dramatis-list .npc:last-child { border-bottom: none; }
+.cast-circle.catch-all .cast-circle-head .title { color: var(--brass-dim); }
+
+.cast-list {
+  list-style: none;
+  padding: 0;
+}
+
+.cast-entry {
+  padding: 5px 0 5px 1.15em;
+  text-indent: -1.15em;            /* wrapped lines tuck under the name */
+  font-family: 'EB Garamond', serif;
+  font-style: italic;
+  font-size: 14.5px;
+  line-height: 1.42;
+  color: var(--paper-dim);
+}
 
 .npc-name {
-  display: block;
   font-family: 'Cormorant Garamond', serif;
+  font-style: normal;
   font-weight: 600;
-  font-size: 20px;
+  font-size: 18px;
   color: var(--brass);
   letter-spacing: 0.3px;
-  line-height: 1.1;
+  line-height: 1;
 }
 
-.npc-epithet {
-  display: block;
+/* Cross-reference: the person's entry lives under another circle. */
+.cast-ref .npc-name { color: var(--brass-dim); }
+.cast-ref a {
+  color: var(--brass);
+  text-decoration: none;
+  border-bottom: 1px dotted var(--brass-dim);
+}
+.cast-ref a:hover,
+.cast-ref a:focus-visible { color: var(--brass-hi); border-bottom-color: var(--brass-hi); }
+
+.npc-also {
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-style: normal;
+  font-size: 9.5px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--paper-dim);
+  text-decoration: none;
+  border-bottom: 1px dotted var(--brass-dim);
+  white-space: nowrap;
+  margin-left: 6px;
+}
+.npc-also:hover,
+.npc-also:focus-visible { color: var(--brass-hi); }
+
+/* Marks */
+.npc-against {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin-right: 8px;
+  background: var(--seal);
+  transform: rotate(45deg);
+  vertical-align: 2px;
+}
+
+.npc-sigil {
+  width: 12px;
+  height: 12px;
+  margin-left: 6px;
+  vertical-align: -1px;
+  color: var(--brass);
+}
+
+.cast-legend {
+  margin-top: 6px;
+  padding-top: 14px;
+  border-top: 1px solid var(--rule);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 26px;
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--paper-dim);
+}
+
+.cast-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.cast-legend .npc-against,
+.cast-legend .npc-sigil { margin: 0; vertical-align: 0; }
+
+/* Roll call: the fold. Closed, the summary is the names; open, the names
+   give way to the entries and the summary becomes the way back. */
+.cast-rollcall { margin-top: 2px; }
+.cast-rollcall[open] { padding-bottom: 4px; }
+
+.cast-rollcall > summary {
+  list-style: none;
+  cursor: pointer;
+  padding: 6px 0 6px 1.15em;
+  text-indent: -1.15em;
   font-family: 'EB Garamond', serif;
   font-style: italic;
   font-size: 14px;
+  line-height: 1.5;
   color: var(--paper-dim);
-  margin-top: 4px;
-  line-height: 1.4;
+}
+.cast-rollcall > summary::-webkit-details-marker { display: none; }
+.cast-rollcall > summary:hover { color: var(--paper); }
+.cast-rollcall > summary:focus-visible { outline: 1px solid var(--brass-hi); outline-offset: 4px; }
+
+/* Chevron: points right while folded, down once open. */
+.cast-rollcall > summary::before {
+  content: '';
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  margin-right: 9px;
+  vertical-align: 2px;
+  border-right: 1px solid var(--brass);
+  border-bottom: 1px solid var(--brass);
+  transform: rotate(-45deg);
+  transition: transform 0.18s ease;
+}
+.cast-rollcall[open] > summary::before { transform: rotate(45deg); }
+
+.roll-name {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: normal;
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--brass);
+  white-space: nowrap;
+}
+.roll-name.ref { color: var(--brass-dim); }
+.roll-name .npc-against { width: 6px; height: 6px; margin-right: 6px; vertical-align: 1px; }
+.roll-name .npc-sigil { width: 11px; height: 11px; margin-left: 4px; }
+
+.cast-rollcall > summary .range {
+  display: block;
+  text-indent: 0;
+  margin-top: 2px;
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-style: normal;
+  font-size: 9.5px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--paper-dim);
+  opacity: 0.8;
+}
+.cast-rollcall > summary .less { display: none; }
+.cast-rollcall[open] > summary .names,
+.cast-rollcall[open] > summary .range { display: none; }
+.cast-rollcall[open] > summary .less { display: inline; }
+
+@media (max-width: 900px) {
+  .cast-circles { columns: 1; }
+  .cast-plate { padding: 20px 18px 14px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cast-rollcall > summary::before { transition: none; }
 }
 
 /* ─────────────────────────────────────────────────────────────────

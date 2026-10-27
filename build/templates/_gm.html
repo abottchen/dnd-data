@@ -1,7 +1,44 @@
 {% from "_macros.html" import section_head -%}
+{#- The cast is a printed dramatis personae grouped by circle: one plate,
+    a block per company the party knew people as, run-in entries (name,
+    comma, epithet). Within a circle, everyone named in the last few sessions
+    (compute.CAST_PRESENT_WINDOW) has a full entry; the rest are a one-line
+    roll call of bare names, which is the page's only fold: open it and the
+    names expand into entries. Factions are heraldic marks after the name,
+    "against" is a seal-red mark before it, and an NPC with a second company
+    is cross-referenced there rather than listed twice. Contract:
+    docs/superpowers/specs/2026-10-26-npc-circles-design.md. -#}
+{%- set sigil_ids = ["harpers", "zhentarim", "flaming-fist", "order-of-the-gauntlet", "emerald-enclave", "ytepka-society"] %}
+{%- macro sigil(f) -%}
+<svg class="npc-sigil" viewBox="0 0 16 16" role="img" aria-label="{{ f.title }}"><title>{{ f.title }}</title><use href="#sigil-{{ f.key if f.key in sigil_ids else 'generic' }}"/></svg>
+{%- endmacro %}
+{%- macro against(e) -%}
+{%- if e.allegiance == "against" %}<span class="npc-against" role="img" aria-label="stood against them" title="stood against them"></span>{% endif -%}
+{%- endmacro %}
+{%- macro entry(e) -%}
+{%- if e.ref -%}
+<li class="cast-entry cast-ref"><span class="npc-name">{{ e.name }}</span>, see <a href="#npc-{{ e.slug }}">{{ e.home.title }}</a></li>
+{%- else -%}
+<li class="cast-entry" id="npc-{{ e.slug }}">{{ against(e) }}<span class="npc-name">{{ e.name }}</span>{% for f in e.factions %}{{ sigil(f) }}{% endfor %}, {{ e.epithet | safe }}{% for a in e.also %} <a class="npc-also" href="#circle-{{ a.key }}">also of {{ a.title }}</a>{% endfor %}</li>
+{%- endif -%}
+{%- endmacro %}
+{%- macro roll_name(e) -%}
+<span class="roll-name{% if e.ref %} ref{% endif %}">{{ against(e) }}{{ e.name }}{% for f in e.factions %}{{ sigil(f) }}{% endfor %}</span>
+{%- endmacro %}
 <article class="character" id="gm" role="tabpanel" aria-labelledby="tab-gm">
   {%- set gm_member = {"id": "gm"} %}
   {%- set gm_fortune = fortune.get("gm") %}
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <defs>
+      <symbol id="sigil-harpers" viewBox="0 0 16 16"><path d="M11.5 2.5 A6 6 0 1 0 11.5 13.5 A4.6 4.6 0 1 1 11.5 2.5 Z" fill="currentColor" opacity="0.9"/><path d="M11 5.5 V10.5 M13.2 6.5 V9.5" stroke="currentColor" stroke-width="1.1" fill="none"/></symbol>
+      <symbol id="sigil-zhentarim" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6" fill="none" stroke="currentColor" stroke-width="1.1"/><path d="M5 5.2 H11 L5 10.8 H11" fill="none" stroke="currentColor" stroke-width="1.2"/></symbol>
+      <symbol id="sigil-flaming-fist" viewBox="0 0 16 16"><rect x="4.5" y="8.5" width="7" height="5" fill="currentColor" opacity="0.9"/><path d="M5.5 7.5 L6.6 3.5 L7.8 7.5 M8.6 7.5 L9.6 2.5 L10.8 7.5" fill="none" stroke="currentColor" stroke-width="1.1"/></symbol>
+      <symbol id="sigil-order-of-the-gauntlet" viewBox="0 0 16 16"><path d="M8 1.8 L13 3.6 V8 Q13 12.2 8 14.4 Q3 12.2 3 8 V3.6 Z" fill="none" stroke="currentColor" stroke-width="1.1"/><path d="M8 5 V11 M5.8 8 H10.2" stroke="currentColor" stroke-width="1.1"/></symbol>
+      <symbol id="sigil-emerald-enclave" viewBox="0 0 16 16"><path d="M3 13.5 Q3 5 13.5 2.5 Q11.5 13.5 3 13.5 Z" fill="none" stroke="currentColor" stroke-width="1.1"/><path d="M3 13.5 L10.5 6" stroke="currentColor" stroke-width="1"/></symbol>
+      <symbol id="sigil-ytepka-society" viewBox="0 0 16 16"><path d="M3 13 L5 5 M8 13 V2.5 M13 13 L11 5" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></symbol>
+      <symbol id="sigil-generic" viewBox="0 0 16 16"><circle cx="8" cy="8" r="4.5" fill="none" stroke="currentColor" stroke-width="1.1"/><circle cx="8" cy="8" r="1.2" fill="currentColor"/></symbol>
+    </defs>
+  </svg>
   <header class="character-header">
     <img class="portrait" src="images/GM.png" alt="">
     <div class="identity">
@@ -18,28 +55,42 @@
 
   <section class="dramatis-personae">
     {{ section_head("i", "The Cast", "Dramatis Personae", "Those who walked beside, and those who stood athwart.", "trefoil") }}
-    <div class="dramatis-grid">
-      <div class="dramatis-column">
-        <div class="dramatis-sub">Those Who Stood With Them</div>
-        <ul class="dramatis-list">
-          {%- for n in npcs_by_allegiance.with %}
-          <li class="npc">
-            <span class="npc-name">{{ n.name }}</span>
-            <span class="npc-epithet">{{ n.epithet | safe }}</span>
-          </li>
-          {%- endfor %}
-        </ul>
+    <div class="cast-plate">
+      <div class="cast-circles">
+        {%- for c in cast.circles %}
+        <section class="cast-circle{% if c.catch_all %} catch-all{% endif %}" id="circle-{{ c.key }}" data-circle="{{ c.key }}">
+          <h3 class="cast-circle-head"><span class="title">{{ c.title }}</span><span class="count">{{ c.total }}</span></h3>
+          {%- if c.present %}
+          <ul class="cast-list">
+            {%- for e in c.present %}
+            {{ entry(e) }}
+            {%- endfor %}
+          </ul>
+          {%- endif %}
+          {%- if c.rollcall %}
+          <details class="cast-rollcall">
+            <summary>
+              <span class="names">{% if c.present %}also {% endif %}{% for e in c.rollcall %}{{ roll_name(e) }}{% if not loop.last %}, {% endif %}{% endfor %}</span>
+              <span class="less">fold the roll call</span>
+              {%- if c.last_seen_label %}
+              <span class="range">not seen since session {{ c.last_seen_label }}</span>
+              {%- endif %}
+            </summary>
+            <ul class="cast-list">
+              {%- for e in c.rollcall %}
+              {{ entry(e) }}
+              {%- endfor %}
+            </ul>
+          </details>
+          {%- endif %}
+        </section>
+        {%- endfor %}
       </div>
-      <div class="dramatis-column">
-        <div class="dramatis-sub">Those Who Stood Against Them</div>
-        <ul class="dramatis-list">
-          {%- for n in npcs_by_allegiance.against %}
-          <li class="npc">
-            <span class="npc-name">{{ n.name }}</span>
-            <span class="npc-epithet">{{ n.epithet | safe }}</span>
-          </li>
-          {%- endfor %}
-        </ul>
+      <div class="cast-legend">
+        <span class="cast-legend-item"><span class="npc-against" aria-hidden="true"></span>stood against them</span>
+        {%- for f in cast.factions %}
+        <span class="cast-legend-item">{{ sigil(f) }}{{ f.title }}</span>
+        {%- endfor %}
       </div>
     </div>
   </section>
