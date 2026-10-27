@@ -1342,21 +1342,21 @@ def _compute_header_eyebrow(chronicle: dict, ledger: dict) -> list[str]:
         lines.append(f"{sessions} {word} Kept")
     return [ln for ln in lines if ln]
 
-# -- Dramatis Personae: the circle plate -------------------------------------
+# -- Dramatis Personae: the cast plate ---------------------------------------
 # Contract: docs/superpowers/specs/2026-10-26-npc-circles-design.md.
-# Each NPC files under its home circle (the first company in its `circles`),
-# other companies list it in their roll call as a cross-reference, and
-# factions become marks on the entry. Within a circle, anyone named in the
-# last CAST_PRESENT_WINDOW sessions gets a full entry; the rest form the roll
-# call, the page's one fold. The name match is deliberately stricter than
-# slices.mentions(): that one is case-insensitive because an authoring slice
-# should err toward more context, but here a hit on "the river" or "dark"
-# would keep River and Dark present for good. Exact-case whole-word match
-# first; case-insensitive only when the exact name never appears anywhere
-# in the log (it writes "the honeyman").
-CAST_PRESENT_WINDOW = 5
+# Each NPC files under one circle (or the catch-all). A circle is live when
+# anyone in it was named in the last CAST_PRESENT_WINDOW sessions, or when
+# it is billed principal; the named get full entries and the rest fold.
+# The name match is deliberately stricter than slices.mentions(): that one
+# is case-insensitive because an authoring slice should err toward more
+# context, but here a hit on "the river" or "dark" would keep River and Dark
+# present for good. Exact-case whole-word match first; case-insensitive only
+# when the exact name never appears anywhere in the log (it writes "the
+# honeyman").
+CAST_PRESENT_WINDOW = 3
 CAST_CATCH_ALL_KEY = "road"
 CAST_CATCH_ALL_TITLE = "Met Along the Road"
+CAST_TIERS = {"principal": 0, None: 1, "aside": 2}
 
 
 def _cast_name_keys(name: str) -> list[str]:
@@ -1387,19 +1387,22 @@ def _cast_slug(name: str) -> str:
 
 def compute_cast(npcs: list, session_log: dict, circles: list | None = None,
                  window: int = CAST_PRESENT_WINDOW) -> dict:
-    """The GM tab's cast plate: `circles`, one block per company in order of
-    most recent mention (the catch-all for NPCs in no company always last),
-    and `factions`, the legend of faction marks that actually appear.
+    """The GM tab's cast plate: `live`, the circles with someone named in the
+    last `window` sessions (and every principal circle, whatever its
+    recency), and `dormant`, the rest. Both run principals first, then
+    ordinary circles by most recent mention (ties by how many sessions name
+    the circle, then by first mention), then asides, with the catch-all for
+    NPCs in no circle always last.
 
-    Each block: `present` (full entries, members named in the last `window`
-    sessions), `rollcall` (everyone else, plus cross-references from NPCs
-    whose home is another company), `total`, and `last_seen_label` (the
-    latest session anyone in the roll call was named, Roman, or ""). Both
-    lists run in order of first meeting; never-named NPCs sink to the end.
-    Unknown circle keys are ignored here (the validator reports them) and a
-    missing `circles` field reads as no circles, so a half-migrated store
-    still renders."""
-    registry = {c["key"]: c for c in (circles or []) if c.get("key")}
+    Each block: `key`, `title`, `billing` ("principal", "aside" or None),
+    `catch_all`, `present` (full entries: members named in the window, or
+    every member of a principal circle), `rollcall` (the folded rest),
+    `total`, and `last_seen_label` (the latest session anyone folded was
+    named, Roman, or ""). Both lists run in order of first meeting;
+    never-named NPCs sink to the end. An unknown key is ignored here (the
+    validator reports it) and a missing `circle` reads as none, so a
+    half-migrated store still renders."""
+    registry = {c["key"]: c for c in (circles or []) if isinstance(c, dict) and c.get("key")}
     entries = session_log.get("entries", [])
     latest = max((e["session"] for e in entries), default=0)
     present_from = latest - window + 1
@@ -1415,57 +1418,37 @@ def compute_cast(npcs: list, session_log: dict, circles: list | None = None,
             blocks[key] = {
                 "key": key,
                 "title": c["title"] if c else CAST_CATCH_ALL_TITLE,
+                "billing": (c or {}).get("billing"),
                 "catch_all": c is None,
                 "present": [], "rollcall": [],
-                "_last": None, "_first": None,
+                "_sessions": set(),
             }
         return blocks[key]
 
-    def touch(b: dict, sessions: list[int]) -> None:
-        if sessions:
-            b["_last"] = max(b["_last"] or 0, sessions[-1])
-            b["_first"] = min(b["_first"] or sessions[0], sessions[0])
-
-    bearers: Counter = Counter()
     for n in ordered:
-        keys = list(dict.fromkeys(k for k in (n.get("circles") or []) if k in registry))
-        companies = [k for k in keys if registry[k]["kind"] == "company"]
-        factions = [k for k in keys if registry[k]["kind"] == "faction"]
-        home = companies[0] if companies else CAST_CATCH_ALL_KEY
+        key = n.get("circle")
+        b = block(key if key in registry else CAST_CATCH_ALL_KEY)
         sessions = seen[n["name"]]
-        entry = {
-            "name": n["name"],
-            "slug": _cast_slug(n["name"]),
-            "epithet": n.get("epithet", ""),
-            "allegiance": n.get("allegiance"),
-            "factions": [{"key": k, "title": registry[k]["title"]} for k in factions],
-            "also": [{"key": k, "title": registry[k]["title"]} for k in companies[1:]],
-            "home": {"key": home, "title": block(home)["title"]},
-            "ref": False,
-        }
-        bearers.update(factions)
-        b = block(home)
-        present = bool(sessions) and sessions[-1] >= present_from
+        entry = {"name": n["name"], "slug": _cast_slug(n["name"]), "epithet": n.get("epithet", "")}
+        present = b["billing"] == "principal" or (bool(sessions) and sessions[-1] >= present_from)
         (b["present"] if present else b["rollcall"]).append(entry)
-        touch(b, sessions)
-        for k in companies[1:]:
-            other = block(k)
-            other["rollcall"].append(dict(entry, ref=True))
-            touch(other, sessions)
+        b["_sessions"].update(sessions)
 
-    out = []
+    live: list[dict] = []
+    dormant: list[dict] = []
     for b in blocks.values():
-        last = max((seen[e["name"]][-1] for e in b["rollcall"] if seen[e["name"]]), default=None)
+        folded_last = max((seen[e["name"]][-1] for e in b["rollcall"] if seen[e["name"]]), default=None)
         b["total"] = len(b["present"]) + len(b["rollcall"])
-        b["last_seen_label"] = _to_roman(last) if last else ""
-        out.append(b)
-    out.sort(key=lambda b: (b["catch_all"], b["_last"] is None, -(b["_last"] or 0), b["_first"] or 0))
-    for b in out:
-        del b["_last"], b["_first"]
-
-    legend = [{"key": c["key"], "title": c["title"]}
-              for c in registry.values() if c.get("kind") == "faction" and bearers[c["key"]]]
-    return {"circles": out, "factions": legend}
+        b["last_seen_label"] = _to_roman(folded_last) if folded_last else ""
+        named = b.pop("_sessions")
+        tier = 3 if b["catch_all"] else CAST_TIERS[b["billing"]]
+        b["_order"] = (tier, -max(named, default=0), -len(named), min(named, default=0))
+        (live if b["present"] else dormant).append(b)
+    for group in (live, dormant):
+        group.sort(key=lambda b: b["_order"])
+        for b in group:
+            del b["_order"]
+    return {"live": live, "dormant": dormant}
 
 def compute_cr_label(creature: str) -> str:
     info = bestiary_lookup(creature)

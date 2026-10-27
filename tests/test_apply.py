@@ -95,35 +95,23 @@ def test_append_npcs_uses_slice_key_not_model_output():
     slice_data = {"name": "Azlund", "mentions": []}
     output = {"fields": {
         "epithet": "the merchant who brokers what others would not",
-        "allegiance": "with",
-        "circles": [],
+        "circle": None,
     }, "reason": "test"}
     apply.apply_append_npcs(authored, key="Azlund",
                             slice_data=slice_data, output=output)
+    # Exactly the contract's three fields, nothing echoed from the model.
     assert authored["npcs"] == [{
         "name": "Azlund",
         "epithet": "the merchant who brokers what others would not",
-        "allegiance": "with",
-        "circles": [],
+        "circle": None,
     }]
 
 
-def test_append_npcs_tolerates_null_allegiance():
-    authored = {"npcs": []}
-    output = {"fields": {"epithet": "ambiguous", "allegiance": None, "circles": []},
-              "reason": "test"}
-    apply.apply_append_npcs(authored, key="Stranger",
-                            slice_data={"name": "Stranger", "mentions": []},
-                            output=output)
-    assert authored["npcs"][0]["allegiance"] is None
-
-
 def test_append_npcs_rejects_existing_name():
-    authored = {"npcs": [{"name": "Azlund", "epithet": "e", "allegiance": "with"}]}
+    authored = {"npcs": [{"name": "Azlund", "epithet": "e", "circle": None}]}
     with pytest.raises(ValueError, match="already authored"):
         apply.apply_append_npcs(authored, "Azlund", {"name": "Azlund"},
-                                {"fields": {"epithet": "x", "allegiance": "with",
-                                            "circles": []}})
+                                {"fields": {"epithet": "x", "circle": None}})
 
 
 # -- apply_refresh_chapters --------------------------------------------------
@@ -286,125 +274,101 @@ def test_refresh_known_npcs_rewrite_preserves_order():
 # -- NPC circles (append + refresh) ------------------------------------------
 
 _REGISTRY = [
-    {"key": "guides", "title": "The Guides", "kind": "company"},
-    {"key": "port-nyanzaru", "title": "The People of Port Nyanzaru", "kind": "company"},
-    {"key": "harpers", "title": "The Harpers", "kind": "faction"},
+    {"key": "guides", "title": "The Guides"},
+    {"key": "port-nyanzaru", "title": "The People of Port Nyanzaru"},
+    {"key": "harpers", "title": "The Harpers"},
 ]
 
 
-def _npc_output(circles, **over):
-    fields = {"epithet": "e", "allegiance": "with", "circles": circles}
+def _npc_output(circle, **over):
+    fields = {"epithet": "e", "circle": circle}
     fields.update(over)
     return {"fields": fields, "reason": "test"}
 
 
-def test_append_npcs_writes_circles():
+def test_append_npcs_writes_circle():
     authored = {"npcs": [], "site": {"circles": _REGISTRY}}
     apply.apply_append_npcs(authored, "Wren", {"name": "Wren", "mentions": []},
-                            _npc_output(["port-nyanzaru", "harpers"]))
-    assert authored["npcs"][0]["circles"] == ["port-nyanzaru", "harpers"]
-
-
-def test_append_npcs_orders_companies_before_factions():
-    """The contract is companies first (home circle first), then factions.
-    Apply normalises model output that lists a faction ahead of a company,
-    keeping the relative order within each kind."""
-    authored = {"npcs": [], "site": {"circles": _REGISTRY}}
-    apply.apply_append_npcs(authored, "Wren", {"name": "Wren", "mentions": []},
-                            _npc_output(["harpers", "port-nyanzaru", "guides"]))
-    assert authored["npcs"][0]["circles"] == ["port-nyanzaru", "guides", "harpers"]
+                            _npc_output("port-nyanzaru"))
+    assert authored["npcs"][0]["circle"] == "port-nyanzaru"
 
 
 def test_append_npcs_rejects_unknown_circle_key():
     authored = {"npcs": [], "site": {"circles": _REGISTRY}}
     with pytest.raises(ValueError, match="unknown circle"):
         apply.apply_append_npcs(authored, "Wren", {"name": "Wren", "mentions": []},
-                                _npc_output(["port-nyanzaru", "obanashi"]))
+                                _npc_output("obanashi"))
     assert authored["npcs"] == []
 
 
-def test_append_npcs_rejects_circles_when_registry_absent():
-    """No registry means no valid keys: a non-empty list cannot be honoured."""
+def test_append_npcs_rejects_circle_when_registry_absent():
+    """No registry means no valid keys: a key cannot be honoured."""
     authored = {"npcs": [], "site": {}}
     with pytest.raises(ValueError, match="unknown circle"):
         apply.apply_append_npcs(authored, "Wren", {"name": "Wren", "mentions": []},
-                                _npc_output(["harpers"]))
+                                _npc_output("harpers"))
 
 
-def test_append_npcs_empty_circles_ok_without_registry():
+def test_append_npcs_null_circle_ok_without_registry():
     authored = {"npcs": []}
     apply.apply_append_npcs(authored, "Volo", {"name": "Volo", "mentions": []},
-                            _npc_output([]))
-    assert authored["npcs"][0]["circles"] == []
+                            _npc_output(None))
+    assert authored["npcs"][0]["circle"] is None
 
 
-def test_refresh_npcs_rewrite_writes_circles():
-    authored = {"npcs": [{"name": "Shago", "epithet": "e", "allegiance": "with",
-                          "circles": []}],
+def test_refresh_npcs_rewrite_writes_circle():
+    authored = {"npcs": [{"name": "Shago", "epithet": "e", "circle": None}],
                 "site": {"circles": _REGISTRY}}
     output = {"decision": "rewrite", "reason": "joined the guides",
-              "fields": {"epithet": "e2", "allegiance": "with", "circles": ["guides"]}}
+              "fields": {"epithet": "e2", "circle": "guides"}}
     apply.apply_refresh_npcs(authored, "Shago", {}, output)
-    assert authored["npcs"][0]["circles"] == ["guides"]
-    assert authored["npcs"][0]["epithet"] == "e2"
-
-
-def test_refresh_npcs_rewrite_orders_companies_before_factions():
-    authored = {"npcs": [{"name": "Wren", "epithet": "e", "allegiance": "with",
-                          "circles": []}],
-                "site": {"circles": _REGISTRY}}
-    output = {"decision": "rewrite", "reason": "r",
-              "fields": {"epithet": "e", "allegiance": "with",
-                         "circles": ["harpers", "port-nyanzaru"]}}
-    apply.apply_refresh_npcs(authored, "Wren", {}, output)
-    assert authored["npcs"][0]["circles"] == ["port-nyanzaru", "harpers"]
+    assert authored["npcs"][0] == {"name": "Shago", "epithet": "e2", "circle": "guides"}
 
 
 def test_refresh_npcs_rewrite_rejects_unknown_circle_key():
-    authored = {"npcs": [{"name": "Shago", "epithet": "e", "allegiance": "with",
-                          "circles": ["guides"]}],
+    authored = {"npcs": [{"name": "Shago", "epithet": "e", "circle": "guides"}],
                 "site": {"circles": _REGISTRY}}
     output = {"decision": "rewrite", "reason": "r",
-              "fields": {"epithet": "e2", "allegiance": "with", "circles": ["nope"]}}
+              "fields": {"epithet": "e2", "circle": "nope"}}
     with pytest.raises(ValueError, match="unknown circle"):
         apply.apply_refresh_npcs(authored, "Shago", {}, output)
-    # Nothing moved: the entry keeps its old prose and circles.
-    assert authored["npcs"][0] == {"name": "Shago", "epithet": "e",
-                                   "allegiance": "with", "circles": ["guides"]}
+    # Nothing moved: the entry keeps its old prose and circle.
+    assert authored["npcs"][0] == {"name": "Shago", "epithet": "e", "circle": "guides"}
 
 
-def test_refresh_npcs_no_change_leaves_circles():
-    authored = {"npcs": [{"name": "Shago", "epithet": "e", "allegiance": "with",
-                          "circles": ["guides"]}],
+def test_refresh_npcs_no_change_leaves_circle():
+    authored = {"npcs": [{"name": "Shago", "epithet": "e", "circle": "guides"}],
                 "site": {"circles": _REGISTRY}}
     apply.apply_refresh_npcs(authored, "Shago", {},
                              {"decision": "no_change", "fields": None, "reason": ""})
-    assert authored["npcs"][0]["circles"] == ["guides"]
+    assert authored["npcs"][0]["circle"] == "guides"
 
 
 def test_refresh_known_npcs_merges_circle_additions_append_only():
     """New circles are appended; a proposal whose key already exists is
-    skipped (the pipeline never renames or removes a published circle)."""
+    skipped (the pipeline never renames or removes a published circle).
+    A proposal's billing is kept; nothing else of it reaches the registry."""
     authored = {"site": {"known_npcs": ["A"],
-                         "circles": [{"key": "guides", "title": "The Guides",
-                                      "kind": "company"}]}}
+                         "circles": [{"key": "guides", "title": "The Guides"}]}}
     output = {"decision": "rewrite", "reason": "r", "fields": {
         "known_npcs": ["A", "Xhosala"],
         "circles": [
-            {"key": "guides", "title": "Renamed Guides", "kind": "company"},
-            {"key": "obanashi", "title": "The Obanashi", "kind": "company"},
+            {"key": "guides", "title": "Renamed Guides"},
+            {"key": "obanashi", "title": "The Obanashi"},
+            {"key": "enemy", "title": "The Enemy", "billing": "principal", "members": []},
         ],
     }}
     apply.apply_refresh_known_npcs(authored, "all", {}, output)
     assert authored["site"]["known_npcs"] == ["A", "Xhosala"]
     assert authored["site"]["circles"] == [
-        {"key": "guides", "title": "The Guides", "kind": "company"},
-        {"key": "obanashi", "title": "The Obanashi", "kind": "company"},
+        {"key": "guides", "title": "The Guides"},
+        {"key": "obanashi", "title": "The Obanashi"},
+        {"key": "enemy", "title": "The Enemy", "billing": "principal"},
     ]
 
 
 def test_refresh_known_npcs_rewrite_without_circles_keeps_registry():
-    reg = [{"key": "guides", "title": "The Guides", "kind": "company"}]
+    reg = [{"key": "guides", "title": "The Guides"}]
     authored = {"site": {"known_npcs": ["A"], "circles": list(reg)}}
     output = {"decision": "rewrite", "reason": "r",
               "fields": {"known_npcs": ["A", "B"]}}
@@ -416,15 +380,14 @@ def test_refresh_known_npcs_creates_registry_when_absent():
     authored = {"site": {"known_npcs": ["A"]}}
     output = {"decision": "rewrite", "reason": "r", "fields": {
         "known_npcs": ["A"],
-        "circles": [{"key": "obanashi", "title": "The Obanashi", "kind": "company"}],
+        "circles": [{"key": "obanashi", "title": "The Obanashi"}],
     }}
     apply.apply_refresh_known_npcs(authored, "all", {}, output)
-    assert authored["site"]["circles"] == [
-        {"key": "obanashi", "title": "The Obanashi", "kind": "company"}]
+    assert authored["site"]["circles"] == [{"key": "obanashi", "title": "The Obanashi"}]
 
 
 def test_refresh_known_npcs_no_change_leaves_registry():
-    reg = [{"key": "guides", "title": "The Guides", "kind": "company"}]
+    reg = [{"key": "guides", "title": "The Guides"}]
     authored = {"site": {"known_npcs": ["A"], "circles": list(reg)}}
     apply.apply_refresh_known_npcs(authored, "all", {},
                                    {"decision": "no_change", "fields": None, "reason": ""})
@@ -436,14 +399,13 @@ def _store_for_discovery():
         "site": {
             "known_npcs": ["Artus Cimber", "Xhosala"],
             "circles": [
-                {"key": "horizon", "title": "The Horizon", "kind": "company"},
-                {"key": "harpers", "title": "The Harpers", "kind": "faction"},
+                {"key": "horizon", "title": "The Horizon"},
+                {"key": "harpers", "title": "The Harpers"},
             ],
         },
         "npcs": [
-            {"name": "Artus Cimber", "epithet": "e", "allegiance": "with",
-             "circles": ["horizon"]},
-            {"name": "Xhosala", "epithet": "e", "allegiance": "with", "circles": []},
+            {"name": "Artus Cimber", "epithet": "e", "circle": "horizon"},
+            {"name": "Xhosala", "epithet": "e", "circle": None},
         ],
     }
 
@@ -452,26 +414,21 @@ def test_refresh_known_npcs_places_existing_members_in_new_circle():
     """The per-NPC slices in the same run were prepared before this result
     existed, so a new circle's already-authored members are filed here, or
     the circle would sit memberless (and fail validation) until a hand edit.
-    Placement keeps companies ahead of factions."""
+    A member already filed elsewhere moves: the proposal names them."""
     authored = _store_for_discovery()
     output = {"decision": "rewrite", "reason": "r", "fields": {
         "known_npcs": ["Artus Cimber", "Xhosala"],
-        "circles": [
-            {"key": "obanashi", "title": "The Obanashi", "kind": "company",
-             "members": ["Xhosala", "Artus Cimber"]},
-            {"key": "ytepka-society", "title": "The Ytepka Society", "kind": "faction",
-             "members": ["Xhosala"]},
-        ],
+        "circles": [{"key": "companions", "title": "The Companions", "billing": "principal",
+                     "members": ["Xhosala", "Artus Cimber"]}],
     }}
     apply.apply_refresh_known_npcs(authored, "all", {}, output)
     by_name = {n["name"]: n for n in authored["npcs"]}
-    assert by_name["Xhosala"]["circles"] == ["obanashi", "ytepka-society"]
-    assert by_name["Artus Cimber"]["circles"] == ["horizon", "obanashi"]
-    assert [c["key"] for c in authored["site"]["circles"]] == [
-        "horizon", "harpers", "obanashi", "ytepka-society"]
+    assert by_name["Xhosala"]["circle"] == "companions"
+    assert by_name["Artus Cimber"]["circle"] == "companions"
+    assert [c["key"] for c in authored["site"]["circles"]] == ["horizon", "harpers", "companions"]
     # The stored registry entry carries only the registry fields.
     assert authored["site"]["circles"][2] == {
-        "key": "obanashi", "title": "The Obanashi", "kind": "company"}
+        "key": "companions", "title": "The Companions", "billing": "principal"}
 
 
 def test_refresh_known_npcs_defers_members_not_yet_authored():
@@ -480,14 +437,14 @@ def test_refresh_known_npcs_defers_members_not_yet_authored():
     authored = _store_for_discovery()
     output = {"decision": "rewrite", "reason": "r", "fields": {
         "known_npcs": ["Artus Cimber", "Xhosala", "Wainrath"],
-        "circles": [{"key": "tamalka", "title": "Tamalka", "kind": "company",
+        "circles": [{"key": "tamalka", "title": "Tamalka",
                      "members": ["Wainrath", "Xhosala"]}],
     }}
     apply.apply_refresh_known_npcs(authored, "all", {}, output)
     assert authored["site"]["known_npcs"][-1] == "Wainrath"
     assert authored["site"]["circles"][-1]["key"] == "tamalka"
     by_name = {n["name"]: n for n in authored["npcs"]}
-    assert by_name["Xhosala"]["circles"] == ["tamalka"]
+    assert by_name["Xhosala"]["circle"] == "tamalka"
     assert "Wainrath" not in by_name
 
 
@@ -498,7 +455,7 @@ def test_refresh_known_npcs_rejects_member_outside_known_npcs():
     before = {"site": dict(authored["site"]), "npcs": [dict(n) for n in authored["npcs"]]}
     output = {"decision": "rewrite", "reason": "r", "fields": {
         "known_npcs": ["Artus Cimber", "Xhosala", "Wainrath"],
-        "circles": [{"key": "obanashi", "title": "The Obanashi", "kind": "company",
+        "circles": [{"key": "obanashi", "title": "The Obanashi",
                      "members": ["Xhosala", "Xosala"]}],
     }}
     with pytest.raises(ValueError, match="not a known NPC"):
@@ -513,12 +470,11 @@ def test_refresh_known_npcs_existing_key_is_skipped_with_its_members():
     output = {"decision": "rewrite", "reason": "r", "fields": {
         "known_npcs": ["Artus Cimber", "Xhosala"],
         "circles": [{"key": "horizon", "title": "The Horizon, renamed",
-                     "kind": "company", "members": ["Xhosala"]}],
+                     "members": ["Xhosala"]}],
     }}
     apply.apply_refresh_known_npcs(authored, "all", {}, output)
     assert authored["site"]["circles"][0]["title"] == "The Horizon"
-    assert authored["npcs"][1]["circles"] == []
-
+    assert authored["npcs"][1]["circle"] is None
 
 # -- apply_refresh_ascent_read -----------------------------------------------
 
@@ -589,17 +545,15 @@ def test_refresh_known_npcs_drops_denied_members_from_proposals():
     member is dropped whole rather than entering the registry memberless."""
     authored = {"site": {"known_npcs": ["Azlund"], "circles": [],
                          "not_npcs": [{"name": "Wickles", "why": "a familiar"}]},
-                "npcs": [{"name": "Tessa", "epithet": "e", "allegiance": "with",
-                          "circles": []}]}
+                "npcs": [{"name": "Tessa", "epithet": "e", "circle": None}]}
     output = {"decision": "rewrite", "reason": "r", "fields": {
         "known_npcs": ["Azlund", "Tessa", "Wickles"],
         "circles": [
-            {"key": "companions", "title": "The Companions", "kind": "company",
+            {"key": "companions", "title": "The Companions",
              "members": ["Wickles", "Tessa"]},
-            {"key": "pets", "title": "The Pets", "kind": "company",
-             "members": ["Wickles"]},
+            {"key": "pets", "title": "The Pets", "members": ["Wickles"]},
         ]}}
     apply.apply_refresh_known_npcs(authored, "all", {}, output)
     assert authored["site"]["known_npcs"] == ["Azlund", "Tessa"]
     assert [c["key"] for c in authored["site"]["circles"]] == ["companions"]
-    assert authored["npcs"][0]["circles"] == ["companions"]
+    assert authored["npcs"][0]["circle"] == "companions"

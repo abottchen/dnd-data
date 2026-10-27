@@ -219,18 +219,21 @@ def validate_site(site: dict, latest_session: int) -> list[ValidationError]:
             errors.append(ValidationError(KIND_MALFORMED, "site", ("singleton",), field=f))
     return errors
 
-CIRCLE_KINDS = ("company", "faction")
+CIRCLE_BILLINGS = ("principal", "aside")
+CIRCLE_FIELDS = ("key", "title", "billing")
 CIRCLE_KEY = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
+NPC_RETIRED_FIELDS = ("circles", "allegiance")
 
 def validate_circles(site: dict, npcs: list) -> list[ValidationError]:
-    """The NPC-circle registry (`site.circles`) and every NPC's `circles` list.
+    """The circle registry (`site.circles`) and every NPC's `circle`.
 
-    Registry entries are `{key, title, kind}`: keys are unique slugs, titles
-    are non-blank, kind is "company" or "faction". An absent registry reads
-    as empty (cold start). Every authored NPC must carry a `circles` list
-    whose keys all exist in the registry, with no duplicates. Every registry
-    circle must have at least one member: a circle nobody belongs to is
-    clutter, and most likely a key typo.
+    Registry entries are `{key, title}` plus an optional `billing` of
+    "principal" or "aside": keys are unique slugs, titles are non-blank, and
+    no other field is allowed. An absent registry reads as empty (cold
+    start). Every authored NPC carries `circle`, a registry key or null, and
+    nothing of the retired contract (`circles`, `allegiance`). Every registry
+    circle has at least one member: a circle nobody belongs to is clutter,
+    and most likely a key typo.
     """
     errors: list[ValidationError] = []
     registry = site.get("circles", [])
@@ -254,28 +257,32 @@ def validate_circles(site: dict, npcs: list) -> list[ValidationError]:
         title = entry.get("title")
         if not isinstance(title, str) or not title.strip():
             errors.append(ValidationError(KIND_MALFORMED, "circles", (label,), field="title"))
-        if entry.get("kind") not in CIRCLE_KINDS:
-            errors.append(ValidationError(KIND_MALFORMED, "circles", (label,), field="kind"))
+        if "billing" in entry and entry["billing"] not in CIRCLE_BILLINGS:
+            errors.append(ValidationError(KIND_MALFORMED, "circles", (label,), field="billing"))
+        for f in entry:
+            if f not in CIRCLE_FIELDS:
+                errors.append(ValidationError(KIND_MALFORMED, "circles", (label,), field=f))
 
     members: dict[str, int] = {k: 0 for k in keys}
     for npc in npcs:
         name = npc.get("name")
-        circles = npc.get("circles")
-        if not isinstance(circles, list):
-            errors.append(ValidationError(KIND_MALFORMED, "npcs", (name,), field="circles"))
+        for stale in NPC_RETIRED_FIELDS:
+            if stale in npc:
+                errors.append(ValidationError(KIND_MALFORMED, "npcs", (name,), field=stale))
+        if "circle" not in npc:
+            errors.append(ValidationError(KIND_MALFORMED, "npcs", (name,), field="circle"))
             continue
-        seen: set = set()
-        for key in circles:
-            if key in seen:
-                errors.append(ValidationError(
-                    KIND_MALFORMED, "npcs", (name,), field=f"circles duplicates '{key}'"))
-                continue
-            seen.add(key)
-            if key not in members:
-                errors.append(ValidationError(
-                    KIND_MALFORMED, "npcs", (name,), field=f"circles unknown key '{key}'"))
-                continue
-            members[key] += 1
+        circle = npc["circle"]
+        if circle is None:
+            continue
+        if not isinstance(circle, str):
+            errors.append(ValidationError(KIND_MALFORMED, "npcs", (name,), field="circle"))
+            continue
+        if circle not in members:
+            errors.append(ValidationError(
+                KIND_MALFORMED, "npcs", (name,), field=f"circle unknown key '{circle}'"))
+            continue
+        members[circle] += 1
     for key, count in members.items():
         if count == 0:
             errors.append(ValidationError(KIND_ORPHAN, "circles", (key,)))

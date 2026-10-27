@@ -225,3 +225,34 @@ catch-all; a company of one is not a group.
 - Cross-referenced members always sit in the roll call of their secondary
   circle, even when present; the presence shows in the home entry.
 - The present window stays at five sessions.
+
+## Revised on review (2026-10-27)
+
+Adam reviewed the first build on the live page and the contract above was
+cut down to what the page actually uses. What stands now:
+
+- **One circle per NPC.** `circles` (a list) became `circle` (one registry
+  key or null). Cross-references were clutter, and without them a second
+  company had no job; without chips, a faction had no job either, so the
+  `kind` split is gone. An organisation (the Harpers) is simply a circle
+  for people no closer group claims (Azlund); Wren's Harper membership
+  lives in his epithet.
+- **No allegiance.** The field was authored, reviewed, wrong four times in
+  ten, and shown nowhere once the against-mark went. Removed from prompts,
+  schemas, apply, slices, validators and the store; the validator refuses
+  the retired fields so the store cannot drift back.
+- **No marks at all.** Sigils needed a legend; chips felt out of place.
+  Death is stated in the epithet, which the prompts now require.
+- **Billing.** A registry entry may carry `billing`: `principal` (The
+  Companions, The Enemy: Acererak and Ras Nsi) or `aside` (The Dinosaur
+  Racers). The discovery pass proposes it; the GM can hand-edit it.
+- **Layout.** One column at an 880 px measure; group titles in the display
+  serif; entries as a name column and a roman description column; the
+  present window is three sessions. Principals come first and never fold.
+  Circles with nobody named lately drop out of the column into one folded
+  row each under a rule. Every fold is the same control, one open at a
+  time, animated, with a "fold" control while open.
+- **Removed from the store on review:** Lilac Mist (a player character),
+  Wickles and Vorn (a familiar and a shield guardian; `site.not_npcs`
+  keeps them out), The Fleeing Yuan-ti (not a name), The House of Healing
+  and Yokka's Goblins (not groups the players would name).

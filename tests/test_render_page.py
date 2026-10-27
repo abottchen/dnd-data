@@ -89,29 +89,30 @@ def test_forbidden_names_regex_matches_full_name():
 def test_gm_cast_renders_circles_and_folds_the_unseen(staged_env):
     html, _ = _render_html(
         staged_env,
-        circles=[{"key": "merchants", "title": "The Merchants", "kind": "company"},
-                 {"key": "harpers", "title": "The Harpers", "kind": "faction"}],
+        circles=[{"key": "merchants", "title": "The Merchants"},
+                 {"key": "villains", "title": "The Villains", "billing": "principal"}],
         npcs=[
-            {"name": "Azlund", "allegiance": "with", "epithet": "of the House of Healing",
-             "circles": ["merchants", "harpers"]},
-            {"name": "Hollow Ghost", "allegiance": "against", "epithet": "never named again",
-             "circles": ["merchants"]},
-            {"name": "Tiryki", "allegiance": None, "epithet": "a merchant prince", "circles": []},
+            {"name": "Azlund", "epithet": "of the House of Healing", "circle": "merchants"},
+            {"name": "Hollow Ghost", "epithet": "never named again", "circle": "merchants"},
+            {"name": "Acererak", "epithet": "the lich", "circle": "villains"},
+            {"name": "Tiryki", "epithet": "a racer", "circle": None},
         ])
     gm = html[html.index('id="gm"'):]
-    # Circles are blocks; the catch-all for the ungrouped comes last.
-    assert gm.index('data-circle="merchants"') < gm.index('data-circle="road"')
-    # Azlund is named in the fixture log: a full run-in entry with an anchor,
-    # a Harper mark after the name, then the comma and the epithet.
+    # Principals first, then the circle with someone named lately; the
+    # catch-all for the ungrouped last.
+    assert gm.index('data-circle="villains"') < gm.index('data-circle="merchants"') < gm.index('data-circle="road"')
+    # Azlund is named in the fixture log: a full entry, name then description.
     assert 'id="npc-azlund"' in gm
     assert '<span class="npc-name">Azlund</span>' in gm
-    assert "<title>The Harpers</title>" in gm
-    assert ", of the House of Healing" in gm
-    # Hollow Ghost never is, so it sits in the roll call with its against-mark.
-    assert 'class="cast-rollcall"' in gm
+    assert 'class="npc-desc">of the House of Healing' in gm
+    # Acererak never is, but a principal is always in full.
+    assert 'id="npc-acererak"' in gm
+    # Hollow Ghost never is, so it sits folded behind a count line.
+    assert 'class="cast-fold"' in gm
     assert "Hollow Ghost" in gm
-    assert "stood against them" in gm
-    assert "dramatis-grid" not in gm
+    assert "and 1 more" in gm
+    for retired in ("dramatis-grid", "cast-legend", "npc-sigil", "npc-against", "cast-rollcall"):
+        assert retired not in gm
 
 
 def test_map_tab_and_panel_render(staged_env):

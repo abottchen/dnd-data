@@ -17,25 +17,22 @@ import sys
 from . import render, validators
 
 
-def _circle_kinds(authored: dict) -> dict:
-    """key -> kind for every circle in the registry (site.circles)."""
+def _circle_keys(authored: dict) -> set:
+    """Every key in the circle registry (site.circles)."""
     site = authored.get("site") or {}
-    return {c["key"]: c.get("kind") for c in (site.get("circles") or [])}
+    return {c["key"] for c in (site.get("circles") or []) if isinstance(c, dict) and c.get("key")}
 
 
-def _resolve_circles(authored: dict, circles: list) -> list:
-    """Check an NPC's circle keys against the registry and put companies
-    ahead of factions (stable within each kind), so the first entry is the
-    home circle whatever order the model listed them in. An unknown key
-    raises ValueError: the result is rejected rather than landing a dangling
-    key that validate_circles would fail the render on."""
-    kinds = _circle_kinds(authored)
-    unknown = [k for k in circles if k not in kinds]
-    if unknown:
-        raise ValueError("unknown circle key(s): " + ", ".join(repr(k) for k in unknown))
-    return ([k for k in circles if kinds[k] != "faction"]
-            + [k for k in circles if kinds[k] == "faction"])
-
+def _resolve_circle(authored: dict, circle):
+    """Check an NPC's circle against the registry. Null is fine (the NPC files
+    under the catch-all); an unknown key raises ValueError so the result is
+    rejected rather than landing a dangling key that validate_circles would
+    fail the render on."""
+    if circle is None:
+        return None
+    if circle not in _circle_keys(authored):
+        raise ValueError(f"unknown circle key: {circle!r}")
+    return circle
 
 def apply_append_kills(authored: dict, key, slice_data: dict, output: dict) -> None:
     """Each entry in output['fields'] keys by <char>__<date>__<creature>__<method>;
@@ -95,12 +92,10 @@ def apply_append_npcs(authored: dict, key, slice_data: dict, output: dict) -> No
     if any(n["name"] == key for n in authored["npcs"]):
         raise ValueError(f"npc {key!r} already authored")
     fields = output["fields"]
-    circles = _resolve_circles(authored, list(fields["circles"]))
     authored["npcs"].append({
         "name": key,
         "epithet": fields["epithet"],
-        "allegiance": fields.get("allegiance"),
-        "circles": circles,
+        "circle": _resolve_circle(authored, fields.get("circle")),
     })
 
 
@@ -153,10 +148,9 @@ def apply_refresh_npcs(authored: dict, key, slice_data: dict, output: dict) -> N
     for n in authored["npcs"]:
         if n["name"] == name:
             # Resolve before touching the entry so a bad key leaves it intact.
-            circles = _resolve_circles(authored, list(fields["circles"]))
+            circle = _resolve_circle(authored, fields.get("circle"))
             n["epithet"] = fields["epithet"]
-            n["allegiance"] = fields["allegiance"]
-            n["circles"] = circles
+            n["circle"] = circle
             return
     raise ValueError(f"npc {name!r} not found in authored store")
 
@@ -217,12 +211,14 @@ def apply_refresh_known_npcs(authored: dict, key, slice_data: dict, output: dict
     renames, removes, or re-populates a published circle.
 
     Each accepted circle's `members` who already have an authored entry are
-    filed under it here. The per-NPC slices of this same run were prepared
+    filed under it here, moving them if they were filed elsewhere: the
+    proposal names them. The per-NPC slices of this same run were prepared
     before this result existed, so nothing else would place them and the
     circle would sit memberless, which validate_circles fails the render on.
     Members not yet authored are left to append-npcs, whose next slice will
     carry the new circle. A member outside the (new) known_npcs list is a
     typo or an invention: the whole result is refused before any mutation.
+    Of a proposal, only `key`, `title` and `billing` reach the registry.
 
     A player character (the slice's `party`) or a name in `site.not_npcs` is
     never an NPC, however the model filed it: such names are dropped from the
@@ -262,15 +258,14 @@ def apply_refresh_known_npcs(authored: dict, key, slice_data: dict, output: dict
     registry = site.setdefault("circles", [])
     npcs_by_name = {n["name"]: n for n in authored.get("npcs", [])}
     for c in accepted:
-        registry.append({"key": c["key"], "title": c["title"], "kind": c["kind"]})
+        entry = {"key": c["key"], "title": c["title"]}
+        if "billing" in c:
+            entry["billing"] = c["billing"]
+        registry.append(entry)
         for m in c.get("members", []):
             npc = npcs_by_name.get(m)
-            if npc is None:
-                continue
-            circles = list(npc.get("circles", []))
-            if c["key"] not in circles:
-                circles.append(c["key"])
-            npc["circles"] = _resolve_circles(authored, circles)
+            if npc is not None:
+                npc["circle"] = c["key"]
 
 
 def apply_refresh_archetype_inscription(authored: dict, key, slice_data: dict, output: dict) -> None:

@@ -150,15 +150,14 @@ def _authored_with_azlund(slice_env):
     fixture session 1; session 2 names no NPC."""
     npcs_path = slice_env["authored_dir"] / "npcs.json"
     npcs_path.write_text(json.dumps([
-        {"name": "Azlund", "allegiance": "with",
-         "epithet": "the merchant who brokers what others would not"}
+        {"name": "Azlund", "epithet": "the merchant who brokers what others would not"}
     ]))
     return store.load_authored()
 
 
 def test_refresh_npcs_emits_for_npc_named_in_new_session(slice_env):
     """An NPC named in a session past the marker is re-evaluated, and its slice
-    carries the full mention history plus the existing epithet/allegiance."""
+    carries the full mention history plus the existing epithet."""
     authored = _authored_with_azlund(slice_env)
     # Marker 0 makes session 1 (where Azlund appears) a "new" session.
     authored["site"] = {**authored["site"], "refreshed_through_session": 0}
@@ -166,7 +165,7 @@ def test_refresh_npcs_emits_for_npc_named_in_new_session(slice_env):
     by_key = dict(out)
     assert "Azlund" in by_key
     assert any("Azlund" in m["line"] for m in by_key["Azlund"]["mentions"])
-    assert by_key["Azlund"]["existing"]["allegiance"] == "with"
+    assert by_key["Azlund"]["existing"]["epithet"] == "the merchant who brokers what others would not"
 
 
 def test_refresh_npcs_skips_npc_only_in_already_refreshed_sessions(slice_env):
@@ -327,8 +326,8 @@ def test_archetype_slice_carries_no_fabricated_stats(slice_env):
 # -- NPC circles: the registry rides in every NPC slice ----------------------
 
 _CIRCLES = [
-    {"key": "house-of-healing", "title": "The House of Healing", "kind": "company"},
-    {"key": "harpers", "title": "The Harpers", "kind": "faction"},
+    {"key": "house-of-healing", "title": "The House of Healing"},
+    {"key": "harpers", "title": "The Harpers", "billing": "principal"},
 ]
 
 
@@ -348,27 +347,27 @@ def test_append_npcs_slice_tolerates_missing_registry(slice_env):
     assert body["circles"] == []
 
 
-def test_refresh_npcs_slice_carries_registry_and_existing_circles(slice_env):
+def test_refresh_npcs_slice_carries_registry_and_existing_circle(slice_env):
     """A refresh slice carries the registry (so a rewrite can move the NPC)
-    and the NPC's current circles under `existing`. A pre-backfill entry
-    with no `circles` field reads as []."""
+    and the NPC's current circle under `existing`. A pre-migration entry
+    with no `circle` field reads as null."""
     authored = _authored_with_azlund(slice_env)
     authored["site"] = {**authored["site"], "refreshed_through_session": 0,
                         "circles": list(_CIRCLES)}
     out = slices.refresh_npcs(slice_env["data"], authored)
     body = dict(out)["Azlund"]
     assert body["circles"] == _CIRCLES
-    assert body["existing"]["circles"] == []
+    assert body["existing"]["circle"] is None
 
 
-def test_refresh_npcs_slice_existing_circles_round_trip(slice_env):
+def test_refresh_npcs_slice_existing_circle_round_trip(slice_env):
     authored = _authored_with_azlund(slice_env)
-    authored["npcs"][0]["circles"] = ["house-of-healing", "harpers"]
+    authored["npcs"][0]["circle"] = "house-of-healing"
     authored["site"] = {**authored["site"], "refreshed_through_session": 0,
                         "circles": list(_CIRCLES)}
     out = slices.refresh_npcs(slice_env["data"], authored)
     body = dict(out)["Azlund"]
-    assert body["existing"]["circles"] == ["house-of-healing", "harpers"]
+    assert body["existing"]["circle"] == "house-of-healing"
 
 
 def test_refresh_known_npcs_slice_carries_existing_circles(slice_env):

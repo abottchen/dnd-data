@@ -2151,216 +2151,155 @@ img.chronicle-session-pip:focus-visible {
    ───────────────────────────────────────────────────────────────── */
 .dramatis-personae { margin-bottom: 56px; }
 
-/* One plate; a block per circle (the group the party knew people as),
-   flowing in two columns. Entries are run-in like a printed dramatis
-   personae: name, comma, epithet, hanging indent. Within a circle the
-   people named lately have entries and the rest are a roll call of bare
-   names, a native <details> that is the section's only fold. Marks sit in
-   the same place on every line: seal-red diamond before an "against" name,
-   brass faction sigil after the name. */
+/* One plate, one column, a block per circle. Entries are a name column
+   and a description column, like a playbill's cast list. Circles with
+   someone named lately are live blocks; the rest are one folded row each
+   under a rule. Every fold is the same <details> control: a count line
+   while closed, a "fold" control while open, one open at a time, animated
+   by the cast IIFE in _script.html. */
 .cast-plate {
-  max-width: 1180px;
+  max-width: 880px;
   margin: 0 auto;
   background: var(--ink-soft);
   border: 1px solid var(--rule-strong);
   padding: 26px 32px 18px;
 }
 
-.cast-circles {
-  columns: 2;
-  column-gap: 48px;
-  column-rule: 1px solid var(--rule);
-}
-
-.cast-circle {
-  break-inside: avoid;
-  margin-bottom: 28px;
-}
+.cast-circle { margin-bottom: 22px; }
 
 .cast-circle-head {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  font-family: 'IBM Plex Sans', sans-serif;
-  font-size: 10px;
-  font-weight: 500;
-  letter-spacing: 3px;
-  text-transform: uppercase;
-  color: var(--brass);
+  margin: 0 0 10px;
+  padding-bottom: 6px;
   border-bottom: 1px solid var(--rule);
-  padding-bottom: 8px;
-  margin-bottom: 8px;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 21px;
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--brass-hi);
 }
-
-.cast-circle-head .count {
-  color: var(--paper-dim);
-  letter-spacing: 1px;
-  font-variant-numeric: tabular-nums;
-}
-
-.cast-circle.catch-all .cast-circle-head .title { color: var(--brass-dim); }
+.cast-circle[data-billing="aside"] .cast-circle-head,
+.cast-circle.catch-all .cast-circle-head { color: var(--brass-dim); }
 
 .cast-list {
   list-style: none;
+  margin: 0;
   padding: 0;
 }
 
 .cast-entry {
-  padding: 5px 0 5px 1.15em;
-  text-indent: -1.15em;            /* wrapped lines tuck under the name */
-  font-family: 'EB Garamond', serif;
-  font-style: italic;
-  font-size: 14.5px;
-  line-height: 1.42;
-  color: var(--paper-dim);
+  display: grid;
+  grid-template-columns: 190px 1fr;
+  column-gap: 20px;
+  align-items: baseline;
+  margin: 0 0 9px;
 }
 
 .npc-name {
   font-family: 'Cormorant Garamond', serif;
-  font-style: normal;
   font-weight: 600;
   font-size: 18px;
-  color: var(--brass);
-  letter-spacing: 0.3px;
-  line-height: 1;
-}
-
-/* Cross-reference: the person's entry lives under another circle. */
-.cast-ref .npc-name { color: var(--brass-dim); }
-.cast-ref a {
-  color: var(--brass);
-  text-decoration: none;
-  border-bottom: 1px dotted var(--brass-dim);
-}
-.cast-ref a:hover,
-.cast-ref a:focus-visible { color: var(--brass-hi); border-bottom-color: var(--brass-hi); }
-
-.npc-also {
-  font-family: 'IBM Plex Sans', sans-serif;
-  font-style: normal;
-  font-size: 9.5px;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  color: var(--paper-dim);
-  text-decoration: none;
-  border-bottom: 1px dotted var(--brass-dim);
-  white-space: nowrap;
-  margin-left: 6px;
-}
-.npc-also:hover,
-.npc-also:focus-visible { color: var(--brass-hi); }
-
-/* Marks */
-.npc-against {
-  display: inline-block;
-  width: 7px;
-  height: 7px;
-  margin-right: 8px;
-  background: var(--seal);
-  transform: rotate(45deg);
-  vertical-align: 2px;
-}
-
-.npc-sigil {
-  width: 12px;
-  height: 12px;
-  margin-left: 6px;
-  vertical-align: -1px;
+  line-height: 1.2;
   color: var(--brass);
 }
 
-.cast-legend {
-  margin-top: 6px;
-  padding-top: 14px;
-  border-top: 1px solid var(--rule);
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px 26px;
-  font-family: 'IBM Plex Sans', sans-serif;
-  font-size: 10px;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  color: var(--paper-dim);
+.npc-desc {
+  font-family: 'EB Garamond', serif;
+  font-size: 15.5px;
+  line-height: 1.45;
+  color: var(--paper);
+  opacity: 0.9;
 }
 
-.cast-legend-item {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-}
-.cast-legend .npc-against,
-.cast-legend .npc-sigil { margin: 0; vertical-align: 0; }
-
-/* Roll call: the fold. Closed, the summary is the names; open, the names
-   give way to the entries and the summary becomes the way back. */
-.cast-rollcall { margin-top: 2px; }
-.cast-rollcall[open] { padding-bottom: 4px; }
-
-.cast-rollcall > summary {
+/* The fold. */
+.cast-fold > summary {
   list-style: none;
   cursor: pointer;
-  padding: 6px 0 6px 1.15em;
-  text-indent: -1.15em;
-  font-family: 'EB Garamond', serif;
-  font-style: italic;
-  font-size: 14px;
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 12.5px;
   line-height: 1.5;
   color: var(--paper-dim);
 }
-.cast-rollcall > summary::-webkit-details-marker { display: none; }
-.cast-rollcall > summary:hover { color: var(--paper); }
-.cast-rollcall > summary:focus-visible { outline: 1px solid var(--brass-hi); outline-offset: 4px; }
+.cast-fold > summary::-webkit-details-marker { display: none; }
+.cast-fold > summary:hover { color: var(--paper); }
+.cast-fold > summary:focus-visible { outline: 1px solid var(--brass-hi); outline-offset: 4px; }
 
-/* Chevron: points right while folded, down once open. */
-.cast-rollcall > summary::before {
+/* In a live block the count line sits in the description column. */
+.cast-circle > .cast-fold > summary { padding: 0 0 6px 210px; }
+.cast-circle > .cast-fold > summary::before {
   content: '';
   display: inline-block;
   width: 5px;
   height: 5px;
-  margin-right: 9px;
+  margin-right: 8px;
   vertical-align: 2px;
   border-right: 1px solid var(--brass);
   border-bottom: 1px solid var(--brass);
   transform: rotate(-45deg);
-  transition: transform 0.18s ease;
 }
-.cast-rollcall[open] > summary::before { transform: rotate(45deg); }
+.cast-circle > .cast-fold[open] > summary { padding-left: 0; }
+.cast-circle > .cast-fold[open] > summary::before { display: none; }
 
-.roll-name {
-  font-family: 'Cormorant Garamond', serif;
-  font-style: normal;
-  font-weight: 600;
-  font-size: 15px;
+.cast-fold .fold-open { display: none; }
+.cast-fold[open] > summary .fold-closed { display: none; }
+.cast-fold[open] > summary .fold-open {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.fold-ctl {
   color: var(--brass);
   white-space: nowrap;
 }
-.roll-name.ref { color: var(--brass-dim); }
-.roll-name .npc-against { width: 6px; height: 6px; margin-right: 6px; vertical-align: 1px; }
-.roll-name .npc-sigil { width: 11px; height: 11px; margin-left: 4px; }
-
-.cast-rollcall > summary .range {
-  display: block;
-  text-indent: 0;
-  margin-top: 2px;
-  font-family: 'IBM Plex Sans', sans-serif;
-  font-style: normal;
-  font-size: 9.5px;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  color: var(--paper-dim);
-  opacity: 0.8;
+.fold-ctl::after {
+  content: '';
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  margin-left: 7px;
+  vertical-align: 2px;
+  border-right: 1px solid currentColor;
+  border-bottom: 1px solid currentColor;
+  transform: rotate(-135deg);
 }
-.cast-rollcall > summary .less { display: none; }
-.cast-rollcall[open] > summary .names,
-.cast-rollcall[open] > summary .range { display: none; }
-.cast-rollcall[open] > summary .less { display: inline; }
+
+.cast-fold[open] {
+  border-left: 2px solid var(--brass-dim);
+  padding-left: 12px;
+  margin-top: 6px;
+}
+.cast-fold .fold-body { overflow: hidden; }       /* the IIFE animates its height */
+.cast-fold .fold-body > .cast-list { padding: 8px 0 6px; }
+
+/* Circles with nobody named lately: one row each. */
+.cast-dormant {
+  margin-top: 10px;
+  padding-top: 14px;
+  border-top: 1px solid var(--rule-strong);
+}
+.cast-dormant > .cast-fold > summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 14px;
+  padding: 9px 0 8px;
+  border-bottom: 1px solid var(--rule);
+}
+.cast-dormant > .cast-fold > summary .title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--brass-dim);
+}
+.cast-dormant > .cast-fold > summary:hover .title,
+.cast-dormant > .cast-fold[open] > summary .title { color: var(--brass); }
+.cast-dormant > .cast-fold > summary .fold-closed { white-space: nowrap; }
+.cast-dormant > .cast-fold[open] { margin: 6px 0; }
 
 @media (max-width: 900px) {
-  .cast-circles { columns: 1; }
   .cast-plate { padding: 20px 18px 14px; }
-}
-@media (prefers-reduced-motion: reduce) {
-  .cast-rollcall > summary::before { transition: none; }
+  .cast-entry { grid-template-columns: 1fr; row-gap: 2px; }
+  .cast-circle > .cast-fold > summary { padding-left: 0; }
 }
 
 /* ─────────────────────────────────────────────────────────────────

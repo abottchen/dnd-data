@@ -350,33 +350,33 @@ def test_refresh_char_schema_requires_basis_on_rewrite():
 from build.render import validate_circles
 
 _CIRCLE_REG = [
-    {"key": "guides", "title": "The Guides", "kind": "company"},
-    {"key": "harpers", "title": "The Harpers", "kind": "faction"},
+    {"key": "guides", "title": "The Guides"},
+    {"key": "harpers", "title": "The Harpers", "billing": "principal"},
 ]
 
-def _npc(name, circles):
-    return {"name": name, "epithet": "e", "allegiance": "with", "circles": circles}
+def _npc(name, circle):
+    return {"name": name, "epithet": "e", "circle": circle}
 
 def test_validate_circles_passes_when_consistent():
     site = {"circles": _CIRCLE_REG}
-    npcs = [_npc("Shago", ["guides"]), _npc("Wren", ["harpers"]), _npc("Volo", [])]
+    npcs = [_npc("Shago", "guides"), _npc("Wren", "harpers"), _npc("Volo", None)]
     assert validate_circles(site, npcs) == []
 
-def test_validate_circles_tolerates_absent_registry_with_empty_lists():
-    assert validate_circles({}, [_npc("Volo", [])]) == []
+def test_validate_circles_tolerates_absent_registry_with_null_circles():
+    assert validate_circles({}, [_npc("Volo", None)]) == []
 
 @pytest.mark.parametrize("bad_entry, field", [
-    ({"key": "The Guides", "title": "The Guides", "kind": "company"}, "key"),
-    ({"key": "guides-", "title": "The Guides", "kind": "company"}, "key"),
-    ({"title": "The Guides", "kind": "company"}, "key"),
-    ({"key": "guides", "title": "  ", "kind": "company"}, "title"),
-    ({"key": "guides", "kind": "company"}, "title"),
-    ({"key": "guides", "title": "The Guides", "kind": "guild"}, "kind"),
-    ({"key": "guides", "title": "The Guides"}, "kind"),
+    ({"key": "The Guides", "title": "The Guides"}, "key"),
+    ({"key": "guides-", "title": "The Guides"}, "key"),
+    ({"title": "The Guides"}, "key"),
+    ({"key": "guides", "title": "  "}, "title"),
+    ({"key": "guides"}, "title"),
+    ({"key": "guides", "title": "The Guides", "billing": "star"}, "billing"),
+    ({"key": "guides", "title": "The Guides", "kind": "company"}, "kind"),   # retired field
 ])
 def test_validate_circles_rejects_malformed_registry_entry(bad_entry, field):
     site = {"circles": [bad_entry]}
-    errors = validate_circles(site, [_npc("Shago", ["guides"])])
+    errors = validate_circles(site, [_npc("Shago", "guides")])
     assert any(e.kind == KIND_MALFORMED and e.kind_type == "circles"
                and e.field == field for e in errors), [str(e) for e in errors]
 
@@ -385,51 +385,52 @@ def test_validate_circles_rejects_non_dict_registry_entry():
     assert any(e.kind == KIND_MALFORMED and e.kind_type == "circles" for e in errors)
 
 def test_validate_circles_rejects_non_list_registry():
-    errors = validate_circles({"circles": "guides"}, [_npc("Volo", [])])
+    errors = validate_circles({"circles": "guides"}, [_npc("Volo", None)])
     assert any(e.kind == KIND_MALFORMED and e.kind_type == "site"
                and e.field == "circles" for e in errors)
 
 def test_validate_circles_rejects_duplicate_registry_key():
-    site = {"circles": _CIRCLE_REG + [{"key": "guides", "title": "Again", "kind": "company"}]}
-    errors = validate_circles(site, [_npc("Shago", ["guides"]), _npc("Wren", ["harpers"])])
+    site = {"circles": _CIRCLE_REG + [{"key": "guides", "title": "Again"}]}
+    errors = validate_circles(site, [_npc("Shago", "guides"), _npc("Wren", "harpers")])
     assert any(e.kind == KIND_MALFORMED and e.kind_type == "circles"
                and e.key == ("guides",) and "duplicate" in e.field for e in errors)
 
-def test_validate_circles_flags_npc_missing_circles_field():
+def test_validate_circles_flags_npc_missing_circle_field():
     site = {"circles": _CIRCLE_REG}
-    npcs = [_npc("Shago", ["guides"]), _npc("Wren", ["harpers"]),
-            {"name": "Volo", "epithet": "e", "allegiance": "with"}]
+    npcs = [_npc("Shago", "guides"), _npc("Wren", "harpers"), {"name": "Volo", "epithet": "e"}]
     errors = validate_circles(site, npcs)
     assert any(e.kind == KIND_MALFORMED and e.kind_type == "npcs"
-               and e.key == ("Volo",) and e.field == "circles" for e in errors)
+               and e.key == ("Volo",) and e.field == "circle" for e in errors)
 
-def test_validate_circles_flags_non_list_npc_circles():
+def test_validate_circles_flags_non_string_circle():
     site = {"circles": _CIRCLE_REG}
-    npcs = [_npc("Shago", "guides"), _npc("Wren", ["harpers"])]
+    npcs = [_npc("Shago", ["guides"]), _npc("Wren", "harpers")]
     errors = validate_circles(site, npcs)
     assert any(e.kind == KIND_MALFORMED and e.kind_type == "npcs"
-               and e.key == ("Shago",) and e.field == "circles" for e in errors)
+               and e.key == ("Shago",) and e.field == "circle" for e in errors)
+
+@pytest.mark.parametrize("stale", ["circles", "allegiance"])
+def test_validate_circles_flags_retired_npc_fields(stale):
+    """The store keeps no cruft: the list-of-circles and allegiance fields of
+    the first contract are refused, not ignored."""
+    site = {"circles": _CIRCLE_REG}
+    shago = dict(_npc("Shago", "guides"), **{stale: ["guides"] if stale == "circles" else "with"})
+    errors = validate_circles(site, [shago, _npc("Wren", "harpers")])
+    assert any(e.kind == KIND_MALFORMED and e.kind_type == "npcs"
+               and e.key == ("Shago",) and e.field == stale for e in errors)
 
 def test_validate_circles_flags_dangling_key():
     site = {"circles": _CIRCLE_REG}
-    npcs = [_npc("Shago", ["guides"]), _npc("Wren", ["harpers"]),
-            _npc("Xhosala", ["obanashi"])]
+    npcs = [_npc("Shago", "guides"), _npc("Wren", "harpers"), _npc("Xhosala", "obanashi")]
     errors = validate_circles(site, npcs)
     assert len(errors) == 1
     e = errors[0]
     assert e.kind == KIND_MALFORMED and e.kind_type == "npcs" and e.key == ("Xhosala",)
     assert "obanashi" in e.field
 
-def test_validate_circles_flags_duplicate_key_within_npc():
-    site = {"circles": _CIRCLE_REG}
-    npcs = [_npc("Shago", ["guides", "guides"]), _npc("Wren", ["harpers"])]
-    errors = validate_circles(site, npcs)
-    assert any(e.kind == KIND_MALFORMED and e.kind_type == "npcs"
-               and e.key == ("Shago",) and "guides" in e.field for e in errors)
-
 def test_validate_circles_flags_memberless_circle():
-    site = {"circles": _CIRCLE_REG + [{"key": "orolunga", "title": "Orolunga", "kind": "company"}]}
-    npcs = [_npc("Shago", ["guides"]), _npc("Wren", ["harpers"])]
+    site = {"circles": _CIRCLE_REG + [{"key": "orolunga", "title": "Orolunga"}]}
+    npcs = [_npc("Shago", "guides"), _npc("Wren", "harpers")]
     errors = validate_circles(site, npcs)
     assert errors == [ValidationError(KIND_ORPHAN, "circles", ("orolunga",))]
 
@@ -437,23 +438,11 @@ def test_validate_circles_dangling_key_does_not_also_count_as_membership():
     """An unknown key is reported once, on the NPC; it must not be mistaken
     for a member of some circle, nor hide a genuinely memberless circle."""
     site = {"circles": _CIRCLE_REG}
-    npcs = [_npc("Shago", ["guide"]), _npc("Wren", ["harpers"])]
+    npcs = [_npc("Shago", "guide"), _npc("Wren", "harpers")]
     errors = validate_circles(site, npcs)
     kinds = {(e.kind, e.kind_type, e.key) for e in errors}
     assert (KIND_MALFORMED, "npcs", ("Shago",)) in kinds
     assert (KIND_ORPHAN, "circles", ("guides",)) in kinds
-
-def test_validate_all_wires_circles(staged_env, tmp_path):
-    """A dangling circle key on an authored NPC must surface through
-    validate_all, the gate render.py runs."""
-    from build import store
-    data = render.load_data(staged_env / "data")
-    authored = store.load_authored()
-    authored["npcs"] = [_npc("Azlund", ["no-such-circle"])]
-    errors = render.validate_all(data, authored, images_dir=tmp_path)
-    assert any(e.kind_type == "npcs" and e.key == ("Azlund",)
-               and "no-such-circle" in (e.field or "") for e in errors)
-
 
 # -- not_npcs: player characters and denied names are never NPCs -------------
 

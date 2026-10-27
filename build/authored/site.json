@@ -144,84 +144,55 @@
   ],
   "circles": [
     {
-      "key": "house-of-healing",
-      "title": "The House of Healing",
-      "kind": "company"
-    },
-    {
       "key": "horizon",
-      "title": "The Horizon",
-      "kind": "company"
+      "title": "The Horizon"
     },
     {
       "key": "companions",
       "title": "The Companions",
-      "kind": "company"
+      "billing": "principal"
+    },
+    {
+      "key": "enemy",
+      "title": "The Enemy",
+      "billing": "principal"
     },
     {
       "key": "guides",
-      "title": "The Guides",
-      "kind": "company"
+      "title": "The Guides"
     },
     {
       "key": "port-nyanzaru",
-      "title": "The People of Port Nyanzaru",
-      "kind": "company"
+      "title": "The People of Port Nyanzaru"
     },
     {
       "key": "merchant-princes",
-      "title": "The Merchant Princes",
-      "kind": "company"
+      "title": "The Merchant Princes"
     },
     {
       "key": "dinosaur-racers",
       "title": "The Dinosaur Racers",
-      "kind": "company"
+      "billing": "aside"
     },
     {
       "key": "camp-vengeance",
-      "title": "Camp Vengeance",
-      "kind": "company"
+      "title": "Camp Vengeance"
     },
     {
       "key": "nuanwa-olerros-scouts",
-      "title": "Nuanwa Olerro's Scouts",
-      "kind": "company"
+      "title": "Nuanwa Olerro's Scouts"
     },
     {
       "key": "fort-beluarian",
-      "title": "Fort Beluarian",
-      "kind": "company"
+      "title": "Fort Beluarian"
     },
     {
       "key": "shilku-dwarves",
-      "title": "The Shilku Dwarves",
-      "kind": "company"
+      "title": "The Shilku Dwarves"
     },
     {
       "key": "harpers",
-      "title": "The Harpers",
-      "kind": "faction"
-    },
-    {
-      "key": "zhentarim",
-      "title": "The Zhentarim",
-      "kind": "faction"
-    },
-    {
-      "key": "order-of-the-gauntlet",
-      "title": "The Order of the Gauntlet",
-      "kind": "faction"
-    },
-    {
-      "key": "emerald-enclave",
-      "title": "The Emerald Enclave",
-      "kind": "faction"
-    },
-    {
-      "key": "flaming-fist",
-      "title": "The Flaming Fist",
-      "kind": "faction"
+      "title": "The Harpers"
     }
   ],
   "ascent_read": "Legends forged mostly by steel, but the road and its riddles have left their mark on every hard-won mile.",

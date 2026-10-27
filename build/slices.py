@@ -202,7 +202,7 @@ def append_npcs(data: dict, authored: dict) -> list[tuple]:
     missing = [n for n in expected if n not in auth_names]
     out = []
     # The circle registry rides in every NPC slice: the transformer files the
-    # NPC under registry keys only (or returns [] when none fits).
+    # NPC under one registry key (or returns null when none fits).
     registry = list(authored["site"].get("circles", []))
     for name in missing:
         npc_mentions = []
@@ -336,8 +336,7 @@ def refresh_npcs(data: dict, authored: dict) -> list[tuple]:
             "circles": registry,
             "existing": {
                 "epithet": npc["epithet"],
-                "allegiance": npc.get("allegiance"),
-                "circles": list(npc.get("circles", [])),
+                "circle": npc.get("circle"),
             },
         }))
     return out

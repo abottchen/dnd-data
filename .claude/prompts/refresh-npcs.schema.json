@@ -21,32 +21,19 @@
       ],
       "required": [
         "epithet",
-        "allegiance",
-        "circles"
+        "circle"
       ],
       "additionalProperties": false,
       "properties": {
         "epithet": {
           "type": "string"
         },
-        "allegiance": {
+        "circle": {
           "type": [
             "string",
             "null"
           ],
-          "enum": [
-            "with",
-            "against",
-            null
-          ]
-        },
-        "circles": {
-          "type": "array",
-          "items": {
-            "type": "string",
-            "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
-          },
-          "uniqueItems": true
+          "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
         }
       }
     },

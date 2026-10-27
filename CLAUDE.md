@@ -24,8 +24,8 @@ Static GitHub Pages site visualizing data from an ongoing D&D campaign.
   - `build/compute.py` — every `compute_*` (trials, fortune, radar / ascent / constellation geometry, chronicle, reliquary, cast, …) and `compute_all`, which assembles the full template context. Imports `inventory` at module top: the old render↔inventory circular import is dissolved because `inventory` now imports the dice-map loader from `loaders`.
   - `build/paths.py`, `store.py`, `slices.py`, `registry.py`, `prepare.py`, `apply.py`, `apply_cli.py` — orchestrator submodules (path resolution, authored-store I/O, per-category slice builders, transformer registry, run-dir preparation, returned-prose application, manifest-driven apply + render).
   - `build/authored/` — JSON prose store: `kills.json`, `sessions.json`, `chapters.json`, `npcs.json`, `characters.json`, `site.json`. The only writable surface for the orchestrator's apply step.
-    - `site.json` → `circles`: the NPC-circle registry, `[{"key", "title", "kind"}]`; `kind` is `company` or `faction`, keys are slugs and stable once published.
-    - `npcs.json` → `circles`: required on every entry, a list of registry keys with companies first, `[]` when none fits.
+    - `site.json` → `circles`: the NPC-circle registry, `[{"key", "title", "billing"?}]`; `billing` is `principal` or `aside`, keys are slugs and stable once published.
+    - `npcs.json` → `circle`: required on every entry, one registry key or `null`.
     - `site.json` → `not_npcs`: `[{"name", "why"}]`, recurring names that are not NPCs (a familiar, a construct the party owns); with the party roster it is the exclusion set that apply and `validate_not_npcs` enforce.
   - `build/mapimage.py` — re-encodes `data/chult-player-map.jpg` into `site/images/chult-map.jpg` at full resolution (`prepare_map`). Called by `apply` just before the render, and available standalone as `python -m build map [--force]`. A no-op unless the source's SHA-256 differs from the one recorded in `build/map-source.json`, so ordinary builds pay nothing.
   - `build/map-source.json` — committed record of the SHA-256 `site/images/chult-map.jpg` was last built from, plus its byte size. This is the map's staleness signal; mtimes are deliberately not consulted, because the derivative is git-tracked and git stamps working-tree files at checkout time, so a pull or stash after dropping in a new map would leave the stale derivative looking newer than its own source. Delete it to force a one-off rebuild.
@@ -86,15 +86,15 @@ The `build` package prepares authoring slices, dispatches them in-session via th
 Pipeline (`prepare` step):
 1. Load source data from `data/` + authored prose from `build/authored/`.
 2. **Discovery pass** — when `latest_session > site.refreshed_through_session`, run `refresh-known-npcs` to extract any newly named NPCs from new session text and append them to `site.known_npcs`. Runs before the append pass so newly discovered names flow into per-NPC epithet authoring on the same build. Returns `no_change` or `rewrite`. It also proposes new circles for the registry, and never a name from the party roster or `site.not_npcs`; apply enforces both.
-3. **Append pass** — for each category (`kills`, `chapters`, `npcs`, `characters`, `sworn`), the slice builder in `build/slices.py` computes a set difference between `data/` and `build/authored/` (keyed on `(character, date, creature, method)` for kills, `name` for NPCs, etc.). One slice is emitted per missing entity. Deleting a single entry from an authored file causes that one entry to be re-authored on the next run; nothing else moves. The `append-npcs` result places the NPC in `circles` using registry keys only.
-4. **Refresh pass** — when `latest_session > site.refreshed_through_session`, evaluate each `refresh-*` transformer (`chapters`, `npcs`, `characters`, `road-ahead`, `intro-epithet`); each returns `no_change` or `rewrite`. A `refresh-npcs` rewrite returns the full `circles` list, so a refresh can move an NPC.
+3. **Append pass** — for each category (`kills`, `chapters`, `npcs`, `characters`, `sworn`), the slice builder in `build/slices.py` computes a set difference between `data/` and `build/authored/` (keyed on `(character, date, creature, method)` for kills, `name` for NPCs, etc.). One slice is emitted per missing entity. Deleting a single entry from an authored file causes that one entry to be re-authored on the next run; nothing else moves. The `append-npcs` result places the NPC in `circle` with a registry key or null.
+4. **Refresh pass** — when `latest_session > site.refreshed_through_session`, evaluate each `refresh-*` transformer (`chapters`, `npcs`, `characters`, `road-ahead`, `intro-epithet`); each returns `no_change` or `rewrite`. A `refresh-npcs` rewrite returns `circle`, so a refresh can move an NPC.
 5. Write all pending slices + frozen prompts to `build/.run/<timestamp>/pending/`.
 
 In-session (`/build-prose` skill): it dispatches one sub-agent per pending slice; each sub-agent reads the slice + frozen prompt, authors prose, and writes a JSON result file to `build/.run/<timestamp>/results/`. Then apply runs.
 
 Pipeline (`apply` step):
 1. Validate each result file against its JSON Schema.
-2. Apply results to authored sections; bump `site.refreshed_through_session` on full refresh-pass success. NPC `circles` are checked against the registry; registry proposals merge append-only, and the pipeline never renames or removes a circle.
+2. Apply results to authored sections; bump `site.refreshed_through_session` on full refresh-pass success. An NPC's `circle` is checked against the registry; registry proposals merge append-only (key, title, billing) and file their already-authored members, and the pipeline never renames or removes a circle.
 3. Run `build/render.py`.
 
 ### NPC circles
