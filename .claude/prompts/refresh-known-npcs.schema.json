@@ -16,6 +16,26 @@
           "type": "array",
           "items": {"type": "string"},
           "uniqueItems": true
+        },
+        "circles": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "object",
+            "required": ["key", "title", "kind", "members"],
+            "additionalProperties": false,
+            "properties": {
+              "key": {"type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"},
+              "title": {"type": "string", "minLength": 1},
+              "kind": {"type": "string", "enum": ["company", "faction"]},
+              "members": {
+                "type": "array",
+                "items": {"type": "string"},
+                "minItems": 1,
+                "uniqueItems": true
+              }
+            }
+          }
         }
       }
     },

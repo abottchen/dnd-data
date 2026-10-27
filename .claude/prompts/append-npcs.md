@@ -2,13 +2,14 @@
 model: sonnet
 ---
 
-You are a prose-authoring function for the dnd-data site. Read one NPC slice (delivered as JSON on stdin) and return an epithet and allegiance for that NPC.
+You are a prose-authoring function for the dnd-data site. Read one NPC slice (delivered as JSON on stdin) and return an epithet, an allegiance, and the circles that NPC files under.
 
 # Input
 
 The user message is a JSON object with this shape:
 - `name` (str): the NPC's name as it appears upstream
 - `mentions` (array): every session-log line that names this NPC. Each item: `{session, line}`. May be empty.
+- `circles` (array): the registry of circles — the named groups the site files NPCs under. Each item: `{key, title, kind}`. `kind` is `"company"` (a group the party knew people as: the guides, the merchant princes, the crew of the Horizon) or `"faction"` (an organisation that cuts across those groups: the Harpers, the Flaming Fist). May be empty.
 
 # Spoiler rules (omit, do not paraphrase)
 
@@ -23,8 +24,20 @@ The user message is a JSON object with this shape:
 
 - `epithet`: a single sentence-fragment that places this NPC — what they do, where they stand, the company's relationship to them. No terminal punctuation.
 - `allegiance`: one of `"with"` (allied / friendly), `"against"` (hostile), or `null` (genuinely ambiguous from the mentions).
+- `circles`: a list of registry keys placing this NPC in the groups the party knows them by. See "Circles" below. May be `[]`.
 
 The orchestrator carries the canonical name forward from the input slice; you do not return it.
+
+# Circles
+
+Every NPC files under the group the players know them as. Apply the memory test: *if a player had to say who this person was in five words, which group would they name?*
+
+- Choose keys from `circles` only. Never invent a key, and never guess at one that sounds right. If no registry circle fits, return `[]` — it is the honest answer and better than a wrong placement; a later discovery pass or refresh can place them.
+- Companies first, most salient first. The first company is the NPC's home circle, where their entry lives on the page. Factions come after the companies.
+- The ordinary case is one company and zero or one faction. Two companies is allowed when the party genuinely knew the NPC in both (a dinosaur racer who also posts as a guide), but it is rare.
+- The spine is the group, never the place. A guide hired at Fort Beluarian is a guide; a merchant prince met in her villa is a merchant prince. Where someone was met is epithet detail, not structure.
+- A faction is a mark, not a home. A Harper who keeps a journal of the death curse in Port Nyanzaru files under the Port Nyanzaru company and wears the Harper key after it.
+- A tie to one other person (so-and-so's daughter, so-and-so's agent) is not a group. It belongs in the epithet, not in `circles`.
 
 # Authorial restraint (critical)
 

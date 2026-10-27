@@ -9,13 +9,18 @@
     },
     "fields": {
       "type": ["object", "null"],
-      "required": ["epithet", "allegiance"],
+      "required": ["epithet", "allegiance", "circles"],
       "additionalProperties": false,
       "properties": {
         "epithet": {"type": "string"},
         "allegiance": {
           "type": "string",
           "enum": ["with", "against"]
+        },
+        "circles": {
+          "type": "array",
+          "items": {"type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"},
+          "uniqueItems": true
         }
       }
     },

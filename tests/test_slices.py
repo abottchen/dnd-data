@@ -322,3 +322,64 @@ def test_archetype_slice_carries_no_fabricated_stats(slice_env):
     out = slices.refresh_archetype_inscription(data, authored)
     (_, s), = [t for t in out if t[0] == "vex"]
     assert set(s["archetype"]) == {"slug", "label", "score"}
+
+
+# -- NPC circles: the registry rides in every NPC slice ----------------------
+
+_CIRCLES = [
+    {"key": "house-of-healing", "title": "The House of Healing", "kind": "company"},
+    {"key": "harpers", "title": "The Harpers", "kind": "faction"},
+]
+
+
+def test_append_npcs_slice_carries_circle_registry(slice_env):
+    authored = slice_env["authored"]
+    authored["site"]["circles"] = list(_CIRCLES)
+    out = slices.append_npcs(slice_env["data"], authored)
+    _, body = out[0]
+    assert body["circles"] == _CIRCLES
+
+
+def test_append_npcs_slice_tolerates_missing_registry(slice_env):
+    authored = slice_env["authored"]
+    authored["site"].pop("circles", None)
+    out = slices.append_npcs(slice_env["data"], authored)
+    _, body = out[0]
+    assert body["circles"] == []
+
+
+def test_refresh_npcs_slice_carries_registry_and_existing_circles(slice_env):
+    """A refresh slice carries the registry (so a rewrite can move the NPC)
+    and the NPC's current circles under `existing`. A pre-backfill entry
+    with no `circles` field reads as []."""
+    authored = _authored_with_azlund(slice_env)
+    authored["site"] = {**authored["site"], "refreshed_through_session": 0,
+                        "circles": list(_CIRCLES)}
+    out = slices.refresh_npcs(slice_env["data"], authored)
+    body = dict(out)["Azlund"]
+    assert body["circles"] == _CIRCLES
+    assert body["existing"]["circles"] == []
+
+
+def test_refresh_npcs_slice_existing_circles_round_trip(slice_env):
+    authored = _authored_with_azlund(slice_env)
+    authored["npcs"][0]["circles"] = ["house-of-healing", "harpers"]
+    authored["site"] = {**authored["site"], "refreshed_through_session": 0,
+                        "circles": list(_CIRCLES)}
+    out = slices.refresh_npcs(slice_env["data"], authored)
+    body = dict(out)["Azlund"]
+    assert body["existing"]["circles"] == ["house-of-healing", "harpers"]
+
+
+def test_refresh_known_npcs_slice_carries_existing_circles(slice_env):
+    authored = slice_env["authored"]
+    authored["site"]["circles"] = list(_CIRCLES)
+    _, body = slices.refresh_known_npcs(slice_env["data"], authored)[0]
+    assert body["existing_circles"] == _CIRCLES
+
+
+def test_refresh_known_npcs_slice_tolerates_missing_registry(slice_env):
+    authored = slice_env["authored"]
+    authored["site"].pop("circles", None)
+    _, body = slices.refresh_known_npcs(slice_env["data"], authored)[0]
+    assert body["existing_circles"] == []

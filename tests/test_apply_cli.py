@@ -51,6 +51,7 @@ def _valid_payload_for(entry: dict, run_dir: Path) -> dict:
             "fields": {
                 "epithet": "the Tested",
                 "allegiance": None,
+                "circles": [],
             },
             "reason": "test fixture",
         }
