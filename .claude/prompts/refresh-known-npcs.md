@@ -42,7 +42,7 @@ When in doubt, prefer **omission**. A thin authored entry for a non-character is
 
 A circle is a named group the site files NPCs under. Two kinds:
 
-- `company`: the group the party knew people as — the guides, the merchant princes, the crew of the Horizon, Camp Vengeance, the Shilku dwarves. The memory test: *if a player had to say who this person was in five words, which group would they name?*
+- `company`: the group the party knew people as — the guides, the merchant princes, the crew of the Horizon, the companions who travel with the party, Camp Vengeance, the Shilku dwarves. The memory test: *if a player had to say who this person was in five words, which group would they name?*
 - `faction`: an organisation that cuts across companies — the Harpers, the Zhentarim, the Flaming Fist, the Order of the Gauntlet, the Emerald Enclave. Factions render as a mark on a name, not as the structure.
 
 Propose a new circle only when all of these hold:

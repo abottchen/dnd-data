@@ -188,13 +188,21 @@ catch-all; a company of one is not a group.
 - Apply normalises `circles` to companies-first order rather than trusting
   the model's ordering; the validator accepts either order.
 - Registry as populated for session 31: twelve companies (the House of
-  Healing, the Horizon, the Company's Own, the Guides, the People of Port
+  Healing, the Horizon, the Companions, the Guides, the People of Port
   Nyanzaru, the Merchant Princes, the Dinosaur Racers, Camp Vengeance,
   Yokka's Goblins, Nuanwa Olerro's Scouts, Fort Beluarian, the Shilku
   Dwarves) and five factions (Harpers, Zhentarim, Order of the Gauntlet,
   Emerald Enclave, Flaming Fist). Fifteen NPCs file under the catch-all.
   Calls worth a second look are listed in the implementing agent's report
   and summarised in the pull request.
+- The Companions (Artus Cimber, Dragonbait, Vorn, Wickles) is the circle
+  for everyone who travels with the party for the long haul. The first
+  backfill had filed Artus and Dragonbait under the Horizon because they
+  arrived on it, and kept a separate "Company's Own" circle for the two
+  PC-bound creatures; the user corrected the first on review, and the
+  second was folded in rather than leave two two-member circles that both
+  mean "goes where the party goes". The prompts now say that how someone
+  arrived is not their group.
 
 ## Decisions made without the user
 

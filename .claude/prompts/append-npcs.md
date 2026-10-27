@@ -36,6 +36,7 @@ Every NPC files under the group the players know them as. Apply the memory test:
 - Companies first, most salient first. The first company is the NPC's home circle, where their entry lives on the page. Factions come after the companies.
 - The ordinary case is one company and zero or one faction. Two companies is allowed when the party genuinely knew the NPC in both (a dinosaur racer who also posts as a guide), but it is rare.
 - The spine is the group, never the place. A guide hired at Fort Beluarian is a guide; a merchant prince met in her villa is a merchant prince. Where someone was met is epithet detail, not structure.
+- Nor the way they arrived. Someone who travels with the party for the long haul is one of the companions (the `companions` circle), not crew of the ship they sailed in on or one of the band they were first met among; the players remember the road since, not the landing.
 - A faction is a mark, not a home. A Harper who keeps a journal of the death curse in Port Nyanzaru files under the Port Nyanzaru company and wears the Harper key after it.
 - A tie to one other person (so-and-so's daughter, so-and-so's agent) is not a group. It belongs in the epithet, not in `circles`.
 

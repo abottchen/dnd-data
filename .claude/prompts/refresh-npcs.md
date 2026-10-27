@@ -42,7 +42,7 @@ A rewrite returns the full `circles` list, not a delta: carry `existing.circles`
 - Every NPC files under the group the players know them as. The memory test: *if a player had to say who this person was in five words, which group would they name?*
 - Choose keys from `circles` only; never invent one. `[]` is the honest answer when no registry circle fits.
 - Companies first, most salient first (the first company is the home circle); factions after the companies. One company and at most one faction is the ordinary case; two companies is rare.
-- The group, never the place: a guide hired at a fort is a guide. A faction is a mark worn after the company, not a home. A tie to one other person is epithet material, not a circle.
+- The group, never the place or the way they arrived: a guide hired at a fort is a guide, and someone who travels with the party for the long haul is a companion, not crew of the ship they sailed in on. A faction is a mark worn after the company, not a home. A tie to one other person is epithet material, not a circle.
 
 # Output
 
