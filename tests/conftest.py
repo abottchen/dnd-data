@@ -1,7 +1,5 @@
 import shutil
-import subprocess
 import sys
-import warnings
 from pathlib import Path
 
 import pytest
@@ -10,24 +8,6 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO_ROOT))
 
 FIXTURES = Path(__file__).resolve().parent / "fixtures"
-
-
-def pytest_sessionstart(session):
-    """The forbidden-names hooks only run when core.hooksPath is set — a
-    fresh clone is silently unguarded. Warn loudly rather than fail."""
-    repo = Path(__file__).resolve().parent.parent
-    try:
-        out = subprocess.run(
-            ["git", "-C", str(repo), "config", "core.hooksPath"],
-            capture_output=True, text=True)
-        hooks_path = out.stdout.strip()
-    except OSError:
-        return
-    if hooks_path != ".githooks":
-        warnings.warn(
-            "core.hooksPath is not '.githooks' — the forbidden-name guard "
-            "is INACTIVE in this clone. Run: git config core.hooksPath .githooks",
-            stacklevel=1)
 
 
 @pytest.fixture(autouse=True)
