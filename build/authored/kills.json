@@ -822,5 +822,109 @@
     "method": "Eldritch Blast",
     "verse": "Hajoka, who feared no lightning, folded in his own hall",
     "annotation": "Eldritch Blast &middot; a third rune woke on the rod"
+  },
+  {
+    "character": "grieg",
+    "date": "2026-11-01",
+    "creature": "Stirge",
+    "method": "Trident",
+    "verse": "A stirge, swollen and still, on the blade's point",
+    "annotation": "Trident &middot; it had barely begun to drink"
+  },
+  {
+    "character": "grieg",
+    "date": "2026-11-01",
+    "creature": "Stirge",
+    "method": "Longbow",
+    "verse": "A stirge that never found its way back to the dark",
+    "annotation": "Longbow &middot; a small thing, a small sound"
+  },
+  {
+    "character": "grieg",
+    "date": "2026-11-01",
+    "creature": "Meenlock",
+    "method": "Trident",
+    "verse": "A meenlock that came for the shadows and found none",
+    "annotation": "Trident &middot; no fear to give, no dark to step through"
+  },
+  {
+    "character": "vex",
+    "date": "2026-11-01",
+    "creature": "Stirge",
+    "method": "Scimitar",
+    "verse": "A stirge burst red against a companion's back",
+    "annotation": "Scimitar &middot; the blood it had taken went back to the ground"
+  },
+  {
+    "character": "vex",
+    "date": "2026-11-01",
+    "creature": "Stirge",
+    "method": "Longbow",
+    "verse": "A stirge parted from an acolyte's shoulder",
+    "annotation": "Longbow &middot; one arrow, close to the skin"
+  },
+  {
+    "character": "urida",
+    "date": "2026-11-01",
+    "creature": "Stirge",
+    "method": "Fire Bolt",
+    "verse": "A stirge gone to ash on the wing",
+    "annotation": "Fire Bolt &middot; only a scorched smell left in the swarm"
+  },
+  {
+    "character": "urida",
+    "date": "2026-11-01",
+    "creature": "Yellow Musk Zombie",
+    "method": "Fireball",
+    "verse": "Nine musk zombies, marching, then a single bright instant",
+    "annotation": "Fireball &middot; the hut shook and the field lay quiet"
+  },
+  {
+    "character": "urida",
+    "date": "2026-11-01",
+    "creature": "Blightwalker",
+    "method": "Fire Bolt",
+    "verse": "A blightwalker, shadow-wreathed, unmade by one flame",
+    "annotation": "Fire Bolt &middot; its eyes flared once and went out"
+  },
+  {
+    "character": "chumble",
+    "date": "2026-11-01",
+    "creature": "Stirge",
+    "method": "Eldritch Blast",
+    "verse": "A stirge burst in the air above the canopy path",
+    "annotation": "Eldritch Blast &middot; the cloud thinned by one more"
+  },
+  {
+    "character": "chumble",
+    "date": "2026-11-01",
+    "creature": "Meenlock",
+    "method": "Eldritch Blast",
+    "verse": "A meenlock undone in a light it could not hide from",
+    "annotation": "Eldritch Blast &middot; the root-dark kept none of it"
+  },
+  {
+    "character": "lilac",
+    "date": "2026-11-01",
+    "creature": "Wight",
+    "method": "Longbow",
+    "verse": "A wight that walked with purpose, and fell from a tree",
+    "annotation": "Longbow &middot; marked first, and the arrows came after"
+  },
+  {
+    "character": "lilac",
+    "date": "2026-11-01",
+    "creature": "Stirge",
+    "method": "Longbow",
+    "verse": "A stirge pinned out of the swarm's loose spiral",
+    "annotation": "Longbow &middot; a quick draw and a quicker end"
+  },
+  {
+    "character": "lilac",
+    "date": "2026-11-01",
+    "creature": "Yellow Musk Zombie",
+    "method": "Longbow",
+    "verse": "One zombie stood up again, and was laid down",
+    "annotation": "Longbow &middot; the last of the ten, with the rest already ash"
   }
 ]

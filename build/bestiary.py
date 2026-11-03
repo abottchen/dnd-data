@@ -119,6 +119,19 @@ CUSTOM_CREATURE_TOKENS = {
 # has the creature's actual type AND CR — e.g. the Shilku companion module's
 # Aspect of Imix ran at CR 6, and no standard CR 6 creature is an elemental.
 CUSTOM_CREATURES = {
+    # Lost City of Mezro, appendix B: a corrupted nature spirit in melted armour.
+    # Medium undead, CR 3. No 5etools entry exists, so the token is a local file
+    # under site/images/tokens/ (served relative to index.html, like the party
+    # portraits); it is the DM's Owlbear Rodeo token, copied into the repo.
+    "Blightwalker": {
+        "name": "Blightwalker",
+        "type": "undead",
+        "cr": "3",
+        "source": "The Lost City of Mezro, appendix B (custom)",
+        "hasToken": True,
+        "token": None,
+        "token_url": "images/tokens/blightwalker.webp",
+    },
     "Aspect of Imix": {
         "name": "Aspect of Imix",
         "type": "elemental",

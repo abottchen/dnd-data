@@ -370,9 +370,9 @@
     "circle": null
   },
   {
-    "name": "Nerissa",
-    "epithet": "who remembers little of herself, and whom Wren named as Mesika, a death-curse investigator whose journal the company has read",
-    "circle": null
+    "name": "Mesika",
+    "epithet": "warrior of Mezro who walked out of a ruined city believing it was 1385, wore the borrowed name Nerissa for three tendays until the company handed her own back to her, and pledged her sword and followed them into the Forsaken Tree",
+    "circle": "companions"
   },
   {
     "name": "Rhoga",
@@ -381,12 +381,22 @@
   },
   {
     "name": "Xhosala",
-    "epithet": "met quarrelling with Artus Cimber at the cave mouth, who fears the Heart of the Wild would be used for one man's purpose, and who agreed to lead the company to the Forsaken Tree",
-    "circle": null
+    "epithet": "who led her band out of the Seething Halls to guide the company to the Forsaken Tree, gave Lilac a stone tuned to the Heart of Blight, and held the root opening beside Artus Cimber",
+    "circle": "obanashi"
   },
   {
     "name": "Wren",
-    "epithet": "called Soggy Wren, who keeps a journal of the death curse at Kaya's House of Repose and opened it to the company in trade for what they knew",
-    "circle": "port-nyanzaru"
+    "epithet": "called Soggy Wren, the Harper who keeps a journal of the death curse at Kaya's House of Repose and opened it to the company in trade for what they knew",
+    "circle": "harpers"
+  },
+  {
+    "name": "Josok",
+    "epithet": "priest among Xhosala's followers, who cast lesser restoration on the scout the wight had bitten",
+    "circle": "obanashi"
+  },
+  {
+    "name": "Zamisi",
+    "epithet": "hunter and scout of Xhosala's following, bitten by the wight on the road to the Forsaken Tree and left pale, weak and frailer for it",
+    "circle": "obanashi"
   }
 ]

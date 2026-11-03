@@ -59,3 +59,14 @@ def test_aspect_of_imix_cr6(bestiary_dir):
     assert info["type"] == "elemental"
     assert info["cr"] == "6"
     assert _kill_xp("Aspect of Imix") == 2300
+
+
+def test_blightwalker_is_custom_cr3_undead(bestiary_dir):
+    # Lost City of Mezro appendix creature with no 5etools entry: custom CR 3
+    # undead whose token is a local file under site/images/tokens/.
+    from build.bestiary import _kill_xp
+    info = bestiary_lookup("Blightwalker")
+    assert info["type"] == "undead"
+    assert info["cr"] == "3"
+    assert info["token_url"] == "images/tokens/blightwalker.webp"
+    assert _kill_xp("Blightwalker") == 700
