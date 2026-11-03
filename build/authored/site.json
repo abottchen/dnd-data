@@ -3,12 +3,12 @@
   "page_subtitle": "A ledger of those who walk &middot; and those they have laid down",
   "intro_epithet": "Five travellers and a storyteller, bound to a doomed road",
   "footnote": "The names above are the names given &middot; the ones who fell were given no names",
-  "refreshed_through_session": 31,
+  "refreshed_through_session": 32,
   "road_ahead": {
     "known": [
       {
         "name": "The Ring of Winter",
-        "gloss": "bound to Artus Cimber's hand, last seen opening an eye of frost on a deck of pirates."
+        "gloss": "bound to Artus Cimber's hand, now holding the Forsaken Tree's mouth open while it freezes the skin around it."
       },
       {
         "name": "The Soulmonger",
@@ -36,7 +36,7 @@
       },
       {
         "name": "The Heart of the Wild",
-        "gloss": "corrupted at the root, and eating away at the magic of Chult until someone mends it."
+        "gloss": "turned to the Heart of Blight beneath the Forsaken Tree, guarded, and eating away at the magic of Chult until someone mends it."
       }
     ],
     "was_known": [
@@ -45,7 +45,7 @@
         "gloss": "the naga atop Orolunga, who answered once and cannot be asked again."
       }
     ],
-    "direction": "Back in Port Nyanzaru with Nerissa's old name of Mesika in hand, the company means to tell Artus what Wren revealed, then rejoin Xhosala at the Seething Halls and press on to the Forsaken Tree."
+    "direction": "Deep in the roots of the Forsaken Tree with Mesika and Dragonbait beside them, the company has reached the heart chamber, where an unseen guardian stands between them and the Heart of Blight while Artus holds the way open behind."
   },
   "gm": {
     "name": "The Dungeon Master",
@@ -127,10 +127,12 @@
     "Acererak",
     "Wainrath",
     "Nava",
-    "Nerissa",
+    "Mesika",
     "Rhoga",
     "Xhosala",
-    "Wren"
+    "Wren",
+    "Josok",
+    "Zamisi"
   ],
   "not_npcs": [
     {
@@ -140,6 +142,26 @@
     {
       "name": "Vorn",
       "why": "the shield guardian bound to Urida's amulet"
+    },
+    {
+      "name": "Aviline",
+      "why": "a ghost met once under the Forsaken Tree; the DM declined a cast entry"
+    },
+    {
+      "name": "Ugor",
+      "why": "one of Xhosala's hunters; the DM declined cast entries for her followers beyond Josok and Zamisi"
+    },
+    {
+      "name": "Yapa",
+      "why": "one of Xhosala's acolytes; the DM declined cast entries for her followers beyond Josok and Zamisi"
+    },
+    {
+      "name": "Dengo",
+      "why": "one of Xhosala's acolytes; the DM declined cast entries for her followers beyond Josok and Zamisi"
+    },
+    {
+      "name": "Nerissa",
+      "why": "the borrowed name Mesika wore until session 32; her cast entry is Mesika"
     }
   ],
   "circles": [
@@ -193,6 +215,10 @@
     {
       "key": "harpers",
       "title": "The Harpers"
+    },
+    {
+      "key": "obanashi",
+      "title": "The Obanashi"
     }
   ],
   "ascent_read": "Legends forged mostly by steel, but the road and its riddles have left their mark on every hard-won mile.",

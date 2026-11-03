@@ -61,19 +61,17 @@
     "epithet": "of the Tabaxi, who lets the bowstring do all her speaking",
     "reliquary_header": "Felled before they drew near",
     "constellation_epithet": "ever at the hunt, the soft-pawed shot",
-    "distinction_title": "The Second Search",
-    "distinction_subtitle": "who crept back for Nerissa's journal while its owner slept",
-    "distinction_detail": "Session <b>31</b> &middot; Nerissa's hidden journal lifted from her pack, read by night, and returned unnoticed",
+    "distinction_title": "The Widest Swing",
+    "distinction_subtitle": "whose dice run hotter and colder than any other hand's",
+    "distinction_detail": "The widest spread of any d20 in the company &middot; <b>23</b> crit successes beside <b>24</b> crit fails",
     "archetype_badge": {
       "archetype": "naturalist",
       "inscription": "A sprig of mistletoe rides on her belt, tied with ribbon, and she reads the trail through it long before she lets an arrow fly."
     },
     "distinction_basis": {
-      "kind": "narrative",
-      "sessions": [
-        31
-      ],
-      "note": "retrieved and read Nerissa's hidden journal while she slept"
+      "kind": "mechanical",
+      "atom": "is_party_swingiest",
+      "value": true
     },
     "sworn_creed": "she crossed once into the feywild, and it never fully let her walk back out"
   },
