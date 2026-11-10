@@ -221,12 +221,16 @@ def _paragraphs(text: str) -> "object":
     """Render authored prose as one or more <p> blocks.
 
     Summaries are authored as plain text, where a blank line is the only
-    paragraph signal. Escaping happens here, so prose fields no longer need
+    paragraph signal, and a block that is exactly "* * *" is a scene break
+    (styled by `.scene-break`). Escaping happens here, so prose fields no longer need
     `| safe` in the templates.
     """
     from markupsafe import Markup, escape
     blocks = [b.strip() for b in re.split(r"\n\s*\n", (text or "").strip()) if b.strip()]
-    return Markup("".join(f"<p>{escape(b)}</p>" for b in blocks))
+    return Markup("".join(
+        '<p class="scene-break">* * *</p>' if b == "* * *" else f"<p>{escape(b)}</p>"
+        for b in blocks
+    ))
 
 def render_page(context: dict, templates_dir: Path, out_path: Path) -> None:
     from jinja2 import Environment, FileSystemLoader, StrictUndefined

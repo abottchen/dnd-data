@@ -398,5 +398,10 @@
     "name": "Zamisi",
     "epithet": "hunter and scout of Xhosala's following, bitten by the wight on the road to the Forsaken Tree and left pale, weak and frailer for it",
     "circle": "obanashi"
+  },
+  {
+    "name": "Kolate",
+    "epithet": "who corrupted the Heart of the Wild, and fell to the party in the heart chamber beneath the Forsaken Tree, his trident-pierced hands mid-spell",
+    "circle": "enemy"
   }
 ]

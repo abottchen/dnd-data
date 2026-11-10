@@ -99,6 +99,9 @@ CUSTOM_NPC_STATBLOCKS = {
     # under the fiction of a different job, so they borrow the warrior's block.
     # Without this they fall through to CR 0 and 10 XP.
     "Firenewt Worker": "Firenewt Warrior",
+    # Lost City of Mezro: the Forsaken Tree's guardian is "Kolate, a necromancer",
+    # so he borrows that block (CR 9, humanoid).
+    "Kolate": "Necromancer",
 }
 
 # Explicit pip-icon overrides for named NPCs. Maps display name -> an image URL
@@ -110,6 +113,8 @@ CUSTOM_NPC_STATBLOCKS = {
 # on the pip via this table.
 CUSTOM_CREATURE_TOKENS = {
     "Queen Grabstab": "https://5e.tools/img/adventure/ToA/048-0322.webp",
+    # The DM's Owlbear Rodeo token, copied into the repo like the blightwalker's.
+    "Kolate": "images/tokens/kolate.webp",
 }
 
 # Fully custom creatures with no 5etools analogue at the right CR. Each entry

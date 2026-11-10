@@ -926,5 +926,37 @@
     "method": "Longbow",
     "verse": "One zombie stood up again, and was laid down",
     "annotation": "Longbow &middot; the last of the ten, with the rest already ash"
+  },
+  {
+    "character": "grieg",
+    "date": "2026-11-08",
+    "creature": "Kolate",
+    "method": "Trident",
+    "verse": "Kolate, his hands pinned open mid-spell, and the roots gone quiet",
+    "annotation": "Trident &middot; the last word of the casting never left him"
+  },
+  {
+    "character": "vex",
+    "date": "2026-11-08",
+    "creature": "Zombie",
+    "method": "Scimitar",
+    "verse": "The last zombie guard among the roots, reduced to a pile of bones",
+    "annotation": "Scimitar &middot; two blades, and nothing left to stand"
+  },
+  {
+    "character": "chumble",
+    "date": "2026-11-08",
+    "creature": "Zombie",
+    "method": "Eldritch Blast",
+    "verse": "A zombie posted among the roots, dropped where it stood",
+    "annotation": "Eldritch Blast &middot; two blasts, and the guard did not rise"
+  },
+  {
+    "character": "lilac",
+    "date": "2026-11-08",
+    "creature": "Zombie",
+    "method": "Longbow",
+    "verse": "A zombie guard in the root-walled dark, undone at range",
+    "annotation": "Longbow &middot; the first arrow wide, the second took it apart"
   }
 ]

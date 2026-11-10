@@ -40,3 +40,16 @@ def test_paragraphs_filter_escapes_and_handles_single_block(tmp_path):
     assert html.count("<p>") == 1
     assert "<img onerror" not in html
     assert "&lt;img" in html
+
+
+def test_paragraphs_filter_marks_scene_breaks(tmp_path):
+    """A block that is exactly "* * *" becomes a classed scene-break paragraph."""
+    tdir = tmp_path / "t"
+    tdir.mkdir()
+    (tdir / "base.html").write_text("<div>{{ v | paragraphs }}</div>")
+    out = tmp_path / "out.html"
+    render.render_page({"v": "Before.\n\n* * *\n\nAfter * * * inline."}, tdir, out)
+    assert out.read_text() == (
+        '<div><p>Before.</p><p class="scene-break">* * *</p>'
+        "<p>After * * * inline.</p></div>"
+    )

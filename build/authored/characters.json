@@ -62,8 +62,8 @@
     "reliquary_header": "Felled before they drew near",
     "constellation_epithet": "ever at the hunt, the soft-pawed shot",
     "distinction_title": "The Widest Swing",
-    "distinction_subtitle": "whose dice run hotter and colder than any other hand's",
-    "distinction_detail": "The widest spread of any d20 in the company &middot; <b>23</b> crit successes beside <b>24</b> crit fails",
+    "distinction_subtitle": "whose dice run as hot and as cold as any hand at the table",
+    "distinction_detail": "No d20 in the company swings wider &middot; <b>23</b> crit successes beside <b>25</b> crit fails",
     "archetype_badge": {
       "archetype": "naturalist",
       "inscription": "A sprig of mistletoe rides on her belt, tied with ribbon, and she reads the trail through it long before she lets an arrow fly."
@@ -77,7 +77,7 @@
   },
   {
     "id": "grieg",
-    "epithet": "of the Wulven, who takes up whatever weapon the moment puts in reach",
+    "epithet": "of the Wulven, who has settled the company's hardest fights with a trident",
     "reliquary_header": "Felled by whatever came to hand",
     "constellation_epithet": "the busiest hand, and richly paid for it",
     "distinction_title": "The Heaviest Blow",
