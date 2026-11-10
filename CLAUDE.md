@@ -104,7 +104,7 @@ The GM tab's cast is grouped by circle. The authoring rules live in the three NP
 
 ## Chronicle session entries
 
-The Chronicle's per-session entries are not authored by any transformer or by `/build-prose`; the `write-chronicle` skill produces them. Whatever produces them must meet this interface, which the renderer and validators enforce:
+The Chronicle's per-session entries are not authored by any transformer or by `/build-prose`. Whatever produces them must meet this interface, which the renderer and validators enforce:
 
 - **Where:** `build/authored/sessions.json`, a JSON list with one object per session in `data/session-log.json`. Order doesn't matter (render looks entries up by `session`). It's public and committed, so the privacy rules below apply to every string in it.
 - **Shape:**
@@ -132,7 +132,6 @@ End-to-end verification: run the three-step build (or just `build/render.py` to 
 ## Skills available in this repo
 
 - **`bestiarylookup`** (`.claude/skills/bestiarylookup/`) — looks up a creature in 5etools data and returns its stats (type, CR, source, URL). Consulted by `render.py` when rendering the "Kinds Slain" trial card.
-- **`write-chronicle`** (`.claude/skills/write-chronicle/`) — drafts a session's Chronicle chapter in Volo's voice, runs the DM review loop on a private artifact, and writes the final entry into `build/authored/sessions.json` via `scripts/story2entry.py`. Voice and form in `voice.md`; facts the DM has ruled on in `facts.md`; drafts live in the untracked `build/.chronicle/session-<N>/`.
 
 ## External dependencies
 
