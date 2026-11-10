@@ -3,12 +3,12 @@
   "page_subtitle": "A ledger of those who walk &middot; and those they have laid down",
   "intro_epithet": "Five travellers and a storyteller, bound to a doomed road",
   "footnote": "The names above are the names given &middot; the ones who fell were given no names",
-  "refreshed_through_session": 32,
+  "refreshed_through_session": 33,
   "road_ahead": {
     "known": [
       {
         "name": "The Ring of Winter",
-        "gloss": "bound to Artus Cimber's hand, now holding the Forsaken Tree's mouth open while it freezes the skin around it."
+        "gloss": "on Artus Cimber's hand, gone north with the Heart and promised to Kir Sabal a week behind the company."
       },
       {
         "name": "The Soulmonger",
@@ -32,20 +32,20 @@
       },
       {
         "name": "The Yuan-ti's Door",
-        "gloss": "a yuan-ti drew blood and fled within, and Wickles watches from the eaves."
-      },
-      {
-        "name": "The Heart of the Wild",
-        "gloss": "turned to the Heart of Blight beneath the Forsaken Tree, guarded, and eating away at the magic of Chult until someone mends it."
+        "gloss": "a yuan-ti drew blood and fled within."
       }
     ],
     "was_known": [
       {
         "name": "Saja N'baza",
         "gloss": "the naga atop Orolunga, who answered once and cannot be asked again."
+      },
+      {
+        "name": "The Heart of the Wild",
+        "gloss": "pried from the Forsaken Tree once Kolate fell and handed to Xhosala for purifying, though Wickles may have swallowed whatever lived inside it."
       }
     ],
-    "direction": "Deep in the roots of the Forsaken Tree with Mesika and Dragonbait beside them, the company has reached the heart chamber, where an unseen guardian stands between them and the Heart of Blight while Artus holds the way open behind."
+    "direction": "With the Heart carried out of the Forsaken Tree and Chumble gone north beside Artus, the rest of the company marches southwest for the bridge at Ataaz Muhahah on the way to Kir Sabal, and undead are closing in from the south."
   },
   "gm": {
     "name": "The Dungeon Master",
@@ -132,7 +132,8 @@
     "Xhosala",
     "Wren",
     "Josok",
-    "Zamisi"
+    "Zamisi",
+    "Kolate"
   ],
   "not_npcs": [
     {
