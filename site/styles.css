@@ -1826,7 +1826,6 @@ img.chronicle-session-pip:focus-visible {
   font-size: 16px;
   color: var(--paper-dim);
   line-height: 1.55;
-  max-width: 700px;
 }
 
 .chronicle-session-summary p { margin-bottom: 0.8em; }
@@ -3095,7 +3094,7 @@ img.chronicle-session-pip:focus-visible {
 @property --hero-fade-b { syntax: '<length>'; inherits: false; initial-value: 0px; }
 .hero-summary {
   font-family: 'EB Garamond', serif; font-size: 17px; color: var(--paper);
-  line-height: 1.6; max-width: 660px; opacity: 0.9;
+  line-height: 1.6; opacity: 0.9;
   max-height: clamp(360px, 48vh, 540px);
   overflow-y: auto; overscroll-behavior: contain;
   padding-right: 18px; scrollbar-gutter: stable;
@@ -3244,7 +3243,7 @@ img.chronicle-session-pip:focus-visible {
 .chronicle-chapter-panel.active { display: block; }
 
 .chronicle-session-quiet {
-  list-style: none; margin: 12px 0 0; padding: 10px 0 0 0; max-width: 700px;
+  list-style: none; margin: 12px 0 0; padding: 10px 0 0 0;
   border-top: 1px solid var(--rule);
 }
 .chronicle-session-quiet li {
@@ -3252,6 +3251,32 @@ img.chronicle-session-pip:focus-visible {
   color: var(--paper-dim); line-height: 1.5; margin: 0 0 4px; position: relative; padding-left: 16px;
 }
 .chronicle-session-quiet li::before { content: "\2022"; position: absolute; left: 4px; color: var(--brass-dim); }
+
+/* Book prose: the long-form session entries (Chronicle summaries and the
+   landing hero) are set like a printed page and fill the width of their
+   pane. Justification leans on hyphenation, which needs <html lang>
+   (base.html declares "en"). The limits keep short words whole and never
+   leave a two-letter fragment. Below the 900px breakpoint the text stays
+   ragged-right. A paragraph that is just "* * *" is a scene break:
+   render._paragraphs gives it the scene-break class, centred here. */
+.chronicle-session-summary p,
+.hero-summary p {
+  -webkit-hyphens: auto;
+  hyphens: auto;
+  hyphenate-limit-chars: 6 3 3;
+  -webkit-hyphenate-limit-before: 3;
+  -webkit-hyphenate-limit-after: 3;
+  text-wrap: pretty;
+}
+@media (min-width: 901px) {
+  .chronicle-session-summary p,
+  .hero-summary p { text-align: justify; }
+}
+.chronicle-session-summary p.scene-break,
+.hero-summary p.scene-break {
+  text-align: center; letter-spacing: 0.6em; color: var(--brass-dim);
+  margin-block: 1.4em;
+}
 
 @media (max-width: 900px) {
   .hero { grid-template-columns: 1fr; gap: 28px; }
