@@ -403,5 +403,10 @@
     "name": "Kolate",
     "epithet": "who corrupted the Heart of the Wild, and fell to the party in the heart chamber beneath the Forsaken Tree, his trident-pierced hands mid-spell",
     "circle": "enemy"
+  },
+  {
+    "name": "Asharra",
+    "epithet": "red-feathered aarakocra who met the company at the foot of Kir Sabal, and named Grieg a known thief and liar",
+    "circle": null
   }
 ]

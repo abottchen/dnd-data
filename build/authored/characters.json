@@ -61,17 +61,17 @@
     "epithet": "of the Tabaxi, who lets the bowstring do all her speaking",
     "reliquary_header": "Felled before they drew near",
     "constellation_epithet": "ever at the hunt, the soft-pawed shot",
-    "distinction_title": "The Widest Swing",
+    "distinction_title": "The Hot and Cold Hand",
     "distinction_subtitle": "whose dice run as hot and as cold as any hand at the table",
-    "distinction_detail": "No d20 in the company swings wider &middot; <b>23</b> crit successes beside <b>25</b> crit fails",
+    "distinction_detail": "<b>24</b> crit successes beside <b>25</b> crit fails",
     "archetype_badge": {
       "archetype": "naturalist",
       "inscription": "A sprig of mistletoe rides on her belt, tied with ribbon, and she reads the trail through it long before she lets an arrow fly."
     },
     "distinction_basis": {
       "kind": "mechanical",
-      "atom": "is_party_swingiest",
-      "value": true
+      "atom": "crits",
+      "value": 24
     },
     "sworn_creed": "she crossed once into the feywild, and it never fully let her walk back out"
   },
@@ -93,5 +93,22 @@
       "archetype": "pack-mule",
       "inscription": "A 25-pound hunting trap waits in Grieg's pack for the day a beast needs catching instead of killing, one more weight a beast hunter carries just in case."
     }
+  },
+  {
+    "id": "gerogre",
+    "epithet": "of the Gnarlborn, raised to fight the rot that infests this land",
+    "reliquary_header": "Taken down at the root",
+    "constellation_epithet": "rolls yet unwritten",
+    "distinction_title": "The Longest Sleep",
+    "distinction_subtitle": "Rooted in one tree for a century before joining the company",
+    "distinction_detail": "<b>~100</b> years rooted &middot; no kills yet",
+    "distinction_basis": {
+      "kind": "narrative",
+      "sessions": [
+        34
+      ],
+      "note": "Rooted in a tree about a hundred years before joining"
+    },
+    "sworn_creed": "joined in body to a living partner, and the two take the rot's measure as one"
   }
 ]

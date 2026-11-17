@@ -141,14 +141,16 @@ main, header, nav, article, section, aside, footer {
   flex-wrap: wrap;
 }
 
+/* Ten tabs share one row. Spacing, portrait and type scale with the
+   viewport so the row holds from ~1280px up; narrower screens wrap. */
 .tab {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 12px 22px 14px;
+  gap: clamp(7px, 0.55vw, 12px);
+  padding: 12px clamp(13px, 0.9vw, 20px) 14px;
   font-family: 'Cormorant Garamond', serif;
   font-weight: 500;
-  font-size: 19px;
+  font-size: clamp(16px, 1.2vw, 19px);
   color: var(--paper);
   text-decoration: none;
   background: linear-gradient(180deg, rgba(232,220,195,0.10) 0%, rgba(232,220,195,0.04) 100%);
@@ -190,8 +192,8 @@ main, header, nav, article, section, aside, footer {
 }
 
 .tab img {
-  width: 30px;
-  height: 30px;
+  width: clamp(24px, 1.9vw, 30px);
+  height: clamp(24px, 1.9vw, 30px);
   border-radius: 50%;
   object-fit: cover;
   opacity: 0.6;
@@ -3216,7 +3218,7 @@ img.chronicle-session-pip:focus-visible {
    ───────────────────────────────────────────────────────────────── */
 .tab-glyph {
   width: 26px; height: 26px; border-radius: 50%; border: 1px solid var(--rule-strong);
-  display: inline-flex; align-items: center; justify-content: center; margin-right: 8px;
+  display: inline-flex; align-items: center; justify-content: center;
   color: var(--brass); flex: 0 0 auto;
 }
 .tab.chronicle-tab.active .tab-glyph, .tab.chronicle-tab:hover .tab-glyph { color: var(--brass-hi); border-color: var(--brass); }

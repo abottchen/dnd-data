@@ -3,7 +3,7 @@
   "page_subtitle": "A ledger of those who walk &middot; and those they have laid down",
   "intro_epithet": "Five travellers and a storyteller, bound to a doomed road",
   "footnote": "The names above are the names given &middot; the ones who fell were given no names",
-  "refreshed_through_session": 33,
+  "refreshed_through_session": 34,
   "road_ahead": {
     "known": [
       {
@@ -45,7 +45,7 @@
         "gloss": "pried from the Forsaken Tree once Kolate fell and handed to Xhosala for purifying, though Wickles may have swallowed whatever lived inside it."
       }
     ],
-    "direction": "With the Heart carried out of the Forsaken Tree and Chumble gone north beside Artus, the rest of the company marches southwest for the bridge at Ataaz Muhahah on the way to Kir Sabal, and undead are closing in from the south."
+    "direction": "With Gerogre walking beside them, the company has crossed the gorge at Ataaz Muhahah and climbed to Kir Sabal to ask Asharra for a road to Omu, and she meets them by naming Grieg a known thief and liar."
   },
   "gm": {
     "name": "The Dungeon Master",
@@ -133,7 +133,8 @@
     "Wren",
     "Josok",
     "Zamisi",
-    "Kolate"
+    "Kolate",
+    "Asharra"
   ],
   "not_npcs": [
     {
