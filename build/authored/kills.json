@@ -958,5 +958,45 @@
     "method": "Longbow",
     "verse": "A zombie guard in the root-walled dark, undone at range",
     "annotation": "Longbow &middot; the first arrow wide, the second took it apart"
+  },
+  {
+    "character": "grieg",
+    "date": "2026-11-15",
+    "creature": "Zombie",
+    "method": "Trident",
+    "verse": "A zombie that reached the line and got no further",
+    "annotation": "Trident &middot; the horde closed in, and none of it touched him"
+  },
+  {
+    "character": "vex",
+    "date": "2026-11-15",
+    "creature": "Zombie",
+    "method": "Longbow",
+    "verse": "A zombie dropped mid-shamble, still leaning toward the camp",
+    "annotation": "Longbow &middot; an arrow from a distance the dead could not cross"
+  },
+  {
+    "character": "vex",
+    "date": "2026-11-15",
+    "creature": "Zombie",
+    "method": "Scimitar",
+    "verse": "A zombie cut down where the arrows had run out",
+    "annotation": "Scimitar &middot; close work after the bow, and no blow came back"
+  },
+  {
+    "character": "urida",
+    "date": "2026-11-15",
+    "creature": "Zombie",
+    "method": "Fireball",
+    "verse": "A zombie among many, gone to ash in one bright breath",
+    "annotation": "Fireball &middot; the whole press of the horde burned together"
+  },
+  {
+    "character": "lilac",
+    "date": "2026-11-15",
+    "creature": "Zombie",
+    "method": "Longbow",
+    "verse": "A zombie felled before it learned her name",
+    "annotation": "Longbow &middot; patient shots, and the horde thinned by her hand"
   }
 ]
