@@ -336,6 +336,33 @@ def test_refresh_npcs_rewrite_rejects_unknown_circle_key():
     assert authored["npcs"][0] == {"name": "Shago", "epithet": "e", "circle": "guides"}
 
 
+def test_refresh_npcs_keeps_circle_newer_than_its_slice():
+    """The discovery pass can create a circle and file an NPC in it in the
+    same build that refreshes that NPC. The refresh slice was frozen before
+    the circle existed, so its verdict on circle can't weigh it: the epithet
+    lands, the newer filing stands."""
+    authored = {"npcs": [{"name": "Asharra", "epithet": "e", "circle": "kir-sabal"}],
+                "site": {"circles": _REGISTRY + [{"key": "kir-sabal", "title": "Kir Sabal"}]}}
+    slice_data = {"name": "Asharra", "mentions": [], "circles": _REGISTRY,
+                  "existing": {"epithet": "e", "circle": None}}
+    for circle in (None, "guides"):
+        output = {"decision": "rewrite", "reason": "r",
+                  "fields": {"epithet": "e2", "circle": circle}}
+        apply.apply_refresh_npcs(authored, "Asharra", slice_data, output)
+        assert authored["npcs"][0] == {"name": "Asharra", "epithet": "e2", "circle": "kir-sabal"}
+
+
+def test_refresh_npcs_moves_npc_out_of_circle_its_slice_saw():
+    authored = {"npcs": [{"name": "Shago", "epithet": "e", "circle": "guides"}],
+                "site": {"circles": _REGISTRY}}
+    slice_data = {"name": "Shago", "mentions": [], "circles": _REGISTRY,
+                  "existing": {"epithet": "e", "circle": "guides"}}
+    output = {"decision": "rewrite", "reason": "left the guides",
+              "fields": {"epithet": "e2", "circle": None}}
+    apply.apply_refresh_npcs(authored, "Shago", slice_data, output)
+    assert authored["npcs"][0]["circle"] is None
+
+
 def test_refresh_npcs_no_change_leaves_circle():
     authored = {"npcs": [{"name": "Shago", "epithet": "e", "circle": "guides"}],
                 "site": {"circles": _REGISTRY}}
