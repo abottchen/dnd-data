@@ -406,7 +406,17 @@
   },
   {
     "name": "Asharra",
-    "epithet": "red-feathered aarakocra who met the company at the foot of Kir Sabal, and named Grieg a known thief and liar",
-    "circle": null
+    "epithet": "whom the aarakocra of Kir Sabal call Teacher, who accused Grieg of theft and then offered the company ten days of flight for a black orchid from Nangalore",
+    "circle": "kir-sabal"
+  },
+  {
+    "name": "Princess Mwaxanaré",
+    "epithet": "heir to the throne of Omu, sheltered in the monastery of Kir Sabal, who asked the company to bring her the Skull Chalice of Ch'gakare",
+    "circle": "kir-sabal"
+  },
+  {
+    "name": "Na",
+    "epithet": "younger brother of Princess Mwaxanaré and heir to the throne of Omu, who wears homemade aarakocra wings and sends paper gliders out over the jungle of Kir Sabal",
+    "circle": "kir-sabal"
   }
 ]
