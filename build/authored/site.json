@@ -3,7 +3,7 @@
   "page_subtitle": "A ledger of those who walk &middot; and those they have laid down",
   "intro_epithet": "Five travellers and a storyteller, bound to a doomed road",
   "footnote": "The names above are the names given &middot; the ones who fell were given no names",
-  "refreshed_through_session": 34,
+  "refreshed_through_session": 35,
   "road_ahead": {
     "known": [
       {
@@ -45,7 +45,7 @@
         "gloss": "pried from the Forsaken Tree once Kolate fell and handed to Xhosala for purifying, though Wickles may have swallowed whatever lived inside it."
       }
     ],
-    "direction": "With Gerogre walking beside them, the company has crossed the gorge at Ataaz Muhahah and climbed to Kir Sabal to ask Asharra for a road to Omu, and she meets them by naming Grieg a known thief and liar."
+    "direction": "Asharra can give the company ten days of flight to reach Omu if they bring her a black orchid, so they have gone south by river to the drowned royal gardens of Nangalore, where crane monstrosities keep the only one she knows of."
   },
   "gm": {
     "name": "The Dungeon Master",
@@ -134,7 +134,9 @@
     "Josok",
     "Zamisi",
     "Kolate",
-    "Asharra"
+    "Asharra",
+    "Princess Mwaxanaré",
+    "Na"
   ],
   "not_npcs": [
     {
@@ -221,6 +223,10 @@
     {
       "key": "obanashi",
       "title": "The Obanashi"
+    },
+    {
+      "key": "kir-sabal",
+      "title": "Kir Sabal"
     }
   ],
   "ascent_read": "Legends forged mostly by steel, but the road and its riddles have left their mark on every hard-won mile.",

@@ -145,10 +145,17 @@ def apply_refresh_npcs(authored: dict, key, slice_data: dict, output: dict) -> N
         return
     fields = output["fields"] or {}
     name = key
+    seen = {c.get("key") for c in slice_data.get("circles") or [] if isinstance(c, dict)}
     for n in authored["npcs"]:
         if n["name"] == name:
             # Resolve before touching the entry so a bad key leaves it intact.
             circle = _resolve_circle(authored, fields.get("circle"))
+            # A circle the slice's registry lacks was created (and the NPC
+            # filed in it) by this build's discovery pass, after the slice
+            # was frozen. The transformer never saw it, so its circle verdict
+            # can't override it.
+            if "circles" in slice_data and n.get("circle") and n["circle"] not in seen:
+                circle = n["circle"]
             n["epithet"] = fields["epithet"]
             n["circle"] = circle
             return
